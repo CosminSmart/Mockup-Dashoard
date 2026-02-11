@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Dashboard</title>
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="layout">
+        <header class="header">
+            <h1>Client Dashboard</h1>
+            <div class="user-info">
+                <span>John Client</span>
+                <div class="user-avatar">JC</div>
+            </div>
+        </header>
+        
+        <aside class="sidebar">
+            <h2>Client Portal</h2>
+            <nav>
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="finance.html">Finance</a>
+                <a href="orders.html">Orders</a>
+                <a href="profile.html">Profile</a>
+            </nav>
+        </aside>
+        
+        <main class="main">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Active Orders</h3>
+                    <div class="card-value">12</div>
+                    <div class="card-label">Current orders</div>
+                </div>
+                <div class="card">
+                    <h3>Total Spent</h3>
+                    <div class="card-value">$5,420</div>
+                    <div class="card-label">This month</div>
+                </div>
+                <div class="card">
+                    <h3>Pending Invoices</h3>
+                    <div class="card-value">3</div>
+                    <div class="card-label">Awaiting payment</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h2>Recent Activity</h2>
+                <p>Your recent orders and transactions will appear here.</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

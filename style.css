@@ -11,29 +11,67 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 2rem;
 }
 
 .container {
     text-align: center;
-    padding: 2rem;
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 900px;
+    width: 100%;
 }
 
 h1 {
-    color: #333;
+    color: white;
     font-size: 3rem;
-    animation: fadeIn 1s ease-in;
+    margin-bottom: 1rem;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+p {
+    color: white;
+    font-size: 1.2rem;
+    margin-bottom: 3rem;
+}
+
+.role-links {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.role-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #333;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.role-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
+.role-card h2 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.role-card.client h2 {
+    color: #3498db;
+}
+
+.role-card.admin h2 {
+    color: #e74c3c;
+}
+
+.role-card.employee h2 {
+    color: #2ecc71;
+}
+
+.role-card p {
+    color: #7f8c8d;
+    font-size: 1rem;
+    margin: 0;
 }

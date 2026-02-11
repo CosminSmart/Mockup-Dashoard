@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <div class="layout">
+        <header class="header">
+            <h1>Employee Dashboard</h1>
+            <div class="user-info">
+                <span>Jane Employee</span>
+                <div class="user-avatar">JE</div>
+            </div>
+        </header>
+        
+        <aside class="sidebar">
+            <h2>Employee Portal</h2>
+            <nav>
+                <a href="dashboard.html" class="active">Dashboard</a>
+                <a href="tasks.html">Tasks</a>
+                <a href="schedule.html">Schedule</a>
+                <a href="timesheet.html">Timesheet</a>
+            </nav>
+        </aside>
+        
+        <main class="main">
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>Active Tasks</h3>
+                    <div class="card-value">8</div>
+                    <div class="card-label">Assigned to you</div>
+                </div>
+                <div class="card">
+                    <h3>Hours This Week</h3>
+                    <div class="card-value">32</div>
+                    <div class="card-label">Out of 40</div>
+                </div>
+                <div class="card">
+                    <h3>Completed</h3>
+                    <div class="card-value">24</div>
+                    <div class="card-label">This month</div>
+                </div>
+            </div>
+            
+            <div class="content-section">
+                <h2>Today's Schedule</h2>
+                <p>Your tasks and meetings for today.</p>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
