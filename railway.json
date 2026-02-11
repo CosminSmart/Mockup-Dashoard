@@ -1,0 +1,9 @@
+{
+  "$schema": "https://railway.app/static-config-schema.json",
+  "build": {
+    "strategy": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "npx serve -l $PORT"
+  }
+}
