@@ -1,592 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace - Client</title>
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
-    <style>
-        .marketplace-header {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .marketplace-header-content h2 {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .marketplace-header-content p {
-            color: #7f8c8d;
-            font-size: 0.95rem;
-        }
-
-        .btn-request-offer {
-            padding: 0.75rem 1.5rem;
-            background: #9b59b6;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-request-offer:hover {
-            background: #8e44ad;
-        }
-
-        .packages-list {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .packages-list h2 {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: #2c3e50;
-        }
-
-        .packages-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .package-card {
-            background: #fafafa;
-            border: 1px solid #e5e5e5;
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .package-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .package-card.out-of-stock {
-            opacity: 0.7;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        .status-badge.in-stock {
-            background: #d4f4dd;
-            color: #0d7a2c;
-        }
-
-        .status-badge.high-demand {
-            background: #fff4e6;
-            color: #e67700;
-        }
-
-        .status-badge.out-of-stock {
-            background: #e8e8e8;
-            color: #666;
-        }
-
-        .package-icon {
-            width: 48px;
-            height: 48px;
-            background: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            font-size: 24px;
-        }
-
-        .package-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 4px;
-        }
-
-        .package-subtitle {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 12px;
-        }
-
-        .package-details {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .package-details strong {
-            color: #1a1a1a;
-        }
-
-        .package-price {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin: 12px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .price-original {
-            text-decoration: line-through;
-            color: #999;
-            font-size: 16px;
-        }
-
-        .price-discounted {
-            color: #e74c3c;
-        }
-
-        .discount-badge {
-            background: #e74c3c;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .package-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 12px;
-            flex: 1;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-        }
-
-        .btn-view {
-            background: #3498db;
-            color: white;
-        }
-
-        .btn-view:hover {
-            background: #2980b9;
-        }
-
-        .btn-request {
-            background: #9b59b6;
-            color: white;
-        }
-
-        .btn-request:hover {
-            background: #8e44ad;
-        }
-
-        /* Side Panel */
-        .side-panel {
-            position: fixed;
-            top: 0;
-            right: -600px;
-            width: 600px;
-            height: 100vh;
-            background: white;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
-            transition: right 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .side-panel.open {
-            right: 0;
-        }
-
-        .side-panel-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            z-index: 999;
-        }
-
-        .side-panel-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .side-panel-header {
-            padding: 24px;
-            border-bottom: 1px solid #e5e5e5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-        }
-
-        .side-panel-header h2 {
-            font-size: 20px;
-            color: #1a1a1a;
-        }
-
-        .close-panel {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-            padding: 4px 8px;
-            line-height: 1;
-        }
-
-        .close-panel:hover {
-            color: #1a1a1a;
-        }
-
-        .side-panel-content {
-            padding: 24px;
-        }
-
-        .package-preview {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 24px;
-            color: white;
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .package-preview .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .package-preview .name {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .package-preview .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 16px;
-        }
-
-        .package-preview .price {
-            font-size: 32px;
-            font-weight: 700;
-        }
-
-        .detail-section {
-            margin-bottom: 24px;
-        }
-
-        .detail-section h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .detail-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 16px;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .detail-value {
-            font-size: 14px;
-            color: #1a1a1a;
-            font-weight: 500;
-            text-align: right;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .badge.success {
-            background: #d4f4dd;
-            color: #0d7a2c;
-        }
-
-        .badge.warning {
-            background: #fff4e6;
-            color: #e67700;
-        }
-
-        .badge.info {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        /* Request Form */
-        .request-form {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-
-        .request-form h3 {
-            font-size: 16px;
-            color: #2c3e50;
-            margin-bottom: 16px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 6px;
-        }
-
-        .form-group textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-            resize: vertical;
-            min-height: 100px;
-        }
-
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #9b59b6;
-        }
-
-        .btn-submit-request {
-            width: 100%;
-            padding: 12px;
-            background: #9b59b6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-submit-request:hover {
-            background: #8e44ad;
-        }
-
-        .success-message {
-            background: #d4edda;
-            border: 1px solid #c3e6cb;
-            color: #155724;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1rem;
-            display: none;
-        }
-
-        .success-message.show {
-            display: block;
-        }
-
-        /* My Requests Panel Styles */
-        .my-requests-list {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .my-request-item {
-            background: #f8f9fa;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            padding: 16px;
-            transition: all 0.2s;
-        }
-
-        .my-request-item:hover {
-            border-color: #9b59b6;
-            box-shadow: 0 2px 8px rgba(155, 89, 182, 0.1);
-        }
-
-        .my-request-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
-        }
-
-        .my-request-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 4px;
-        }
-
-        .my-request-time {
-            font-size: 12px;
-            color: #95a5a6;
-        }
-
-        .my-request-message {
-            background: white;
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            color: #2c3e50;
-            line-height: 1.5;
-            white-space: pre-wrap;
-        }
-
-        .empty-requests {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: #95a5a6;
-        }
-
-        .empty-requests-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .empty-requests p {
-            font-size: 1rem;
-            margin: 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="layout">
-        <header class="header">
-            <h1>Marketplace</h1>
-            <div class="user-info">
-                <span>John Client</span>
-                <div class="user-avatar">JC</div>
-            </div>
-        </header>
-        
-        <aside class="sidebar">
-            <h2>Client Portal</h2>
-            <nav>
-                <a href="dashboard.html">Dashboard</a>
-                <a href="marketplace.html" class="active">Marketplace</a>
-                <a href="finance.html">Finance</a>
-                <a href="orders.html">Orders</a>
-                <a href="profile.html">Profile</a>
-            </nav>
-        </aside>
-        
-        <main class="main">
-            <div class="success-message" id="successMessage">
-                ✅ Your request has been sent to admin successfully!
-            </div>
-
-            <div class="marketplace-header">
-                <div class="marketplace-header-content">
-                    <h2>🛍️ Marketplace</h2>
-                    <p>Browse available packages and request custom offers</p>
-                </div>
-                <div style="display: flex; gap: 12px;">
-                    <button class="btn-request-offer" onclick="openMyRequestsPanel()" style="background: #3498db;">
-                        📋 My Requests
-                        <span id="myRequestsCount" style="background: white; color: #3498db; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 700; margin-left: 4px;">0</span>
-                    </button>
-                    <button class="btn-request-offer" onclick="openRequestOfferPanel()">
-                        💬 Request Custom Offer
-                    </button>
-                </div>
-            </div>
-
-            <div class="packages-list">
-                <h2>📋 Available Packages</h2>
-                <div class="packages-grid" id="packagesGrid">
-                    <!-- Packages will be rendered here by JavaScript -->
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Side Panel Overlay -->
-    <div class="side-panel-overlay" id="sidePanelOverlay" onclick="closeSidePanel()"></div>
-
-    <!-- Side Panel -->
-    <div class="side-panel" id="sidePanel">
-        <div class="side-panel-header">
-            <h2 id="sidePanelTitle">Package Details</h2>
-            <button class="close-panel" onclick="closeSidePanel()">×</button>
-        </div>
-        
-        <div class="side-panel-content" id="sidePanelContent">
-            <!-- Content will be dynamically loaded here -->
-        </div>
-    </div>
-
-    <!-- JavaScript moved to external file
-    <script>
+﻿
         // Current client ID
         const CURRENT_CLIENT_ID = 'client_001';
 
@@ -665,13 +77,13 @@
             
             if (pkg.stockStatus === 'out-of-stock') {
                 statusBadge = 'out-of-stock';
-                statusText = '○ Out of Stock';
+                statusText = 'â—‹ Out of Stock';
             } else if (pkg.stockStatus === 'high-demand') {
                 statusBadge = 'high-demand';
-                statusText = '⚡ High Demand';
+                statusText = 'âš¡ High Demand';
             } else {
                 statusBadge = 'in-stock';
-                statusText = '● In Stock';
+                statusText = 'â— In Stock';
             }
 
             // Calculate discounted price if discount exists AND client can see it
@@ -806,7 +218,7 @@
                 ` : ''}
 
                 <button class="btn-submit-request" onclick="requestPackage(${pkg.id})">
-                    💬 Request Custom Offer for This Package
+                    ðŸ’¬ Request Custom Offer for This Package
                 </button>
             `;
 
@@ -827,13 +239,13 @@
                 </div>
 
                 <div class="request-form">
-                    <h3>📝 Describe Your Request</h3>
+                    <h3>ðŸ“ Describe Your Request</h3>
                     <div class="form-group">
                         <label for="requestMessage">What would you like to request?</label>
                         <textarea id="requestMessage" placeholder="Example: I'm interested in bulk purchase of 10+ accounts. Can you offer a discount? Or: I need custom spending limits for this package..."></textarea>
                     </div>
                     <button class="btn-submit-request" onclick="submitRequest(${pkg.id})">
-                        📤 Send Request to Admin
+                        ðŸ“¤ Send Request to Admin
                     </button>
                 </div>
             `;
@@ -847,7 +259,7 @@
             
             const content = `
                 <div class="request-form">
-                    <h3>📝 General Request</h3>
+                    <h3>ðŸ“ General Request</h3>
                     <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 16px;">
                         Describe what you're looking for and our team will get back to you with a custom offer.
                     </p>
@@ -856,7 +268,7 @@
                         <textarea id="generalRequestMessage" placeholder="Example: I need a custom package for TikTok Ads with higher spending limits. Can we discuss pricing? Or: Looking for bulk purchase of Facebook BM accounts..."></textarea>
                     </div>
                     <button class="btn-submit-request" onclick="submitGeneralRequest()">
-                        📤 Send Request to Admin
+                        ðŸ“¤ Send Request to Admin
                     </button>
                 </div>
             `;
@@ -968,7 +380,7 @@
             if (myRequests.length === 0) {
                 content = `
                     <div class="empty-requests">
-                        <div class="empty-requests-icon">📋</div>
+                        <div class="empty-requests-icon">ðŸ“‹</div>
                         <p>You haven't sent any requests yet</p>
                     </div>
                 `;
@@ -1004,7 +416,4 @@
             document.getElementById('sidePanelContent').innerHTML = content;
             openSidePanel();
         }
-    </script> -->
-    <script src="../js/client-marketplace.js"></script>
-</body>
-</html>
+    

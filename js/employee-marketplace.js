@@ -1,794 +1,12 @@
-﻿<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace Management - Admin</title>
-    <link rel="stylesheet" href="../css/layout.css">
-    <link rel="stylesheet" href="../css/dashboard.css">
-    <style>
-        .page-header {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .page-header-content h2 {
-            font-size: 1.8rem;
-            color: #2c3e50;
-            margin-bottom: 0.5rem;
-        }
-
-        .page-header-content p {
-            color: #7f8c8d;
-            font-size: 0.95rem;
-        }
-
-        .btn-add-package {
-            padding: 0.75rem 1.5rem;
-            background: #3498db;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .btn-add-package:hover {
-            background: #2980b9;
-        }
-
-        .packages-list {
-            background: white;
-            padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .packages-list h2 {
-            font-size: 1.3rem;
-            margin-bottom: 1.5rem;
-            color: #2c3e50;
-        }
-
-        .packages-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .package-card {
-            background: #fafafa;
-            border: 1px solid #e5e5e5;
-            border-radius: 12px;
-            padding: 20px;
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-
-        .package-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .package-card.out-of-stock {
-            opacity: 0.7;
-        }
-
-        .status-badge {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-
-        .status-badge.in-stock {
-            background: #d4f4dd;
-            color: #0d7a2c;
-        }
-
-        .status-badge.high-demand {
-            background: #fff4e6;
-            color: #e67700;
-        }
-
-        .status-badge.out-of-stock {
-            background: #e8e8e8;
-            color: #666;
-        }
-
-        .package-icon {
-            width: 48px;
-            height: 48px;
-            background: white;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            font-size: 24px;
-        }
-
-        .package-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin-bottom: 4px;
-        }
-
-        .package-subtitle {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 12px;
-        }
-
-        .package-details {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 8px;
-        }
-
-        .package-details strong {
-            color: #1a1a1a;
-        }
-
-        .package-price {
-            font-size: 20px;
-            font-weight: 600;
-            color: #1a1a1a;
-            margin: 12px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .price-original {
-            text-decoration: line-through;
-            color: #999;
-            font-size: 16px;
-        }
-
-        .price-discounted {
-            color: #e74c3c;
-        }
-
-        .discount-badge {
-            background: #e74c3c;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-
-        .package-actions {
-            display: flex;
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .btn-small {
-            padding: 8px 16px;
-            font-size: 12px;
-            flex: 1;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-edit {
-            background: #3498db;
-            color: white;
-        }
-
-        .btn-edit:hover {
-            background: #2980b9;
-        }
-
-        .btn-delete {
-            background: #e74c3c;
-            color: white;
-        }
-
-        .btn-delete:hover {
-            background: #c0392b;
-        }
-
-        /* Side Panel */
-        .side-panel {
-            position: fixed;
-            top: 0;
-            right: -500px;
-            width: 500px;
-            height: 100vh;
-            background: white;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
-            transition: right 0.3s ease;
-            z-index: 1000;
-            overflow-y: auto;
-        }
-
-        .side-panel.open {
-            right: 0;
-        }
-
-        .side-panel-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            z-index: 999;
-        }
-
-        .side-panel-overlay.open {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .side-panel-header {
-            padding: 24px;
-            border-bottom: 1px solid #e5e5e5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-        }
-
-        .side-panel-header h2 {
-            font-size: 20px;
-            color: #1a1a1a;
-        }
-
-        .close-panel {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-            padding: 4px 8px;
-            line-height: 1;
-        }
-
-        .close-panel:hover {
-            color: #1a1a1a;
-        }
-
-        .side-panel-content {
-            padding: 24px;
-        }
-
-        .side-panel-actions {
-            display: flex;
-            gap: 12px;
-            padding: 20px 24px;
-            border-top: 1px solid #e5e5e5;
-            position: sticky;
-            bottom: 0;
-            background: white;
-        }
-
-        .side-panel-actions .btn {
-            flex: 1;
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 16px;
-        }
-
-        .form-group label {
-            font-size: 13px;
-            font-weight: 500;
-            color: #333;
-            margin-bottom: 6px;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 10px 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            font-family: inherit;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #3498db;
-        }
-
-        .form-group textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-
-        .discount-section {
-            background: #fff9e6;
-            border: 1px dashed #ffc107;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 16px;
-        }
-
-        .discount-section h4 {
-            font-size: 14px;
-            color: #f57c00;
-            margin-bottom: 12px;
-        }
-
-        .discount-type-selector {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .discount-type-selector label {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            font-size: 13px;
-        }
-
-        .discount-inputs {
-            display: flex;
-            gap: 12px;
-            align-items: flex-end;
-        }
-
-        .discount-inputs .form-group {
-            flex: 1;
-            margin-bottom: 0;
-        }
-
-        .btn-clear-discount {
-            padding: 10px 16px;
-            background: #f5f5f5;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            white-space: nowrap;
-        }
-
-        .btn-clear-discount:hover {
-            background: #e5e5e5;
-        }
-
-        .package-preview {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 24px;
-            color: white;
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .package-preview .icon {
-            font-size: 48px;
-            margin-bottom: 12px;
-        }
-
-        .package-preview .name {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 8px;
-        }
-
-        .package-preview .subtitle {
-            font-size: 14px;
-            opacity: 0.9;
-            margin-bottom: 16px;
-        }
-
-        .package-preview .price {
-            font-size: 32px;
-            font-weight: 700;
-        }
-
-        .detail-section {
-            margin-bottom: 24px;
-        }
-
-        .detail-section h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 12px;
-        }
-
-        .detail-card {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 16px;
-        }
-
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .detail-row:last-child {
-            border-bottom: none;
-        }
-
-        .detail-label {
-            font-size: 13px;
-            color: #666;
-            font-weight: 500;
-        }
-
-        .detail-value {
-            font-size: 14px;
-            color: #1a1a1a;
-            font-weight: 500;
-            text-align: right;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .badge.success {
-            background: #d4f4dd;
-            color: #0d7a2c;
-        }
-
-        .badge.warning {
-            background: #fff4e6;
-            color: #e67700;
-        }
-
-        .badge.info {
-            background: #e3f2fd;
-            color: #1976d2;
-        }
-
-        /* Floating Requests Button */
-        .floating-requests-btn {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            width: 60px;
-            height: 60px;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            font-size: 1.5rem;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(231, 76, 60, 0.4);
-            transition: all 0.3s;
-            z-index: 998;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .floating-requests-btn:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 16px rgba(231, 76, 60, 0.5);
-        }
-
-        .requests-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #fff;
-            color: #e74c3c;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 700;
-            border: 2px solid #e74c3c;
-        }
-
-        /* Requests Panel Styles */
-        .requests-panel {
-            position: fixed;
-            top: 0;
-            right: -600px;
-            width: 600px;
-            height: 100vh;
-            background: white;
-            box-shadow: -4px 0 20px rgba(0,0,0,0.15);
-            transition: right 0.3s ease;
-            z-index: 1001;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .requests-panel.open {
-            right: 0;
-        }
-
-        .requests-panel-header {
-            padding: 24px;
-            border-bottom: 1px solid #e5e5e5;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            background: white;
-            z-index: 10;
-        }
-
-        .requests-panel-header h2 {
-            font-size: 1.5rem;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .request-item {
-            background: #f8f9fa;
-            border: 1px solid #e5e5e5;
-            border-radius: 8px;
-            padding: 1.25rem;
-            margin-bottom: 1rem;
-            transition: all 0.2s;
-        }
-
-        .request-item:hover {
-            border-color: #3498db;
-            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
-        }
-
-        .request-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .request-user {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .request-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: #3498db;
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .request-user-info h4 {
-            font-size: 1rem;
-            color: #2c3e50;
-            margin-bottom: 0.25rem;
-        }
-
-        .request-user-info p {
-            font-size: 0.875rem;
-            color: #7f8c8d;
-            margin: 0;
-        }
-
-        .request-time {
-            font-size: 0.75rem;
-            color: #95a5a6;
-        }
-
-        .request-message {
-            background: white;
-            padding: 1rem;
-            border-radius: 6px;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: #2c3e50;
-            line-height: 1.5;
-        }
-
-        .request-actions {
-            display: flex;
-            gap: 0.75rem;
-        }
-
-        .btn-approve {
-            flex: 1;
-            padding: 0.75rem;
-            background: #27ae60;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-approve:hover {
-            background: #229954;
-        }
-
-        .btn-deny {
-            flex: 1;
-            padding: 0.75rem;
-            background: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .btn-deny:hover {
-            background: #c0392b;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            color: #95a5a6;
-        }
-
-        .empty-state-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        .empty-state p {
-            font-size: 1rem;
-            margin: 0;
-        }
-    </style>
-</head>
-<body>
-    <div class="layout">
-        <header class="header">
-            <h1>Marketplace Management</h1>
-            <div class="user-info">
-                <span>Admin User</span>
-                <div class="user-avatar">AU</div>
-            </div>
-        </header>
-        
-        <aside class="sidebar">
-            <h2>Admin Panel</h2>
-            <nav>
-                <a href="dashboard.html">Dashboard</a>
-                <a href="users.html">Users</a>
-                <a href="marketplace.html" class="active">Marketplace</a>
-            </nav>
-        </aside>
-        
-        <main class="main">
-            <div class="page-header">
-                <div class="page-header-content">
-                    <h2>📦 Marketplace Management</h2>
-                    <p>Add and manage packages available in marketplace</p>
-                </div>
-                <button class="btn-add-package" onclick="openAddPackagePanel()">
-                    <span>➕</span>
-                    <span>Add New Package</span>
-                </button>
-            </div>
-
-            <div class="packages-list">
-                <h2>📋 Existing Packages</h2>
-                <div class="packages-grid" id="packagesGrid">
-                    <!-- Packages will be rendered here by JavaScript -->
-                </div>
-            </div>
-        </main>
-    </div>
-
-    <!-- Floating Requests Button -->
-    <button class="floating-requests-btn" onclick="openRequestsPanel()">
-        🔔
-        <span class="requests-badge" id="totalRequestsBadge">0</span>
-    </button>
-
-    <!-- Requests Panel -->
-    <div class="requests-panel" id="requestsPanel">
-        <div class="requests-panel-header">
-            <h2>🔔 Client Requests</h2>
-            <button class="close-panel" onclick="closeRequestsPanel()">×</button>
-        </div>
-
-        <div class="tab-content active" id="clientsTab" style="padding: 24px;">
-            <div id="clientRequestsList">
-                <!-- Client requests will be rendered here -->
-            </div>
-        </div>
-    </div>
-
-    <!-- Side Panel Overlay -->
-    <div class="side-panel-overlay" id="sidePanelOverlay" onclick="closeSidePanel()"></div>
-
-    <!-- Side Panel -->
-    <div class="side-panel" id="sidePanel">
-        <div class="side-panel-header">
-            <h2 id="sidePanelTitle">Package Details</h2>
-            <button class="close-panel" onclick="closeSidePanel()">×</button>
-        </div>
-        
-        <div class="side-panel-content" id="sidePanelContent">
-            <!-- Content will be dynamically loaded here -->
-        </div>
-
-        <div class="side-panel-actions" id="sidePanelActions">
-            <!-- Actions will be dynamically loaded here -->
-        </div>
-    </div>
-
-    <!-- JavaScript moved to external file
-    <script>
+﻿
         // Mock data storage with initial packages
         let packages = [
             {
                 id: 1,
                 type: 'profile',
                 name: 'Personal Profile (Verified)',
-                icon: '👤',
-                subtitle: 'Meta • WORLDWIDE',
+                icon: 'ðŸ‘¤',
+                subtitle: 'Meta â€¢ WORLDWIDE',
                 price: '10',
                 region: 'Worldwide',
                 status: 'Verified',
@@ -804,8 +22,8 @@
                 id: 2,
                 type: 'facebook',
                 name: 'Facebook Account + BM',
-                icon: '∞',
-                subtitle: '3 Ad Acc • $250 Limit',
+                icon: 'âˆž',
+                subtitle: '3 Ad Acc â€¢ $250 Limit',
                 price: '120',
                 region: 'Worldwide',
                 status: 'Verified',
@@ -821,7 +39,7 @@
                 id: 3,
                 type: 'tiktok',
                 name: 'Premium TikTok Ads',
-                icon: '🎵',
+                icon: 'ðŸŽµ',
                 subtitle: 'No Spending Limits',
                 price: '250',
                 region: 'Worldwide',
@@ -889,8 +107,8 @@
                 id: 7,
                 type: 'taboola',
                 name: 'Taboola Farmed WV',
-                icon: '📢',
-                subtitle: 'Any GEO • TAG №218',
+                icon: 'ðŸ“¢',
+                subtitle: 'Any GEO â€¢ TAG â„–218',
                 price: '500',
                 region: 'Worldwide',
                 status: '',
@@ -908,131 +126,6 @@
         let viewingPackageId = null;
         let isEditMode = false;
 
-        // Client requests storage
-        let clientRequests = [];
-
-        // Check for requests from localStorage
-        function loadRequests() {
-            const storedClient = localStorage.getItem('marketplaceClientRequests');
-            
-            if (storedClient) {
-                clientRequests = JSON.parse(storedClient);
-            }
-            
-            renderRequests();
-            updateRequestsBadges();
-        }
-
-        function saveRequests() {
-            localStorage.setItem('marketplaceClientRequests', JSON.stringify(clientRequests));
-        }
-
-        function updateRequestsBadges() {
-            const totalRequests = clientRequests.length;
-            document.getElementById('totalRequestsBadge').textContent = totalRequests;
-            
-            // Hide badge if no requests
-            if (totalRequests === 0) {
-                document.getElementById('totalRequestsBadge').style.display = 'none';
-            } else {
-                document.getElementById('totalRequestsBadge').style.display = 'flex';
-            }
-        }
-
-        function renderRequests() {
-            renderClientRequests();
-        }
-
-        function renderClientRequests() {
-            const container = document.getElementById('clientRequestsList');
-            
-            if (clientRequests.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">💼</div>
-                        <p>No client requests or offers</p>
-                    </div>
-                `;
-                return;
-            }
-
-            container.innerHTML = clientRequests.map(request => `
-                <div class="request-item">
-                    <div class="request-header">
-                        <div class="request-user">
-                            <div class="request-avatar" style="background: #9b59b6;">${request.initials}</div>
-                            <div class="request-user-info">
-                                <h4>${request.name}</h4>
-                                <p>${request.company || 'Client'} ${request.email ? '• ' + request.email : ''}</p>
-                            </div>
-                        </div>
-                        <span class="request-time">${request.timeAgo}</span>
-                    </div>
-                    <div class="request-message">
-                        ${request.message}
-                    </div>
-                    <div class="request-actions">
-                        <button class="btn-approve" onclick="contactClient('${request.email || ''}', '${request.phone || ''}')">
-                            📧 Contact Client
-                        </button>
-                        <button class="btn-deny" onclick="dismissClientRequest(${request.id})">
-                            ✕ Dismiss
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function dismissClientRequest(id) {
-            const request = clientRequests.find(r => r.id === id);
-            if (!request) return;
-
-            if (confirm(`Dismiss request from ${request.name}?`)) {
-                clientRequests = clientRequests.filter(r => r.id !== id);
-                saveRequests();
-                renderRequests();
-                updateRequestsBadges();
-            }
-        }
-
-        function contactClient(email, phone) {
-            // Show contact options
-            let contactOptions = [];
-            
-            if (email) {
-                contactOptions.push(`📧 Email: ${email}`);
-            }
-            if (phone) {
-                contactOptions.push(`📞 Phone: ${phone}`);
-            }
-            
-            if (contactOptions.length === 0) {
-                alert('No contact information available for this client.');
-                return;
-            }
-            
-            const message = `Contact Information:\n\n${contactOptions.join('\n')}\n\nWould you like to open your email client?`;
-            
-            if (email && confirm(message)) {
-                // Open email client
-                window.location.href = `mailto:${email}?subject=Regarding Your Marketplace Request`;
-            } else {
-                alert(contactOptions.join('\n'));
-            }
-        }
-
-        function openRequestsPanel() {
-            document.getElementById('requestsPanel').classList.add('open');
-            document.getElementById('sidePanelOverlay').classList.add('open');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeRequestsPanel() {
-            document.getElementById('requestsPanel').classList.remove('open');
-            document.getElementById('sidePanelOverlay').classList.remove('open');
-            document.body.style.overflow = 'auto';
-        }
-
         // Initialize packages on load
         window.addEventListener('DOMContentLoaded', function() {
             // Load packages from localStorage if available
@@ -1045,10 +138,6 @@
             localStorage.setItem('marketplacePackages', JSON.stringify(packages));
             
             renderAllPackages();
-            loadRequests();
-            
-            // Check for new requests every 5 seconds
-            setInterval(loadRequests, 5000);
         });
 
         function renderAllPackages() {
@@ -1082,29 +171,29 @@
             
             if (pkg.stockStatus === 'out-of-stock') {
                 statusBadge = 'out-of-stock';
-                statusText = '○ Out of Stock';
+                statusText = 'â—‹ Out of Stock';
             } else if (pkg.stockStatus === 'high-demand') {
                 statusBadge = 'high-demand';
-                statusText = '⚡ High Demand';
+                statusText = 'âš¡ High Demand';
             } else {
                 statusBadge = 'in-stock';
-                statusText = '● In Stock';
+                statusText = 'â— In Stock';
             }
 
             // Calculate discounted price if discount exists
             let priceHTML = '';
             if (pkg.discountType && pkg.discountValue > 0) {
                 const discountedPrice = calculateDiscountedPrice(parseFloat(pkg.price), pkg.discountType, parseFloat(pkg.discountValue));
-                const discountLabel = pkg.discountType === 'percentage' ? `${pkg.discountValue}%` : `$${pkg.discountValue}`;
+                const discountLabel = pkg.discountType === 'percentage' ? `${pkg.discountValue}%` : `${pkg.discountValue}`;
                 priceHTML = `
                     <div class="package-price">
-                        <span class="price-original">from $${pkg.price}</span>
-                        <span class="price-discounted">$${discountedPrice.toFixed(2)}</span>
+                        <span class="price-original">from ${pkg.price}</span>
+                        <span class="price-discounted">${discountedPrice.toFixed(2)}</span>
                         <span class="discount-badge">-${discountLabel}</span>
                     </div>
                 `;
             } else {
-                priceHTML = `<div class="package-price">from $${pkg.price}</div>`;
+                priceHTML = `<div class="package-price">from ${pkg.price}</div>`;
             }
             
             card.innerHTML = `
@@ -1133,9 +222,10 @@
 
             if (confirm(`Are you sure you want to delete "${pkg.name}"?`)) {
                 packages = packages.filter(p => p.id !== id);
+                localStorage.setItem('marketplacePackages', JSON.stringify(packages));
                 renderAllPackages();
                 closeSidePanel();
-                alert('✅ Package deleted successfully!');
+                alert('âœ… Package deleted successfully!');
             }
         }
 
@@ -1151,8 +241,8 @@
             setupDiscountToggle('add');
             
             document.getElementById('sidePanelActions').innerHTML = `
-                <button class="btn btn-edit" onclick="saveNewPackage()">💾 Add Package</button>
-                <button class="btn" style="background: #666; color: white;" onclick="closeSidePanel()">✕ Cancel</button>
+                <button class="btn btn-edit" onclick="saveNewPackage()">ðŸ’¾ Add Package</button>
+                <button class="btn" style="background: #666; color: white;" onclick="closeSidePanel()">âœ• Cancel</button>
             `;
 
             openSidePanel();
@@ -1167,14 +257,14 @@
 
             document.getElementById('sidePanelTitle').textContent = 'Package Details';
             
-            let priceHTML = `<div class="price">from $${pkg.price}</div>`;
+            let priceHTML = `<div class="price">from ${pkg.price}</div>`;
             if (pkg.discountType && pkg.discountValue > 0) {
                 const discountedPrice = calculateDiscountedPrice(parseFloat(pkg.price), pkg.discountType, parseFloat(pkg.discountValue));
-                const discountLabel = pkg.discountType === 'percentage' ? `${pkg.discountValue}%` : `$${pkg.discountValue}`;
+                const discountLabel = pkg.discountType === 'percentage' ? `${pkg.discountValue}%` : `${pkg.discountValue}`;
                 priceHTML = `
                     <div class="price" style="display: flex; align-items: center; gap: 8px; justify-content: center;">
-                        <span style="text-decoration: line-through; opacity: 0.6; font-size: 24px;">from $${pkg.price}</span>
-                        <span style="color: #e74c3c; font-size: 32px;">$${discountedPrice.toFixed(2)}</span>
+                        <span style="text-decoration: line-through; opacity: 0.6; font-size: 24px;">from ${pkg.price}</span>
+                        <span style="color: #e74c3c; font-size: 32px;">${discountedPrice.toFixed(2)}</span>
                         <span style="background: #e74c3c; padding: 4px 8px; border-radius: 4px; font-size: 12px;">-${discountLabel}</span>
                     </div>
                 `;
@@ -1222,6 +312,18 @@
                             <span class="detail-label">Discount Value</span>
                             <span class="detail-value"><span class="badge warning">${pkg.discountType === 'percentage' ? pkg.discountValue + '%' : '$' + pkg.discountValue}</span></span>
                         </div>
+                        ${pkg.discountTarget ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Target</span>
+                            <span class="detail-value">${pkg.discountTarget === 'all' ? 'All Clients' : 'Specific Clients'}</span>
+                        </div>
+                        ` : ''}
+                        ${pkg.discountTarget === 'specific' && pkg.specificClients ? `
+                        <div class="detail-row">
+                            <span class="detail-label">Client IDs</span>
+                            <span class="detail-value" style="font-size: 12px;">${pkg.specificClients}</span>
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
                 ` : ''}
@@ -1297,8 +399,8 @@
             document.getElementById('sidePanelContent').innerHTML = content;
             
             document.getElementById('sidePanelActions').innerHTML = `
-                <button class="btn btn-edit" onclick="editPackageInPanel(${id})">✏️ Edit</button>
-                <button class="btn btn-delete" onclick="deletePackage(${id})">🗑️ Delete</button>
+                <button class="btn btn-edit" onclick="editPackageInPanel(${id})">âœï¸ Edit</button>
+                <button class="btn btn-delete" onclick="deletePackage(${id})">ðŸ—‘ï¸ Delete</button>
             `;
 
             openSidePanel();
@@ -1319,8 +421,8 @@
             setupDiscountToggle('edit', pkg);
             
             document.getElementById('sidePanelActions').innerHTML = `
-                <button class="btn btn-edit" onclick="savePackageFromPanel(${id})">💾 Save Changes</button>
-                <button class="btn" style="background: #666; color: white;" onclick="viewPackage(${id})">✕ Cancel</button>
+                <button class="btn btn-edit" onclick="savePackageFromPanel(${id})">ðŸ’¾ Save Changes</button>
+                <button class="btn" style="background: #666; color: white;" onclick="viewPackage(${id})">âœ• Cancel</button>
             `;
 
             openSidePanel();
@@ -1353,7 +455,7 @@
 
                     <div class="form-group">
                         <label for="${prefix}_packageIcon">Icon (emoji or text)</label>
-                        <input type="text" id="${prefix}_packageIcon" value="${pkg?.icon || ''}" placeholder="🎯" maxlength="2">
+                        <input type="text" id="${prefix}_packageIcon" value="${pkg?.icon || ''}" placeholder="ðŸŽ¯" maxlength="2">
                     </div>
 
                     <div class="form-group">
@@ -1421,7 +523,7 @@
                 </div>
 
                 <div class="discount-section">
-                    <h4>💰 Add Discount (Optional)</h4>
+                    <h4>ðŸ’° Add Discount (Optional)</h4>
                     <div class="discount-type-selector">
                         <label>
                             <input type="radio" name="${prefix}_discountType" value="percentage" ${pkg?.discountType === 'percentage' ? 'checked' : ''}>
@@ -1449,7 +551,7 @@
                     </div>
                     
                     <div class="form-group" id="${prefix}_specificClientsGroup" style="display: ${pkg?.discountTarget === 'specific' ? 'block' : 'none'};">
-                        <label for="${prefix}_specificClients">Client IDs (comma separated)</label>
+                        <label for="${prefix}_specificClients">Client IDs (comma-separated)</label>
                         <input type="text" id="${prefix}_specificClients" value="${pkg?.specificClients || ''}" placeholder="e.g. client_001, client_002">
                         <small style="color: #666; font-size: 12px; display: block; margin-top: 4px;">
                             Enter client IDs separated by commas. Only these clients will see the discount.
@@ -1491,7 +593,7 @@
                 id: Date.now(),
                 type: document.getElementById('add_packageType').value,
                 name: document.getElementById('add_packageName').value,
-                icon: document.getElementById('add_packageIcon').value || '📦',
+                icon: document.getElementById('add_packageIcon').value || 'ðŸ“¦',
                 subtitle: document.getElementById('add_packageSubtitle').value,
                 price: document.getElementById('add_packagePrice').value,
                 region: document.getElementById('add_packageRegion').value,
@@ -1516,7 +618,7 @@
             
             renderAllPackages();
             closeSidePanel();
-            alert('✅ Package added successfully!');
+            alert('âœ… Package added successfully!');
         }
 
         function savePackageFromPanel(id) {
@@ -1524,7 +626,7 @@
                 id: id,
                 type: document.getElementById('edit_packageType').value,
                 name: document.getElementById('edit_packageName').value,
-                icon: document.getElementById('edit_packageIcon').value || '📦',
+                icon: document.getElementById('edit_packageIcon').value || 'ðŸ“¦',
                 subtitle: document.getElementById('edit_packageSubtitle').value,
                 price: document.getElementById('edit_packagePrice').value,
                 region: document.getElementById('edit_packageRegion').value,
@@ -1552,7 +654,7 @@
 
             renderAllPackages();
             viewPackage(id);
-            alert('✅ Package updated successfully!');
+            alert('âœ… Package updated successfully!');
         }
 
         function openSidePanel() {
@@ -1568,7 +670,4 @@
             viewingPackageId = null;
             isEditMode = false;
         }
-    </script> -->
-    <script src="../js/admin-marketplace.js"></script>
-</body>
-</html>
+    
