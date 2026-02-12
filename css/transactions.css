@@ -183,3 +183,7 @@
       gap:10px;
     }
     .fin-page{ font-size:12px; opacity:.7; }
+
+    #openAddTransactions{
+        margin-top: 10px;
+    }
