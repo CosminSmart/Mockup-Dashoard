@@ -173,3 +173,65 @@ th {
 .icon-btn:hover {
     opacity: 0.7;
 }
+
+.profiles-section {
+    border-top: 2px solid #eee;
+    padding-top: 1rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.profile-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.profile-tab {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: #f0f0f0;
+    cursor: pointer;
+    border-radius: 4px 4px 0 0;
+    transition: all 0.3s;
+}
+
+.profile-tab:hover {
+    background: #e0e0e0;
+}
+
+.profile-tab.active {
+    background: #3498db;
+    color: white;
+}
+
+.profile-tab-add {
+    padding: 0.5rem 1rem;
+    border: 1px dashed #3498db;
+    background: white;
+    color: #3498db;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.profile-tab-add:hover {
+    background: #f0f8ff;
+}
+
+.profile-content {
+    display: none;
+}
+
+.profile-custom-fields {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+}
+
+.profile-custom-fields h4 {
+    margin-bottom: 0.5rem;
+}
