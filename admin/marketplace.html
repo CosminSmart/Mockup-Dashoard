@@ -729,6 +729,18 @@
 
             <div class="packages-list">
                 <h2>📋 Existing Packages</h2>
+                
+                <!-- Category Filter -->
+                <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center;">
+                    <label style="font-weight: 500; color: #666;">Filter by Category:</label>
+                    <select id="categoryFilter" style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; font-size: 14px;" onchange="filterByCategory()">
+                        <option value="all">All Categories</option>
+                        <option value="ads-account">Ads Account</option>
+                        <option value="service">Service</option>
+                        <option value="assets">Assets</option>
+                    </select>
+                </div>
+                
                 <div class="packages-grid" id="packagesGrid">
                     <!-- Packages will be rendered here by JavaScript -->
                 </div>

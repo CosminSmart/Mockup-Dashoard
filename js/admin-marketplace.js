@@ -190,7 +190,7 @@
                         ${request.message}
                     </div>
                     <div class="request-actions">
-                        <button class="btn-approve" onclick="contactClient('${request.email || ''}', '${request.phone || ''}')">
+                        <button class="btn-approve" onclick="contactClient('${request.email || ''}', '${request.phone || ''}', '${request.telegram || ''}')">
                             📧 Contact Client
                         </button>
                         <button class="btn-deny" onclick="dismissClientRequest(${request.id})">
@@ -213,8 +213,16 @@
             }
         }
 
-        function contactClient(email, phone) {
-            // Show contact options
+        function contactClient(email, phone, telegram) {
+            // Priority: Telegram > Email > Phone
+            if (telegram) {
+                // Remove @ if present and open Telegram
+                const telegramUsername = telegram.replace('@', '');
+                window.open(`https://t.me/${telegramUsername}`, '_blank');
+                return;
+            }
+            
+            // Fallback to email/phone if no Telegram
             let contactOptions = [];
             
             if (email) {
@@ -232,7 +240,6 @@
             const message = `Contact Information:\n\n${contactOptions.join('\n')}\n\nWould you like to open your email client?`;
             
             if (email && confirm(message)) {
-                // Open email client
                 window.location.href = `mailto:${email}?subject=Regarding Your Marketplace Request`;
             } else {
                 alert(contactOptions.join('\n'));
@@ -275,6 +282,39 @@
             packages.forEach(pkg => addPackageToGrid(pkg));
         }
 
+        // Filter packages by category
+        function filterByCategory() {
+            const selectedCategory = document.getElementById('categoryFilter').value;
+            const grid = document.getElementById('packagesGrid');
+            grid.innerHTML = '';
+            
+            const filteredPackages = selectedCategory === 'all' 
+                ? packages 
+                : packages.filter(pkg => pkg.category === selectedCategory);
+            
+            filteredPackages.forEach(pkg => addPackageToGrid(pkg));
+            
+            if (filteredPackages.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">No packages found in this category.</p>';
+            }
+        }
+
+        function filterByCategory() {
+            const selectedCategory = document.getElementById('categoryFilter').value;
+            const grid = document.getElementById('packagesGrid');
+            grid.innerHTML = '';
+            
+            const filteredPackages = selectedCategory === 'all' 
+                ? packages 
+                : packages.filter(pkg => pkg.category === selectedCategory);
+            
+            filteredPackages.forEach(pkg => addPackageToGrid(pkg));
+            
+            if (filteredPackages.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #999; padding: 2rem;">No packages found in this category.</p>';
+            }
+        }
+
         function calculateDiscountedPrice(price, discountType, discountValue) {
             if (!discountValue || discountValue <= 0) return null;
             
@@ -300,13 +340,13 @@
             
             if (pkg.stockStatus === 'out-of-stock') {
                 statusBadge = 'out-of-stock';
-                statusText = '○ Out of Stock';
+                statusText = 'Out of Stock';
             } else if (pkg.stockStatus === 'high-demand') {
                 statusBadge = 'high-demand';
-                statusText = '⚡ High Demand';
+                statusText = 'High Demand';
             } else {
                 statusBadge = 'in-stock';
-                statusText = '● In Stock';
+                statusText = 'In Stock';
             }
 
             // Calculate discounted price if discount exists
@@ -595,6 +635,28 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="${prefix}_packageCategory">Category *</label>
+                        <select id="${prefix}_packageCategory" required>
+                            <option value="">Select category</option>
+                            <option value="ads-account" ${pkg?.category === 'ads-account' ? 'selected' : ''}>Ads Account</option>
+                            <option value="service" ${pkg?.category === 'service' ? 'selected' : ''}>Service</option>
+                            <option value="assets" ${pkg?.category === 'assets' ? 'selected' : ''}>Assets</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="${prefix}_packageImage">Package Image URL</label>
+                    <input type="url" id="${prefix}_packageImage" value="${pkg?.imageUrl || ''}" placeholder="https://example.com/image.jpg">
+                    <small style="color: #666; font-size: 12px; display: block; margin-top: 4px;">
+                        Enter a direct URL to an image (JPG, PNG, GIF). Image will be displayed at 120px height.
+                    </small>
+                    ${pkg?.imageUrl ? `<img src="${pkg.imageUrl}" alt="Preview" style="width: 100%; max-width: 300px; height: auto; margin-top: 8px; border-radius: 8px; border: 1px solid #ddd;">` : ''}
+                </div>
+
+                <div class="form-grid">
+
+                    <div class="form-group">
                         <label for="${prefix}_packageStatus">BM/Verification Status</label>
                         <select id="${prefix}_packageStatus">
                             <option value="" ${!pkg?.status ? 'selected' : ''}>N/A</option>
@@ -713,6 +775,8 @@
                 subtitle: document.getElementById('add_packageSubtitle').value,
                 price: document.getElementById('add_packagePrice').value,
                 region: document.getElementById('add_packageRegion').value,
+                category: document.getElementById('add_packageCategory').value,
+                imageUrl: document.getElementById('add_packageImage').value,
                 status: document.getElementById('add_packageStatus').value,
                 access: document.getElementById('add_packageAccess').value,
                 dailyLimit: document.getElementById('add_dailyLimit').value,
@@ -746,6 +810,8 @@
                 subtitle: document.getElementById('edit_packageSubtitle').value,
                 price: document.getElementById('edit_packagePrice').value,
                 region: document.getElementById('edit_packageRegion').value,
+                category: document.getElementById('edit_packageCategory').value,
+                imageUrl: document.getElementById('edit_packageImage').value,
                 status: document.getElementById('edit_packageStatus').value,
                 access: document.getElementById('edit_packageAccess').value,
                 dailyLimit: document.getElementById('edit_dailyLimit').value,
@@ -787,3 +853,85 @@
             isEditMode = false;
         }
     
+
+
+// Override addPackageToGrid to include image and category
+const originalAddPackageToGrid = addPackageToGrid;
+function addPackageToGrid(pkg) {
+    const grid = document.getElementById('packagesGrid');
+    const card = document.createElement('div');
+    card.className = 'package-card';
+    if (pkg.stockStatus === 'out-of-stock') {
+        card.classList.add('out-of-stock');
+    }
+    card.dataset.id = pkg.id;
+    card.onclick = () => viewPackage(pkg.id);
+    
+    let statusBadge = '';
+    let statusText = '';
+    
+    if (pkg.stockStatus === 'out-of-stock') {
+        statusBadge = 'out-of-stock';
+        statusText = 'Out of Stock';
+    } else if (pkg.stockStatus === 'high-demand') {
+        statusBadge = 'high-demand';
+        statusText = 'High Demand';
+    } else {
+        statusBadge = 'in-stock';
+        statusText = 'In Stock';
+    }
+
+    // Calculate discounted price if discount exists
+    let priceHTML = '';
+    if (pkg.discountType && pkg.discountValue > 0) {
+        const discountedPrice = calculateDiscountedPrice(parseFloat(pkg.price), pkg.discountType, parseFloat(pkg.discountValue));
+        const discountLabel = pkg.discountType === 'percentage' ? `${pkg.discountValue}%` : `${pkg.discountValue}`;
+        priceHTML = `
+            <div class="package-price">
+                <span class="price-original">from ${pkg.price}</span>
+                <span class="price-discounted">${discountedPrice.toFixed(2)}</span>
+                <span class="discount-badge">-${discountLabel}</span>
+            </div>
+        `;
+    } else {
+        priceHTML = `<div class="package-price">from ${pkg.price}</div>`;
+    }
+    
+    // Display image if available
+    let imageHTML = '';
+    if (pkg.imageUrl) {
+        imageHTML = `<img src="${pkg.imageUrl}" alt="${pkg.name}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin-bottom: 12px;">`;
+    }
+    
+    // Display category badge
+    let categoryBadge = '';
+    if (pkg.category) {
+        const categoryLabels = {
+            'ads-account': 'Ads Account',
+            'service': 'Service',
+            'assets': 'Assets'
+        };
+        categoryBadge = `<div style="font-size: 11px; color: #666; margin-bottom: 8px; font-weight: 500;">${categoryLabels[pkg.category] || pkg.category}</div>`;
+    }
+    
+    card.innerHTML = `
+        <span class="status-badge ${statusBadge}">${statusText}</span>
+        ${imageHTML}
+        ${categoryBadge}
+        <div class="package-icon">${pkg.icon}</div>
+        <div class="package-title">${pkg.name}</div>
+        <div class="package-subtitle">${pkg.subtitle}</div>
+        ${pkg.dailyLimit ? `<div class="package-details"><strong>Daily Limit:</strong> ${pkg.dailyLimit}</div>` : ''}
+        ${pkg.status ? `<div class="package-details"><strong>Status:</strong> ${pkg.status}</div>` : ''}
+        ${pkg.region ? `<div class="package-details"><strong>Region:</strong> ${pkg.region}</div>` : ''}
+        ${pkg.access ? `<div class="package-details"><strong>Access:</strong> ${pkg.access}</div>` : ''}
+        ${pkg.type2 ? `<div class="package-details"><strong>Type:</strong> ${pkg.type2}</div>` : ''}
+        ${priceHTML}
+        <div class="package-actions">
+            <button class="btn btn-small btn-edit" onclick="event.stopPropagation(); editPackageInPanel(${pkg.id})">Edit</button>
+            <button class="btn btn-small btn-delete" onclick="event.stopPropagation(); deletePackage(${pkg.id})">Delete</button>
+        </div>
+    `;
+    
+    grid.appendChild(card);
+}
