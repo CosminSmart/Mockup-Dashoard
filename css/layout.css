@@ -29,6 +29,37 @@ body {
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.theme-toggle {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.theme-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: all 0.3s;
+}
+
+.theme-btn:hover {
+    background: #f0f0f0;
+}
+
+.theme-btn.active {
+    background: #3498db;
+    color: white;
+    border-color: #3498db;
+}
+
 .sidebar {
     grid-area: sidebar;
     background: #2c3e50;
