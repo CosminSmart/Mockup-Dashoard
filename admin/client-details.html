@@ -220,6 +220,32 @@
                 </div>
               </div>
             </div>
+
+            <!-- Billing Terms -->
+            <div class="um-card" id="billingCard">
+              <div class="um-card__head">
+                <div class="um-card__title">Billing Terms</div>
+                <div class="um-card__head-actions">
+                  <button class="um-btn um-btn--ghost" type="button" id="billEditBtn">Edit</button>
+                  <button class="um-btn um-btn--ghost" type="button" id="billSaveBtn" hidden>Save</button>
+                  <button class="um-btn um-btn--ghost" type="button" id="billCancelBtn" hidden>Cancel</button>
+                </div>
+              </div>
+
+              <div class="um-table-wrap" style="padding:0; background:transparent;">
+                <table class="um-table-mini">
+                  <thead>
+                    <tr>
+                      <th>Type</th>
+                      <th>Interval</th>
+                      <th>Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="billBody"></tbody>
+                </table>
+              </div>
+            </div>
+
           </div>
 
           <!-- Right column -->
@@ -249,19 +275,18 @@
                     <span>TRC Fee</span>
                     <strong id="trcFeeText">—</strong>
                   </div>
-                </div>
+               zinho
               </div>
 
-              <!-- edit (only shows on Edit) -->
-                <div id="netEdit" hidden class="um-two-col">
+              <!-- edit (inputs only; percent stays visible above) -->
+              <div id="netEdit" hidden class="um-two-col">
                 <div class="um-field" style="margin-bottom:0;">
-                    <input class="um-input um-inline-input" id="ercFeeInput" inputmode="decimal" placeholder="0" />
+                  <input class="um-input um-inline-input" id="ercFeeInput" inputmode="decimal" placeholder="0" />
                 </div>
                 <div class="um-field" style="margin-bottom:0;">
-                    <input class="um-input um-inline-input" id="trcFeeInput" inputmode="decimal" placeholder="0" />
+                  <input class="um-input um-inline-input" id="trcFeeInput" inputmode="decimal" placeholder="0" />
                 </div>
-                </div>
-
+              </div>
             </div>
 
             <!-- Fee Table -->
@@ -334,7 +359,6 @@
       saveBtn: document.getElementById("saveBtn"),
       cancelBtn: document.getElementById("cancelBtn"),
 
-      // profile inputs
       nameInput: document.getElementById("nameInput"),
       companyInput: document.getElementById("companyInput"),
       telegramInput: document.getElementById("telegramInput"),
@@ -343,7 +367,6 @@
       countryInput: document.getElementById("countryInput"),
       statusInput: document.getElementById("statusInput"),
 
-      // network fees block
       ercFeeText: document.getElementById("ercFeeText"),
       trcFeeText: document.getElementById("trcFeeText"),
       ercFeeInput: document.getElementById("ercFeeInput"),
@@ -354,13 +377,17 @@
       netSaveBtn: document.getElementById("netSaveBtn"),
       netCancelBtn: document.getElementById("netCancelBtn"),
 
-      // fee table
       feeBody: document.getElementById("feeBody"),
       feeEditBtn: document.getElementById("feeEditBtn"),
       feeSaveBtn: document.getElementById("feeSaveBtn"),
       feeCancelBtn: document.getElementById("feeCancelBtn"),
 
       notFound: document.getElementById("notFound"),
+
+      billBody: document.getElementById("billBody"),
+      billEditBtn: document.getElementById("billEditBtn"),
+      billSaveBtn: document.getElementById("billSaveBtn"),
+      billCancelBtn: document.getElementById("billCancelBtn"),
     };
 
     function initials(name){
@@ -391,14 +418,13 @@
       return s;
     }
 
-    // Money parser: "$250" or "250$" or "250"
     function parseMoneyOrNumber(s){
       const raw = String(s ?? "").trim();
       if (!raw) return { value:null, prefix:"", suffix:"" };
 
-      const m1 = raw.match(/^([$€£])\s*([\d.,]+)$/); // "$250"
-      const m2 = raw.match(/^([\d.,]+)\s*([$€£])$/); // "250$"
-      const m3 = raw.match(/^([\d.,]+)$/);           // "250"
+      const m1 = raw.match(/^([$€£])\s*([\d.,]+)$/);
+      const m2 = raw.match(/^([\d.,]+)\s*([$€£])$/);
+      const m3 = raw.match(/^([\d.,]+)$/);
 
       const toNum = (x) => {
         const n = Number(String(x).replace(/,/g,""));
@@ -422,26 +448,17 @@
     function formatMoney(prefix, value, suffix){
       const n = Number(value);
       if (Number.isNaN(n)) return (prefix || "") + value + (suffix || "");
-      // keep as int if it is int; else 2 decimals
       const out = Number.isInteger(n) ? String(n) : String(+n.toFixed(2));
       return (prefix || "") + out + (suffix || "");
     }
 
     function clamp0(n){ return Math.max(0, n); }
 
-    // Apply discount rules:
-    // - If target is percent (fee "5%"): 
-    //    mode "%" => new = old * (1 - disc/100)
-    //    mode "$" => treat as "percentage points off": new = old - disc
-    // - If target is money (setup "$250"):
-    //    mode "%" => new = old * (1 - disc/100)
-    //    mode "$" => new = old - disc
     function applyDiscountToValue(originalStr, discountValue, discountMode){
       const s = String(originalStr ?? "").trim();
       const disc = Number(discountValue);
       if (Number.isNaN(disc) || disc < 0) return s;
 
-      // percent?
       const pct = parsePercentValue(s);
       if (pct !== null){
         let out;
@@ -450,12 +467,10 @@
         } else {
           out = clamp0(pct - disc);
         }
-        // keep clean formatting
         const outStr = Number.isInteger(out) ? String(out) : String(+out.toFixed(2));
         return outStr + "%";
       }
 
-      // money/number?
       const parsed = parseMoneyOrNumber(s);
       if (parsed.value !== null){
         let out;
@@ -467,21 +482,22 @@
         return formatMoney(parsed.prefix, out, parsed.suffix);
       }
 
-      // fallback: can't parse => unchanged
       return s;
     }
 
     let client = null;
     let snapshot = null;
 
-    // snapshots
     let netSnap = null;
     let feeSnap = null;
 
     let feeEditing = false;
 
-    // keep track of inline discount editor (only one open at a time)
-    let openDiscount = { rowIdx: null, col: null }; // col: "setup" | "fee"
+    let openDiscount = { rowIdx: null, col: null };
+
+    // ✅ billing state (MUTAT SUS)
+    let billSnap = null;
+    let billEditing = false;
 
     function loadClient(){
       if (!id) return null;
@@ -500,6 +516,14 @@
           { type: "Facebook Ads", setup: "$250", fee: "6%" },
           { type: "TikTok Ads", setup: "$250", fee: "3%" },
         ];
+      }
+
+      // ✅ billing defaults (AICI, nu jos)
+      if (!client.billing){
+        client.billing = {
+          initial: { days: 21, amount: "$30" },
+          recurring: { days: 30, amount: "$50" }
+        };
       }
     }
 
@@ -577,7 +601,6 @@
               value="${String(row.fee ?? "").replace(/"/g, "&quot;")}" />
           `;
         } else {
-          // view mode with "Apply discount" per cell
           if (openDiscount.rowIdx === idx && openDiscount.col === "setup"){
             tdSetup.innerHTML = buildDiscountInlineEditor(idx, "setup");
           } else {
@@ -597,29 +620,63 @@
         els.feeBody.appendChild(tr);
       });
 
-      // focus input if discount editor is open
       if (!feeEditing && openDiscount.rowIdx !== null){
         const input = els.feeBody.querySelector("[data-discount-value]");
         if (input) input.focus();
       }
     }
 
+    // ✅ Billing renderer (LIPSEA)
+    function renderBilling(){
+      const rows = [
+        { key: "initial", label: "Initial payment" },
+        { key: "recurring", label: "Recurring" }
+      ];
+
+      els.billBody.innerHTML = "";
+
+      rows.forEach(r => {
+        const data = client.billing?.[r.key] || {};
+        const tr = document.createElement("tr");
+
+        const tdType = document.createElement("td");
+        tdType.textContent = r.label;
+
+        const tdDays = document.createElement("td");
+        const tdAmount = document.createElement("td");
+
+        if (!billEditing){
+          tdDays.textContent = (data.days ?? "—") + " zile";
+          tdAmount.innerHTML = `<strong>${data.amount ?? "—"}</strong>`;
+        } else {
+          tdDays.innerHTML = `<input class="um-input um-inline-input" data-bill-days="${r.key}" value="${data.days ?? ""}">`;
+          tdAmount.innerHTML = `<input class="um-input um-inline-input" data-bill-amount="${r.key}" value="${data.amount ?? ""}">`;
+        }
+
+        tr.appendChild(tdType);
+        tr.appendChild(tdDays);
+        tr.appendChild(tdAmount);
+        els.billBody.appendChild(tr);
+      });
+    }
+
     function renderAll(){
       if (!client){
         els.notFound.hidden = false;
         els.editBtn.disabled = true;
-
         els.netEditBtn.disabled = true;
         els.feeEditBtn.disabled = true;
+        els.billEditBtn.disabled = true;
         return;
       }
 
       renderProfile();
       renderNetworkFees();
       renderFeeTable();
+      renderBilling(); // ✅ adăugat
     }
 
-    // ===== Profile edit (left) =====
+    // ===== Profile edit =====
     function enterEdit(){
       snapshot = JSON.parse(JSON.stringify(client));
 
@@ -669,14 +726,14 @@
     function enterNetEdit(){
       netSnap = JSON.parse(JSON.stringify(client));
 
-      // only number in inputs (no %)
       const erc = parsePercentValue(client.ercFee) ?? Number(client.ercFee);
       const trc = parsePercentValue(client.trcFee) ?? Number(client.trcFee);
 
       els.ercFeeInput.value = (erc !== null && !Number.isNaN(erc)) ? String(erc) : String(client.ercFee ?? "");
       els.trcFeeInput.value = (trc !== null && !Number.isNaN(trc)) ? String(trc) : String(client.trcFee ?? "");
 
-      els.netView.hidden = true;
+      // ✅ procentul rămâne sus, doar apar inputurile jos
+      els.netView.hidden = false;
       els.netEdit.hidden = false;
 
       els.netEditBtn.hidden = true;
@@ -711,12 +768,10 @@
       exitNetEdit(false);
     }
 
-    // ===== Fee table edit (manual edit mode) =====
+    // ===== Fee edit =====
     function enterFeeEdit(){
       feeSnap = JSON.parse(JSON.stringify(client));
       feeEditing = true;
-
-      // close any discount inline editor
       openDiscount = { rowIdx: null, col: null };
 
       els.feeEditBtn.hidden = true;
@@ -760,7 +815,7 @@
       exitFeeEdit(false);
     }
 
-    // ===== Discount inline (per row, per cell) =====
+    // ===== Discount inline =====
     function openDiscountEditor(idx, col){
       openDiscount = { rowIdx: idx, col };
       renderFeeTable();
@@ -785,7 +840,6 @@
       closeDiscountEditor();
     }
 
-    // Event delegation inside fee table
     els.feeBody.addEventListener("click", (e) => {
       const openBtn = e.target.closest("[data-discount-open]");
       if (openBtn){
@@ -828,6 +882,45 @@
       }
     });
 
+    // ===== Billing edit handlers =====
+    function enterBillEdit(){
+      billSnap = JSON.parse(JSON.stringify(client));
+      billEditing = true;
+
+      els.billEditBtn.hidden = true;
+      els.billSaveBtn.hidden = false;
+      els.billCancelBtn.hidden = false;
+
+      renderBilling();
+    }
+
+    function exitBillEdit(restore){
+      if (restore && billSnap) client = billSnap;
+
+      billEditing = false;
+
+      els.billEditBtn.hidden = false;
+      els.billSaveBtn.hidden = true;
+      els.billCancelBtn.hidden = true;
+
+      renderBilling();
+    }
+
+    function saveBilling(){
+      document.querySelectorAll("[data-bill-days]").forEach(inp => {
+        const key = inp.dataset.billDays;
+        if (client.billing?.[key]) client.billing[key].days = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-bill-amount]").forEach(inp => {
+        const key = inp.dataset.billAmount;
+        if (client.billing?.[key]) client.billing[key].amount = inp.value.trim();
+      });
+
+      persist();
+      exitBillEdit(false);
+    }
+
     // ===== init =====
     client = loadClient();
     if (client){
@@ -836,20 +929,23 @@
     }
     renderAll();
 
-    // profile events
+    // events
     els.editBtn.addEventListener("click", enterEdit);
     els.cancelBtn.addEventListener("click", () => exitEdit(true));
     els.saveBtn.addEventListener("click", saveProfile);
 
-    // network fees events
     els.netEditBtn.addEventListener("click", enterNetEdit);
     els.netCancelBtn.addEventListener("click", () => exitNetEdit(true));
     els.netSaveBtn.addEventListener("click", saveNetFees);
 
-    // fee table events
     els.feeEditBtn.addEventListener("click", enterFeeEdit);
     els.feeCancelBtn.addEventListener("click", () => exitFeeEdit(true));
     els.feeSaveBtn.addEventListener("click", saveFeeTable);
+
+    // ✅ billing listeners (o singură dată)
+    els.billEditBtn.addEventListener("click", enterBillEdit);
+    els.billCancelBtn.addEventListener("click", () => exitBillEdit(true));
+    els.billSaveBtn.addEventListener("click", saveBilling);
   </script>
 
   <script src="../js/sidebar.js"></script>
