@@ -192,21 +192,6 @@
             </div>
 
             <div class="field-group">
-                <label>Email</label>
-                <input type="email" id="modalEmail" value="account@example.com">
-            </div>
-
-            <div class="field-group">
-                <label>Password</label>
-                <input type="password" id="modalPassword" value="********">
-            </div>
-
-            <div class="field-group">
-                <label>2FA Code</label>
-                <input type="text" id="modal2FA" value="JBSWY3DPEHPK3PXP">
-            </div>
-
-            <div class="field-group">
                 <label>Proxy</label>
                 <input type="text" id="modalProxy" value="192.168.1.1:8080">
             </div>
@@ -233,6 +218,94 @@
 
             <button class="btn" style="width: 100%; margin-bottom: 1rem;">Save Changes</button>
 
+            <!-- Account Profiles Section -->
+            <div class="profiles-section">
+                <h3>Account Profiles</h3>
+                <div class="profile-tabs">
+                    <button class="profile-tab active" onclick="switchProfileTab(1)">Profile 1</button>
+                    <button class="profile-tab" onclick="switchProfileTab(2)">Profile 2</button>
+                    <button class="profile-tab-add" onclick="addProfileTab()">+</button>
+                </div>
+
+                <div class="profile-content" id="profileContent1" style="display: block;">
+                    <div class="field-group">
+                        <label>Profile Name</label>
+                        <input type="text" value="Main Profile">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" checked style="width: auto;">
+                            Set as Primary Profile (Account Name)
+                        </label>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Email</label>
+                        <input type="email" value="profile1@example.com">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Password</label>
+                        <input type="password" value="********">
+                    </div>
+
+                    <div class="field-group">
+                        <label>2FA Code</label>
+                        <input type="text" value="JBSWY3DPEHPK3PXP">
+                    </div>
+
+                    <div class="profile-custom-fields">
+                        <h4>Custom Fields</h4>
+                        <div class="custom-field-item">
+                            <input type="text" placeholder="Field name" style="flex: 1;">
+                            <input type="text" placeholder="Value" style="flex: 1;">
+                            <button class="btn" style="padding: 0.5rem;">Remove</button>
+                        </div>
+                        <button class="btn" onclick="addProfileCustomField(1)" style="margin-top: 0.5rem;">Add Custom Field</button>
+                    </div>
+                </div>
+
+                <div class="profile-content" id="profileContent2" style="display: none;">
+                    <div class="field-group">
+                        <label>Profile Name</label>
+                        <input type="text" value="Secondary Profile">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: flex; align-items: center; gap: 0.5rem;">
+                            <input type="checkbox" style="width: auto;">
+                            Set as Primary Profile (Account Name)
+                        </label>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Email</label>
+                        <input type="email" value="profile2@example.com">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Password</label>
+                        <input type="password" value="********">
+                    </div>
+
+                    <div class="field-group">
+                        <label>2FA Code</label>
+                        <input type="text" value="ABCDE2FGHIJK3LMN">
+                    </div>
+
+                    <div class="profile-custom-fields">
+                        <h4>Custom Fields</h4>
+                        <div class="custom-field-item">
+                            <input type="text" placeholder="Field name" style="flex: 1;">
+                            <input type="text" placeholder="Value" style="flex: 1;">
+                            <button class="btn" style="padding: 0.5rem;">Remove</button>
+                        </div>
+                        <button class="btn" onclick="addProfileCustomField(2)" style="margin-top: 0.5rem;">Add Custom Field</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="cards-section">
                 <h3>Cards</h3>
                 <div id="cardsList">
@@ -252,18 +325,6 @@
                     </div>
                 </div>
                 <button class="btn" onclick="addCard()" style="margin-top: 1rem;">Add Card</button>
-            </div>
-
-            <div class="custom-fields">
-                <h3>Custom Fields</h3>
-                <div id="customFieldsList">
-                    <div class="custom-field-item">
-                        <input type="text" placeholder="Field name" style="flex: 1;">
-                        <input type="text" placeholder="Value" style="flex: 1;">
-                        <button class="btn" style="padding: 0.5rem;">Remove</button>
-                    </div>
-                </div>
-                <button class="btn" onclick="addCustomField()" style="margin-top: 1rem;">Add Custom Field</button>
             </div>
         </div>
     </div>
@@ -361,6 +422,44 @@
                 <button class="btn" onclick="this.parentElement.remove()" style="padding: 0.5rem;">Remove</button>
             `;
             list.appendChild(newField);
+        }
+
+        function switchProfileTab(profileId) {
+            // Hide all profile contents
+            document.querySelectorAll('.profile-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected profile content
+            document.getElementById('profileContent' + profileId).style.display = 'block';
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function addProfileTab() {
+            alert('Add new profile functionality - to be implemented');
+        }
+
+        function addProfileCustomField(profileId) {
+            const profileContent = document.getElementById('profileContent' + profileId);
+            const customFieldsDiv = profileContent.querySelector('.profile-custom-fields');
+            const addButton = customFieldsDiv.querySelector('.btn');
+            
+            const newField = document.createElement('div');
+            newField.className = 'custom-field-item';
+            newField.innerHTML = `
+                <input type="text" placeholder="Field name" style="flex: 1;">
+                <input type="text" placeholder="Value" style="flex: 1;">
+                <button class="btn" onclick="this.parentElement.remove()" style="padding: 0.5rem;">Remove</button>
+            `;
+            
+            customFieldsDiv.insertBefore(newField, addButton);
         }
 
         function addCard() {
