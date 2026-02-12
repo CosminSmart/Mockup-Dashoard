@@ -21,7 +21,6 @@ const navigationItems = {
     admin: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
         { name: 'Users', page: 'users', icon: '👥' },
-        { name: 'Clients', page: 'clients', icon: '👤' },
         { name: 'Accounts', page: 'accounts', icon: '💳' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' }
     ],
