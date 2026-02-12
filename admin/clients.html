@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clients</title>
+
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/users.css">
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>User Management</h1>
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">AU</div>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <h2>Admin Panel</h2>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="users.html" class="active">Users</a>
+        <a href="reports.html">Reports</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <div class="content-section">
+
+        <!-- ✅ SWITCHER ABOVE TITLE -->
+        <div class="um-switcher um-switcher--top" role="tablist" aria-label="Clients/Employees Switcher">
+          <button class="um-tab is-active" type="button" data-tab="clients" role="tab" aria-selected="true">
+            Clients
+          </button>
+          <button class="um-tab" type="button" data-tab="employees" role="tab" aria-selected="false">
+            Employees
+          </button>
+        </div>
+
+        <h2>Clients</h2>
+        <p>Manage your clients list and details.</p>
+
+        <!-- Clients Table -->
+        <section class="um-view is-active">
+            <!-- Filters + Search -->
+        <div class="um-filters">
+        <div class="um-filters__left">
+            <input class="um-input" id="clientSearch" type="search" placeholder="Search clients (name, email, company, telegram, id)..." />
+        </div>
+
+        <div class="um-filters__right">
+            <select class="um-select" id="statusFilter">
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="pending">Pending</option>
+            </select>
+
+            <select class="um-select" id="createdSort">
+            <option value="newest">Created: Newest</option>
+            <option value="oldest">Created: Oldest</option>
+            </select>
+
+            <button class="um-btn um-btn--ghost" type="button" id="clearFilters">Clear</button>
+        </div>
+        </div>
+
+          <div class="um-table-wrap">
+            <table class="um-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Client Name</th>
+                  <th>Company</th>
+                  <th>Telegram</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>#C-2001</td>
+                  <td>Sarah Mitchell</td>
+                  <td>TechVision Corp</td>
+                  <td>@sarah_mitchell</td>
+                  <td>sarah.mitchell@techvision.com</td>
+                  <td><span class="um-badge um-badge--green">Active</span></td>
+                  <td>2026-01-12</td>
+                  <td style="text-align:right;">
+                    <button class="um-btn um-btn--ghost" type="button"
+                      data-edit
+                      data-id="C-2001"
+                      data-name="Sarah Mitchell"
+                      data-company="TechVision Corp"
+                      data-telegram="@sarah_mitchell"
+                      data-email="sarah.mitchell@techvision.com"
+                      data-phone="+1 (555) 234-5678"
+                      data-country="United States"
+                      data-status="Active"
+                      data-spend="$284.5K"
+                      data-value="$320K"
+                      data-active-accounts="12"
+                      data-engagement="98%">
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>#C-2002</td>
+                  <td>Michael Chen</td>
+                  <td>BrightLabs</td>
+                  <td>@michael_chen</td>
+                  <td>michael.chen@brightlabs.io</td>
+                  <td><span class="um-badge um-badge--gray">Pending</span></td>
+                  <td>2026-01-20</td>
+                  <td style="text-align:right;">
+                    <button class="um-btn um-btn--ghost" type="button"
+                      data-edit
+                      data-id="C-2002"
+                      data-name="Michael Chen"
+                      data-company="BrightLabs"
+                      data-telegram="@michael_chen"
+                      data-email="michael.chen@brightlabs.io"
+                      data-phone="+44 20 7946 0000"
+                      data-country="United Kingdom"
+                      data-status="Pending"
+                      data-spend="$12.0K"
+                      data-value="$18K"
+                      data-active-accounts="2"
+                      data-engagement="61%">
+                      Edit
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <!-- OVERLAY -->
+  <div class="um-overlay" id="umOverlay" hidden></div>
+
+  <!-- RIGHT DRAWER (same as users) -->
+  <aside class="um-drawer" id="umDrawer" aria-hidden="true">
+    <div class="um-drawer__header">
+      <div>
+        <div class="um-drawer__title">Client Details</div>
+        <div class="um-drawer__subtitle" id="dId">#C-0000</div>
+      </div>
+
+      <div class="um-drawer__actions">
+        <button class="um-btn" type="button" id="dEditBtn">Edit</button>
+        <button class="um-btn um-btn--icon" type="button" id="dCloseBtn" aria-label="Close">✕</button>
+      </div>
+    </div>
+
+    <div class="um-drawer__body">
+      <div class="um-card um-profile">
+        <div class="um-avatar">CL</div>
+        <div class="um-profile__meta">
+          <div class="um-profile__name" id="dName">—</div>
+          <div class="um-profile__company" id="dCompany">—</div>
+          <div class="um-profile__status" id="dStatus">—</div>
+        </div>
+      </div>
+
+      <div class="um-card">
+        <div class="um-card__title">Contact Information</div>
+        <div class="um-info">
+          <div class="um-info__row">
+            <span class="um-info__label">Telegram</span>
+            <span class="um-info__value" id="dTelegram">—</span>
+          </div>
+          <div class="um-info__row">
+            <span class="um-info__label">Email</span>
+            <span class="um-info__value" id="dEmail">—</span>
+          </div>
+          <div class="um-info__row">
+            <span class="um-info__label">Phone</span>
+            <span class="um-info__value" id="dPhone">—</span>
+          </div>
+          <div class="um-info__row">
+            <span class="um-info__label">Country</span>
+            <span class="um-info__value" id="dCountry">—</span>
+          </div>
+        </div>
+      </div>
+               <div class="um-card">
+        <div class="um-card__title">Fee</div>
+        <div class="um-list">
+          <div class="um-list__item">
+            <span>Google Fee</span>
+            <strong>5%</strong>
+          </div>
+          <div class="um-list__item">
+            <span>Facebook Fee</span>
+            <strong>6%</strong>
+          </div>
+          <div class="um-list__item">
+            <span>Tiktok Fee</span>
+            <strong>3%</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </aside>
+
+  <script>
+    // Switcher redirect: Employees -> users.html
+    const topTabs = document.querySelectorAll(".um-switcher--top .um-tab");
+    topTabs.forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.tab === "employees") {
+          window.location.href = "users.html";
+        }
+      });
+    });
+
+    // Drawer logic (same as users)
+    const overlay = document.getElementById("umOverlay");
+    const drawer = document.getElementById("umDrawer");
+
+    const dId = document.getElementById("dId");
+    const dName = document.getElementById("dName");
+    const dCompany = document.getElementById("dCompany");
+    const dStatus = document.getElementById("dStatus");
+    const dEmail = document.getElementById("dEmail");
+    const dPhone = document.getElementById("dPhone");
+    const dTelegram = document.getElementById("dTelegram");
+    const dCountry = document.getElementById("dCountry");
+    const dSpend = document.getElementById("dSpend");
+    const dValue = document.getElementById("dValue");
+    const dActiveAccounts = document.getElementById("dActiveAccounts");
+    const dEngagement = document.getElementById("dEngagement");
+
+    function openDrawer(data) {
+      dId.textContent = "#" + data.id;
+      dName.textContent = data.name || "—";
+      dCompany.textContent = data.company || "—";
+      dEmail.textContent = data.email || "—";
+      dPhone.textContent = data.phone || "—";
+      dTelegram.textContent = data.telegram || "—";
+      dCountry.textContent = data.country || "—";
+
+      const isActive = (data.status || "").toLowerCase() === "active";
+      dStatus.innerHTML = `<span class="um-badge ${isActive ? "um-badge--green" : "um-badge--gray"}">${data.status || "—"}</span>`;
+
+      overlay.hidden = false;
+      drawer.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDrawer() {
+      overlay.hidden = true;
+      drawer.classList.remove("is-open");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+
+    document.querySelectorAll("[data-edit]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        openDrawer({
+          id: btn.dataset.id,
+          name: btn.dataset.name,
+          company: btn.dataset.company,
+          telegram: btn.dataset.telegram,
+          email: btn.dataset.email,
+          phone: btn.dataset.phone,
+          country: btn.dataset.country,
+          status: btn.dataset.status,
+          spend: btn.dataset.spend,
+          value: btn.dataset.value,
+          activeAccounts: btn.dataset.activeAccounts,
+          engagement: btn.dataset.engagement,
+        });
+      });
+    });
+
+    overlay.addEventListener("click", closeDrawer);
+    document.getElementById("dCloseBtn").addEventListener("click", closeDrawer);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeDrawer(); });
+
+    document.getElementById("dEditBtn").addEventListener("click", () => {
+      alert("Next step: edit client form.");
+    });
+  </script>
+  <script>
+    // ===== Clients: Search + Filters + Sort =====
+const searchEl = document.getElementById("clientSearch");
+const statusEl = document.getElementById("statusFilter");
+const sortEl = document.getElementById("createdSort");
+const clearBtn = document.getElementById("clearFilters");
+
+const tbody = document.querySelector(".um-table tbody");
+
+function normalize(s){
+  return (s || "").toString().trim().toLowerCase();
+}
+
+function getRowCreatedDate(tr){
+  // Created column index = 6 (0-based 6) in your table
+  const createdText = tr.children[6]?.textContent?.trim() || "";
+  // format: YYYY-MM-DD
+  const d = new Date(createdText);
+  return isNaN(d.getTime()) ? new Date(0) : d;
+}
+
+function getRowStatus(tr){
+  // Status column index = 5
+  const badge = tr.children[5]?.querySelector(".um-badge");
+  return normalize(badge ? badge.textContent : tr.children[5]?.textContent);
+}
+
+function rowMatchesSearch(tr, q){
+  if (!q) return true;
+
+  // Search in: ID, Name, Company, Telegram, Email
+  const id = tr.children[0]?.textContent || "";
+  const name = tr.children[1]?.textContent || "";
+  const company = tr.children[2]?.textContent || "";
+  const telegram = tr.children[3]?.textContent || "";
+  const email = tr.children[4]?.textContent || "";
+
+  const hay = normalize([id, name, company, telegram, email].join(" "));
+  return hay.includes(q);
+}
+
+function applyFilters(){
+  const q = normalize(searchEl?.value);
+  const status = normalize(statusEl?.value);
+
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+
+  rows.forEach(tr => {
+    const okSearch = rowMatchesSearch(tr, q);
+    const rowStatus = getRowStatus(tr);
+
+    const okStatus = (status === "all") ? true : (rowStatus === status);
+
+    tr.style.display = (okSearch && okStatus) ? "" : "none";
+  });
+
+  applySort(); // keep consistent when filter changes
+}
+
+function applySort(){
+  const mode = sortEl?.value || "newest";
+  const rows = Array.from(tbody.querySelectorAll("tr"));
+
+  rows.sort((a,b) => {
+    const da = getRowCreatedDate(a).getTime();
+    const db = getRowCreatedDate(b).getTime();
+    return mode === "oldest" ? (da - db) : (db - da);
+  });
+
+  rows.forEach(r => tbody.appendChild(r));
+}
+
+searchEl?.addEventListener("input", applyFilters);
+statusEl?.addEventListener("change", applyFilters);
+sortEl?.addEventListener("change", applySort);
+
+clearBtn?.addEventListener("click", () => {
+  if (searchEl) searchEl.value = "";
+  if (statusEl) statusEl.value = "all";
+  if (sortEl) sortEl.value = "newest";
+  applyFilters();
+});
+
+// initial
+applyFilters();
+
+  </script>
+</body>
+</html>
