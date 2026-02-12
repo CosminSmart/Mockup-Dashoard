@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Accounts</title>
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/accounts.css">
+</head>
+<body>
+    <div class="layout">
+        <header class="header">
+            <h1>Accounts</h1>
+            <div class="header-right">
+                <div class="theme-toggle">
+                    <button class="theme-btn active">Light</button>
+                    <button class="theme-btn">Dark</button>
+                </div>
+                <div class="user-info">
+                    <span>Admin User</span>
+                    <div class="user-avatar">AU</div>
+                </div>
+            </div>
+        </header>
+        
+        <aside class="sidebar">
+            <h2>Admin Panel</h2>
+            <nav>
+                <a href="dashboard.html">Dashboard</a>
+                <a href="users.html">Users</a>
+                <a href="accounts.html" class="active">Accounts</a>
+         
+            </nav>
+        </aside>
+        
+        <main class="main">
+            <div class="statistics">
+                <div class="stat-box"></div>
+                <div class="stat-box"></div>
+                <div class="stat-box"></div>
+                <div class="stat-box"></div>
+                <div class="stat-box"></div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="filters" style="margin-bottom: 0; flex: 1;">
+                <input type="text" id="searchInput" placeholder="Search accounts...">
+                <select id="platformFilter">
+                    <option value="">All Platforms</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="google">Google</option>
+                    <option value="taboola">Taboola</option>
+                    <option value="outbrain">Outbrain</option>
+                    <option value="microsoft">Microsoft</option>
+                </select>
+                <select id="statusFilter">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="restricted">Restricted</option>
+                </select>
+                <select id="clientFilter">
+                    <option value="">All Clients</option>
+                    <option value="client-a">Client A</option>
+                    <option value="client-b">Client B</option>
+                    <option value="client-c">Client C</option>
+                </select>
+                </div>
+                <button class="btn" onclick="openAddAccountModal()" style="margin-left: 1rem;">+ Add Account</button>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Account ID</th>
+                        <th>Platform</th>
+                        <th>Account Name</th>
+                        <th>Client</th>
+                        <th>Status</th>
+                        <th>Spend</th>
+                        <th>Balance Remaining</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="accountsTable">
+                    <tr>
+                        <td>1</td>
+                        <td>FB-12345</td>
+                        <td>Facebook</td>
+                        <td>Campaign Account 1</td>
+                        <td>Client A</td>
+                        <td>Active</td>
+                        <td>$5,420</td>
+                        <td>$2,580</td>
+                        <td><button class="icon-btn" onclick="openNotesModal(1)" title="Notes">📝</button></td>
+                        <td><button class="btn" onclick="openModal(1)">View More</button></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>GG-67890</td>
+                        <td>Google</td>
+                        <td>Ads Account Pro</td>
+                        <td>Client B</td>
+                        <td>Active</td>
+                        <td>$8,920</td>
+                        <td>$1,080</td>
+                        <td><button class="icon-btn" onclick="openNotesModal(2)" title="Notes">📝</button></td>
+                        <td><button class="btn" onclick="openModal(2)">View More</button></td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>TB-45678</td>
+                        <td>Taboola</td>
+                        <td>Native Ads Account</td>
+                        <td>Client A</td>
+                        <td>Restricted</td>
+                        <td>$3,200</td>
+                        <td>$4,800</td>
+                        <td><button class="icon-btn" onclick="openNotesModal(3)" title="Notes">📝</button></td>
+                        <td><button class="btn" onclick="openModal(3)">View More</button></td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>OB-98765</td>
+                        <td>Outbrain</td>
+                        <td>Content Discovery</td>
+                        <td>Client C</td>
+                        <td>Active</td>
+                        <td>$2,100</td>
+                        <td>$5,900</td>
+                        <td><button class="icon-btn" onclick="openNotesModal(4)" title="Notes">📝</button></td>
+                        <td><button class="btn" onclick="openModal(4)">View More</button></td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>MS-11223</td>
+                        <td>Microsoft</td>
+                        <td>Bing Ads Account</td>
+                        <td>Client B</td>
+                        <td>Restricted</td>
+                        <td>$1,450</td>
+                        <td>$550</td>
+                        <td><button class="icon-btn" onclick="openNotesModal(5)" title="Notes">📝</button></td>
+                        <td><button class="btn" onclick="openModal(5)">View More</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </main>
+    </div>
+
+    <div class="overlay" id="overlay" onclick="closeModal()"></div>
+    <div class="overlay" id="notesOverlay" onclick="closeNotesModal()"></div>
+    <div class="overlay" id="addAccountOverlay" onclick="closeAddAccountModal()"></div>
+    
+    <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Account Details</h2>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="field-group">
+                <label>Account ID</label>
+                <input type="text" id="modalAccountId" value="FB-12345" readonly>
+            </div>
+
+            <div class="field-group">
+                <label>Account Name</label>
+                <input type="text" id="modalAccountName" value="Campaign Account 1">
+            </div>
+
+            <div class="field-group">
+                <label>Platform</label>
+                <input type="text" id="modalPlatform" value="Facebook">
+            </div>
+
+            <div class="field-group">
+                <label>Client</label>
+                <input type="text" id="modalClient" value="Client A">
+            </div>
+
+            <div class="field-group">
+                <label>Account Type</label>
+                <select id="modalAccountType" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="farm">Farm</option>
+                    <option value="agency">Agency</option>
+                </select>
+            </div>
+
+            <div class="field-group">
+                <label>Billing</label>
+                <select id="modalBilling" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="one-time">One Time</option>
+                    <option value="rental">Rental</option>
+                </select>
+            </div>
+
+            <div class="field-group">
+                <label>Email</label>
+                <input type="email" id="modalEmail" value="account@example.com">
+            </div>
+
+            <div class="field-group">
+                <label>Password</label>
+                <input type="password" id="modalPassword" value="********">
+            </div>
+
+            <div class="field-group">
+                <label>2FA Code</label>
+                <input type="text" id="modal2FA" value="JBSWY3DPEHPK3PXP">
+            </div>
+
+            <div class="field-group">
+                <label>Proxy</label>
+                <input type="text" id="modalProxy" value="192.168.1.1:8080">
+            </div>
+
+            <div class="field-group">
+                <label>Provider</label>
+                <input type="text" id="modalProvider" value="Adi">
+            </div>
+
+            <div class="field-group">
+                <label>Setup Account</label>
+                <input type="text" id="modalSetupAccount" value="$500">
+            </div>
+
+            <div class="field-group">
+                <label>Fee (%)</label>
+                <input type="text" id="modalFeePercent" value="15%">
+            </div>
+
+            <div class="field-group">
+                <label>Fee Amount</label>
+                <input type="text" id="modalFeeAmount" value="$813">
+            </div>
+
+            <button class="btn" style="width: 100%; margin-bottom: 1rem;">Save Changes</button>
+
+            <div class="cards-section">
+                <h3>Cards</h3>
+                <div id="cardsList">
+                    <div class="card-item">
+                        <div><strong>Card Mask:</strong> **** **** **** 1234</div>
+                        <div><strong>Name:</strong> John Doe</div>
+                        <div><strong>Spend:</strong> $2,340</div>
+                        <div><strong>Type:</strong> Wallester</div>
+                        <button class="btn" style="padding: 0.3rem 0.8rem; margin-top: 0.5rem;">Remove</button>
+                    </div>
+                    <div class="card-item">
+                        <div><strong>Card Mask:</strong> **** **** **** 5678</div>
+                        <div><strong>Name:</strong> Jane Smith</div>
+                        <div><strong>Spend:</strong> $1,890</div>
+                        <div><strong>Type:</strong> TDX</div>
+                        <button class="btn" style="padding: 0.3rem 0.8rem; margin-top: 0.5rem;">Remove</button>
+                    </div>
+                </div>
+                <button class="btn" onclick="addCard()" style="margin-top: 1rem;">Add Card</button>
+            </div>
+
+            <div class="custom-fields">
+                <h3>Custom Fields</h3>
+                <div id="customFieldsList">
+                    <div class="custom-field-item">
+                        <input type="text" placeholder="Field name" style="flex: 1;">
+                        <input type="text" placeholder="Value" style="flex: 1;">
+                        <button class="btn" style="padding: 0.5rem;">Remove</button>
+                    </div>
+                </div>
+                <button class="btn" onclick="addCustomField()" style="margin-top: 1rem;">Add Custom Field</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="notesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Account Notes</h2>
+                <button class="close-btn" onclick="closeNotesModal()">&times;</button>
+            </div>
+
+            <div class="field-group">
+                <label>Account ID</label>
+                <input type="text" id="notesAccountId" value="FB-12345" readonly>
+            </div>
+
+            <div class="field-group">
+                <label>Notes</label>
+                <textarea id="notesText" rows="10" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; resize: vertical;">Sample notes for this account...</textarea>
+            </div>
+
+            <button class="btn" style="width: 100%;">Save Notes</button>
+        </div>
+    </div>
+
+    <div class="modal" id="addAccountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Account</h2>
+                <button class="close-btn" onclick="closeAddAccountModal()">&times;</button>
+            </div>
+
+            <div class="field-group">
+                <label>Account Name</label>
+                <input type="text" id="addAccountName" placeholder="Enter account name">
+            </div>
+
+            <div class="field-group">
+                <label>Email</label>
+                <input type="email" id="addAccountEmail" placeholder="Enter email">
+            </div>
+
+            <div class="field-group">
+                <label>Client</label>
+                <input type="text" id="addAccountClient" placeholder="Enter client name">
+            </div>
+
+            <div class="field-group">
+                <label>Options (Optional)</label>
+                <textarea id="addAccountOptions" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; resize: vertical;" placeholder="Enter any additional options..."></textarea>
+            </div>
+
+            <button class="btn" style="width: 100%;">Create Account</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal(accountId) {
+            document.getElementById('accountModal').classList.add('active');
+            document.getElementById('overlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('accountModal').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
+        }
+
+        function openNotesModal(accountId) {
+            document.getElementById('notesModal').classList.add('active');
+            document.getElementById('notesOverlay').classList.add('active');
+        }
+
+        function closeNotesModal() {
+            document.getElementById('notesModal').classList.remove('active');
+            document.getElementById('notesOverlay').classList.remove('active');
+        }
+
+        function openAddAccountModal() {
+            document.getElementById('addAccountModal').classList.add('active');
+            document.getElementById('addAccountOverlay').classList.add('active');
+        }
+
+        function closeAddAccountModal() {
+            document.getElementById('addAccountModal').classList.remove('active');
+            document.getElementById('addAccountOverlay').classList.remove('active');
+        }
+
+        function addCustomField() {
+            const list = document.getElementById('customFieldsList');
+            const newField = document.createElement('div');
+            newField.className = 'custom-field-item';
+            newField.innerHTML = `
+                <input type="text" placeholder="Field name" style="flex: 1;">
+                <input type="text" placeholder="Value" style="flex: 1;">
+                <button class="btn" onclick="this.parentElement.remove()" style="padding: 0.5rem;">Remove</button>
+            `;
+            list.appendChild(newField);
+        }
+
+        function addCard() {
+            const list = document.getElementById('cardsList');
+            const newCard = document.createElement('div');
+            newCard.className = 'card-item';
+            newCard.innerHTML = `
+                <div><strong>Card Mask:</strong> <input type="text" placeholder="**** **** **** 0000" style="width: 150px;"></div>
+                <div><strong>Name:</strong> <input type="text" placeholder="Name on card" style="width: 150px;"></div>
+                <div><strong>Spend:</strong> <input type="text" placeholder="$0" style="width: 100px;"></div>
+                <div><strong>Type:</strong> <select style="width: 120px; padding: 0.3rem;">
+                    <option value="wallester">Wallester</option>
+                    <option value="tdx">TDX</option>
+                </select></div>
+                <button class="btn" onclick="this.parentElement.remove()" style="padding: 0.3rem 0.8rem; margin-top: 0.5rem;">Remove</button>
+            `;
+            list.appendChild(newCard);
+        }
+
+        // Simple search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#accountsTable tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // Platform filter
+        document.getElementById('platformFilter').addEventListener('change', function(e) {
+            const platform = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#accountsTable tr');
+            rows.forEach(row => {
+                if (!platform) {
+                    row.style.display = '';
+                } else {
+                    const rowPlatform = row.cells[2]?.textContent.toLowerCase();
+                    row.style.display = rowPlatform?.includes(platform) ? '' : 'none';
+                }
+            });
+        });
+
+        // Status filter
+        document.getElementById('statusFilter').addEventListener('change', function(e) {
+            const status = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#accountsTable tr');
+            rows.forEach(row => {
+                if (!status) {
+                    row.style.display = '';
+                } else {
+                    const rowStatus = row.cells[5]?.textContent.toLowerCase();
+                    row.style.display = rowStatus?.includes(status) ? '' : 'none';
+                }
+            });
+        });
+
+        // Client filter
+        document.getElementById('clientFilter').addEventListener('change', function(e) {
+            const client = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#accountsTable tr');
+            rows.forEach(row => {
+                if (!client) {
+                    row.style.display = '';
+                } else {
+                    const rowClient = row.cells[4]?.textContent.toLowerCase();
+                    row.style.display = rowClient?.includes(client) ? '' : 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
