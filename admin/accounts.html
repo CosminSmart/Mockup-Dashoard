@@ -902,16 +902,20 @@
             alert('Add custom field to profile ' + profileNum);
         }
 
-        // Set Primary Profile - uncheck other profiles
+        // Set Primary Profile - uncheck other profiles and prevent unchecking
         function setPrimaryProfile(profileNum, checkbox) {
-            if (checkbox.checked) {
-                // Uncheck all other primary profile checkboxes
-                document.querySelectorAll('.profile-content input[type="checkbox"]').forEach(cb => {
-                    if (cb !== checkbox) {
-                        cb.checked = false;
-                    }
-                });
+            // Always keep it checked - prevent unchecking
+            if (!checkbox.checked) {
+                checkbox.checked = true;
+                return;
             }
+            
+            // Uncheck all other primary profile checkboxes
+            document.querySelectorAll('.profile-content input[type="checkbox"]').forEach(cb => {
+                if (cb !== checkbox) {
+                    cb.checked = false;
+                }
+            });
         }
 
         function openModal(accountId) {
