@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Transactions</title>
+
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/transactions.css">
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>Transactions</h1>
+      <div class="user-info">
+        <span>John Client</span>
+        <div class="user-avatar">JC</div>
+      </div>
+    </header>
+
+    <aside class="sidebar">
+      <h2>Client Portal</h2>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="marketplace.html">Marketplace</a>
+        <a href="transactions.html" class="active">Transactions</a>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <!-- KPI cards -->
+
+      <div class="content-section">
+        <h2>Transactions</h2>
+        <p>Your financial transactions and invoices.</p>
+
+        <!-- Filters + Search -->
+        <div class="um-filters">
+          <div class="um-filters__left">
+            <input class="um-input" id="txSearch" type="search"
+              placeholder="Search (name, merchant, description, last 4, email)..." />
+          </div>
+
+          <div class="um-filters__right">
+            <select class="um-select" id="txStatus">
+              <option value="all">All Status</option>
+              <option value="success">Success</option>
+              <option value="pending">Pending</option>
+              <option value="declined">Declined</option>
+              <option value="danger">Danger</option>
+            </select>
+
+            <select class="um-select" id="txTime">
+              <option value="all">All Time</option>
+              <option value="30">Last 30 days</option>
+              <option value="7">Last 7 days</option>
+            </select>
+
+            <button class="um-btn um-btn--ghost" type="button" id="txExport">Excel</button>
+            <button class="um-btn um-btn--ghost" type="button" id="txClear">Clear</button>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="um-table-wrap">
+          <table class="um-table" id="txTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Name</th>
+                <th>Last 4</th>
+                <th>Merchant</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th style="text-align:right;">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr
+                data-details
+                data-id="TX-10001"
+                data-date="2026-02-12"
+                data-name="Dima Vicol"
+                data-email="vicoldima018@gmail.com"
+                data-card="543306******9705"
+                data-last4="9705"
+                data-merchant="FACEBK"
+                data-description="FACEBK *MWM9REMZS2"
+                data-amount="-62.00"
+                data-currency="USD"
+                data-status="Pending"
+                data-country="United States"
+                data-fee="5%"
+                data-processor="Stripe"
+                data-reference="REF-9A2F18"
+              >
+                <td>12 Feb 2026</td>
+                <td>Dima Vicol</td>
+                <td>9705</td>
+                <td>FACEBK</td>
+                <td><span class="um-muted">FACEBK *MWM9REMZS2</span></td>
+                <td class="fin-amount negative">-$62</td>
+                <td><span class="um-badge um-badge--yellow">Pending</span></td>
+                <td style="text-align:right;">
+                  <button class="um-btn um-btn--ghost" type="button" data-open>Details</button>
+                </td>
+              </tr>
+
+              <tr
+                data-details
+                data-id="TX-10002"
+                data-date="2026-02-12"
+                data-name="Liquori Lang"
+                data-email="liquori@example.com"
+                data-card="543306******6291"
+                data-last4="6291"
+                data-merchant="FACEBK"
+                data-description="FACEBK *ERNZ9ER6K2"
+                data-amount="-118.00"
+                data-currency="USD"
+                data-status="Pending"
+                data-country="United States"
+                data-fee="6%"
+                data-processor="Stripe"
+                data-reference="REF-1C88D0"
+              >
+                <td>12 Feb 2026</td>
+                <td>Liquori Lang</td>
+                <td>6291</td>
+                <td>FACEBK</td>
+                <td><span class="um-muted">FACEBK *ERNZ9ER6K2</span></td>
+                <td class="fin-amount negative">-$118</td>
+                <td><span class="um-badge um-badge--yellow">Pending</span></td>
+                <td style="text-align:right;">
+                  <button class="um-btn um-btn--ghost" type="button" data-open>Details</button>
+                </td>
+              </tr>
+
+              <tr
+                data-details
+                data-id="TX-10003"
+                data-date="2025-09-17"
+                data-name="Juniper Solan"
+                data-email="juniper@example.com"
+                data-card="**** **** **** 0831"
+                data-last4="0831"
+                data-merchant="TABOOLA.COM LTD"
+                data-description="TABOOLA.COM LTD DOVER DEUS"
+                data-amount="7.23"
+                data-currency="USD"
+                data-status="Declined"
+                data-country="United Kingdom"
+                data-fee="3%"
+                data-processor="Stripe"
+                data-reference="REF-7F01AA"
+              >
+                <td>17 Sep 2025</td>
+                <td>Juniper Solan</td>
+                <td>0831</td>
+                <td>TABOOLA</td>
+                <td><span class="um-muted">TABOOLA.COM LTD DOVER DEUS</span></td>
+                <td class="fin-amount positive">$7.23</td>
+                <td><span class="um-badge um-badge--red">Declined</span></td>
+                <td style="text-align:right;">
+                  <button class="um-btn um-btn--ghost" type="button" data-open>Details</button>
+                </td>
+              </tr>
+
+              <tr
+                data-details
+                data-id="TX-10004"
+                data-date="2025-07-02"
+                data-name="Luca Moretti"
+                data-email="luca@example.com"
+                data-card="**** **** **** 1908"
+                data-last4="1908"
+                data-merchant="BLACKHATWORLD.COM"
+                data-description="approved or completed successfully"
+                data-amount="30.00"
+                data-currency="USD"
+                data-status="Success"
+                data-country="Italy"
+                data-fee="2%"
+                data-processor="Stripe"
+                data-reference="REF-CC92B1"
+              >
+                <td>02 Jul 2025</td>
+                <td>Luca Moretti</td>
+                <td>1908</td>
+                <td>BLACKHATWORLD</td>
+                <td><span class="um-muted">approved or completed successfully</span></td>
+                <td class="fin-amount positive">$30</td>
+                <td><span class="um-badge um-badge--green">Success</span></td>
+                <td style="text-align:right;">
+                  <button class="um-btn um-btn--ghost" type="button" data-open>Details</button>
+                </td>
+              </tr>
+
+              <tr
+                data-details
+                data-id="TX-10005"
+                data-date="2025-07-02"
+                data-name="Luca Moretti"
+                data-email="luca@example.com"
+                data-card="**** **** **** 1908"
+                data-last4="1908"
+                data-merchant="BLACKHATWORLD.COM"
+                data-description="no sufficient funds"
+                data-amount="30.00"
+                data-currency="USD"
+                data-status="Danger"
+                data-country="Italy"
+                data-fee="2%"
+                data-processor="Stripe"
+                data-reference="REF-1180DD"
+              >
+                <td>02 Jul 2025</td>
+                <td>Luca Moretti</td>
+                <td>1908</td>
+                <td>BLACKHATWORLD</td>
+                <td><span class="um-muted">no sufficient funds</span></td>
+                <td class="fin-amount positive">$30</td>
+                <td><span class="um-badge um-badge--red">Danger</span></td>
+                <td style="text-align:right;">
+                  <button class="um-btn um-btn--ghost" type="button" data-open>Details</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination (mock) -->
+        <div class="fin-pagination">
+          <button class="um-btn um-btn--ghost" type="button" id="txPrev">←</button>
+          <div class="fin-page" id="txPage">Page 1 of 12</div>
+          <button class="um-btn um-btn--ghost" type="button" id="txNext">→</button>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Overlay + Drawer -->
+  <div class="um-overlay" id="txOverlay" hidden></div>
+
+  <aside class="um-drawer" id="txDrawer" aria-hidden="true">
+    <div class="um-drawer__header">
+      <div>
+        <div class="um-drawer__title">Transaction Details</div>
+        <div class="um-drawer__subtitle" id="dTxId">#TX-00000</div>
+      </div>
+
+      <div class="um-drawer__actions">
+        <button class="um-btn um-btn--icon" type="button" id="txCloseBtn" aria-label="Close">✕</button>
+      </div>
+    </div>
+
+    <div class="um-drawer__body">
+      <div class="um-card">
+        <div class="um-card__title">Summary</div>
+        <div class="um-info">
+          <div class="um-info__row"><span class="um-info__label">Status</span><span class="um-info__value" id="dTxStatus">—</span></div>
+          <div class="um-info__row"><span class="um-info__label">Amount</span><span class="um-info__value" id="dTxAmount">—</span></div>
+          <div class="um-info__row"><span class="um-info__label">Date</span><span class="um-info__value" id="dTxDate">—</span></div>
+        </div>
+      </div>
+
+      <div class="um-card">
+        <div class="um-card__title">Card & Customer</div>
+        <div class="um-info">
+          <div class="um-info__row"><span class="um-info__label">Name</span><span class="um-info__value" id="dTxName">—</span></div>
+          <div class="um-info__row"><span class="um-info__label">Email</span><span class="um-info__value" id="dTxEmail">—</span></div>
+          <div class="um-info__row"><span class="um-info__label">Card</span><span class="um-info__value" id="dTxCard">—</span></div>
+          <div class="um-info__row"><span class="um-info__label">Last 4</span><span class="um-info__value" id="dTxLast4">—</span></div>
+        </div>
+      </div>
+
+      <div class="um-card">
+        <div class="um-card__title">Merchant</div>
+        <div class="um-info">
+          <div class="um-info__row"><span class="um-info__label">Merchant</span><span class="um-info__value" id="dTxMerchant">—</span></div>
+          <div class="um-info__row"><span class="um-info__label">Description</span><span class="um-info__value" id="dTxDesc">—</span></div>
+          <div class="um-info__row"><span class="um-info__label">Country</span><span class="um-info__value" id="dTxCountry">—</span></div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <script>
+    // ===== Drawer open/close =====
+    const txOverlay = document.getElementById("txOverlay");
+    const txDrawer = document.getElementById("txDrawer");
+
+    const dTxId = document.getElementById("dTxId");
+    const dTxStatus = document.getElementById("dTxStatus");
+    const dTxAmount = document.getElementById("dTxAmount");
+    const dTxDate = document.getElementById("dTxDate");
+    const dTxName = document.getElementById("dTxName");
+    const dTxEmail = document.getElementById("dTxEmail");
+    const dTxCard = document.getElementById("dTxCard");
+    const dTxLast4 = document.getElementById("dTxLast4");
+    const dTxMerchant = document.getElementById("dTxMerchant");
+    const dTxDesc = document.getElementById("dTxDesc");
+    const dTxCountry = document.getElementById("dTxCountry");
+    const dTxFee = document.getElementById("dTxFee");
+    const dTxRef = document.getElementById("dTxRef");
+
+    function statusBadge(statusRaw){
+      const s = (statusRaw || "").toLowerCase();
+      if (s === "success") return `<span class="um-badge um-badge--green">Success</span>`;
+      if (s === "pending") return `<span class="um-badge um-badge--yellow">Pending</span>`;
+      if (s === "declined") return `<span class="um-badge um-badge--red">Declined</span>`;
+      if (s === "danger") return `<span class="um-badge um-badge--red">Danger</span>`;
+      return `<span class="um-badge um-badge--gray">${statusRaw || "—"}</span>`;
+    }
+
+    function openTxDrawer(tr){
+      const ds = tr.dataset;
+
+      dTxId.textContent = "#" + (ds.id || "—");
+      dTxStatus.innerHTML = statusBadge(ds.status);
+      dTxDate.textContent = ds.date || "—";
+
+      const amt = Number(ds.amount || 0);
+      const currency = ds.currency || "";
+      const sign = amt < 0 ? "-" : "";
+      const abs = Math.abs(amt).toFixed(2);
+      dTxAmount.textContent = `${sign}$${abs} ${currency}`.trim();
+
+      dTxName.textContent = ds.name || "—";
+      dTxEmail.textContent = ds.email || "—";
+      dTxCard.textContent = ds.card || "—";
+      dTxLast4.textContent = ds.last4 || "—";
+
+      dTxMerchant.textContent = ds.merchant || "—";
+      dTxDesc.textContent = ds.description || "—";
+      dTxCountry.textContent = ds.country || "—";
+
+      txOverlay.hidden = false;
+      txOverlay.classList.add("is-open");
+      txDrawer.classList.add("is-open");
+      txDrawer.setAttribute("aria-hidden", "false");
+    }
+
+    function closeTxDrawer(){
+      txOverlay.hidden = true;
+      txOverlay.classList.remove("is-open");
+      txDrawer.classList.remove("is-open");
+      txDrawer.setAttribute("aria-hidden", "true");
+    }
+
+    document.querySelectorAll("[data-details]").forEach(tr => {
+      tr.querySelector("[data-open]")?.addEventListener("click", () => openTxDrawer(tr));
+    });
+
+    txOverlay.addEventListener("click", closeTxDrawer);
+    document.getElementById("txCloseBtn").addEventListener("click", closeTxDrawer);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeTxDrawer(); });
+
+    // ===== Search + Filter =====
+    const txSearch = document.getElementById("txSearch");
+    const txStatus = document.getElementById("txStatus");
+    const txTime = document.getElementById("txTime");
+    const txClear = document.getElementById("txClear");
+    const txExport = document.getElementById("txExport");
+
+    const txTbody = document.querySelector("#txTable tbody");
+
+    function normalize(s){ return (s || "").toString().trim().toLowerCase(); }
+
+    function rowText(tr){
+      // Search across visible columns + dataset
+      const ds = tr.dataset;
+      const chunks = [
+        tr.children[0]?.textContent, // date
+        tr.children[1]?.textContent, // name
+        tr.children[2]?.textContent, // last4
+        tr.children[3]?.textContent, // merchant
+        tr.children[4]?.textContent, // desc
+        ds.email
+      ];
+      return normalize(chunks.join(" "));
+    }
+
+    function rowStatus(tr){
+      const badge = tr.children[6]?.querySelector(".um-badge");
+      return normalize(badge ? badge.textContent : tr.children[6]?.textContent);
+    }
+
+    function rowDate(tr){
+      const ds = tr.dataset;
+      const d = new Date(ds.date || tr.children[0]?.textContent || "");
+      return isNaN(d.getTime()) ? new Date(0) : d;
+    }
+
+    function applyTxFilters(){
+      const q = normalize(txSearch.value);
+      const st = normalize(txStatus.value);
+      const days = txTime.value === "all" ? null : Number(txTime.value);
+
+      const now = new Date();
+      const rows = Array.from(txTbody.querySelectorAll("tr"));
+
+      rows.forEach(tr => {
+        const okSearch = !q ? true : rowText(tr).includes(q);
+        const s = rowStatus(tr);
+        const okStatus = (st === "all") ? true : (s === st);
+
+        let okTime = true;
+        if (days){
+          const d = rowDate(tr);
+          const diffDays = (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24);
+          okTime = diffDays <= days;
+        }
+
+        tr.style.display = (okSearch && okStatus && okTime) ? "" : "none";
+      });
+    }
+
+    txSearch.addEventListener("input", applyTxFilters);
+    txStatus.addEventListener("change", applyTxFilters);
+    txTime.addEventListener("change", applyTxFilters);
+
+    txClear.addEventListener("click", () => {
+      txSearch.value = "";
+      txStatus.value = "all";
+      txTime.value = "all";
+      applyTxFilters();
+    });
+
+    txExport.addEventListener("click", () => {
+      alert("Mock: Export to Excel. Next step: generate CSV/XLSX from filtered rows.");
+    });
+
+    applyTxFilters();
+
+    // Pagination buttons (mock)
+    document.getElementById("txPrev").addEventListener("click", () => alert("Mock: prev page"));
+    document.getElementById("txNext").addEventListener("click", () => alert("Mock: next page"));
+  </script>
+</body>
+</html>
