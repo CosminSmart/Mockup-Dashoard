@@ -43,7 +43,8 @@
                 <div class="stat-box"></div>
             </div>
 
-            <div class="filters">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div class="filters" style="margin-bottom: 0; flex: 1;">
                 <input type="text" id="searchInput" placeholder="Search accounts...">
                 <select id="platformFilter">
                     <option value="">All Platforms</option>
@@ -64,6 +65,8 @@
                     <option value="client-b">Client B</option>
                     <option value="client-c">Client C</option>
                 </select>
+                </div>
+                <button class="btn" onclick="openAddAccountModal()" style="margin-left: 1rem;">+ Add Account</button>
             </div>
 
             <table>
@@ -149,6 +152,7 @@
 
     <div class="overlay" id="overlay" onclick="closeModal()"></div>
     <div class="overlay" id="notesOverlay" onclick="closeNotesModal()"></div>
+    <div class="overlay" id="addAccountOverlay" onclick="closeAddAccountModal()"></div>
     
     <div class="modal" id="accountModal">
         <div class="modal-content">
@@ -291,6 +295,37 @@
         </div>
     </div>
 
+    <div class="modal" id="addAccountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Account</h2>
+                <button class="close-btn" onclick="closeAddAccountModal()">&times;</button>
+            </div>
+
+            <div class="field-group">
+                <label>Account Name</label>
+                <input type="text" id="addAccountName" placeholder="Enter account name">
+            </div>
+
+            <div class="field-group">
+                <label>Email</label>
+                <input type="email" id="addAccountEmail" placeholder="Enter email">
+            </div>
+
+            <div class="field-group">
+                <label>Client</label>
+                <input type="text" id="addAccountClient" placeholder="Enter client name">
+            </div>
+
+            <div class="field-group">
+                <label>Options (Optional)</label>
+                <textarea id="addAccountOptions" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; resize: vertical;" placeholder="Enter any additional options..."></textarea>
+            </div>
+
+            <button class="btn" style="width: 100%;">Create Account</button>
+        </div>
+    </div>
+
     <script>
         function openModal(accountId) {
             document.getElementById('accountModal').classList.add('active');
@@ -310,6 +345,16 @@
         function closeNotesModal() {
             document.getElementById('notesModal').classList.remove('active');
             document.getElementById('notesOverlay').classList.remove('active');
+        }
+
+        function openAddAccountModal() {
+            document.getElementById('addAccountModal').classList.add('active');
+            document.getElementById('addAccountOverlay').classList.add('active');
+        }
+
+        function closeAddAccountModal() {
+            document.getElementById('addAccountModal').classList.remove('active');
+            document.getElementById('addAccountOverlay').classList.remove('active');
         }
 
         function addCustomField() {
