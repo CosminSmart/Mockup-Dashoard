@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -221,31 +222,6 @@
               </div>
             </div>
 
-            <!-- Billing Terms -->
-            <div class="um-card" id="billingCard">
-              <div class="um-card__head">
-                <div class="um-card__title">Billing Terms</div>
-                <div class="um-card__head-actions">
-                  <button class="um-btn um-btn--ghost" type="button" id="billEditBtn">Edit</button>
-                  <button class="um-btn um-btn--ghost" type="button" id="billSaveBtn" hidden>Save</button>
-                  <button class="um-btn um-btn--ghost" type="button" id="billCancelBtn" hidden>Cancel</button>
-                </div>
-              </div>
-
-              <div class="um-table-wrap" style="padding:0; background:transparent;">
-                <table class="um-table-mini">
-                  <thead>
-                    <tr>
-                      <th>Type</th>
-                      <th>Interval</th>
-                      <th>Amount</th>
-                    </tr>
-                  </thead>
-                  <tbody id="billBody"></tbody>
-                </table>
-              </div>
-            </div>
-
           </div>
 
           <!-- Right column -->
@@ -275,11 +251,11 @@
                     <span>TRC Fee</span>
                     <strong id="trcFeeText">—</strong>
                   </div>
+                </div>
               </div>
-            </div>
 
               <!-- edit (inputs only; percent stays visible above) -->
-              <div id="netEdit" hidden class="um-two-col">
+              <div id="netEdit" hidden class="um-two-col" style="margin-top:10px;">
                 <div class="um-field" style="margin-bottom:0;">
                   <input class="um-input um-inline-input" id="ercFeeInput" inputmode="decimal" placeholder="0" />
                 </div>
@@ -306,6 +282,10 @@
                     <tr>
                       <th>Account Type</th>
                       <th>Page Setup</th>
+                      <th>Init Interval</th>
+                      <th>Init Amount</th>
+                      <th>Rec Interval</th>
+                      <th>Rec Amount</th>
                       <th>Fee</th>
                     </tr>
                   </thead>
@@ -367,6 +347,7 @@
       countryInput: document.getElementById("countryInput"),
       statusInput: document.getElementById("statusInput"),
 
+      // network fees
       ercFeeText: document.getElementById("ercFeeText"),
       trcFeeText: document.getElementById("trcFeeText"),
       ercFeeInput: document.getElementById("ercFeeInput"),
@@ -377,17 +358,13 @@
       netSaveBtn: document.getElementById("netSaveBtn"),
       netCancelBtn: document.getElementById("netCancelBtn"),
 
+      // fee table
       feeBody: document.getElementById("feeBody"),
       feeEditBtn: document.getElementById("feeEditBtn"),
       feeSaveBtn: document.getElementById("feeSaveBtn"),
       feeCancelBtn: document.getElementById("feeCancelBtn"),
 
       notFound: document.getElementById("notFound"),
-
-      billBody: document.getElementById("billBody"),
-      billEditBtn: document.getElementById("billEditBtn"),
-      billSaveBtn: document.getElementById("billSaveBtn"),
-      billCancelBtn: document.getElementById("billCancelBtn"),
     };
 
     function initials(name){
@@ -418,6 +395,7 @@
       return s;
     }
 
+    // Money parser: "$250" or "250$" or "250"
     function parseMoneyOrNumber(s){
       const raw = String(s ?? "").trim();
       if (!raw) return { value:null, prefix:"", suffix:"" };
@@ -454,6 +432,13 @@
 
     function clamp0(n){ return Math.max(0, n); }
 
+    // Apply discount rules:
+    // - If target is percent (fee "5%"):
+    //    mode "%" => new = old * (1 - disc/100)
+    //    mode "$" => treat as "percentage points off": new = old - disc
+    // - If target is money (setup "$250"):
+    //    mode "%" => new = old * (1 - disc/100)
+    //    mode "$" => new = old - disc
     function applyDiscountToValue(originalStr, discountValue, discountMode){
       const s = String(originalStr ?? "").trim();
       const disc = Number(discountValue);
@@ -488,16 +473,14 @@
     let client = null;
     let snapshot = null;
 
+    // snapshots
     let netSnap = null;
     let feeSnap = null;
 
     let feeEditing = false;
 
-    let openDiscount = { rowIdx: null, col: null };
-
-    // ✅ billing state (MUTAT SUS)
-    let billSnap = null;
-    let billEditing = false;
+    // keep track of inline discount editor (only one open at a time)
+    let openDiscount = { rowIdx: null, col: null }; // col: "setup" | "fee"
 
     function loadClient(){
       if (!id) return null;
@@ -512,19 +495,43 @@
 
       if (!Array.isArray(client.feeTable) || client.feeTable.length === 0){
         client.feeTable = [
-          { type: "Google Ads", setup: "$250", fee: "5%" },
-          { type: "Facebook Ads", setup: "$250", fee: "6%" },
-          { type: "TikTok Ads", setup: "$250", fee: "3%" },
+          {
+            type: "Google Ads",
+            setup: "$250",
+            initInterval: 21,
+            initAmount: "$30",
+            recInterval: 30,
+            recAmount: "$50",
+            fee: "5%"
+          },
+          {
+            type: "Facebook Ads",
+            setup: "$250",
+            initInterval: 21,
+            initAmount: "$30",
+            recInterval: 30,
+            recAmount: "$50",
+            fee: "6%"
+          },
+          {
+            type: "TikTok Ads",
+            setup: "$250",
+            initInterval: 21,
+            initAmount: "$30",
+            recInterval: 30,
+            recAmount: "$50",
+            fee: "3%"
+          },
         ];
       }
 
-      // ✅ billing defaults (AICI, nu jos)
-      if (!client.billing){
-        client.billing = {
-          initial: { days: 21, amount: "$30" },
-          recurring: { days: 30, amount: "$50" }
-        };
-      }
+      // ensure new fields exist on each row
+      client.feeTable.forEach(r => {
+        if (r.initInterval === undefined) r.initInterval = 21;
+        if (r.initAmount === undefined) r.initAmount = "$30";
+        if (r.recInterval === undefined) r.recInterval = 30;
+        if (r.recAmount === undefined) r.recAmount = "$50";
+      });
     }
 
     function persist(){
@@ -585,38 +592,54 @@
       client.feeTable.forEach((row, idx) => {
         const tr = document.createElement("tr");
 
-        const tdType = document.createElement("td");
-        tdType.textContent = row.type || "—";
+        const tdType    = document.createElement("td");
+        const tdSetup   = document.createElement("td");
+        const tdInitInt = document.createElement("td");
+        const tdInitAmt = document.createElement("td");
+        const tdRecInt  = document.createElement("td");
+        const tdRecAmt  = document.createElement("td");
+        const tdFee     = document.createElement("td");
 
-        const tdSetup = document.createElement("td");
-        const tdFee = document.createElement("td");
+        tdType.textContent = row.type || "—";
 
         if (feeEditing){
           tdSetup.innerHTML = `
             <input class="um-input um-inline-input" data-setup-input data-idx="${idx}"
               value="${String(row.setup ?? "").replace(/"/g, "&quot;")}" />
           `;
+          tdInitInt.innerHTML = `<input class="um-input um-inline-input" data-init-int data-idx="${idx}" value="${String(row.initInterval ?? "")}">`;
+          tdInitAmt.innerHTML = `<input class="um-input um-inline-input" data-init-amt data-idx="${idx}" value="${String(row.initAmount ?? "").replace(/"/g,"&quot;")}">`;
+          tdRecInt.innerHTML  = `<input class="um-input um-inline-input" data-rec-int data-idx="${idx}" value="${String(row.recInterval ?? "")}">`;
+          tdRecAmt.innerHTML  = `<input class="um-input um-inline-input" data-rec-amt data-idx="${idx}" value="${String(row.recAmount ?? "").replace(/"/g,"&quot;")}">`;
           tdFee.innerHTML = `
             <input class="um-input um-inline-input" data-fee-input data-idx="${idx}"
               value="${String(row.fee ?? "").replace(/"/g, "&quot;")}" />
           `;
         } else {
-          if (openDiscount.rowIdx === idx && openDiscount.col === "setup"){
-            tdSetup.innerHTML = buildDiscountInlineEditor(idx, "setup");
-          } else {
-            tdSetup.innerHTML = buildDiscountCellView(row.setup, idx, "setup");
-          }
+          tdSetup.innerHTML =
+            (openDiscount.rowIdx === idx && openDiscount.col === "setup")
+              ? buildDiscountInlineEditor(idx, "setup")
+              : buildDiscountCellView(row.setup, idx, "setup");
 
-          if (openDiscount.rowIdx === idx && openDiscount.col === "fee"){
-            tdFee.innerHTML = buildDiscountInlineEditor(idx, "fee");
-          } else {
-            tdFee.innerHTML = buildDiscountCellView(row.fee, idx, "fee");
-          }
+          tdInitInt.textContent = row.initInterval ?? "—";
+          tdInitAmt.innerHTML   = `<strong>${row.initAmount ?? "—"}</strong>`;
+          tdRecInt.textContent  = row.recInterval ?? "—";
+          tdRecAmt.innerHTML    = `<strong>${row.recAmount ?? "—"}</strong>`;
+
+          tdFee.innerHTML =
+            (openDiscount.rowIdx === idx && openDiscount.col === "fee")
+              ? buildDiscountInlineEditor(idx, "fee")
+              : buildDiscountCellView(row.fee, idx, "fee");
         }
 
         tr.appendChild(tdType);
         tr.appendChild(tdSetup);
+        tr.appendChild(tdInitInt);
+        tr.appendChild(tdInitAmt);
+        tr.appendChild(tdRecInt);
+        tr.appendChild(tdRecAmt);
         tr.appendChild(tdFee);
+
         els.feeBody.appendChild(tr);
       });
 
@@ -626,57 +649,21 @@
       }
     }
 
-    // ✅ Billing renderer (LIPSEA)
-    function renderBilling(){
-      const rows = [
-        { key: "initial", label: "Initial payment" },
-        { key: "recurring", label: "Recurring" }
-      ];
-
-      els.billBody.innerHTML = "";
-
-      rows.forEach(r => {
-        const data = client.billing?.[r.key] || {};
-        const tr = document.createElement("tr");
-
-        const tdType = document.createElement("td");
-        tdType.textContent = r.label;
-
-        const tdDays = document.createElement("td");
-        const tdAmount = document.createElement("td");
-
-        if (!billEditing){
-          tdDays.textContent = (data.days ?? "—") + " zile";
-          tdAmount.innerHTML = `<strong>${data.amount ?? "—"}</strong>`;
-        } else {
-          tdDays.innerHTML = `<input class="um-input um-inline-input" data-bill-days="${r.key}" value="${data.days ?? ""}">`;
-          tdAmount.innerHTML = `<input class="um-input um-inline-input" data-bill-amount="${r.key}" value="${data.amount ?? ""}">`;
-        }
-
-        tr.appendChild(tdType);
-        tr.appendChild(tdDays);
-        tr.appendChild(tdAmount);
-        els.billBody.appendChild(tr);
-      });
-    }
-
     function renderAll(){
       if (!client){
         els.notFound.hidden = false;
         els.editBtn.disabled = true;
         els.netEditBtn.disabled = true;
         els.feeEditBtn.disabled = true;
-        els.billEditBtn.disabled = true;
         return;
       }
 
       renderProfile();
       renderNetworkFees();
       renderFeeTable();
-      renderBilling(); // ✅ adăugat
     }
 
-    // ===== Profile edit =====
+    // ===== Profile edit (left) =====
     function enterEdit(){
       snapshot = JSON.parse(JSON.stringify(client));
 
@@ -732,7 +719,7 @@
       els.ercFeeInput.value = (erc !== null && !Number.isNaN(erc)) ? String(erc) : String(client.ercFee ?? "");
       els.trcFeeInput.value = (trc !== null && !Number.isNaN(trc)) ? String(trc) : String(client.trcFee ?? "");
 
-      // ✅ procentul rămâne sus, doar apar inputurile jos
+      // show both view + edit (inputs under values)
       els.netView.hidden = false;
       els.netEdit.hidden = false;
 
@@ -768,10 +755,12 @@
       exitNetEdit(false);
     }
 
-    // ===== Fee edit =====
+    // ===== Fee table edit (manual edit mode) =====
     function enterFeeEdit(){
       feeSnap = JSON.parse(JSON.stringify(client));
       feeEditing = true;
+
+      // close any discount inline editor
       openDiscount = { rowIdx: null, col: null };
 
       els.feeEditBtn.hidden = true;
@@ -794,28 +783,41 @@
     }
 
     function saveFeeTable(){
-      const setupInputs = Array.from(document.querySelectorAll("[data-setup-input]"));
-      const feeInputs   = Array.from(document.querySelectorAll("[data-fee-input]"));
-
-      setupInputs.forEach(inp => {
+      document.querySelectorAll("[data-setup-input]").forEach(inp => {
         const idx = Number(inp.dataset.idx);
-        if (!Number.isNaN(idx) && client.feeTable[idx]){
-          client.feeTable[idx].setup = inp.value.trim();
-        }
+        if (client.feeTable[idx]) client.feeTable[idx].setup = inp.value.trim();
       });
 
-      feeInputs.forEach(inp => {
+      document.querySelectorAll("[data-init-int]").forEach(inp => {
         const idx = Number(inp.dataset.idx);
-        if (!Number.isNaN(idx) && client.feeTable[idx]){
-          client.feeTable[idx].fee = inp.value.trim();
-        }
+        if (client.feeTable[idx]) client.feeTable[idx].initInterval = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-init-amt]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].initAmount = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-rec-int]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].recInterval = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-rec-amt]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].recAmount = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-fee-input]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].fee = inp.value.trim();
       });
 
       persist();
       exitFeeEdit(false);
     }
 
-    // ===== Discount inline =====
+    // ===== Discount inline (per row, per cell) =====
     function openDiscountEditor(idx, col){
       openDiscount = { rowIdx: idx, col };
       renderFeeTable();
@@ -840,6 +842,7 @@
       closeDiscountEditor();
     }
 
+    // Event delegation inside fee table
     els.feeBody.addEventListener("click", (e) => {
       const openBtn = e.target.closest("[data-discount-open]");
       if (openBtn){
@@ -882,45 +885,6 @@
       }
     });
 
-    // ===== Billing edit handlers =====
-    function enterBillEdit(){
-      billSnap = JSON.parse(JSON.stringify(client));
-      billEditing = true;
-
-      els.billEditBtn.hidden = true;
-      els.billSaveBtn.hidden = false;
-      els.billCancelBtn.hidden = false;
-
-      renderBilling();
-    }
-
-    function exitBillEdit(restore){
-      if (restore && billSnap) client = billSnap;
-
-      billEditing = false;
-
-      els.billEditBtn.hidden = false;
-      els.billSaveBtn.hidden = true;
-      els.billCancelBtn.hidden = true;
-
-      renderBilling();
-    }
-
-    function saveBilling(){
-      document.querySelectorAll("[data-bill-days]").forEach(inp => {
-        const key = inp.dataset.billDays;
-        if (client.billing?.[key]) client.billing[key].days = inp.value.trim();
-      });
-
-      document.querySelectorAll("[data-bill-amount]").forEach(inp => {
-        const key = inp.dataset.billAmount;
-        if (client.billing?.[key]) client.billing[key].amount = inp.value.trim();
-      });
-
-      persist();
-      exitBillEdit(false);
-    }
-
     // ===== init =====
     client = loadClient();
     if (client){
@@ -929,25 +893,23 @@
     }
     renderAll();
 
-    // events
+    // profile events
     els.editBtn.addEventListener("click", enterEdit);
     els.cancelBtn.addEventListener("click", () => exitEdit(true));
     els.saveBtn.addEventListener("click", saveProfile);
 
+    // network fees events
     els.netEditBtn.addEventListener("click", enterNetEdit);
     els.netCancelBtn.addEventListener("click", () => exitNetEdit(true));
     els.netSaveBtn.addEventListener("click", saveNetFees);
 
+    // fee table events
     els.feeEditBtn.addEventListener("click", enterFeeEdit);
     els.feeCancelBtn.addEventListener("click", () => exitFeeEdit(true));
     els.feeSaveBtn.addEventListener("click", saveFeeTable);
-
-    // ✅ billing listeners (o singură dată)
-    els.billEditBtn.addEventListener("click", enterBillEdit);
-    els.billCancelBtn.addEventListener("click", () => exitBillEdit(true));
-    els.billSaveBtn.addEventListener("click", saveBilling);
   </script>
 
   <script src="../js/sidebar.js"></script>
 </body>
 </html>
+```
