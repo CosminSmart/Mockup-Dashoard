@@ -454,11 +454,43 @@
         
         <main class="main">
             <div class="statistics">
-                <div class="stat-box"></div>
-                <div class="stat-box"></div>
-                <div class="stat-box"></div>
-                <div class="stat-box"></div>
-                <div class="stat-box"></div>
+                <div class="stat-box">
+                    <h4>GENERAL WALLET BALANCE</h4>
+                    <div class="stat-value">$783.04</div>
+                    <div class="stat-description">This is "Remaining balance"</div>
+                </div>
+                <div class="stat-box">
+                    <h4>INDIVIDUAL BALANCES TOTAL</h4>
+                    <div class="stat-value">$1,080.00</div>
+                    <div class="stat-description">Sum of per-account balances</div>
+                </div>
+                <div class="stat-box">
+                    <h4>ACCOUNTS ON GENERAL</h4>
+                    <div class="stat-value">1</div>
+                    <div class="stat-badges">
+                        <span class="badge badge-general">General</span>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <h4>ACCOUNTS ON INDIVIDUAL</h4>
+                    <div class="stat-value">1</div>
+                    <div class="stat-badges">
+                        <span class="badge badge-individual">Individual</span>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <h4>SPEND (PERIOD)</h4>
+                    <div class="stat-value">$1,026.96</div>
+                    <div class="stat-description">Includes manual spend for CL</div>
+                </div>
+                <div class="stat-box">
+                    <h4>STATUS (ACTIVE/RESTRICTED)</h4>
+                    <div class="stat-value">1 / 0</div>
+                    <div class="stat-badges">
+                        <span class="badge badge-active">Active</span>
+                        <span class="badge badge-restricted">Restricted</span>
+                    </div>
+                </div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
@@ -471,17 +503,37 @@
                     <option value="taboola">Taboola</option>
                     <option value="outbrain">Outbrain</option>
                     <option value="microsoft">Microsoft</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="snapchat">Snapchat</option>
                 </select>
                 <select id="statusFilter">
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="restricted">Restricted</option>
+                    <option value="in-review">In Review</option>
+                    <option value="disabled">Disabled</option>
                 </select>
-                <select id="clientFilter">
-                    <option value="">All Clients</option>
-                    <option value="client-a">Client A</option>
-                    <option value="client-b">Client B</option>
-                    <option value="client-c">Client C</option>
+                <select id="assignedFilter">
+                    <option value="">Assigned + Unassigned</option>
+                    <option value="assigned">Assigned</option>
+                    <option value="unassigned">Unassigned</option>
+                </select>
+                <select id="assetTypeFilter">
+                    <option value="">All Asset Types</option>
+                    <option value="ad-account">Ad Account</option>
+                    <option value="profile">Profile</option>
+                    <option value="bm">BM</option>
+                    <option value="page">Page</option>
+                </select>
+                <select id="balanceTypeFilter">
+                    <option value="">All Balance Types</option>
+                    <option value="general">General</option>
+                    <option value="individual">Individual</option>
+                </select>
+                <select id="contractFilter">
+                    <option value="">All Contracts</option>
+                    <option value="recurring">Recurring</option>
+                    <option value="one-time">One Time</option>
                 </select>
                 </div>
                 <button class="btn" onclick="openAddAccountModal()" style="margin-left: 1rem;">+ Add Account</button>

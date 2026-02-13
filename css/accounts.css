@@ -138,7 +138,7 @@ th {
 
 .statistics {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
@@ -148,18 +148,63 @@ th {
     padding: 1.5rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #e5e5e5;
 }
 
 .stat-box h4 {
-    margin-bottom: 0.5rem;
-    color: #7f8c8d;
-    font-size: 0.9rem;
+    margin-bottom: 0.8rem;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
 .stat-value {
-    font-size: 1.8rem;
+    font-size: 2rem;
     font-weight: bold;
-    color: #2c3e50;
+    color: #111827;
+    margin-bottom: 0.5rem;
+}
+
+.stat-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+.stat-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.badge-general {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-individual {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-active {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.badge-restricted {
+    background: #fee2e2;
+    color: #991b1b;
 }
 
 .icon-btn {
