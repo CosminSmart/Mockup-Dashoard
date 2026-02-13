@@ -224,6 +224,41 @@
           </div>
         </div>
       </div>
+
+      <!-- Activity Logs -->
+<div class="um-card">
+  <div class="um-card__title">Activity Logs</div>
+
+<div class="um-list" id="dLogs">
+  <div class="um-list__item">
+    <span>Updated fee settings</span>
+    <strong>2026-02-12 14:22</strong>
+  </div>
+
+  <div class="um-list__item">
+    <span>Placed support ticket</span>
+    <strong>2026-02-12 13:10</strong>
+  </div>
+
+  <div class="um-list__item">
+    <span>Created new request</span>
+    <strong>2026-02-11 18:05</strong>
+  </div>
+
+  <div class="um-list__item">
+    <span>Deleted account connection</span>
+    <strong>2026-02-10 09:33</strong>
+  </div>
+
+  <div class="um-list__item">
+    <span>Edited billing terms</span>
+    <strong>2026-02-09 16:40</strong>
+  </div>
+</div>
+
+</div>
+
+
     </div>
   </aside>
 
@@ -364,10 +399,12 @@ const dEmail = document.getElementById("dEmail");
 const dPhone = document.getElementById("dPhone");
 const dTelegram = document.getElementById("dTelegram"); // ✅ ADD
 const dCountry = document.getElementById("dCountry");
+const dLogs = document.getElementById("dLogs");
 const dSpend = document.getElementById("dSpend");
 const dValue = document.getElementById("dValue");
 const dActiveAccounts = document.getElementById("dActiveAccounts");
 const dEngagement = document.getElementById("dEngagement");
+
 
 function openDrawer(data) {
   dId.textContent = "#" + data.id;
@@ -381,11 +418,13 @@ function openDrawer(data) {
   const isActive = (data.status || "").toLowerCase() === "active";
   dStatus.innerHTML = `<span class="um-badge ${isActive ? "um-badge--green" : "um-badge--gray"}">${data.status}</span>`;
 
+
   overlay.hidden = false;
   overlay.classList.add("is-open");
   drawer.classList.add("is-open");
   drawer.setAttribute("aria-hidden", "false");
 }
+
 
 function closeDrawer() {
   overlay.hidden = true;
