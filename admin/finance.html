@@ -1,1468 +1,375 @@
 <!DOCTYPE html>
 <html lang="ro">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Finance (Ledger) - Client/Admin</title>
-  <style>
-    :root{
-      --bg:#0b0d12; --panel:#121625; --panel2:#0f1320; --border:rgba(255,255,255,.08);
-      --text:#e9eefc; --muted:rgba(233,238,252,.62);
-      --accent:#7c5cff; --ok:#2dd4bf; --warn:#fbbf24; --bad:#fb7185;
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background: radial-gradient(1200px 600px at 20% -10%, rgba(124,92,255,.35), transparent 60%),
-                  radial-gradient(900px 500px at 110% 10%, rgba(45,212,191,.25), transparent 60%),
-                  var(--bg);
-      color:var(--text);
-    }
-    .wrap{max-width:1200px; margin:0 auto; padding:20px}
-    header{display:flex; gap:12px; align-items:center; justify-content:space-between; margin-bottom:14px}
-    .title{display:flex; flex-direction:column}
-    .title h1{margin:0; font-size:18px}
-    .title small{color:var(--muted)}
-    .bar{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
-    .chip{
-      border:1px solid var(--border); background: rgba(255,255,255,.04);
-      padding:8px 10px; border-radius:999px; color:var(--muted); font-size:12px;
-      display:flex; gap:8px; align-items:center;
-    }
-    .chip strong{color:var(--text); font-weight:700}
-    .btn{
-      border:1px solid var(--border); background: rgba(255,255,255,.05);
-      color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer;
-      font-weight:650; font-size:13px;
-    }
-    .btn.primary{background: rgba(124,92,255,.18); border-color: rgba(124,92,255,.35)}
-    .btn.ok{background: rgba(45,212,191,.12); border-color: rgba(45,212,191,.30)}
-    .btn.bad{background: rgba(251,113,133,.12); border-color: rgba(251,113,133,.30)}
-    .btn:disabled{opacity:.45; cursor:not-allowed}
-    .grid{display:grid; grid-template-columns: 1.1fr .9fr; gap:14px}
-    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Finance</title>
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="../css/accounts.css">
+    <style>
+        .finance-container {
+            width: 100%;
+        }
 
-    .cards{display:grid; grid-template-columns: repeat(7, 1fr); gap:10px; margin-bottom:14px}
-    @media (max-width: 980px){ .cards{grid-template-columns: repeat(2, 1fr)} }
-    .card{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding:12px;
-      min-height:70px;
-    }
-    .card .k{color:var(--muted); font-size:12px}
-    .card .v{font-size:16px; margin-top:6px; font-weight:800}
-    .card .s{font-size:11px; color:var(--muted); margin-top:2px}
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
 
-    .panel{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow:hidden;
-    }
-    .panel-head{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      padding:12px 14px; border-bottom:1px solid var(--border);
-      background: rgba(0,0,0,.12);
-    }
-    .panel-head h2{margin:0; font-size:14px}
-    .panel-head small{color:var(--muted)}
-    .tabs{display:flex; gap:8px; flex-wrap:wrap}
-    .tab{
-      border:1px solid var(--border); background: rgba(255,255,255,.04);
-      color:var(--muted); padding:8px 10px; border-radius:999px; cursor:pointer;
-      font-size:12px; font-weight:700;
-    }
-    .tab.active{color:var(--text); border-color: rgba(124,92,255,.35); background: rgba(124,92,255,.16)}
-    .panel-body{padding:14px}
+        .wallet-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
 
-    table{width:100%; border-collapse:collapse}
-    th, td{padding:10px 8px; border-bottom:1px solid var(--border); text-align:left; font-size:13px}
-    th{color:var(--muted); font-weight:700; font-size:12px}
-    td small{color:var(--muted)}
-    .row-actions{display:flex; gap:8px; flex-wrap:wrap}
-    .pill{display:inline-flex; gap:6px; align-items:center; padding:4px 8px; border-radius:999px; font-size:11px;
-      border:1px solid var(--border); background: rgba(255,255,255,.04); color:var(--muted);
-    }
-    .pill.ok{border-color: rgba(45,212,191,.30); background: rgba(45,212,191,.10); color: rgba(233,238,252,.9)}
-    .pill.warn{border-color: rgba(251,191,36,.30); background: rgba(251,191,36,.10); color: rgba(233,238,252,.9)}
-    .pill.bad{border-color: rgba(251,113,133,.30); background: rgba(251,113,133,.10); color: rgba(233,238,252,.9)}
-    .muted{color:var(--muted)}
-    .split{display:grid; grid-template-columns:1fr 1fr; gap:10px}
-    @media (max-width: 680px){ .split{grid-template-columns:1fr} }
-    .field{display:flex; flex-direction:column; gap:6px; margin-bottom:10px}
-    .field label{font-size:12px; color:var(--muted)}
-    .input, select{
-      background: rgba(0,0,0,.18);
-      border:1px solid var(--border);
-      color:var(--text);
-      padding:10px 10px;
-      border-radius: 12px;
-      outline:none;
-    }
-    .help{font-size:11px; color:var(--muted)}
-    .notice{
-      padding:10px 12px; border-radius:14px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,.04);
-      color:var(--muted);
-      font-size:12px;
-    }
+        .wallet-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
 
-    /* modal */
-    .modal{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:18px; z-index:9999}
-    .modal[hidden]{display:none}
-    .overlay{position:absolute; inset:0; background: rgba(0,0,0,.55); backdrop-filter: blur(6px)}
-    .dialog{
-      position:relative; width:min(820px, 100%); max-height: 86vh; overflow:auto;
-      border:1px solid var(--border); border-radius: 18px;
-      background: linear-gradient(180deg, rgba(18,22,37,.95), rgba(14,18,30,.92));
-      box-shadow: 0 20px 80px rgba(0,0,0,.55);
-    }
-    .dialog-head{display:flex; align-items:flex-start; justify-content:space-between; gap:10px; padding:14px 14px; border-bottom:1px solid var(--border)}
-    .dialog-head h3{margin:0; font-size:14px}
-    .dialog-head p{margin:4px 0 0; color:var(--muted); font-size:12px}
-    .dialog-body{padding:14px}
-    .dialog-foot{padding:14px; border-top:1px solid var(--border); display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap}
-    .x{background:transparent; border:1px solid var(--border); color:var(--text); width:36px; height:36px; border-radius:12px; cursor:pointer}
-    .right-panel .panel-body{padding-top:10px}
-    .hr{height:1px; background: var(--border); margin:12px 0}
-    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
-  </style>
+        .wallet-balance {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .transfer-options {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .transfer-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #3498db;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .transfer-btn:hover {
+            background: #2980b9;
+        }
+
+        .fee-notice {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .topups-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .topup-item {
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .modal-simple {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .modal-simple.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-simple-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="title">
-        <h1>Finance (Ledger-driven)</h1>
-        <small>Același ecran: <span class="mono">Client View</span> vs <span class="mono">Admin View</span> (permisiuni + acțiuni)</small>
-      </div>
-
-      <div class="bar">
-        <div class="chip">Client: <strong id="clientName">John Client</strong></div>
-        <div class="chip">Role: <strong id="roleLabel">Admin</strong></div>
-        <button class="btn" id="toggleRoleBtn">Switch to Client</button>
-        <button class="btn" id="seedBtn">Reset Demo Data</button>
-      </div>
-    </header>
-
-    <!-- KPI cards -->
-    <section class="cards" id="kpiCards"></section>
-
-    <div class="grid">
-      <!-- left main -->
-      <section class="panel">
-        <div class="panel-head">
-          <div>
-            <h2>Finance Workspace</h2>
-            <small class="muted">Totul se calculează din ledger (tranzacții).</small>
-          </div>
-          <div class="tabs" id="tabs"></div>
-        </div>
-        <div class="panel-body" id="tabContent"></div>
-      </section>
-
-      <!-- right insights -->
-      <aside class="panel right-panel">
-        <div class="panel-head">
-          <div>
-            <h2>Details & Rules</h2>
-            <small class="muted">Ce vede clientul vs ce poate face adminul</small>
-          </div>
-          <div class="row-actions">
-            <button class="btn primary" id="openLedgerBtn">Open Ledger</button>
-          </div>
-        </div>
-        <div class="panel-body">
-          <div class="notice">
-            <div><strong>Model:</strong> Vault → Platform Pool → Live Budget (Shared/Assigned) → Spend</div>
-            <div class="hr"></div>
-            <div><strong>Admin:</strong> poate adăuga Top-ups, FX, Allocations, Charges, Fees, Refunds.</div>
-            <div><strong>Client:</strong> vede tot, dar nu poate modifica (în demo).</div>
-          </div>
-
-          <div class="hr"></div>
-
-          <div class="split">
-            <div class="notice">
-              <div class="muted">Fancy names:</div>
-              <div>• Vault (Main Wallet)</div>
-              <div>• Platform Pool (Reserve)</div>
-              <div>• Live Budget (Working)</div>
-              <div>• Shared / Assigned</div>
+    <div class="layout">
+        <header class="header">
+            <h1>Finance</h1>
+            <div class="header-right">
+                <div class="theme-toggle">
+                    <button class="theme-btn active">Light</button>
+                    <button class="theme-btn">Dark</button>
+                </div>
+                <div class="user-info">
+                    <span>Admin User</span>
+                    <div class="user-avatar">AU</div>
+                </div>
             </div>
-            <div class="notice">
-              <div class="muted">Important:</div>
-              <div>Top-up FX rate se îngheață la confirmare.</div>
-              <div>Totals = SUM din tranzacții, nu câmpuri.</div>
+        </header>
+        
+        <!-- Dynamic Sidebar (generated by sidebar.js) -->
+        <aside class="sidebar" id="sidebar"></aside>
+        
+        <main class="main">
+            <div class="finance-container">
+                <!-- KPI Statistics -->
+                <div class="statistics">
+                    <div class="stat-box">
+                        <h4>TOTAL TOPUPS</h4>
+                        <div class="stat-value">$5,000.00</div>
+                        <div class="stat-description">All time topups</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>MAIN WALLET</h4>
+                        <div class="stat-value">$1,000.00</div>
+                        <div class="stat-description">Available balance</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>PLATFORMs VAULT</h4>
+                        <div class="stat-value">$2,000.00</div>
+                        <div class="stat-description">
+                            <select style="width: 100%; padding: 0.3rem; border: 1px solid #ddd; border-radius: 4px; margin-top: 0.5rem; font-size: 0.85rem;">
+                                <option value="total">Total - $2,000.00</option>
+                                <option value="facebook">Facebook - $1,200.00</option>
+                                <option value="google">Google - $500.00</option>
+                                <option value="tiktok">TikTok - $300.00</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>GENERAL BALANCE</h4>
+                        <div class="stat-value">$1,200.00</div>
+                        <div class="stat-description">Shared accounts</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>INDIVIDUAL BALANCE</h4>
+                        <div class="stat-value">$300.00</div>
+                        <div class="stat-description">Individual accounts</div>
+                    </div>
+                    <div class="stat-box">
+                        <h4>TOTAL FEES</h4>
+                        <div class="stat-value">$500.00</div>
+                        <div class="stat-description">Fees collected</div>
+                    </div>
+                </div>
+
+                <!-- Main Wallet -->
+                <div class="wallet-section">
+                    <div class="wallet-header">
+                        <div>
+                            <h2>Main Wallet</h2>
+                            <div class="wallet-balance">$1s,000.00</div>
+                        </div>
+                        <button class="transfer-btn" onclick="openAddTopup()">+ Add Topup</button>
+                    </div>
+                    <div class="transfer-options">
+                        <button class="transfer-btn" onclick="openTransferModal('main-to-platform')">Transfer to Platform Vault</button>
+                    </div>
+                    <div class="fee-notice">
+                        <strong>Note:</strong> A 5% fee (set by admin in clients) will be applied when transferring to Platform Vault. Fees are non-refundable.
+                    </div>
+                </div>
+
+                <!-- Platform Vault -->
+                <div class="wallet-section">
+                    <div class="wallet-header">
+                        <div>
+                            <h2>Platform Vault</h2>
+                            <div class="wallet-balance">$2,000.00</div>
+                        </div>
+                    </div>
+                    <div class="transfer-options">
+                        <button class="transfer-btn" onclick="openTransferModal('platform-to-general')">Transfer to General Balance</button>
+                        <button class="transfer-btn" onclick="openTransferModal('platform-to-individual')">Transfer to Individual Balance</button>
+                        <button class="transfer-btn" onclick="openTransferModal('platform-to-main')">Transfer Back to Main Wallet</button>
+                        <button class="transfer-btn" onclick="openTransferModal('platform-to-platform')">Transfer to Another Platform</button>
+                    </div>
+                    <div class="fee-notice">
+                        <strong>Note:</strong> A 5% fee will be applied when transferring to another platform. Fees are non-refundable.
+                    </div>
+                </div>
+
+                <!-- Total Topups -->
+                <div class="topups-section">
+                    <h2>Total Topups</h2>
+                    <div class="topup-item">
+                        <div>
+                            <strong>Topup #1</strong>
+                            <div>Date: 2024-01-15</div>
+                        </div>
+                        <div style="font-weight: bold;">$1,000.00</div>
+                    </div>
+                    <div class="topup-item">
+                        <div>
+                            <strong>Topup #2</strong>
+                            <div>Date: 2024-01-20</div>
+                        </div>
+                        <div style="font-weight: bold;">$2,000.00</div>
+                    </div>
+                    <div class="topup-item">
+                        <div>
+                            <strong>Topup #3</strong>
+                            <div>Date: 2024-01-25</div>
+                        </div>
+                        <div style="font-weight: bold;">$2,000.00</div>
+                    </div>
+                </div>
             </div>
-          </div>
-
-          <div class="hr"></div>
-          <div class="notice">
-            <strong>Quick sanity check:</strong>
-            <div class="muted" id="sanityLine"></div>
-          </div>
-        </div>
-      </aside>
+        </main>
     </div>
-  </div>
 
-  <!-- Modal: Generic -->
-  <div class="modal" id="modal" hidden>
-    <div class="overlay" data-close="1"></div>
-    <div class="dialog">
-      <div class="dialog-head">
-        <div>
-          <h3 id="modalTitle">Modal</h3>
-          <p id="modalSubtitle">Subtitle</p>
-        </div>
-        <button class="x" id="modalCloseBtn" title="Close">✕</button>
-      </div>
-      <div class="dialog-body" id="modalBody"></div>
-      <div class="dialog-foot" id="modalFoot"></div>
-    </div>
-  </div>
-
-<script>
-/**
- * =========================
- *  LEDGER MODEL (DEMO)
- * =========================
- * We simulate double-entry style, but for simplicity we store transactions as:
- *   { id, ts, type, meta, lines:[ {account, amountUSD} ... ] }
- * Where amountUSD is + for credit to that account, - for debit from that account.
- *
- * Then balances are computed by summing lines per account.
- *
- * Accounts (examples):
- *  - vault
- *  - pool:meta
- *  - live:meta:shared
- *  - live:meta:assigned:acc_1
- *  - revenue:setup
- *  - revenue:services
- *  - revenue:fees
- *  - spend:meta
- *  - refunds:payable
- */
-
-const state = {
-  role: 'admin', // 'admin' | 'client'
-  activeTab: 'topups',
-  client: { id:'c_1', name: 'John Client' },
-  platforms: [
-    { id:'meta', name:'Meta' },
-    { id:'tiktok', name:'TikTok' },
-    { id:'google', name:'Google' },
-  ],
-  accounts: [
-    { id:'acc_1', label:'Account #1 (Meta)' , platform:'meta', feeRate:0.03 },
-    { id:'acc_2', label:'Account #2 (Meta)' , platform:'meta', feeRate:0.02 },
-    { id:'acc_3', label:'Account #3 (TikTok)' , platform:'tiktok', feeRate:0.04 },
-  ],
-  ledger: [],
-  topups: [],  // normalized view
-  charges: [], // setup/services entries (linked to tx)
-  fees: [],    // fee records (linked to spend/tx)
-};
-
-const $ = (sel) => document.querySelector(sel);
-const fmt = (n) => new Intl.NumberFormat('en-US', {style:'currency', currency:'USD'}).format(n || 0);
-const uid = () => Math.random().toString(16).slice(2,10) + '-' + Date.now().toString(16).slice(-6);
-
-function nowISO(){ return new Date().toISOString(); }
-
-/** Ledger helper */
-function postTx({type, meta={}, lines=[]}){
-  const tx = { id: uid(), ts: nowISO(), type, meta, lines };
-  state.ledger.unshift(tx);
-  return tx;
-}
-
-function accountBalance(prefixOrExact){
-  // If prefix is used (like "pool:"), sum all matching accounts
-  let sum = 0;
-  for (const tx of state.ledger){
-    for (const ln of tx.lines){
-      if (ln.account === prefixOrExact || ln.account.startsWith(prefixOrExact)){
-        sum += ln.amountUSD;
-      }
-    }
-  }
-  return round2(sum);
-}
-
-function round2(x){ return Math.round((x + Number.EPSILON) * 100) / 100; }
-
-/** Derived totals */
-function totalTopUpsUSD(){
-  return round2(state.topups.filter(t=>t.status==='confirmed').reduce((a,t)=>a+t.amountUSD,0));
-}
-function totalSpendUSD(){
-  return round2(state.ledger
-    .filter(tx=>tx.type==='SPEND')
-    .reduce((a,tx)=> a + tx.lines.filter(l=>l.account.startsWith('spend:')).reduce((s,l)=>s+l.amountUSD,0), 0));
-}
-function totalFeesUSD(){
-  return round2(state.ledger
-    .filter(tx=>tx.type==='FEE_CHARGE')
-    .reduce((a,tx)=> a + tx.lines.filter(l=>l.account==='revenue:fees').reduce((s,l)=>s+l.amountUSD,0), 0));
-}
-function refundDueUSD(){
-  // refunds payable positive = still due
-  return round2(accountBalance('refunds:payable'));
-}
-
-function kpiModel(){
-  const vault = accountBalance('vault');
-  const pools = accountBalance('pool:');
-  const live  = accountBalance('live:');
-  const spend = Math.abs(accountBalance('spend:')); // spend stored positive in spend account
-  const fees  = accountBalance('revenue:fees');
-  const setups = accountBalance('revenue:setup');
-  const services = accountBalance('revenue:services');
-  return { vault, pools, live, spend, fees, setups, services };
-}
-
-/** Permissions */
-function can(action){
-  if (state.role === 'admin') return true;
-  // client demo: read-only
-  return false;
-}
-
-/** Seed data */
-function seed(){
-  state.ledger = [];
-  state.topups = [];
-  state.charges = [];
-  state.fees = [];
-
-  // 1) Topup confirmed 1000 USDT -> 1000 USD
-  createTopup({
-    method:'USDT TRC20',
-    proof:'TXHASH_TRX_abc123',
-    amountOriginal:1000,
-    currencyOriginal:'USDT',
-    fxRateToUSD:1,
-    status:'confirmed',
-  });
-
-  // 2) Allocate 600 to Meta Pool
-  transferVaultToPool({ platformId:'meta', amountUSD:600 });
-
-  // 3) Allocate from Meta Pool to Live Shared 400
-  allocatePoolToLiveShared({ platformId:'meta', amountUSD:400 });
-
-  // 4) Allocate to account #1 assigned 150
-  allocatePoolToAssigned({ platformId:'meta', accountId:'acc_1', amountUSD:150 });
-
-  // 5) Spend 120 on account #1 (Meta)
-  addSpend({ platformId:'meta', accountId:'acc_1', amountUSD:120 });
-
-  // 6) Fee on that spend (3%) => 3.6
-  addFeeOnSpend({ platformId:'meta', accountId:'acc_1', spendUSD:120, feeRate:0.03 });
-
-  // 7) Setup charge one-time 80 for acc_1
-  addSetupCharge({
-    model:'one-time', accountId:'acc_1', amountUSD:80, note:'Setup account #1'
-  });
-
-  // 8) Additional service 50 BOV linked to acc_1
-  addServiceCharge({
-    serviceType:'BOV', amountUSD:50, linkAccountId:'acc_1',
-    details:{ region:'US', level:'Standard', note:'BOV verification' }
-  });
-
-  // 9) Simulate fee refund due 1.20 (payable) (e.g., adjustment)
-  addFeeRefundDue({ amountUSD:1.2, reason:'Fee adjustment for closed account' });
-
-  renderAll();
-}
-
-/** Topups */
-function createTopup({method, proof, amountOriginal, currencyOriginal, fxRateToUSD, status}){
-  const amountUSD = round2(amountOriginal * fxRateToUSD);
-  const item = {
-    id: uid(),
-    ts: nowISO(),
-    method,
-    proof,
-    amountOriginal,
-    currencyOriginal,
-    fxRateToUSD,
-    amountUSD,
-    status: status || 'pending'
-  };
-  state.topups.unshift(item);
-
-  if (item.status === 'confirmed'){
-    // Post to ledger: +vault
-    postTx({
-      type:'TOPUP_CONFIRMED',
-      meta:{ topupId:item.id, method:item.method, proof:item.proof, fx:item.fxRateToUSD, original:`${item.amountOriginal} ${item.currencyOriginal}` },
-      lines:[
-        { account:'vault', amountUSD: +item.amountUSD },
-        { account:'funding:source', amountUSD: -item.amountUSD } // technical balancing
-      ]
-    });
-  }
-  return item;
-}
-
-function confirmTopup(id){
-  const t = state.topups.find(x=>x.id===id);
-  if (!t || t.status==='confirmed') return;
-  t.status = 'confirmed';
-  // freeze amountUSD as saved
-  postTx({
-    type:'TOPUP_CONFIRMED',
-    meta:{ topupId:t.id, method:t.method, proof:t.proof, fx:t.fxRateToUSD, original:`${t.amountOriginal} ${t.currencyOriginal}` },
-    lines:[
-      { account:'vault', amountUSD: +t.amountUSD },
-      { account:'funding:source', amountUSD: -t.amountUSD }
-    ]
-  });
-}
-
-/** Transfers */
-function transferVaultToPool({platformId, amountUSD}){
-  amountUSD = round2(Number(amountUSD));
-  if (!amountUSD || amountUSD <= 0) return;
-  postTx({
-    type:'VAULT_TO_POOL',
-    meta:{ platformId },
-    lines:[
-      { account:`pool:${platformId}`, amountUSD: +amountUSD },
-      { account:'vault', amountUSD: -amountUSD }
-    ]
-  });
-}
-
-function allocatePoolToLiveShared({platformId, amountUSD}){
-  amountUSD = round2(Number(amountUSD));
-  postTx({
-    type:'POOL_TO_LIVE_SHARED',
-    meta:{ platformId },
-    lines:[
-      { account:`live:${platformId}:shared`, amountUSD: +amountUSD },
-      { account:`pool:${platformId}`, amountUSD: -amountUSD },
-    ]
-  });
-}
-
-function allocatePoolToAssigned({platformId, accountId, amountUSD}){
-  amountUSD = round2(Number(amountUSD));
-  postTx({
-    type:'POOL_TO_ASSIGNED',
-    meta:{ platformId, accountId },
-    lines:[
-      { account:`live:${platformId}:assigned:${accountId}`, amountUSD: +amountUSD },
-      { account:`pool:${platformId}`, amountUSD: -amountUSD },
-    ]
-  });
-}
-
-/** Spend */
-function addSpend({platformId, accountId, amountUSD}){
-  amountUSD = round2(Number(amountUSD));
-  // Spend reduces the assigned/live bucket and increases spend expense account.
-  postTx({
-    type:'SPEND',
-    meta:{ platformId, accountId },
-    lines:[
-      { account:`spend:${platformId}`, amountUSD: +amountUSD }, // expense tracked as positive
-      { account:`live:${platformId}:assigned:${accountId}`, amountUSD: -amountUSD }
-    ]
-  });
-}
-
-/** Fees */
-function addFeeOnSpend({platformId, accountId, spendUSD, feeRate}){
-  spendUSD = Number(spendUSD);
-  feeRate = Number(feeRate);
-  const feeUSD = round2(spendUSD * feeRate);
-
-  const rec = {
-    id: uid(),
-    ts: nowISO(),
-    type: 'fee_on_spend',
-    platformId, accountId,
-    baseUSD: spendUSD,
-    feeRate,
-    feeUSD,
-    refundedUSD: 0,
-    status: 'charged'
-  };
-  state.fees.unshift(rec);
-
-  postTx({
-    type:'FEE_CHARGE',
-    meta:{ feeId:rec.id, platformId, accountId, baseUSD:spendUSD, feeRate },
-    lines:[
-      { account:'revenue:fees', amountUSD: +feeUSD },
-      { account:'vault', amountUSD: -feeUSD }
-    ]
-  });
-}
-
-function addFeeRefundDue({amountUSD, reason}){
-  amountUSD = round2(Number(amountUSD));
-  if (!amountUSD || amountUSD <= 0) return;
-  postTx({
-    type:'REFUND_DUE',
-    meta:{ reason },
-    lines:[
-      { account:'refunds:payable', amountUSD: +amountUSD },
-      { account:'revenue:fees', amountUSD: -amountUSD } // reverse revenue (or contra)
-    ]
-  });
-}
-
-function settleRefund({amountUSD, note}){
-  amountUSD = round2(Number(amountUSD));
-  postTx({
-    type:'REFUND_SETTLED',
-    meta:{ note },
-    lines:[
-      { account:'refunds:payable', amountUSD: -amountUSD },
-      { account:'vault', amountUSD: -amountUSD }, // money leaves vault to client
-      { account:'cash:out', amountUSD: +amountUSD } // technical balance
-    ]
-  });
-}
-
-/** Charges (Setup & Services) */
-function addSetupCharge({model, accountId, amountUSD, intervalDays, note}){
-  amountUSD = round2(Number(amountUSD));
-  const charge = {
-    id: uid(),
-    ts: nowISO(),
-    kind: 'setup',
-    model, // one-time | recurring
-    accountId,
-    amountUSD,
-    intervalDays: model==='recurring' ? Number(intervalDays || 30) : null,
-    note: note || '',
-  };
-  state.charges.unshift(charge);
-
-  postTx({
-    type:'SETUP_CHARGE',
-    meta:{ chargeId: charge.id, model: charge.model, accountId, intervalDays: charge.intervalDays, note: charge.note },
-    lines:[
-      { account:'revenue:setup', amountUSD: +amountUSD },
-      { account:'vault', amountUSD: -amountUSD }
-    ]
-  });
-}
-
-function addServiceCharge({serviceType, amountUSD, linkAccountId, details}){
-  amountUSD = round2(Number(amountUSD));
-  const charge = {
-    id: uid(),
-    ts: nowISO(),
-    kind: 'service',
-    serviceType,
-    amountUSD,
-    linkAccountId: linkAccountId || null,
-    details: details || {}
-  };
-  state.charges.unshift(charge);
-
-  postTx({
-    type:'SERVICE_CHARGE',
-    meta:{ chargeId: charge.id, serviceType, linkAccountId: charge.linkAccountId, details: charge.details },
-    lines:[
-      { account:'revenue:services', amountUSD: +amountUSD },
-      { account:'vault', amountUSD: -amountUSD }
-    ]
-  });
-}
-
-/** UI render */
-const tabs = [
-  { id:'topups', label:'Top-Ups' },
-  { id:'funding', label:'Funding (Vault → Pool → Live)' },
-  { id:'charges', label:'Charges (Setup / Services)' },
-  { id:'fees', label:'Fees & Refunds' },
-];
-
-function renderAll(){
-  $('#clientName').textContent = state.client.name;
-  $('#roleLabel').textContent = state.role === 'admin' ? 'Admin' : 'Client';
-  $('#toggleRoleBtn').textContent = state.role === 'admin' ? 'Switch to Client' : 'Switch to Admin';
-
-  renderKPIs();
-  renderTabs();
-  renderTabContent();
-  renderSanity();
-}
-
-function renderSanity(){
-  // Vault should equal confirmed topups - transfers - charges - fees - refunds settled + ??? (demo only)
-  const top = totalTopUpsUSD();
-  const vault = accountBalance('vault');
-  const pools = accountBalance('pool:');
-  const live = accountBalance('live:');
-  const fees = accountBalance('revenue:fees');
-  const setups = accountBalance('revenue:setup');
-  const services = accountBalance('revenue:services');
-  const refundsDue = accountBalance('refunds:payable');
-
-  $('#sanityLine').textContent =
-    `TopUps: ${fmt(top)} | Vault: ${fmt(vault)} | Pools: ${fmt(pools)} | Live: ${fmt(live)} | Revenue: setup ${fmt(setups)}, services ${fmt(services)}, fees ${fmt(fees)} | Refund due: ${fmt(refundsDue)}`;
-}
-
-function renderKPIs(){
-  const m = kpiModel();
-  const data = [
-    { k:'Total Top-Ups', v: fmt(totalTopUpsUSD()), s:'Confirmed only' },
-    { k:'Vault (Client Cash)', v: fmt(m.vault), s:'Unallocated' },
-    { k:'Platform Pools', v: fmt(m.pools), s:'Deployable' },
-    { k:'Live Budgets', v: fmt(m.live), s:'Shared + Assigned' },
-    { k:'Total Spend', v: fmt(m.spend), s:'Expense tracked' },
-    { k:'Fees Collected', v: fmt(m.fees), s:'Revenue: fees' },
-    { k:'Refund Due', v: fmt(refundDueUSD()), s:'Payable' },
-  ];
-
-  const el = $('#kpiCards');
-  el.innerHTML = '';
-  data.forEach(d=>{
-    const div = document.createElement('div');
-    div.className = 'card';
-    div.innerHTML = `<div class="k">${d.k}</div><div class="v">${d.v}</div><div class="s">${d.s}</div>`;
-    el.appendChild(div);
-  });
-}
-
-function renderTabs(){
-  const el = $('#tabs');
-  el.innerHTML = '';
-  tabs.forEach(t=>{
-    const b = document.createElement('button');
-    b.className = 'tab' + (state.activeTab===t.id?' active':'');
-    b.textContent = t.label;
-    b.onclick = ()=>{ state.activeTab=t.id; renderTabContent(); renderTabs(); };
-    el.appendChild(b);
-  });
-}
-
-function renderTabContent(){
-  const host = $('#tabContent');
-  host.innerHTML = '';
-
-  if (state.activeTab==='topups') host.appendChild(viewTopups());
-  if (state.activeTab==='funding') host.appendChild(viewFunding());
-  if (state.activeTab==='charges') host.appendChild(viewCharges());
-  if (state.activeTab==='fees') host.appendChild(viewFees());
-}
-
-/** Views */
-function viewTopups(){
-  const wrap = document.createElement('div');
-
-  const head = document.createElement('div');
-  head.style.display='flex';
-  head.style.justifyContent='space-between';
-  head.style.alignItems='center';
-  head.style.gap='10px';
-  head.style.flexWrap='wrap';
-  head.innerHTML = `
-    <div class="notice" style="flex:1">
-      <strong>Top-ups</strong>
-      <div class="muted">USDT (ERC20/TRC20) sau Wire. FX se introduce în modal și se îngheață la confirmare.</div>
-    </div>
-    <div class="row-actions">
-      <button class="btn primary" id="addTopupBtn">+ Add Top-up</button>
-    </div>
-  `;
-  wrap.appendChild(head);
-
-  const btn = head.querySelector('#addTopupBtn');
-  btn.disabled = !can('addTopup');
-  btn.onclick = () => openTopupModal();
-
-  const table = document.createElement('table');
-  table.innerHTML = `
-    <thead>
-      <tr>
-        <th>Date</th><th>Method</th><th>Proof</th><th>Original</th><th>FX</th><th>USD</th><th>Status</th><th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${state.topups.map(t=>`
-        <tr>
-          <td><small>${new Date(t.ts).toLocaleString()}</small></td>
-          <td>${t.method}</td>
-          <td class="mono"><small>${escapeHtml(t.proof)}</small></td>
-          <td>${t.amountOriginal} ${t.currencyOriginal}</td>
-          <td>${t.fxRateToUSD}</td>
-          <td><strong>${fmt(t.amountUSD)}</strong></td>
-          <td>${badge(t.status)}</td>
-          <td>
-            <div class="row-actions">
-              <button class="btn" data-confirm="${t.id}" ${(!can('confirmTopup') || t.status==='confirmed')?'disabled':''}>Confirm</button>
+    <!-- Transfer Modal -->
+    <div class="modal-simple" id="transferModal">
+        <div class="modal-simple-content">
+            <h2 id="modalTitle">Transfer Funds</h2>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="transferAmount" placeholder="Enter amount">
             </div>
-          </td>
-        </tr>
-      `).join('')}
-    </tbody>
-  `;
-  wrap.appendChild(document.createElement('div')).className='hr';
-  wrap.appendChild(table);
-
-  table.querySelectorAll('[data-confirm]').forEach(b=>{
-    b.onclick = () => {
-      confirmTopup(b.getAttribute('data-confirm'));
-      renderAll();
-    };
-  });
-
-  return wrap;
-}
-
-function viewFunding(){
-  const wrap = document.createElement('div');
-
-  const top = document.createElement('div');
-  top.className='notice';
-  top.innerHTML = `
-    <strong>Funding Flow</strong>
-    <div class="muted">Admin: mută bani din Vault în Platform Pool, apoi alocă din Pool în Live (Shared/Assigned).</div>
-  `;
-  wrap.appendChild(top);
-
-  const controls = document.createElement('div');
-  controls.className='split';
-  controls.style.marginTop='10px';
-  controls.innerHTML = `
-    <div class="panel" style="overflow:hidden">
-      <div class="panel-head">
-        <div>
-          <h2>Vault → Platform Pool</h2>
-          <small class="muted">Depune bani în pool pentru platformă</small>
+            <div class="form-group" id="accountSelectGroup" style="display: none;">
+                <label>Select Account</label>
+                <select id="accountSelect">
+                    <option value="">Select account...</option>
+                    <option value="acc1">Account 1</option>
+                    <option value="acc2">Account 2</option>
+                </select>
+            </div>
+            <div class="form-group" id="platformSelectGroup" style="display: none;">
+                <label>Select Platform</label>
+                <select id="platformSelect">
+                    <option value="">Select platform...</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="google">Google</option>
+                    <option value="tiktok">TikTok</option>
+                </select>
+            </div>
+            <div id="feeInfo" style="margin: 1rem 0; padding: 0.5rem; background: #f0f0f0; border-radius: 4px;"></div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="transfer-btn" onclick="confirmTransfer()">Confirm Transfer</button>
+                <button class="transfer-btn" style="background: #95a5a6;" onclick="closeTransferModal()">Cancel</button>
+            </div>
         </div>
-        <button class="btn primary" id="vaultToPoolBtn">Move</button>
-      </div>
-      <div class="panel-body">
-        <div class="field">
-          <label>Platform</label>
-          <select class="input" id="v2pPlatform">
-            ${state.platforms.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}
-          </select>
-        </div>
-        <div class="field">
-          <label>Amount (USD)</label>
-          <input class="input" id="v2pAmount" type="number" min="0" step="0.01" placeholder="e.g. 250" />
-          <div class="help">Vault balance acum: <strong>${fmt(accountBalance('vault'))}</strong></div>
-        </div>
-      </div>
     </div>
 
-    <div class="panel" style="overflow:hidden">
-      <div class="panel-head">
-        <div>
-          <h2>Platform Pool → Live Budget</h2>
-          <small class="muted">Shared sau Assigned pe cont</small>
+    <!-- Add Topup Modal -->
+    <div class="modal-simple" id="topupModal">
+        <div class="modal-simple-content">
+            <h2>Add Topup</h2>
+            <div class="form-group">
+                <label>Amount</label>
+                <input type="number" id="topupAmount" placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+                <label>Note (Optional)</label>
+                <input type="text" id="topupNote" placeholder="Enter note">
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button class="transfer-btn" onclick="confirmTopup()">Add Topup</button>
+                <button class="transfer-btn" style="background: #95a5a6;" onclick="closeTopupModal()">Cancel</button>
+            </div>
         </div>
-        <button class="btn primary" id="poolToLiveBtn">Allocate</button>
-      </div>
-      <div class="panel-body">
-        <div class="field">
-          <label>Platform</label>
-          <select class="input" id="p2lPlatform">
-            ${state.platforms.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}
-          </select>
-          <div class="help">Pool balance: <strong id="poolBalanceLabel">${fmt(accountBalance('pool:meta'))}</strong></div>
-        </div>
-        <div class="field">
-          <label>Allocate to</label>
-          <select class="input" id="p2lTarget">
-            <option value="shared">Live Shared Budget</option>
-            <option value="assigned:acc_1">Assigned: Account #1 (Meta)</option>
-            <option value="assigned:acc_2">Assigned: Account #2 (Meta)</option>
-            <option value="assigned:acc_3">Assigned: Account #3 (TikTok)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Amount (USD)</label>
-          <input class="input" id="p2lAmount" type="number" min="0" step="0.01" placeholder="e.g. 100" />
-        </div>
-      </div>
     </div>
-  `;
-  wrap.appendChild(document.createElement('div')).className='hr';
-  wrap.appendChild(controls);
 
-  // Bind
-  const vaultToPoolBtn = controls.querySelector('#vaultToPoolBtn');
-  const poolToLiveBtn = controls.querySelector('#poolToLiveBtn');
-  vaultToPoolBtn.disabled = !can('funding');
-  poolToLiveBtn.disabled = !can('funding');
+    <script src="../js/sidebar.js"></script>
+    <script>
+        let currentTransferType = '';
 
-  const p2lPlatform = controls.querySelector('#p2lPlatform');
-  const poolBalanceLabel = controls.querySelector('#poolBalanceLabel');
-  p2lPlatform.onchange = () => {
-    poolBalanceLabel.textContent = fmt(accountBalance('pool:' + p2lPlatform.value));
-    // also update target list to match platform roughly
-    const target = controls.querySelector('#p2lTarget');
-    target.innerHTML = `
-      <option value="shared">Live Shared Budget</option>
-      ${state.accounts
-        .filter(a=>a.platform===p2lPlatform.value)
-        .map(a=>`<option value="assigned:${a.id}">Assigned: ${escapeHtml(a.label)}</option>`).join('')
-      }
-    `;
-  };
-  p2lPlatform.onchange();
+        function openTransferModal(type) {
+            currentTransferType = type;
+            const modal = document.getElementById('transferModal');
+            const title = document.getElementById('modalTitle');
+            const accountGroup = document.getElementById('accountSelectGroup');
+            const platformGroup = document.getElementById('platformSelectGroup');
+            const feeInfo = document.getElementById('feeInfo');
 
-  vaultToPoolBtn.onclick = () => {
-    const platformId = controls.querySelector('#v2pPlatform').value;
-    const amountUSD = Number(controls.querySelector('#v2pAmount').value || 0);
-    if (amountUSD <= 0) return alert('Amount invalid');
-    if (amountUSD > accountBalance('vault')) return alert('Not enough in Vault');
-    transferVaultToPool({platformId, amountUSD});
-    renderAll();
-  };
+            // Reset
+            accountGroup.style.display = 'none';
+            platformGroup.style.display = 'none';
+            feeInfo.innerHTML = '';
 
-  poolToLiveBtn.onclick = () => {
-    const platformId = controls.querySelector('#p2lPlatform').value;
-    const target = controls.querySelector('#p2lTarget').value;
-    const amountUSD = Number(controls.querySelector('#p2lAmount').value || 0);
-    if (amountUSD <= 0) return alert('Amount invalid');
-    if (amountUSD > accountBalance('pool:' + platformId)) return alert('Not enough in Pool');
+            switch(type) {
+                case 'main-to-platform':
+                    title.textContent = 'Transfer to Platform Vault';
+                    platformGroup.style.display = 'block';
+                    feeInfo.innerHTML = '<strong>Fee:</strong> 5% will be deducted from the transfer amount.';
+                    break;
+                case 'platform-to-general':
+                    title.textContent = 'Transfer to General Balance';
+                    break;
+                case 'platform-to-individual':
+                    title.textContent = 'Transfer to Individual Balance';
+                    accountGroup.style.display = 'block';
+                    break;
+                case 'platform-to-main':
+                    title.textContent = 'Transfer Back to Main Wallet';
+                    break;
+                case 'platform-to-platform':
+                    title.textContent = 'Transfer to Another Platform';
+                    platformGroup.style.display = 'block';
+                    feeInfo.innerHTML = '<strong>Fee:</strong> 5% will be deducted from the transfer amount. Fees are non-refundable.';
+                    break;
+            }
 
-    if (target === 'shared'){
-      allocatePoolToLiveShared({platformId, amountUSD});
-    } else if (target.startsWith('assigned:')){
-      const accountId = target.split(':')[1];
-      allocatePoolToAssigned({platformId, accountId, amountUSD});
-    }
-    renderAll();
-  };
-
-  // Summary table
-  const summary = document.createElement('div');
-  summary.style.marginTop='12px';
-  summary.innerHTML = `
-    <div class="notice">
-      <strong>Per Platform Summary</strong>
-      <div class="muted">Pool + Live (Shared/Assigned) + Spend</div>
-    </div>
-    <table style="margin-top:10px">
-      <thead>
-        <tr><th>Platform</th><th>Pool</th><th>Live Shared</th><th>Live Assigned</th><th>Spend</th></tr>
-      </thead>
-      <tbody>
-        ${state.platforms.map(p=>{
-          const pool = accountBalance('pool:' + p.id);
-          const shared = accountBalance('live:' + p.id + ':shared');
-          const assigned = accountBalance('live:' + p.id + ':assigned:');
-          const spend = accountBalance('spend:' + p.id);
-          return `
-            <tr>
-              <td><strong>${p.name}</strong></td>
-              <td>${fmt(pool)}</td>
-              <td>${fmt(shared)}</td>
-              <td>${fmt(assigned)}</td>
-              <td>${fmt(spend)}</td>
-            </tr>
-          `;
-        }).join('')}
-      </tbody>
-    </table>
-  `;
-  wrap.appendChild(document.createElement('div')).className='hr';
-  wrap.appendChild(summary);
-
-  return wrap;
-}
-
-function viewCharges(){
-  const wrap = document.createElement('div');
-
-  const head = document.createElement('div');
-  head.style.display='flex';
-  head.style.justifyContent='space-between';
-  head.style.alignItems='center';
-  head.style.gap='10px';
-  head.style.flexWrap='wrap';
-  head.innerHTML = `
-    <div class="notice" style="flex:1">
-      <strong>Charges</strong>
-      <div class="muted">Setup (one-time/recurring) + Additional services (BOV, SP’s, Fan Pages, BM’s) cu link optional.</div>
-    </div>
-    <div class="row-actions">
-      <button class="btn primary" id="addSetupBtn">+ Setup charge</button>
-      <button class="btn primary" id="addServiceBtn">+ Service charge</button>
-    </div>
-  `;
-  wrap.appendChild(head);
-
-  const addSetupBtn = head.querySelector('#addSetupBtn');
-  const addServiceBtn = head.querySelector('#addServiceBtn');
-  addSetupBtn.disabled = !can('charges');
-  addServiceBtn.disabled = !can('charges');
-  addSetupBtn.onclick = () => openSetupModal();
-  addServiceBtn.onclick = () => openServiceModal();
-
-  const table = document.createElement('table');
-  table.style.marginTop='10px';
-  table.innerHTML = `
-    <thead>
-      <tr><th>Date</th><th>Type</th><th>Model</th><th>Linked</th><th>Details</th><th>Amount</th></tr>
-    </thead>
-    <tbody>
-      ${state.charges.map(c=>{
-        const linked = c.accountId ? `Account: ${c.accountId}` : (c.linkAccountId ? `Account: ${c.linkAccountId}` : '—');
-        const details = c.kind==='setup'
-          ? (c.model==='recurring' ? `Every ${c.intervalDays} days` : `One-time`) + (c.note?` • ${escapeHtml(c.note)}`:'')
-          : `${escapeHtml(c.serviceType)} • ${escapeHtml(JSON.stringify(c.details || {}))}`;
-        return `
-          <tr>
-            <td><small>${new Date(c.ts).toLocaleString()}</small></td>
-            <td>${c.kind==='setup' ? 'Setup' : 'Service'}</td>
-            <td>${c.kind==='setup' ? escapeHtml(c.model) : '—'}</td>
-            <td class="mono"><small>${escapeHtml(linked)}</small></td>
-            <td><small>${details}</small></td>
-            <td><strong>${fmt(c.amountUSD)}</strong></td>
-          </tr>
-        `;
-      }).join('')}
-    </tbody>
-  `;
-  wrap.appendChild(document.createElement('div')).className='hr';
-  wrap.appendChild(table);
-
-  return wrap;
-}
-
-function viewFees(){
-  const wrap = document.createElement('div');
-
-  const head = document.createElement('div');
-  head.style.display='flex';
-  head.style.justifyContent='space-between';
-  head.style.alignItems='center';
-  head.style.gap='10px';
-  head.style.flexWrap='wrap';
-  head.innerHTML = `
-    <div class="notice" style="flex:1">
-      <strong>Fees & Refund Tracker</strong>
-      <div class="muted">Fee on spend + evidență refunds due & settled.</div>
-    </div>
-    <div class="row-actions">
-      <button class="btn primary" id="addSpendBtn">+ Add Spend</button>
-      <button class="btn primary" id="addRefundBtn">+ Mark Refund Due</button>
-      <button class="btn ok" id="settleRefundBtn">Settle Refund</button>
-    </div>
-  `;
-  wrap.appendChild(head);
-
-  const addSpendBtn = head.querySelector('#addSpendBtn');
-  const addRefundBtn = head.querySelector('#addRefundBtn');
-  const settleRefundBtn = head.querySelector('#settleRefundBtn');
-
-  addSpendBtn.disabled = !can('fees');
-  addRefundBtn.disabled = !can('fees');
-  settleRefundBtn.disabled = !can('fees');
-
-  addSpendBtn.onclick = () => openSpendModal();
-  addRefundBtn.onclick = () => openRefundDueModal();
-  settleRefundBtn.onclick = () => openRefundSettleModal();
-
-  // Fees list
-  const feeTable = document.createElement('table');
-  feeTable.style.marginTop='10px';
-  feeTable.innerHTML = `
-    <thead>
-      <tr><th>Date</th><th>Type</th><th>Platform</th><th>Account</th><th>Base</th><th>Rate</th><th>Fee</th></tr>
-    </thead>
-    <tbody>
-      ${state.fees.map(f=>{
-        const platform = (state.platforms.find(p=>p.id===f.platformId)||{}).name || f.platformId;
-        return `
-          <tr>
-            <td><small>${new Date(f.ts).toLocaleString()}</small></td>
-            <td>Fee on spend</td>
-            <td>${escapeHtml(platform)}</td>
-            <td class="mono"><small>${escapeHtml(f.accountId)}</small></td>
-            <td>${fmt(f.baseUSD)}</td>
-            <td>${round2(f.feeRate*100)}%</td>
-            <td><strong>${fmt(f.feeUSD)}</strong></td>
-          </tr>
-        `;
-      }).join('')}
-    </tbody>
-  `;
-  wrap.appendChild(document.createElement('div')).className='hr';
-  wrap.appendChild(feeTable);
-
-  // Refund overview
-  const refundsBox = document.createElement('div');
-  refundsBox.style.marginTop='12px';
-  refundsBox.innerHTML = `
-    <div class="notice">
-      <strong>Refunds</strong>
-      <div class="muted">Refund due (payable): <strong>${fmt(refundDueUSD())}</strong></div>
-      <div class="muted">Settle refund scade Vault + scade Payable.</div>
-    </div>
-  `;
-  wrap.appendChild(document.createElement('div')).className='hr';
-  wrap.appendChild(refundsBox);
-
-  return wrap;
-}
-
-/** Modal utilities */
-function openModal({title, subtitle, bodyHTML, footerButtons=[]}){
-  $('#modalTitle').textContent = title || 'Modal';
-  $('#modalSubtitle').textContent = subtitle || '';
-  $('#modalBody').innerHTML = bodyHTML || '';
-  const foot = $('#modalFoot');
-  foot.innerHTML = '';
-  footerButtons.forEach(btn=>{
-    const b = document.createElement('button');
-    b.className = btn.className || 'btn';
-    b.textContent = btn.text || 'OK';
-    b.disabled = !!btn.disabled;
-    b.onclick = btn.onClick || closeModal;
-    foot.appendChild(b);
-  });
-  $('#modal').hidden = false;
-}
-
-function closeModal(){ $('#modal').hidden = true; }
-
-$('#modalCloseBtn').onclick = closeModal;
-$('#modal').addEventListener('click', (e)=>{
-  if (e.target && e.target.dataset && e.target.dataset.close) closeModal();
-});
-
-/** Specific Modals */
-function openTopupModal(){
-  openModal({
-    title: 'Add Top-up',
-    subtitle: state.role==='admin' ? 'Admin: add pending/confirmed top-up with FX.' : 'Client: read-only',
-    bodyHTML: `
-      <div class="split">
-        <div>
-          <div class="field">
-            <label>Method</label>
-            <select class="input" id="tuMethod">
-              <option>USDT ERC20</option>
-              <option>USDT TRC20</option>
-              <option>Wire Transfer</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Proof (txHash / invoice)</label>
-            <input class="input mono" id="tuProof" placeholder="e.g. 0xabc... / INV-1029" />
-          </div>
-        </div>
-        <div>
-          <div class="field">
-            <label>Original amount</label>
-            <input class="input" id="tuAmount" type="number" min="0" step="0.0001" placeholder="e.g. 1000" />
-          </div>
-          <div class="field">
-            <label>Original currency</label>
-            <select class="input" id="tuCurrency">
-              <option>USDT</option>
-              <option>EUR</option>
-              <option>GBP</option>
-              <option>RON</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>FX rate → USD (freeze on confirm)</label>
-            <input class="input" id="tuFx" type="number" min="0" step="0.0001" value="1" />
-            <div class="help">Ex: USDT=1, EUR=1.08 etc.</div>
-          </div>
-          <div class="notice">
-            USD preview: <strong id="tuPreview">${fmt(0)}</strong>
-          </div>
-        </div>
-      </div>
-      <div class="hr"></div>
-      <div class="field">
-        <label>Status</label>
-        <select class="input" id="tuStatus">
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-        </select>
-        <div class="help">Dacă alegi Confirmed, intră direct în Vault.</div>
-      </div>
-    `,
-    footerButtons: [
-      { text:'Cancel', className:'btn', onClick: closeModal },
-      {
-        text:'Save',
-        className:'btn primary',
-        disabled: !can('addTopup'),
-        onClick: () => {
-          const method = $('#tuMethod').value;
-          const proof = $('#tuProof').value.trim();
-          const amountOriginal = Number($('#tuAmount').value || 0);
-          const currencyOriginal = $('#tuCurrency').value;
-          const fxRateToUSD = Number($('#tuFx').value || 0);
-          const status = $('#tuStatus').value;
-
-          if (!proof) return alert('Proof required');
-          if (amountOriginal <= 0) return alert('Amount invalid');
-          if (fxRateToUSD <= 0) return alert('FX invalid');
-
-          createTopup({method, proof, amountOriginal, currencyOriginal, fxRateToUSD, status});
-          closeModal();
-          renderAll();
-        }
-      }
-    ]
-  });
-
-  const calc = () => {
-    const a = Number($('#tuAmount').value || 0);
-    const fx = Number($('#tuFx').value || 0);
-    $('#tuPreview').textContent = fmt(round2(a*fx));
-  };
-  ['tuAmount','tuFx'].forEach(id => $('#'+id).addEventListener('input', calc));
-  calc();
-}
-
-function openSetupModal(){
-  const options = state.accounts.map(a=>`<option value="${a.id}">${escapeHtml(a.label)}</option>`).join('');
-  openModal({
-    title:'Add Setup Charge',
-    subtitle:'One-time sau recurring pe interval fix de zile (demo: postează charge acum).',
-    bodyHTML: `
-      <div class="split">
-        <div>
-          <div class="field">
-            <label>Account</label>
-            <select class="input" id="suAcc">${options}</select>
-          </div>
-          <div class="field">
-            <label>Model</label>
-            <select class="input" id="suModel">
-              <option value="one-time">one-time</option>
-              <option value="recurring">recurring</option>
-            </select>
-          </div>
-          <div class="field" id="suIntervalWrap" style="display:none">
-            <label>Interval days</label>
-            <input class="input" id="suInterval" type="number" min="1" step="1" value="30"/>
-            <div class="help">În produs: cron/job creează charge-uri periodic. În demo: doar îl memorăm.</div>
-          </div>
-        </div>
-        <div>
-          <div class="field">
-            <label>Amount (USD)</label>
-            <input class="input" id="suAmount" type="number" min="0" step="0.01" placeholder="e.g. 80"/>
-          </div>
-          <div class="field">
-            <label>Note</label>
-            <input class="input" id="suNote" placeholder="e.g. Setup account #1"/>
-          </div>
-          <div class="notice">Vault after charge will decrease.</div>
-        </div>
-      </div>
-    `,
-    footerButtons:[
-      { text:'Cancel', className:'btn', onClick: closeModal },
-      { text:'Add', className:'btn primary', disabled: !can('charges'), onClick: ()=>{
-        const accountId = $('#suAcc').value;
-        const model = $('#suModel').value;
-        const amountUSD = Number($('#suAmount').value || 0);
-        const intervalDays = Number($('#suInterval').value || 30);
-        const note = $('#suNote').value.trim();
-
-        if (amountUSD <= 0) return alert('Amount invalid');
-        if (amountUSD > accountBalance('vault')) return alert('Not enough in Vault');
-        addSetupCharge({model, accountId, amountUSD, intervalDays, note});
-        closeModal(); renderAll();
-      }}
-    ]
-  });
-
-  const toggle = () => {
-    $('#suIntervalWrap').style.display = $('#suModel').value === 'recurring' ? 'block' : 'none';
-  };
-  $('#suModel').addEventListener('change', toggle);
-  toggle();
-}
-
-function openServiceModal(){
-  const options = state.accounts.map(a=>`<option value="${a.id}">${escapeHtml(a.label)}</option>`).join('');
-  openModal({
-    title:'Add Additional Service',
-    subtitle:'BOV / SP’s / Fan Pages / BM’s (link optional la un cont).',
-    bodyHTML: `
-      <div class="split">
-        <div>
-          <div class="field">
-            <label>Service type</label>
-            <select class="input" id="svType">
-              <option>BOV</option>
-              <option>SPs</option>
-              <option>Fan Pages</option>
-              <option>BM's</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Link to account (optional)</label>
-            <select class="input" id="svLink">
-              <option value="">— standalone —</option>
-              ${options}
-            </select>
-          </div>
-          <div class="field">
-            <label>Custom detail (example)</label>
-            <input class="input" id="svDetail1" placeholder="e.g. region / qty / note"/>
-          </div>
-        </div>
-        <div>
-          <div class="field">
-            <label>Amount (USD)</label>
-            <input class="input" id="svAmount" type="number" min="0" step="0.01" placeholder="e.g. 50"/>
-          </div>
-          <div class="field">
-            <label>More details (JSON demo)</label>
-            <input class="input mono" id="svJson" placeholder='{"qty":1,"note":"..."}'/>
-            <div class="help">În produs: faci fields dinamice per service type.</div>
-          </div>
-          <div class="notice">Se scade din Vault și intră în Revenue: Services.</div>
-        </div>
-      </div>
-    `,
-    footerButtons:[
-      { text:'Cancel', className:'btn', onClick: closeModal },
-      { text:'Add', className:'btn primary', disabled: !can('charges'), onClick: ()=>{
-        const serviceType = $('#svType').value;
-        const linkAccountId = $('#svLink').value || null;
-        const amountUSD = Number($('#svAmount').value || 0);
-        if (amountUSD <= 0) return alert('Amount invalid');
-        if (amountUSD > accountBalance('vault')) return alert('Not enough in Vault');
-
-        let details = {};
-        const d1 = $('#svDetail1').value.trim();
-        if (d1) details.detail = d1;
-        const json = $('#svJson').value.trim();
-        if (json){
-          try { details = {...details, ...JSON.parse(json)}; } catch(e){ return alert('Invalid JSON'); }
+            modal.classList.add('active');
         }
 
-        addServiceCharge({serviceType, amountUSD, linkAccountId, details});
-        closeModal(); renderAll();
-      }}
-    ]
-  });
-}
+        function closeTransferModal() {
+            document.getElementById('transferModal').classList.remove('active');
+        }
 
-function openSpendModal(){
-  const platforms = state.platforms.map(p=>`<option value="${p.id}">${p.name}</option>`).join('');
-  openModal({
-    title:'Add Spend (and Fee)',
-    subtitle:'Demo: spend scade din Assigned live bucket. După spend poți adăuga fee automat.',
-    bodyHTML: `
-      <div class="split">
-        <div>
-          <div class="field">
-            <label>Platform</label>
-            <select class="input" id="spPlatform">${platforms}</select>
-          </div>
-          <div class="field">
-            <label>Account (Assigned)</label>
-            <select class="input" id="spAccount"></select>
-            <div class="help">Assigned live balance: <strong id="spBal">${fmt(0)}</strong></div>
-          </div>
-        </div>
-        <div>
-          <div class="field">
-            <label>Spend amount (USD)</label>
-            <input class="input" id="spAmount" type="number" min="0" step="0.01" placeholder="e.g. 120"/>
-          </div>
-          <div class="field">
-            <label>Auto-fee rate (from account)</label>
-            <input class="input" id="spFeeRate" type="number" min="0" step="0.0001" value="0.03"/>
-            <div class="help">Fee preview: <strong id="spFeePrev">${fmt(0)}</strong></div>
-          </div>
-        </div>
-      </div>
-      <div class="notice">Dacă Assigned nu are suficient, în produs fie blochezi, fie permiți shared fallback (rule).</div>
-    `,
-    footerButtons:[
-      { text:'Cancel', className:'btn', onClick: closeModal },
-      { text:'Post spend + fee', className:'btn primary', disabled: !can('fees'), onClick: ()=>{
-        const platformId = $('#spPlatform').value;
-        const accountId = $('#spAccount').value;
-        const amountUSD = Number($('#spAmount').value || 0);
-        const feeRate = Number($('#spFeeRate').value || 0);
+        function confirmTransfer() {
+            alert('Transfer confirmed!');
+            closeTransferModal();
+        }
 
-        if (amountUSD <= 0) return alert('Spend invalid');
-        const assignedBal = accountBalance(`live:${platformId}:assigned:${accountId}`);
-        if (amountUSD > assignedBal) return alert(`Not enough assigned balance (${fmt(assignedBal)})`);
+        function openAddTopup() {
+            document.getElementById('topupModal').classList.add('active');
+        }
 
-        addSpend({platformId, accountId, amountUSD});
-        if (feeRate > 0) addFeeOnSpend({platformId, accountId, spendUSD:amountUSD, feeRate});
-        closeModal(); renderAll();
-      }}
-    ]
-  });
+        function closeTopupModal() {
+            document.getElementById('topupModal').classList.remove('active');
+        }
 
-  const spPlatform = $('#spPlatform');
-  const spAccount = $('#spAccount');
-
-  function loadAccounts(){
-    const pid = spPlatform.value;
-    spAccount.innerHTML = state.accounts
-      .filter(a=>a.platform===pid)
-      .map(a=>`<option value="${a.id}">${escapeHtml(a.label)}</option>`).join('');
-    const a = state.accounts.find(x=>x.id===spAccount.value);
-    $('#spFeeRate').value = a ? a.feeRate : 0.03;
-    updateBal();
-  }
-  function updateBal(){
-    const pid = spPlatform.value;
-    const aid = spAccount.value;
-    const bal = accountBalance(`live:${pid}:assigned:${aid}`);
-    $('#spBal').textContent = fmt(bal);
-    updateFee();
-  }
-  function updateFee(){
-    const spend = Number($('#spAmount').value || 0);
-    const rate = Number($('#spFeeRate').value || 0);
-    $('#spFeePrev').textContent = fmt(round2(spend*rate));
-  }
-
-  spPlatform.onchange = loadAccounts;
-  spAccount.onchange = () => {
-    const a = state.accounts.find(x=>x.id===spAccount.value);
-    $('#spFeeRate').value = a ? a.feeRate : 0.03;
-    updateBal();
-  };
-  $('#spAmount').addEventListener('input', updateFee);
-  $('#spFeeRate').addEventListener('input', updateFee);
-
-  loadAccounts();
-}
-
-function openRefundDueModal(){
-  openModal({
-    title:'Mark Refund Due',
-    subtitle:'Adaugă o obligație de refund (refunds payable).',
-    bodyHTML: `
-      <div class="field">
-        <label>Amount (USD)</label>
-        <input class="input" id="rdAmount" type="number" min="0" step="0.01" placeholder="e.g. 10"/>
-      </div>
-      <div class="field">
-        <label>Reason</label>
-        <input class="input" id="rdReason" placeholder="e.g. fee adjustment / close account" />
-      </div>
-      <div class="notice">Creează: +refunds:payable și -revenue:fees (contra).</div>
-    `,
-    footerButtons:[
-      { text:'Cancel', className:'btn', onClick: closeModal },
-      { text:'Add', className:'btn primary', disabled: !can('fees'), onClick: ()=>{
-        const amountUSD = Number($('#rdAmount').value || 0);
-        const reason = $('#rdReason').value.trim() || 'Refund due';
-        if (amountUSD <= 0) return alert('Amount invalid');
-        addFeeRefundDue({amountUSD, reason});
-        closeModal(); renderAll();
-      }}
-    ]
-  });
-}
-
-function openRefundSettleModal(){
-  openModal({
-    title:'Settle Refund',
-    subtitle:'Plătești refund-ul către client: scade Vault și scade Payable.',
-    bodyHTML: `
-      <div class="field">
-        <label>Amount (USD)</label>
-        <input class="input" id="rsAmount" type="number" min="0" step="0.01" placeholder="e.g. 5"/>
-        <div class="help">Refund due acum: <strong>${fmt(refundDueUSD())}</strong></div>
-      </div>
-      <div class="field">
-        <label>Note</label>
-        <input class="input" id="rsNote" placeholder="e.g. refund fee leftover" />
-      </div>
-      <div class="notice">Rule: nu poți settle mai mult decât payable și mai mult decât Vault.</div>
-    `,
-    footerButtons:[
-      { text:'Cancel', className:'btn', onClick: closeModal },
-      { text:'Settle', className:'btn ok', disabled: !can('fees'), onClick: ()=>{
-        const amountUSD = Number($('#rsAmount').value || 0);
-        const note = $('#rsNote').value.trim() || 'Refund settled';
-        if (amountUSD <= 0) return alert('Amount invalid');
-        if (amountUSD > refundDueUSD()) return alert('Exceeds refund due');
-        if (amountUSD > accountBalance('vault')) return alert('Not enough in Vault');
-        settleRefund({amountUSD, note});
-        closeModal(); renderAll();
-      }}
-    ]
-  });
-}
-
-/** Ledger modal */
-function openLedgerModal(){
-  openModal({
-    title:'Ledger (Transactions)',
-    subtitle:'Debug view: fiecare tranzacție are lines care afectează conturi interne.',
-    bodyHTML: `
-      <div class="notice">
-        <div><strong>Tip:</strong> În produs, asta devine pagina ta de audit & export CSV.</div>
-        <div class="muted">amountUSD: + intră în cont, - iese din cont</div>
-      </div>
-      <div class="hr"></div>
-      <div style="max-height:55vh; overflow:auto">
-        <table>
-          <thead><tr><th>Time</th><th>Type</th><th>Meta</th><th>Lines</th></tr></thead>
-          <tbody>
-            ${state.ledger.map(tx=>`
-              <tr>
-                <td><small>${new Date(tx.ts).toLocaleString()}</small></td>
-                <td><span class="pill">${escapeHtml(tx.type)}</span></td>
-                <td><small class="mono">${escapeHtml(JSON.stringify(tx.meta||{}))}</small></td>
-                <td>
-                  ${tx.lines.map(l=>`
-                    <div class="mono"><small>${escapeHtml(l.account)} : ${l.amountUSD>=0?'+':''}${l.amountUSD.toFixed(2)}</small></div>
-                  `).join('')}
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-    `,
-    footerButtons: [{ text:'Close', className:'btn', onClick: closeModal }]
-  });
-}
-
-/** Helpers */
-function badge(status){
-  if (status==='confirmed') return `<span class="pill ok">confirmed</span>`;
-  if (status==='pending') return `<span class="pill warn">pending</span>`;
-  return `<span class="pill">${escapeHtml(status||'')}</span>`;
-}
-function escapeHtml(str){
-  return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-}
-
-/** Events */
-$('#toggleRoleBtn').onclick = () => {
-  state.role = state.role === 'admin' ? 'client' : 'admin';
-  renderAll();
-};
-$('#seedBtn').onclick = seed;
-$('#openLedgerBtn').onclick = openLedgerModal;
-
-seed();
-</script>
+        function confirmTopup() {
+            alert('Topup added!');
+            closeTopupModal();
+        }
+    </script>
 </body>
 </html>
