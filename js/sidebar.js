@@ -22,7 +22,9 @@ const navigationItems = {
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
         { name: 'Users', page: 'users', icon: '👥' },
         { name: 'Accounts', page: 'accounts', icon: '💳' },
-        { name: 'Marketplace', page: 'marketplace', icon: '🛍️' }
+        { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
+        { name: 'Transactions', page: 'transactions', icon: '💰' }
+        
     ],
     employee: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
