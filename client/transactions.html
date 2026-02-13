@@ -280,7 +280,6 @@
       <div class="um-card">
         <div class="um-card__title">Merchant</div>
         <div class="um-info">
-          <div class="um-info__row"><span class="um-info__label">Merchant</span><span class="um-info__value" id="dTxMerchant">—</span></div>
           <div class="um-info__row"><span class="um-info__label">Description</span><span class="um-info__value" id="dTxDesc">—</span></div>
         </div>
       </div>
@@ -488,7 +487,6 @@
     const dTxCard = document.getElementById("dTxCard");
     const dTxLast4 = document.getElementById("dTxLast4");
     const dTxClient = document.getElementById("dTxClient");
-    const dTxMerchant = document.getElementById("dTxMerchant");
     const dTxDesc = document.getElementById("dTxDesc");
 
     function openTxDrawer(tr){
@@ -511,7 +509,6 @@
       dTxCardType.textContent = ds.cardType || "—";
 
       dTxClient.textContent = ds.client || "—";
-      dTxMerchant.textContent = ds.merchant || "—";
       dTxDesc.textContent = ds.description || "—";
 
       txOverlay.hidden = false;
@@ -632,7 +629,6 @@
     const addTxName = document.getElementById("addTxName");
     const addTxLast4 = document.getElementById("addTxLast4");
     const addTxClient = document.getElementById("addTxClient");
-    const addTxMerchant = document.getElementById("addTxMerchant");
     const addTxDesc = document.getElementById("addTxDesc");
     const addTxAmount = document.getElementById("addTxAmount");
     const addTxCurrency = document.getElementById("addTxCurrency");
@@ -645,7 +641,6 @@
       addTxName.value = "";
       addTxLast4.value = "";
       addTxClient.value = (txClient.value !== "all") ? txClient.value : "John Client";
-      addTxMerchant.value = "";
       addTxDesc.value = "";
       addTxAmount.value = "";
       addTxCurrency.value = "USD";
@@ -688,7 +683,6 @@
       const name = addTxName.value.trim();
       const last4 = addTxLast4.value.trim();
       const client = addTxClient.value.trim();
-      const merchant = addTxMerchant.value.trim();
       const desc = addTxDesc.value.trim();
       const amount = addTxAmount.value.trim();
       const status = addTxStatusSel.value;
