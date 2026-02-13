@@ -30,6 +30,7 @@
         <p>Your financial transactions and invoices.</p>
 
         <div class="um-switcher" role="tablist" aria-label="Users Switcher">
+          <button class="um-btn" type="button" id="openAddTransactions">Add Transaction</button>
         </div>
 
         <!-- Filters + Search -->
@@ -641,6 +642,7 @@
       addTxName.value = "";
       addTxLast4.value = "";
       addTxClient.value = (txClient.value !== "all") ? txClient.value : "John Client";
+      addTxMerchant.value = "";
       addTxDesc.value = "";
       addTxAmount.value = "";
       addTxCurrency.value = "USD";
