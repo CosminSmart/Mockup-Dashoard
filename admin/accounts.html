@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Accounts</title>
+    <title>Admin Accounts - v2.0</title>
     <link rel="stylesheet" href="../css/layout.css">
     <link rel="stylesheet" href="../css/dashboard.css">
     <link rel="stylesheet" href="../css/accounts.css">
@@ -259,6 +259,40 @@
         
         .profile-custom-fields > .btn:hover {
             background: #2980b9;
+        }
+        
+        /* Profiles table styling */
+        .profiles-table {
+            width: 100% !important;
+            border-collapse: collapse !important;
+            background: white !important;
+            border-radius: 8px !important;
+            overflow: hidden !important;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+        }
+        
+        .profiles-table thead tr {
+            background: #2c3e50 !important;
+            color: white !important;
+        }
+        
+        .profiles-table thead th {
+            text-align: left !important;
+            padding: 14px 16px !important;
+            font-size: 0.85rem !important;
+            font-weight: 600 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+            color: white !important;
+            background: #2c3e50 !important;
+        }
+        
+        .profiles-table tbody tr {
+            border-bottom: 1px solid #e5e5e5 !important;
+        }
+        
+        .profiles-table tbody td {
+            padding: 16px !important;
         }
         
         /* Cards section - realistic credit card style */
@@ -531,6 +565,157 @@
         .dropdown-actions .clear-btn:hover {
             background: #7f8c8d;
         }
+
+        /* Responsive table wrapper */
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .table-wrapper table {
+            min-width: 1400px;
+            margin: 0;
+        }
+
+        /* Prevent horizontal scroll on body */
+        body {
+            overflow-x: hidden;
+        }
+
+        .main {
+            overflow-x: hidden;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 1400px) {
+            .filters {
+                flex-wrap: wrap;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .stat-box h4 {
+                font-size: 0.65rem;
+            }
+
+            .stat-value {
+                font-size: 1.3rem;
+            }
+
+            .stat-box {
+                padding: 1rem;
+            }
+
+            /* Make table more compact */
+            table {
+                font-size: 0.85rem;
+            }
+
+            table th,
+            table td {
+                padding: 0.6rem 0.5rem;
+            }
+
+            .btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .stat-box h4 {
+                font-size: 0.6rem;
+            }
+
+            .stat-value {
+                font-size: 1.1rem;
+            }
+
+            .stat-box {
+                padding: 0.8rem;
+            }
+
+            .header-right {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            /* Make table even more compact */
+            table {
+                font-size: 0.8rem;
+            }
+
+            table th,
+            table td {
+                padding: 0.5rem 0.4rem;
+            }
+
+            .btn {
+                padding: 0.35rem 0.7rem;
+                font-size: 0.75rem;
+            }
+
+            .badge {
+                font-size: 0.7rem;
+                padding: 0.2rem 0.5rem;
+            }
+        }
+
+        /* Status dropdown styling */
+        .status-dropdown {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 12px;
+            padding-right: 1.5rem !important;
+        }
+
+        .status-dropdown option {
+            background: white !important;
+            color: #333 !important;
+            padding: 0.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .statistics {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+                align-items: stretch !important;
+            }
+
+            .filters input,
+            .filters select {
+                width: 100% !important;
+            }
+
+            .more-filters-wrapper {
+                width: 100%;
+            }
+
+            .more-filters-btn {
+                width: 100%;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .header-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
     </style>
 </head>
 <body>
@@ -566,27 +751,27 @@
                 </div>
                 <div class="stat-box">
                     <h4>ACCOUNTS</h4>
-                    <div class="stat-value">2</div>
+                    <div class="stat-value">8</div>
                     <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 12px;">
                         <div style="text-align: center;">
-                            <div style="font-size: 24px; font-weight: 600; color: #3498db;">1</div>
-                            <div style="font-size: 12px; color: #666; margin-top: 4px;">General</div>
+                            <div style="font-size: 24px; font-weight: 600; color: #3498db;">5</div>
+                            <div style="font-size: 12px; color: #666; margin-top: 4px;">Assigned</div>
                         </div>
                         <div style="width: 2px; height: 40px; background: #e0e0e0;"></div>
                         <div style="text-align: center;">
-                            <div style="font-size: 24px; font-weight: 600; color: #e74c3c;">1</div>
-                            <div style="font-size: 12px; color: #666; margin-top: 4px;">Individual</div>
+                            <div style="font-size: 24px; font-weight: 600; color: #e67700;">3</div>
+                            <div style="font-size: 12px; color: #666; margin-top: 4px;">Unassigned</div>
                         </div>
                     </div>
                 </div>
                 <div class="stat-box">
                     <h4>SPEND (PERIOD)</h4>
-                    <div class="stat-value">$1,026.96</div>
+                    <div class="stat-value">$4,776.96</div>
                     <div class="stat-description">Includes manual spend for CL</div>
                 </div>
                 <div class="stat-box">
                     <h4>STATUS (ACTIVE/RESTRICTED)</h4>
-                    <div class="stat-value">1 / 0</div>
+                    <div class="stat-value">5 / 1</div>
                     <div class="stat-badges">
                         <span class="badge badge-active">Active</span>
                         <span class="badge badge-restricted">Restricted</span>
@@ -614,6 +799,13 @@
                     <option value="in-review">In Review</option>
                     <option value="disabled">Disabled</option>
                 </select>
+                <select id="assignedFilter" style="max-height: 200px;">
+                    <option value="">All (Assigned + Unassigned)</option>
+                    <option value="unassigned">Unassigned</option>
+                    <option value="client-a">Client A</option>
+                    <option value="client-b">Client B</option>
+                    <option value="client-c">Client C</option>
+                </select>
                 <div class="more-filters-wrapper">
                     <button class="btn more-filters-btn" onclick="toggleMoreFilters(event)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -623,11 +815,14 @@
                     </button>
                     <div class="more-filters-dropdown" id="moreFiltersDropdown">
                         <div class="field-group">
-                            <label>Assigned Status</label>
-                            <select id="assignedFilter">
-                                <option value="">Assigned + Unassigned</option>
-                                <option value="assigned">Assigned</option>
-                                <option value="unassigned">Unassigned</option>
+                            <label>Tag</label>
+                            <select id="tagFilter">
+                                <option value="">All Tags</option>
+                                <option value="scaling-01">Scaling 01</option>
+                                <option value="brand-x">Brand X</option>
+                                <option value="testing">Testing</option>
+                                <option value="premium">Premium</option>
+                                <option value="launch">Launch</option>
                             </select>
                         </div>
                         <div class="field-group">
@@ -673,84 +868,245 @@
                 <button class="btn" onclick="openAddAccountModal()" style="margin-left: 1rem;">+ Add Account</button>
             </div>
 
+            <div class="table-wrapper" style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
             <table>
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Account ID</th>
                         <th>Platform</th>
+                        <th>Asset</th>
                         <th>Account Name</th>
-                        <th>Client</th>
                         <th>Status</th>
+                        <th>Pay</th>
+                        <th>Contract</th>
+                        <th>Tag</th>
+                        <th>Balance Type</th>
+                        <th>Balance</th>
+                        <th>Access</th>
                         <th>Spend</th>
-                        <th>Balance Remaining</th>
-                        <th>Notes</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="accountsTable">
-                    <tr>
+                    <tr data-platform="facebook" data-status="active" data-assigned="client-a" data-asset="ad-account" data-balance="general" data-contract="recurring" data-tag="scaling-01">
                         <td>1</td>
-                        <td>FB-12345</td>
                         <td>Facebook</td>
-                        <td>Campaign Account 1</td>
-                        <td>Client A</td>
-                        <td>Active</td>
-                        <td>$5,420</td>
-                        <td>$2,580</td>
-                        <td><button class="icon-btn" onclick="openNotesModal(1)" title="Notes">📝</button></td>
+                        <td>Ad Account</td>
+                        <td>
+                            <div style="font-weight: 600;">Dennis Robertson</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d;">Skyblue Media - FB-7832</div>
+                        </td>
+                        <td>
+                            <select class="status-dropdown" data-account-id="1" onchange="updateAccountStatus(1, this.value)" style="background: #d4f4dd; color: #0d7a2c; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active" selected>● Active</option>
+                                <option value="in-review">● In Review</option>
+                                <option value="restricted">● Restricted</option>
+                                <option value="disabled">● Disabled</option>
+                            </select>
+                        </td>
+                        <td>CL</td>
+                        <td>Recurring</td>
+                        <td>Scaling 01</td>
+                        <td>General</td>
+                        <td>Shared wallet</td>
+                        <td>
+                            <div style="font-weight: 600;">Main: <span id="access-1">Main Profile</span></div>
+                        </td>
+                        <td style="font-weight: 600;">$134.96</td>
                         <td><button class="btn" onclick="openModal(1)">View More</button></td>
                     </tr>
-                    <tr>
+                    <tr data-platform="google" data-status="in-review" data-assigned="client-b" data-asset="ad-account" data-balance="individual" data-contract="recurring" data-tag="brand-x">
                         <td>2</td>
-                        <td>GG-67890</td>
                         <td>Google</td>
-                        <td>Ads Account Pro</td>
-                        <td>Client B</td>
-                        <td>Active</td>
-                        <td>$8,920</td>
-                        <td>$1,080</td>
-                        <td><button class="icon-btn" onclick="openNotesModal(2)" title="Notes">📝</button></td>
+                        <td>Ad Account</td>
+                        <td>
+                            <div style="font-weight: 600;">Ada Account Pro</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d;">Client B - GG-67890</div>
+                        </td>
+                        <td>
+                            <select class="status-dropdown" data-account-id="2" onchange="updateAccountStatus(2, this.value)" style="background: #fff4e6; color: #e67700; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active">● Active</option>
+                                <option value="in-review" selected>● In Review</option>
+                                <option value="restricted">● Restricted</option>
+                                <option value="disabled">● Disabled</option>
+                            </select>
+                        </td>
+                        <td>CL</td>
+                        <td>Recurring</td>
+                        <td>Brand X</td>
+                        <td>Individual</td>
+                        <td style="font-weight: 600;">$1,080.00</td>
+                        <td>
+                            <div style="font-weight: 600;">Main: <span id="access-2">Gmail Main</span></div>
+                        </td>
+                        <td style="font-weight: 600;">$892.00</td>
                         <td><button class="btn" onclick="openModal(2)">View More</button></td>
                     </tr>
-                    <tr>
+                    <tr data-platform="tiktok" data-status="active" data-assigned="client-a" data-asset="ad-account" data-balance="general" data-contract="one-time" data-tag="testing">
                         <td>3</td>
-                        <td>TB-45678</td>
-                        <td>Taboola</td>
-                        <td>Native Ads Account</td>
-                        <td>Client A</td>
-                        <td>Restricted</td>
-                        <td>$3,200</td>
-                        <td>$4,800</td>
-                        <td><button class="icon-btn" onclick="openNotesModal(3)" title="Notes">📝</button></td>
+                        <td>TikTok</td>
+                        <td>Ad Account</td>
+                        <td>
+                            <div style="font-weight: 600;">TikTok Campaign</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d;">Client A - TT-45678</div>
+                        </td>
+                        <td>
+                            <select class="status-dropdown" data-account-id="3" onchange="updateAccountStatus(3, this.value)" style="background: #d4f4dd; color: #0d7a2c; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active" selected>● Active</option>
+                                <option value="in-review">● In Review</option>
+                                <option value="restricted">● Restricted</option>
+                                <option value="disabled">● Disabled</option>
+                            </select>
+                        </td>
+                        <td>CC</td>
+                        <td>One Time</td>
+                        <td>Testing</td>
+                        <td>General</td>
+                        <td>Shared wallet</td>
+                        <td>
+                            <div style="font-weight: 600;">Main: <span id="access-3">TikTok Pro</span></div>
+                        </td>
+                        <td style="font-weight: 600;">$3,200.00</td>
                         <td><button class="btn" onclick="openModal(3)">View More</button></td>
                     </tr>
-                    <tr>
+                    <tr data-platform="taboola" data-status="active" data-assigned="client-c" data-asset="profile" data-balance="individual" data-contract="recurring" data-tag="premium">
                         <td>4</td>
-                        <td>OB-98765</td>
-                        <td>Outbrain</td>
-                        <td>Content Discovery</td>
-                        <td>Client C</td>
-                        <td>Active</td>
-                        <td>$2,100</td>
-                        <td>$5,900</td>
-                        <td><button class="icon-btn" onclick="openNotesModal(4)" title="Notes">📝</button></td>
+                        <td>Taboola</td>
+                        <td>Profile</td>
+                        <td>
+                            <div style="font-weight: 600;">Native Ads Pro</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d;">Client C - TB-98765</div>
+                        </td>
+                        <td>
+                            <select class="status-dropdown" data-account-id="4" onchange="updateAccountStatus(4, this.value)" style="background: #d4f4dd; color: #0d7a2c; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active" selected>● Active</option>
+                                <option value="in-review">● In Review</option>
+                                <option value="restricted">● Restricted</option>
+                                <option value="disabled">● Disabled</option>
+                            </select>
+                        </td>
+                        <td>CL</td>
+                        <td>Recurring</td>
+                        <td>Premium</td>
+                        <td>Individual</td>
+                        <td style="font-weight: 600;">$5,900.00</td>
+                        <td>
+                            <div style="font-weight: 600;">Main: <span id="access-4">Taboola Master</span></div>
+                        </td>
+                        <td style="font-weight: 600;">$2,100.00</td>
                         <td><button class="btn" onclick="openModal(4)">View More</button></td>
                     </tr>
-                    <tr>
+                    <tr data-platform="snapchat" data-status="restricted" data-assigned="client-b" data-asset="ad-account" data-balance="general" data-contract="one-time" data-tag="launch">
                         <td>5</td>
-                        <td>MS-11223</td>
-                        <td>Microsoft</td>
-                        <td>Bing Ads Account</td>
-                        <td>Client B</td>
-                        <td>Restricted</td>
-                        <td>$1,450</td>
-                        <td>$550</td>
-                        <td><button class="icon-btn" onclick="openNotesModal(5)" title="Notes">📝</button></td>
+                        <td>Snapchat</td>
+                        <td>Ad Account</td>
+                        <td>
+                            <div style="font-weight: 600;">Snap Ads Elite</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d;">Client B - SC-11223</div>
+                        </td>
+                        <td>
+                            <select class="status-dropdown" data-account-id="5" onchange="updateAccountStatus(5, this.value)" style="background: #ffebee; color: #c62828; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active">● Active</option>
+                                <option value="in-review">● In Review</option>
+                                <option value="restricted" selected>● Restricted</option>
+                                <option value="disabled">● Disabled</option>
+                            </select>
+                        </td>
+                        <td>CC</td>
+                        <td>One Time</td>
+                        <td>Launch</td>
+                        <td>General</td>
+                        <td>Shared wallet</td>
+                        <td>
+                            <div style="font-weight: 600;">Main: <span id="access-5">Snap Main</span></div>
+                        </td>
+                        <td style="font-weight: 600;">$1,450.00</td>
                         <td><button class="btn" onclick="openModal(5)">View More</button></td>
+                    </tr>
+                    <tr data-platform="facebook" data-status="active" data-assigned="unassigned" data-asset="ad-account" data-balance="general" data-contract="recurring" data-tag="">
+                        <td>6</td>
+                        <td>Facebook</td>
+                        <td>Ad Account</td>
+                        <td>
+                            <div style="font-weight: 600;">FB Premium Account</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d;">Unassigned - FB-9988</div>
+                        </td>
+                        <td>
+                            <select class="status-dropdown" data-account-id="6" onchange="updateAccountStatus(6, this.value)" style="background: #d4f4dd; color: #0d7a2c; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active" selected>● Active</option>
+                                <option value="in-review">● In Review</option>
+                                <option value="restricted">● Restricted</option>
+                                <option value="disabled">● Disabled</option>
+                            </select>
+                        </td>
+                        <td>CL</td>
+                        <td>Recurring</td>
+                        <td>-</td>
+                        <td>General</td>
+                        <td>Shared wallet</td>
+                        <td>
+                            <div style="font-weight: 600;">Main: <span id="access-6">FB Premium</span></div>
+                        </td>
+                        <td style="font-weight: 600;">$0.00</td>
+                        <td><button class="btn" onclick="openModal(6)">View More</button></td>
+                    </tr>
+                    <tr data-platform="google" data-status="active" data-assigned="unassigned" data-asset="ad-account" data-balance="individual" data-contract="one-time" data-tag="">
+                        <td>7</td>
+                        <td>Google</td>
+                        <td>Ad Account</td>
+                        <td>
+                            <div style="font-weight: 600;">Google Ads Fresh</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d;">Unassigned - GG-5544</div>
+                        </td>
+                        <td>
+                            <select class="status-dropdown" data-account-id="7" onchange="updateAccountStatus(7, this.value)" style="background: #d4f4dd; color: #0d7a2c; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active" selected>● Active</option>
+                                <option value="in-review">● In Review</option>
+                                <option value="restricted">● Restricted</option>
+                                <option value="disabled">● Disabled</option>
+                            </select>
+                        </td>
+                        <td>CC</td>
+                        <td>One Time</td>
+                        <td>-</td>
+                        <td>Individual</td>
+                        <td style="font-weight: 600;">$0.00</td>
+                        <td>
+                            <div style="font-weight: 600;">Main: <span id="access-7">Google Fresh</span></div>
+                        </td>
+                        <td style="font-weight: 600;">$0.00</td>
+                        <td><button class="btn" onclick="openModal(7)">View More</button></td>
+                    </tr>
+                    <tr data-platform="tiktok" data-status="in-review" data-assigned="unassigned" data-asset="profile" data-balance="general" data-contract="recurring" data-tag="">
+                        <td>8</td>
+                        <td>TikTok</td>
+                        <td>Profile</td>
+                        <td>
+                            <div style="font-weight: 600;">TikTok New Profile</div>
+                            <div style="font-size: 0.85rem; color: #7f8c8d;">Unassigned - TT-7766</div>
+                        </td>
+                        <td>
+                            <select class="status-dropdown" data-account-id="8" onchange="updateAccountStatus(8, this.value)" style="background: #fff4e6; color: #e67700; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active">● Active</option>
+                                <option value="in-review" selected>● In Review</option>
+                                <option value="restricted">● Restricted</option>
+                                <option value="disabled">● Disabled</option>
+                            </select>
+                        </td>
+                        <td>CL</td>
+                        <td>Recurring</td>
+                        <td>-</td>
+                        <td>General</td>
+                        <td>Shared wallet</td>
+                        <td>
+                            <div style="font-weight: 600;">Main: <span id="access-8">TikTok New</span></div>
+                        </td>
+                        <td style="font-weight: 600;">$0.00</td>
+                        <td><button class="btn" onclick="openModal(8)">View More</button></td>
                     </tr>
                 </tbody>
             </table>
+            </div>
         </main>
     </div>
 
@@ -802,10 +1158,53 @@
                     </div>
 
                     <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Client Tag</label>
+                        <input type="text" id="modalClientTag" value="Premium" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Asset Type</label>
+                        <select id="modalAssetType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="ad-account">Ad Account</option>
+                            <option value="profile">Profile</option>
+                            <option value="bm">BM</option>
+                            <option value="page">Page</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Status</label>
+                        <select id="modalStatus" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="active">Active</option>
+                            <option value="in-review">In Review</option>
+                            <option value="restricted">Restricted</option>
+                            <option value="disabled">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Balance Type</label>
+                        <select id="modalBalanceType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="general">General</option>
+                            <option value="individual">Individual</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Balance</label>
+                        <input type="text" id="modalBalance" value="$2,580.00" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Primary Access</label>
+                        <input type="text" id="modalPrimaryAccess" value="Main Profile" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Account Type</label>
                         <select id="modalAccountType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
-                            <option value="farm">Farm</option>
-                            <option value="agency">Agency</option>
+                            <option value="cc">CC (Credit Card)</option>
+                            <option value="cl">CL (Credit Line)</option>
                         </select>
                     </div>
 
@@ -813,7 +1212,7 @@
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Billing</label>
                         <select id="modalBilling" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
                             <option value="one-time">One Time</option>
-                            <option value="rental">Rental</option>
+                            <option value="recurring">Recurring</option>
                         </select>
                     </div>
 
@@ -831,109 +1230,149 @@
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Setup Account</label>
                         <input type="text" id="modalSetupAccount" value="$500" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
                     </div>
-
-                    <div class="field-group">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Fee (%)</label>
-                        <input type="text" id="modalFeePercent" value="15%" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
-                    </div>
-
-                    <div class="field-group">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Fee Amount</label>
-                        <input type="text" id="modalFeeAmount" value="$813" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
-                    </div>
                 </div>
             </div>
 
-            <!-- Tab Content: Profiles -->
-            <div class="account-tab-content" id="tabProfiles" style="display: none;">
-                <div class="profile-tabs">
-                    <button class="profile-tab active" onclick="switchProfileTab(1)">Profile 1</button>
-                    <button class="profile-tab" onclick="switchProfileTab(2)">Profile 2</button>
-                    <button class="profile-tab-add" onclick="addProfileTab()">+ Add Profile</button>
+           <div class="account-tab-content" id="tabProfiles" style="display:none;">
+    <div class="profiles-layout">
+
+        <!-- ================= PROFILE LIST ================= -->
+        <div class="profiles-list-box">
+            <div class="profiles-list-header">
+                <h3>Profile List</h3>
+                <button class="btn btn-primary" onclick="addProfile()">+ Add Profile</button>
+            </div>
+
+            <table class="profiles-table">
+                <thead>
+                    <tr>
+                        <th>Profile Name</th>
+                        <th>Email</th>
+                        <th class="center">Tag</th>
+                        <th class="center">Active</th>
+                    </tr>
+                </thead>
+                <tbody id="profilesList">
+                    <tr data-profile="1">
+                        <td class="strong">Main Profile</td>
+                        <td>main.profile@example.com</td>
+                        <td class="center">
+                            <span class="tag tag-primary">Primary</span>
+                        </td>
+                        <td class="center">
+                            <input type="radio" name="activeProfile" checked onchange="switchToProfile(1)">
+                        </td>
+                    </tr>
+
+                    <tr data-profile="2">
+                        <td class="strong">Backup Profile</td>
+                        <td>backup.profile@example.com</td>
+                        <td class="center">
+                            <span class="tag tag-backup">Backup</span>
+                        </td>
+                        <td class="center">
+                            <input type="radio" name="activeProfile" onchange="switchToProfile(2)">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ================= ACTIVE PROFILE DETAILS ================= -->
+        <div class="profile-details-box">
+
+            <h3>Active Profile Details</h3>
+
+            <!-- PROFILE 1 -->
+            <div class="profile-details-content" id="profileDetails1">
+
+                <div class="field-group-grid">
+                    <div class="field-group">
+                        <label>Profile Name</label>
+                        <input type="text" value="Main Profile">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Email</label>
+                        <input type="email" value="main.profile@example.com">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Password</label>
+                        <input type="password" value="********">
+                    </div>
+
+                    <div class="field-group">
+                        <label>2FA Code</label>
+                        <input type="text" value="JBSWY3DPEHPK3PXP">
+                    </div>
                 </div>
 
-                <div class="profile-content" id="profileContent1" style="display: block;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="field-group">
-                            <label>Profile Name</label>
-                            <input type="text" value="Main Profile">
-                        </div>
+                <!-- CUSTOM FIELDS -->
+                <div class="profile-custom-fields">
+                    <h4>Custom Fields</h4>
 
-                        <div class="field-group">
-                            <label>Email</label>
-                            <input type="email" value="profile1@example.com">
-                        </div>
-
-                        <div class="field-group">
-                            <label>Password</label>
-                            <input type="password" value="********">
-                        </div>
-
-                        <div class="field-group">
-                            <label>2FA Code</label>
-                            <input type="text" value="JBSWY3DPEHPK3PXP">
-                        </div>
-
-                        <div class="field-group" style="grid-column: 1 / -1;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem;">
-                                <input type="checkbox" checked style="width: auto;" onchange="setPrimaryProfile(1, this)">
-                                Set as Primary Profile (Account Name)
-                            </label>
-                        </div>
+                    <div class="custom-field-item">
+                        <input type="text" value="Recovery Email">
+                        <input type="text" value="recovery@example.com">
+                        <button class="btn btn-danger">Remove</button>
                     </div>
 
-                    <div class="profile-custom-fields">
-                        <h4>Custom Fields</h4>
-                        <div class="custom-field-item">
-                            <input type="text" placeholder="Field name">
-                            <input type="text" placeholder="Value">
-                            <button class="btn">Remove</button>
-                        </div>
-                        <button class="btn" onclick="addProfileCustomField(1)">Add Custom Field</button>
-                    </div>
+                    <button class="btn btn-secondary" onclick="addProfileCustomField(1)">
+                        + Add Custom Field
+                    </button>
                 </div>
 
-                <div class="profile-content" id="profileContent2" style="display: none;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="field-group">
-                            <label>Profile Name</label>
-                            <input type="text" value="Secondary Profile">
-                        </div>
-
-                        <div class="field-group">
-                            <label>Email</label>
-                            <input type="email" value="profile2@example.com">
-                        </div>
-
-                        <div class="field-group">
-                            <label>Password</label>
-                            <input type="password" value="********">
-                        </div>
-
-                        <div class="field-group">
-                            <label>2FA Code</label>
-                            <input type="text" value="ABCDE2FGHIJK3LMN">
-                        </div>
-
-                        <div class="field-group" style="grid-column: 1 / -1;">
-                            <label style="display: flex; align-items: center; gap: 0.5rem;">
-                                <input type="checkbox" style="width: auto;" onchange="setPrimaryProfile(2, this)">
-                                Set as Primary Profile (Account Name)
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="profile-custom-fields">
-                        <h4>Custom Fields</h4>
-                        <div class="custom-field-item">
-                            <input type="text" placeholder="Field name">
-                            <input type="text" placeholder="Value">
-                            <button class="btn">Remove</button>
-                        </div>
-                        <button class="btn" onclick="addProfileCustomField(2)">Add Custom Field</button>
-                    </div>
+                <div class="profile-actions">
+                    <button class="btn btn-danger" onclick="deleteProfile(1)">
+                        Delete Profile
+                    </button>
                 </div>
             </div>
+
+            <!-- PROFILE 2 -->
+            <div class="profile-details-content" id="profileDetails2" style="display:none;">
+                <div class="field-group-grid">
+                    <div class="field-group">
+                        <label>Profile Name</label>
+                        <input type="text" value="Backup Profile">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Email</label>
+                        <input type="email" value="backup.profile@example.com">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Password</label>
+                        <input type="password" value="********">
+                    </div>
+
+                    <div class="field-group">
+                        <label>2FA Code</label>
+                        <input type="text" value="ABCDE12345">
+                    </div>
+                </div>
+
+                <!-- CUSTOM FIELDS -->
+                <div class="profile-custom-fields">
+                    <h4>Custom Fields</h4>
+
+                    <button class="btn btn-secondary" onclick="addProfileCustomField(2)">
+                        + Add Custom Field
+                    </button>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="btn btn-danger" onclick="deleteProfile(2)">
+                        Delete Profile
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
 
             <!-- Tab Content: Cards -->
             <div class="account-tab-content" id="tabCards" style="display: none;">
@@ -974,7 +1413,7 @@
 
             <!-- Save Button -->
             <div style="display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid #e5e5e5; position: sticky; bottom: 0; background: white;">
-                <button class="btn" style="flex: 1; background: #27ae60; color: white; padding: 12px 24px; font-size: 14px; font-weight: 500; border: none; border-radius: 8px; cursor: pointer;">Save All Changes</button>
+                <button class="btn" onclick="saveAllChanges()" style="flex: 1; background: #27ae60; color: white; padding: 12px 24px; font-size: 14px; font-weight: 500; border: none; border-radius: 8px; cursor: pointer;">Save All Changes</button>
             </div>
         </div>
     </div>
@@ -1088,25 +1527,634 @@
             alert('Add custom field to profile ' + profileNum);
         }
 
-        // Set Primary Profile - uncheck other profiles and prevent unchecking
-        function setPrimaryProfile(profileNum, checkbox) {
-            // Always keep it checked - prevent unchecking
-            if (!checkbox.checked) {
-                checkbox.checked = true;
+        // Switch to profile - show details of selected profile
+        function switchToProfile(profileId) {
+            // Hide all profile details
+            document.querySelectorAll('.profile-details-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show selected profile details
+            const profileDetails = document.getElementById('profileDetails' + profileId);
+            if (profileDetails) {
+                profileDetails.style.display = 'block';
+            }
+
+            // Ensure at least one radio is always checked
+            const checkedRadio = document.querySelector('input[name="activeProfile"]:checked');
+            if (!checkedRadio) {
+                // If somehow no radio is checked, check the first one
+                const firstRadio = document.querySelector('input[name="activeProfile"]');
+                if (firstRadio) {
+                    firstRadio.checked = true;
+                    const firstProfileRow = firstRadio.closest('tr');
+                    const firstProfileId = parseInt(firstProfileRow.getAttribute('data-profile'));
+                    switchToProfile(firstProfileId);
+                }
+            }
+        }
+
+        function addProfile() {
+            alert('Add Profile functionality - opens modal to add new profile');
+        }
+
+        function deleteProfile(profileId) {
+            // Check if this is the only profile
+            const totalProfiles = document.querySelectorAll('#profilesList tr').length;
+            
+            if (totalProfiles === 1) {
+                alert('Cannot delete the last profile. At least one profile must exist.');
                 return;
             }
             
-            // Uncheck all other primary profile checkboxes
-            document.querySelectorAll('.profile-content input[type="checkbox"]').forEach(cb => {
-                if (cb !== checkbox) {
-                    cb.checked = false;
+            // Check if this is the active profile
+            const activeRadio = document.querySelector('input[name="activeProfile"]:checked');
+            if (activeRadio) {
+                const activeProfileRow = activeRadio.closest('tr');
+                const activeProfileId = parseInt(activeProfileRow.getAttribute('data-profile'));
+                
+                if (activeProfileId === profileId) {
+                    alert('Cannot delete the active profile. Please activate another profile first.');
+                    return;
+                }
+            }
+            
+            if (confirm('Are you sure you want to delete this profile?')) {
+                alert('Profile ' + profileId + ' deleted');
+                // TODO: Implement actual profile deletion logic
+            }
+        }
+
+        function addProfileCustomField(profileId) {
+            alert('Add custom field to profile ' + profileId);
+        }
+
+        // Profile names mapping
+        const profileNames = {
+            1: 'Main Profile',
+            2: 'Gmail Main',
+            3: 'TikTok Pro',
+            4: 'Taboola Master',
+            5: 'Snap Main',
+            6: 'Backup Profile',
+            7: 'Secondary Access',
+            8: 'FB Premium',
+            9: 'Google Fresh',
+            10: 'TikTok New'
+        };
+
+        // Track current open account
+        let currentAccountId = null;
+
+        // Profiles data for each account
+        const accountProfiles = {
+            1: [ // Facebook account - Dennis Robertson
+                { id: 1, name: 'Main Profile', email: 'main.fb@example.com', password: '********', twoFA: 'JBSWY3DPEHPK3PXP', tag: 'Primary' }
+            ],
+            2: [ // Google account - Ada Account Pro
+                { id: 2, name: 'Gmail Main', email: 'gmail.main@example.com', password: '********', twoFA: 'ABCDE12345', tag: 'Primary' },
+                { id: 6, name: 'Gmail Backup', email: 'gmail.backup@example.com', password: '********', twoFA: 'FGHIJ67890', tag: 'Backup' }
+            ],
+            3: [ // TikTok account - TikTok Campaign
+                { id: 3, name: 'TikTok Pro', email: 'tiktok.pro@example.com', password: '********', twoFA: 'KLMNO11111', tag: 'Primary' }
+            ],
+            4: [ // Taboola account - Native Ads Pro
+                { id: 4, name: 'Taboola Master', email: 'taboola.master@example.com', password: '********', twoFA: 'PQRST22222', tag: 'Primary' }
+            ],
+            5: [ // Snapchat account - Snap Ads Elite
+                { id: 5, name: 'Snap Main', email: 'snap.main@example.com', password: '********', twoFA: 'UVWXY33333', tag: 'Primary' }
+            ],
+            6: [ // Facebook unassigned - FB Premium Account
+                { id: 8, name: 'FB Premium', email: 'fb.premium@example.com', password: '********', twoFA: 'AAAAA44444', tag: 'Primary' }
+            ],
+            7: [ // Google unassigned - Google Ads Fresh
+                { id: 9, name: 'Google Fresh', email: 'google.fresh@example.com', password: '********', twoFA: 'BBBBB55555', tag: 'Primary' }
+            ],
+            8: [ // TikTok unassigned - TikTok New Profile
+                { id: 10, name: 'TikTok New', email: 'tiktok.new@example.com', password: '********', twoFA: 'CCCCC66666', tag: 'Primary' }
+            ]
+        };
+
+        // Mock account data
+        const accountsData = {
+            1: {
+                id: 'FB-7832',
+                name: 'Dennis Robertson - Skyblue Media',
+                platform: 'Facebook',
+                client: 'Client A',
+                clientTag: 'Scaling 01',
+                assetType: 'ad-account',
+                status: 'active',
+                balanceType: 'general',
+                balance: 'Shared wallet',
+                primaryAccess: 'Main Profile',
+                activeProfileId: 1,
+                accountType: 'cl',
+                billing: 'recurring',
+                proxy: '192.168.1.1:8080',
+                provider: 'Provider A',
+                setupAccount: '$500'
+            },
+            2: {
+                id: 'GG-67890',
+                name: 'Ada Account Pro - Client B',
+                platform: 'Google',
+                client: 'Client B',
+                clientTag: 'Brand X',
+                assetType: 'ad-account',
+                status: 'in-review',
+                balanceType: 'individual',
+                balance: '$1,080.00',
+                primaryAccess: 'Gmail Main',
+                activeProfileId: 2,
+                accountType: 'cl',
+                billing: 'recurring',
+                proxy: '192.168.1.2:8080',
+                provider: 'Provider B',
+                setupAccount: '$750'
+            },
+            3: {
+                id: 'TT-45678',
+                name: 'TikTok Campaign - Client A',
+                platform: 'TikTok',
+                client: 'Client A',
+                clientTag: 'Testing',
+                assetType: 'ad-account',
+                status: 'active',
+                balanceType: 'general',
+                balance: 'Shared wallet',
+                primaryAccess: 'TikTok Pro',
+                activeProfileId: 3,
+                accountType: 'cc',
+                billing: 'one-time',
+                proxy: '192.168.1.3:8080',
+                provider: 'Provider C',
+                setupAccount: '$300'
+            },
+            4: {
+                id: 'TB-98765',
+                name: 'Native Ads Pro - Client C',
+                platform: 'Taboola',
+                client: 'Client C',
+                clientTag: 'Premium',
+                assetType: 'profile',
+                status: 'active',
+                balanceType: 'individual',
+                balance: '$5,900.00',
+                primaryAccess: 'Taboola Master',
+                activeProfileId: 4,
+                accountType: 'cl',
+                billing: 'recurring',
+                proxy: '192.168.1.4:8080',
+                provider: 'Provider D',
+                setupAccount: '$600'
+            },
+            5: {
+                id: 'SC-11223',
+                name: 'Snap Ads Elite - Client B',
+                platform: 'Snapchat',
+                client: 'Client B',
+                clientTag: 'Launch',
+                assetType: 'ad-account',
+                status: 'restricted',
+                balanceType: 'general',
+                balance: 'Shared wallet',
+                primaryAccess: 'Snap Main',
+                activeProfileId: 5,
+                accountType: 'cc',
+                billing: 'one-time',
+                proxy: '192.168.1.5:8080',
+                provider: 'Provider E',
+                setupAccount: '$450'
+            },
+            6: {
+                id: 'FB-9988',
+                name: 'FB Premium Account - Unassigned',
+                platform: 'Facebook',
+                client: 'Unassigned',
+                clientTag: '-',
+                assetType: 'ad-account',
+                status: 'active',
+                balanceType: 'general',
+                balance: 'Shared wallet',
+                primaryAccess: 'FB Premium',
+                activeProfileId: 8,
+                accountType: 'cl',
+                billing: 'recurring',
+                proxy: '192.168.1.6:8080',
+                provider: 'Provider F',
+                setupAccount: '$400'
+            },
+            7: {
+                id: 'GG-5544',
+                name: 'Google Ads Fresh - Unassigned',
+                platform: 'Google',
+                client: 'Unassigned',
+                clientTag: '-',
+                assetType: 'ad-account',
+                status: 'active',
+                balanceType: 'individual',
+                balance: '$0.00',
+                primaryAccess: 'Google Fresh',
+                activeProfileId: 9,
+                accountType: 'cc',
+                billing: 'one-time',
+                proxy: '192.168.1.7:8080',
+                provider: 'Provider G',
+                setupAccount: '$350'
+            },
+            8: {
+                id: 'TT-7766',
+                name: 'TikTok New Profile - Unassigned',
+                platform: 'TikTok',
+                client: 'Unassigned',
+                clientTag: '-',
+                assetType: 'profile',
+                status: 'in-review',
+                balanceType: 'general',
+                balance: 'Shared wallet',
+                primaryAccess: 'TikTok New',
+                activeProfileId: 10,
+                accountType: 'cl',
+                billing: 'recurring',
+                proxy: '192.168.1.8:8080',
+                provider: 'Provider H',
+                setupAccount: '$300'
+            }
+        };
+
+        // Initialize table with correct profile names on page load
+        function initializeTable() {
+            Object.keys(accountsData).forEach(accountId => {
+                const account = accountsData[accountId];
+                const accessSpan = document.getElementById('access-' + accountId);
+                if (accessSpan && account.activeProfileId) {
+                    accessSpan.textContent = profileNames[account.activeProfileId];
                 }
             });
         }
 
+        // Call initialization when page loads
+        window.addEventListener('DOMContentLoaded', function() {
+            loadAccountsFromStorage();
+            initializeTable();
+            updateAllStatusDropdowns();
+        });
+
+        // Load accounts data from localStorage
+        function loadAccountsFromStorage() {
+            const savedAccounts = localStorage.getItem('accountsData');
+            if (savedAccounts) {
+                const parsedAccounts = JSON.parse(savedAccounts);
+                // Replace accountsData with saved data
+                Object.keys(parsedAccounts).forEach(accountId => {
+                    if (accountsData[accountId]) {
+                        accountsData[accountId] = parsedAccounts[accountId];
+                    }
+                });
+            }
+
+            const savedProfiles = localStorage.getItem('accountProfiles');
+            if (savedProfiles) {
+                const parsedProfiles = JSON.parse(savedProfiles);
+                Object.keys(parsedProfiles).forEach(accountId => {
+                    accountProfiles[accountId] = parsedProfiles[accountId];
+                });
+            }
+
+            const savedProfileNames = localStorage.getItem('profileNames');
+            if (savedProfileNames) {
+                const parsedNames = JSON.parse(savedProfileNames);
+                Object.keys(parsedNames).forEach(profileId => {
+                    profileNames[profileId] = parsedNames[profileId];
+                });
+            }
+        }
+
+        // Save accounts data to localStorage
+        function saveAccountsToStorage() {
+            localStorage.setItem('accountsData', JSON.stringify(accountsData));
+        }
+
+        // Update all status dropdowns based on accountsData
+        function updateAllStatusDropdowns() {
+            Object.keys(accountsData).forEach(accountId => {
+                const account = accountsData[accountId];
+                const dropdown = document.querySelector(`select[data-account-id="${accountId}"]`);
+                if (dropdown && account) {
+                    dropdown.value = account.status;
+                    updateDropdownStyle(dropdown, account.status);
+                    
+                    // Update row data-status attribute
+                    const row = dropdown.closest('tr');
+                    if (row) {
+                        row.setAttribute('data-status', account.status);
+                    }
+                }
+            });
+        }
+
+        // Update dropdown styling
+        function updateDropdownStyle(dropdown, status) {
+            switch(status) {
+                case 'active':
+                    dropdown.style.background = '#d4f4dd';
+                    dropdown.style.color = '#0d7a2c';
+                    break;
+                case 'in-review':
+                    dropdown.style.background = '#fff4e6';
+                    dropdown.style.color = '#e67700';
+                    break;
+                case 'restricted':
+                    dropdown.style.background = '#ffebee';
+                    dropdown.style.color = '#c62828';
+                    break;
+                case 'disabled':
+                    dropdown.style.background = '#f5f5f5';
+                    dropdown.style.color = '#666';
+                    break;
+            }
+        }
+
+        function updateAccountStatus(accountId, newStatus) {
+            const account = accountsData[accountId];
+            if (!account) return;
+
+            // Update account data
+            account.status = newStatus;
+
+            // Save to localStorage
+            saveAccountsToStorage();
+
+            // Update data-status attribute on the row
+            const dropdown = document.querySelector(`select[data-account-id="${accountId}"]`);
+            const row = dropdown ? dropdown.closest('tr') : null;
+            if (row) {
+                row.setAttribute('data-status', newStatus);
+            }
+
+            // Update dropdown styling
+            if (dropdown) {
+                updateDropdownStyle(dropdown, newStatus);
+            }
+
+            console.log(`Account ${accountId} status updated to: ${newStatus} and saved to localStorage`);
+        }
+
         function openModal(accountId) {
+            const account = accountsData[accountId];
+            if (!account) {
+                alert('Account not found!');
+                return;
+            }
+
+            // Store current account ID
+            currentAccountId = accountId;
+
+            // Populate Details tab with account data
+            document.getElementById('modalAccountId').value = account.id;
+            document.getElementById('modalAccountName').value = account.name;
+            document.getElementById('modalPlatform').value = account.platform;
+            document.getElementById('modalClient').value = account.client;
+            document.getElementById('modalClientTag').value = account.clientTag;
+            document.getElementById('modalAssetType').value = account.assetType;
+            document.getElementById('modalStatus').value = account.status;
+            document.getElementById('modalBalanceType').value = account.balanceType;
+            document.getElementById('modalBalance').value = account.balance;
+            document.getElementById('modalPrimaryAccess').value = account.primaryAccess;
+            document.getElementById('modalAccountType').value = account.accountType;
+            document.getElementById('modalBilling').value = account.billing;
+            document.getElementById('modalProxy').value = account.proxy;
+            document.getElementById('modalProvider').value = account.provider;
+            document.getElementById('modalSetupAccount').value = account.setupAccount;
+
+            // Populate Profiles tab with account-specific profiles
+            const profiles = accountProfiles[accountId] || [];
+            const profilesListBody = document.getElementById('profilesList');
+            profilesListBody.innerHTML = ''; // Clear existing profiles
+
+            // Ensure there's a valid activeProfileId
+            if (!account.activeProfileId && profiles.length > 0) {
+                account.activeProfileId = profiles[0].id;
+                console.log(`Account ${accountId}: No activeProfileId, setting to first profile: ${profiles[0].id}`);
+            }
+
+            console.log(`Account ${accountId}: activeProfileId = ${account.activeProfileId}, profiles:`, profiles);
+
+            let hasCheckedProfile = false;
+            profiles.forEach((profile, index) => {
+                const isActive = profile.id === account.activeProfileId;
+                if (isActive) hasCheckedProfile = true;
+                
+                const row = document.createElement('tr');
+                row.setAttribute('data-profile', profile.id);
+                row.innerHTML = `
+                    <td class="strong">${profile.name}</td>
+                    <td>${profile.email}</td>
+                    <td class="center">
+                        <span class="tag ${profile.tag === 'Primary' ? 'tag-primary' : 'tag-backup'}">${profile.tag}</span>
+                    </td>
+                    <td class="center">
+                        <input type="radio" name="activeProfile" ${isActive ? 'checked' : ''} onchange="switchToProfile(${profile.id})">
+                    </td>
+                `;
+                profilesListBody.appendChild(row);
+                
+                // Force check the radio button if it should be active
+                if (isActive) {
+                    const radio = row.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.checked = true;
+                        console.log(`Forced checked on profile ${profile.id}`);
+                    }
+                }
+            });
+
+            // If no profile was checked, force check the first one
+            if (!hasCheckedProfile && profiles.length > 0) {
+                console.log(`Account ${accountId}: No profile was checked, forcing first profile`);
+                account.activeProfileId = profiles[0].id;
+                const firstRadio = document.querySelector('input[name="activeProfile"]');
+                if (firstRadio) {
+                    firstRadio.checked = true;
+                    console.log(`Forced checked on first radio button`);
+                }
+            }
+
+            // Populate profile details sections
+            const profileDetailsBox = document.querySelector('.profile-details-box');
+            // Remove all existing profile details
+            const existingDetails = profileDetailsBox.querySelectorAll('.profile-details-content');
+            existingDetails.forEach(detail => detail.remove());
+
+            // Add profile details for each profile
+            profiles.forEach(profile => {
+                const isActive = profile.id === account.activeProfileId;
+                const detailsDiv = document.createElement('div');
+                detailsDiv.className = 'profile-details-content';
+                detailsDiv.id = 'profileDetails' + profile.id;
+                detailsDiv.style.display = isActive ? 'block' : 'none';
+                
+                detailsDiv.innerHTML = `
+                    <div class="field-group-grid">
+                        <div class="field-group">
+                            <label>Profile Name</label>
+                            <input type="text" value="${profile.name}">
+                        </div>
+
+                        <div class="field-group">
+                            <label>Email</label>
+                            <input type="email" value="${profile.email}">
+                        </div>
+
+                        <div class="field-group">
+                            <label>Password</label>
+                            <input type="password" value="${profile.password}">
+                        </div>
+
+                        <div class="field-group">
+                            <label>2FA Code</label>
+                            <input type="text" value="${profile.twoFA}">
+                        </div>
+                    </div>
+
+                    <!-- CUSTOM FIELDS -->
+                    <div class="profile-custom-fields">
+                        <h4>Custom Fields</h4>
+
+                        <button class="btn btn-secondary" onclick="addProfileCustomField(${profile.id})">
+                            + Add Custom Field
+                        </button>
+                    </div>
+
+                    <div class="profile-actions">
+                        <button class="btn btn-danger" onclick="deleteProfile(${profile.id})">
+                            Delete Profile
+                        </button>
+                    </div>
+                `;
+                
+                profileDetailsBox.appendChild(detailsDiv);
+            });
+
+            // Show modal
             document.getElementById('accountModal').classList.add('active');
             document.getElementById('overlay').classList.add('active');
+        }
+
+        function saveAllChanges() {
+            if (!currentAccountId) {
+                alert('No account selected!');
+                return;
+            }
+
+            // Validate that a profile is selected
+            const checkedRadio = document.querySelector('input[name="activeProfile"]:checked');
+            if (!checkedRadio) {
+                alert('Please select an active profile before saving!');
+                return;
+            }
+
+            const account = accountsData[currentAccountId];
+            
+            // Save Details tab data
+            account.id = document.getElementById('modalAccountId').value;
+            account.name = document.getElementById('modalAccountName').value;
+            account.platform = document.getElementById('modalPlatform').value;
+            account.client = document.getElementById('modalClient').value;
+            account.clientTag = document.getElementById('modalClientTag').value;
+            account.assetType = document.getElementById('modalAssetType').value;
+            account.status = document.getElementById('modalStatus').value;
+            account.balanceType = document.getElementById('modalBalanceType').value;
+            account.balance = document.getElementById('modalBalance').value;
+            account.primaryAccess = document.getElementById('modalPrimaryAccess').value;
+            account.accountType = document.getElementById('modalAccountType').value;
+            account.billing = document.getElementById('modalBilling').value;
+            account.proxy = document.getElementById('modalProxy').value;
+            account.provider = document.getElementById('modalProvider').value;
+            account.setupAccount = document.getElementById('modalSetupAccount').value;
+
+            // Save Profiles data
+            const profiles = accountProfiles[currentAccountId] || [];
+            profiles.forEach(profile => {
+                const profileDetailsDiv = document.getElementById('profileDetails' + profile.id);
+                if (profileDetailsDiv) {
+                    const inputs = profileDetailsDiv.querySelectorAll('input');
+                    profile.name = inputs[0].value; // Profile Name
+                    profile.email = inputs[1].value; // Email
+                    profile.password = inputs[2].value; // Password
+                    profile.twoFA = inputs[3].value; // 2FA Code
+                }
+            });
+
+            // Update active profile based on radio selection
+            const profileRow = checkedRadio.closest('tr');
+            const newActiveProfileId = parseInt(profileRow.getAttribute('data-profile'));
+            account.activeProfileId = newActiveProfileId;
+            
+            // Update the profile name in profileNames mapping
+            const activeProfile = profiles.find(p => p.id === newActiveProfileId);
+            if (activeProfile) {
+                account.primaryAccess = activeProfile.name;
+                profileNames[newActiveProfileId] = activeProfile.name;
+                
+                // Update the Access column in the table
+                const accessSpan = document.getElementById('access-' + currentAccountId);
+                if (accessSpan) {
+                    accessSpan.textContent = activeProfile.name;
+                }
+            }
+
+            // Save everything to localStorage
+            saveAccountsToStorage();
+            saveProfilesToStorage();
+
+            // Show success message
+            alert('All changes saved successfully!');
+            
+            // Optional: close modal after saving
+            // closeModal();
+        }
+
+        // Save accounts data to localStorage (enhanced version)
+        function saveAccountsToStorage() {
+            localStorage.setItem('accountsData', JSON.stringify(accountsData));
+        }
+
+        // Save profiles data to localStorage
+        function saveProfilesToStorage() {
+            localStorage.setItem('accountProfiles', JSON.stringify(accountProfiles));
+            localStorage.setItem('profileNames', JSON.stringify(profileNames));
+        }
+
+        // Load accounts data from localStorage (enhanced version)
+        function loadAccountsFromStorage() {
+            const savedAccounts = localStorage.getItem('accountsData');
+            if (savedAccounts) {
+                const parsedAccounts = JSON.parse(savedAccounts);
+                // Replace accountsData with saved data
+                Object.keys(parsedAccounts).forEach(accountId => {
+                    if (accountsData[accountId]) {
+                        accountsData[accountId] = parsedAccounts[accountId];
+                    }
+                });
+            }
+
+            const savedProfiles = localStorage.getItem('accountProfiles');
+            if (savedProfiles) {
+                const parsedProfiles = JSON.parse(savedProfiles);
+                Object.keys(parsedProfiles).forEach(accountId => {
+                    accountProfiles[accountId] = parsedProfiles[accountId];
+                });
+            }
+
+            const savedProfileNames = localStorage.getItem('profileNames');
+            if (savedProfileNames) {
+                const parsedNames = JSON.parse(savedProfileNames);
+                Object.keys(parsedNames).forEach(profileId => {
+                    profileNames[profileId] = parsedNames[profileId];
+                });
+            }
         }
 
         function closeModal() {
@@ -1146,13 +2194,13 @@
         }
 
         function clearMoreFilters() {
-            document.getElementById('assignedFilter').value = '';
+            document.getElementById('tagFilter').value = '';
             document.getElementById('assetTypeFilter').value = '';
             document.getElementById('balanceTypeFilter').value = '';
             document.getElementById('contractFilter').value = '';
             
             // Trigger change events to update the table
-            document.getElementById('assignedFilter').dispatchEvent(new Event('change'));
+            document.getElementById('tagFilter').dispatchEvent(new Event('change'));
             document.getElementById('assetTypeFilter').dispatchEvent(new Event('change'));
             document.getElementById('balanceTypeFilter').dispatchEvent(new Event('change'));
             document.getElementById('contractFilter').dispatchEvent(new Event('change'));
@@ -1163,6 +2211,7 @@
             document.getElementById('searchInput').value = '';
             document.getElementById('platformFilter').value = '';
             document.getElementById('statusFilter').value = '';
+            document.getElementById('assignedFilter').value = '';
             
             // Clear more filters
             clearMoreFilters();
@@ -1243,94 +2292,98 @@
 
         // Simple search functionality
         document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#accountsTable tr');
-            rows.forEach(row => {
-                const text = row.textContent.toLowerCase();
-                row.style.display = text.includes(searchTerm) ? '' : 'none';
-            });
+            applyAllFilters();
         });
 
         // Platform filter
         document.getElementById('platformFilter').addEventListener('change', function(e) {
-            const platform = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#accountsTable tr');
-            rows.forEach(row => {
-                if (!platform) {
-                    row.style.display = '';
-                } else {
-                    const rowPlatform = row.cells[2]?.textContent.toLowerCase();
-                    row.style.display = rowPlatform?.includes(platform) ? '' : 'none';
-                }
-            });
+            applyAllFilters();
         });
 
         // Status filter
         document.getElementById('statusFilter').addEventListener('change', function(e) {
-            const status = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#accountsTable tr');
-            rows.forEach(row => {
-                if (!status) {
-                    row.style.display = '';
-                } else {
-                    const rowStatus = row.cells[5]?.textContent.toLowerCase();
-                    row.style.display = rowStatus?.includes(status) ? '' : 'none';
-                }
-            });
+            applyAllFilters();
         });
 
         // Additional filters (from More Filters modal)
         document.getElementById('assignedFilter').addEventListener('change', function(e) {
-            const assigned = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#accountsTable tr');
-            rows.forEach(row => {
-                if (!assigned) {
-                    row.style.display = '';
-                } else {
-                    // Add your logic here based on your data structure
-                    row.style.display = '';
-                }
-            });
+            applyAllFilters();
         });
 
         document.getElementById('assetTypeFilter').addEventListener('change', function(e) {
-            const assetType = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#accountsTable tr');
-            rows.forEach(row => {
-                if (!assetType) {
-                    row.style.display = '';
-                } else {
-                    // Add your logic here based on your data structure
-                    row.style.display = '';
-                }
-            });
+            applyAllFilters();
         });
 
         document.getElementById('balanceTypeFilter').addEventListener('change', function(e) {
-            const balanceType = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('#accountsTable tr');
-            rows.forEach(row => {
-                if (!balanceType) {
-                    row.style.display = '';
-                } else {
-                    // Add your logic here based on your data structure
-                    row.style.display = '';
-                }
-            });
+            applyAllFilters();
         });
 
         document.getElementById('contractFilter').addEventListener('change', function(e) {
-            const contract = e.target.value.toLowerCase();
+            applyAllFilters();
+        });
+
+        document.getElementById('tagFilter').addEventListener('change', function(e) {
+            applyAllFilters();
+        });
+
+        // Unified filter function that checks all filters together
+        function applyAllFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const platform = document.getElementById('platformFilter').value.toLowerCase();
+            const status = document.getElementById('statusFilter').value.toLowerCase();
+            const assigned = document.getElementById('assignedFilter').value.toLowerCase();
+            const assetType = document.getElementById('assetTypeFilter').value.toLowerCase();
+            const balanceType = document.getElementById('balanceTypeFilter').value.toLowerCase();
+            const contract = document.getElementById('contractFilter').value.toLowerCase();
+            const tag = document.getElementById('tagFilter').value.toLowerCase();
+
             const rows = document.querySelectorAll('#accountsTable tr');
             rows.forEach(row => {
-                if (!contract) {
-                    row.style.display = '';
-                } else {
-                    // Add your logic here based on your data structure
-                    row.style.display = '';
+                let show = true;
+
+                // Search filter
+                if (searchTerm && !row.textContent.toLowerCase().includes(searchTerm)) {
+                    show = false;
                 }
+
+                // Platform filter
+                if (platform && row.getAttribute('data-platform') !== platform) {
+                    show = false;
+                }
+
+                // Status filter
+                if (status && row.getAttribute('data-status') !== status) {
+                    show = false;
+                }
+
+                // Assigned filter
+                if (assigned && row.getAttribute('data-assigned') !== assigned) {
+                    show = false;
+                }
+
+                // Asset type filter
+                if (assetType && row.getAttribute('data-asset') !== assetType) {
+                    show = false;
+                }
+
+                // Balance type filter
+                if (balanceType && row.getAttribute('data-balance') !== balanceType) {
+                    show = false;
+                }
+
+                // Contract filter
+                if (contract && row.getAttribute('data-contract') !== contract) {
+                    show = false;
+                }
+
+                // Tag filter
+                if (tag && row.getAttribute('data-tag') !== tag) {
+                    show = false;
+                }
+
+                row.style.display = show ? '' : 'none';
             });
-        });
+        }
     </script>
 
     <!-- Global Sidebar Script -->

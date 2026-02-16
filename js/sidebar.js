@@ -23,7 +23,8 @@ const navigationItems = {
         { name: 'Users', page: 'users', icon: '👥' },
         { name: 'Accounts', page: 'accounts', icon: '💳' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
-        { name: 'Transactions', page: 'transactions', icon: '💰' }
+        { name: 'Transactions', page: 'transactions', icon: '💰' },
+        { name: 'Settings', page: 'settings', icon: '⚙️' }
         
     ],
     employee: [
@@ -31,14 +32,16 @@ const navigationItems = {
         { name: 'Tasks', page: 'tasks', icon: '✓' },
         { name: 'Schedule', page: 'schedule', icon: '📅' },
         { name: 'Timesheet', page: 'timesheet', icon: '⏰' },
-        { name: 'Marketplace', page: 'marketplace', icon: '🛍️' }
+        { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
+        { name: 'Settings', page: 'settings', icon: '⚙️' }
     ],
     client: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
         { name: 'Transactions', page: 'transactions', icon: '💰' },
         { name: 'Orders', page: 'orders', icon: '📦' },
-        { name: 'Profile', page: 'profile', icon: '👤' }
+        { name: 'Profile', page: 'profile', icon: '👤' },
+        { name: 'Settings', page: 'settings', icon: '⚙️' }
     ]
 };
 

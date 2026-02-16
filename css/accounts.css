@@ -138,7 +138,7 @@ th {
 
 .statistics {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
@@ -279,4 +279,261 @@ th {
 
 .profile-custom-fields h4 {
     margin-bottom: 0.5rem;
+}
+
+/* ================= PROFILES TAB ================= */
+
+.profiles-layout {
+    display: block !important;
+    width: 100% !important;
+}
+
+.profiles-list-box,
+.profile-details-box {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 32px !important;
+}
+
+/* -------- Profile List -------- */
+.profiles-list-box {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.profiles-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.profiles-list-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.profiles-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.profiles-table th,
+.profiles-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.profiles-table th {
+    background: #2c3e50;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+}
+
+.center {
+    text-align: center;
+}
+
+.strong {
+    font-weight: 600;
+}
+
+/* -------- Tags -------- */
+.tag {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.tag-primary {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.tag-backup {
+    background: #fff4e6;
+    color: #92400e;
+}
+
+/* -------- Profile Details -------- */
+.profile-details-box {
+    background: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 10px;
+    padding: 24px;
+}
+
+.profile-details-box h3 {
+    margin-bottom: 20px;
+}
+
+/* -------- Grid Fix -------- */
+.field-group-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 24px;
+}
+
+.field-group label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.field-group input,
+.field-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+}
+
+/* -------- Custom Fields -------- */
+.profile-custom-fields {
+    margin-top: 24px;
+    background: #fffaf0;
+    border: 1px dashed #f1c40f;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.profile-custom-fields h4 {
+    margin-bottom: 12px;
+}
+
+.custom-field-item {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+/* -------- Actions -------- */
+.profile-actions {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* -------- Buttons -------- */
+.btn-primary {
+    background: #3498db;
+}
+
+.btn-secondary {
+    background: #95a5a6;
+}
+
+.btn-danger {
+    background: #e74c3c;
+}
+
+/* ================= STATISTICS ================= */
+
+.statistics {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 stat-box-uri: General Wallet, Individual Balances, Accounts, Spend, Status */
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Stat card */
+.stat-box {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    border: 1px solid #e5e5e5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* Titlu */
+.stat-box h4 {
+    margin-bottom: 0.6rem;
+    color: #6b7280;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Valoare */
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #111827;
+    line-height: 1.2;
+}
+
+/* Descriere */
+.stat-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+/* Badges */
+.stat-badges {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    flex-wrap: wrap;
+}
+
+/* ================= DESKTOP MIC ================= */
+
+@media (max-width: 1400px) {
+    .stat-box {
+        padding: 1rem;
+    }
+
+    .stat-box h4 {
+        font-size: 0.7rem;
+        letter-spacing: 0.4px;
+    }
+
+    .stat-value {
+        font-size: 1.4rem;
+    }
+
+    .stat-description {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 1200px) {
+    .stat-box {
+        padding: 0.85rem;
+    }
+
+    .stat-value {
+        font-size: 1.25rem;
+    }
+}
+
+/* ================= TABLET ================= */
+
+@media (max-width: 1024px) {
+    .statistics {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+    }
+}
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 768px) {
+    .statistics {
+        grid-template-columns: 1fr;
+    }
 }

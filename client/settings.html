@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Settings</title>
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <style>
+        .settings-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .settings-tabs {
+            display: flex;
+            gap: 0;
+            border-bottom: 2px solid #e5e5e5;
+            margin-bottom: 2rem;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+        }
+
+        .settings-tab {
+            flex: 1;
+            padding: 1.2rem;
+            border: none;
+            background: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .settings-tab:hover {
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .settings-tab.active {
+            color: #3498db;
+            border-bottom: 3px solid #3498db;
+            background: white;
+        }
+
+        .settings-content {
+            display: none;
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .settings-content.active {
+            display: block;
+        }
+
+        .settings-section {
+            margin-bottom: 2.5rem;
+        }
+
+        .settings-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .settings-section h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e5e5;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .notification-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border: 1px solid #e5e5e5;
+            border-radius: 6px;
+            margin-bottom: 0.75rem;
+            transition: background 0.2s;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-info {
+            flex: 1;
+        }
+
+        .notification-info h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+        }
+
+        .notification-info p {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        .toggle-switch input:checked + .toggle-slider {
+            background-color: #3498db;
+        }
+
+        .toggle-switch input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #3498db;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .setting-item {
+            display: grid;
+            grid-template-columns: 1fr 2fr auto;
+            gap: 1.5rem;
+            align-items: start;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+
+        .setting-label h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0 0 0.25rem 0;
+        }
+
+        .setting-label p {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .setting-input {
+            display: flex;
+            align-items: center;
+        }
+
+        .setting-input input,
+        .setting-input select {
+            width: 100%;
+            padding: 0.65rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background: #f8f9fa;
+        }
+
+        .setting-input input:focus,
+        .setting-input select:focus {
+            outline: none;
+            border-color: #3498db;
+            background: white;
+        }
+
+        .btn-update {
+            background: white;
+            color: #3498db;
+            border: 1px solid #3498db;
+            padding: 0.65rem 1.5rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .btn-update:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .status-badge {
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .status-badge.connected {
+            background: #d4f4dd;
+            color: #0d7a2c;
+        }
+
+        @media (max-width: 768px) {
+            .settings-tabs {
+                flex-direction: column;
+            }
+
+            .settings-tab {
+                border-bottom: 1px solid #e5e5e5;
+                border-left: 3px solid transparent;
+            }
+
+            .settings-tab.active {
+                border-bottom: 1px solid #e5e5e5;
+                border-left: 3px solid #3498db;
+            }
+
+            .setting-item {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .btn-update {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <header class="header">
+            <h1>Settings</h1>
+            <div class="header-right">
+                <div class="theme-toggle">
+                    <button class="theme-btn active">Light</button>
+                    <button class="theme-btn">Dark</button>
+                </div>
+                <div class="user-info">
+                    <span>Client User</span>
+                    <div class="user-avatar">CU</div>
+                </div>
+            </div>
+        </header>
+        
+        <!-- Dynamic Sidebar (generated by sidebar.js) -->
+        <aside class="sidebar" id="sidebar"></aside>
+        
+        <main class="main">
+            <div class="settings-container">
+                <!-- Tabs Navigation -->
+                <div class="settings-tabs">
+                    <button class="settings-tab active" onclick="switchTab('account')">
+                        Account
+                    </button>
+                    <button class="settings-tab" onclick="switchTab('privacy')">
+                        Privacy
+                    </button>
+                    <button class="settings-tab" onclick="switchTab('notifications')">
+                        Notification Preferences
+                    </button>
+                </div>
+
+                <!-- Account Tab -->
+                <div class="settings-content active" id="account-content">
+                    <h2 style="font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin-bottom: 2rem;">Account Settings</h2>
+
+                    <div class="settings-section">
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h4>Email</h4>
+                                <p>Email login and alerts destination.</p>
+                            </div>
+                            <div class="setting-input">
+                                <input type="email" id="email" placeholder="email@example.com">
+                            </div>
+                            <button class="btn-update" onclick="updateField('email')">Update</button>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h4>Telegram</h4>
+                                <p>Open bot → Start → paste Chat ID.</p>
+                            </div>
+                            <div class="setting-input">
+                                <span class="status-badge connected">Connected</span>
+                            </div>
+                            <button class="btn-update" onclick="openTelegramBot()">Open bot</button>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h4>Telegram Chat ID</h4>
+                                <p>Numeric ID (e.g. 123456789).</p>
+                            </div>
+                            <div class="setting-input">
+                                <input type="text" id="telegramChatId" placeholder="Enter Chat ID">
+                            </div>
+                            <button class="btn-update" onclick="updateField('telegramChatId')">Save</button>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h4>Company name</h4>
+                                <p>Or your full personal name (if no company).</p>
+                            </div>
+                            <div class="setting-input">
+                                <input type="text" id="company" placeholder="Enter company name">
+                            </div>
+                            <button class="btn-update" onclick="updateField('company')">Update</button>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h4>Country</h4>
+                                <p>Used for invoicing and localization.</p>
+                            </div>
+                            <div class="setting-input">
+                                <select id="country">
+                                    <option value="">Select country</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="RO">🇷🇴 Romania</option>
+                                    <option value="UK">🇬🇧 United Kingdom</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="ES">🇪🇸 Spain</option>
+                                    <option value="IT">🇮🇹 Italy</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="AX">🇦🇽 Åland Islands</option>
+                                </select>
+                            </div>
+                            <button class="btn-update" onclick="updateField('country')">Update</button>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h4>Telegram Username</h4>
+                                <p>Your @username (not the numeric Chat ID).</p>
+                            </div>
+                            <div class="setting-input">
+                                <input type="text" id="telegram" placeholder="@username">
+                            </div>
+                            <button class="btn-update" onclick="updateField('telegram')">Update</button>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h4>Phone</h4>
+                                <p>SMS/WhatsApp alerts.</p>
+                            </div>
+                            <div class="setting-input">
+                                <input type="tel" id="phone" placeholder="+40 123 456 789">
+                                <small style="color: #7f8c8d; font-size: 0.8rem; display: block; margin-top: 0.25rem;">Ex: +40 712 345 678</small>
+                            </div>
+                            <button class="btn-update" onclick="updateField('phone')">Update</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Privacy Tab -->
+                <div class="settings-content" id="privacy-content">
+                    <h2 style="font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin-bottom: 2rem;">Privacy & Security</h2>
+
+                    <!-- Change Password Section -->
+                    <div class="settings-section">
+                        <h3>Change Password</h3>
+                        <div style="max-width: 500px;">
+                            <div class="form-group">
+                                <label>Old Password <span style="color: #e74c3c;">*</span></label>
+                                <div style="position: relative;">
+                                    <input type="password" id="oldPassword" placeholder="Enter the old password" style="padding-right: 3rem;">
+                                    <button onclick="togglePasswordVisibility('oldPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
+                                        👁️
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>New Password <span style="color: #e74c3c;">*</span></label>
+                                <div style="position: relative;">
+                                    <input type="password" id="newPassword" placeholder="Enter the new password" style="padding-right: 3rem;">
+                                    <button onclick="togglePasswordVisibility('newPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
+                                        👁️
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Confirm Password <span style="color: #e74c3c;">*</span></label>
+                                <div style="position: relative;">
+                                    <input type="password" id="confirmPassword" placeholder="Confirm the password" style="padding-right: 3rem;">
+                                    <button onclick="togglePasswordVisibility('confirmPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
+                                        👁️
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button class="btn-primary" onclick="changePassword()" style="display: flex; align-items: center; gap: 0.5rem;">
+                                Save Changes
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Two-Factor Authentication Section -->
+                    <div class="settings-section">
+                        <h3>Enable Two-Factor Authentication</h3>
+                        <div style="max-width: 500px;">
+                            <div style="text-align: center; margin-bottom: 2rem;">
+                                <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                        <path d="M9 12l2 2 4-4"></path>
+                                    </svg>
+                                </div>
+                                <h4 style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">Enable Two-Factor Authentication</h4>
+                                <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1.5rem;">Scan the QR code below with your 2FA app:</p>
+                                
+                                <!-- QR Code -->
+                                <div style="background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid #e5e5e5; display: inline-block; margin-bottom: 1.5rem;">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%23fff'/%3E%3Cpath d='M0 0h40v40H0zm40 0h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40zM0 40h40v40H0zm80 40h40v40H80zm120 0h40v40h-40zM0 80h40v40H0zm40 80h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40zM0 120h40v40H0zm80 0h40v40H80zm120 0h40v40h-40zM0 160h40v40H0zm40 0h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40z' fill='%23000'/%3E%3C/svg%3E" alt="QR Code" style="width: 200px; height: 200px; display: block;">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Verify Two-Factor Authentication</label>
+                                <input type="text" id="twoFactorCode" placeholder="Enter your 2FA code" maxlength="6" style="text-align: center; font-size: 1.2rem; letter-spacing: 0.5rem; font-weight: 600;">
+                            </div>
+
+                            <button class="btn-primary" onclick="verify2FA()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                Verify 2FA
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notifications Tab -->
+                <div class="settings-content" id="notifications-content">
+                    <h2 style="font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">Notification settings</h2>
+                    <p style="color: #7f8c8d; font-size: 0.95rem; margin-bottom: 2rem;">Client</p>
+
+                    <div class="settings-section">
+                        <div style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.08);">
+                            <!-- Table Header -->
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 1.5rem 2rem; background: #f8f9fa; border-bottom: 2px solid #e5e5e5;">
+                                <div></div>
+                                <div style="text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.9rem;">Telegram</div>
+                                <div style="text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.9rem;">E-mail</div>
+                                <div style="text-align: center; font-weight: 600; color: #7f8c8d; font-size: 0.9rem;">Application</div>
+                            </div>
+
+                            <!-- Notification Rows -->
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 1.5rem 2rem; border-bottom: 1px solid #e5e5e5; align-items: center;">
+                                <div style="font-weight: 500; color: #2c3e50;">Account balance low</div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="balanceLowTelegram" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="balanceLowEmail" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="balanceLowApp" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 1.5rem 2rem; border-bottom: 1px solid #e5e5e5; align-items: center;">
+                                <div style="font-weight: 500; color: #2c3e50;">Payment received</div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="paymentReceivedTelegram" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="paymentReceivedEmail" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="paymentReceivedApp" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 1.5rem 2rem; border-bottom: 1px solid #e5e5e5; align-items: center;">
+                                <div style="font-weight: 500; color: #2c3e50;">New product available</div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="newProductTelegram" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="newProductEmail" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="newProductApp" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 1.5rem 2rem; border-bottom: 1px solid #e5e5e5; align-items: center;">
+                                <div style="font-weight: 500; color: #2c3e50;">Account status changed</div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="statusChangedTelegram" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="statusChangedEmail" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="statusChangedApp" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 1.5rem 2rem; border-bottom: 1px solid #e5e5e5; align-items: center;">
+                                <div style="font-weight: 500; color: #2c3e50;">Promotional offers</div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="promoOffersTelegram" style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="promoOffersEmail" style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="promoOffersApp" style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 1rem; padding: 1.5rem 2rem; align-items: center;">
+                                <div style="font-weight: 500; color: #2c3e50;">Weekly summary report</div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="weeklySummaryTelegram" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="weeklySummaryEmail" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                                <div style="text-align: center;">
+                                    <input type="checkbox" id="weeklySummaryApp" checked style="width: 20px; height: 20px; cursor: pointer; accent-color: #3498db;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Save Button -->
+                        <div style="margin-top: 2rem;">
+                            <button class="btn-primary" onclick="saveNotificationSettings()">Save All</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Load user data from localStorage on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+        });
+
+        function loadUserData() {
+            // Load data from localStorage
+            const userEmail = localStorage.getItem('userEmail') || '';
+            const userCompany = localStorage.getItem('userCompany') || '';
+            const userCountry = localStorage.getItem('userCountry') || '';
+            const userTelegram = localStorage.getItem('userTelegram') || '';
+            const userPhone = localStorage.getItem('userPhone') || '';
+            const userTelegramChatId = localStorage.getItem('userTelegramChatId') || '';
+
+            // Populate form fields
+            document.getElementById('email').value = userEmail;
+            document.getElementById('phone').value = userPhone;
+            document.getElementById('company').value = userCompany;
+            document.getElementById('country').value = userCountry;
+            document.getElementById('telegram').value = userTelegram;
+            document.getElementById('telegramChatId').value = userTelegramChatId;
+        }
+
+        function updateField(fieldName) {
+            const fieldElement = document.getElementById(fieldName);
+            const value = fieldElement.value.trim();
+
+            // Validate based on field type
+            if (fieldName === 'email') {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(value)) {
+                    alert('Please enter a valid email address!');
+                    return;
+                }
+                localStorage.setItem('userEmail', value);
+            } else if (fieldName === 'telegram') {
+                if (!value.startsWith('@')) {
+                    alert('Telegram username must start with @');
+                    return;
+                }
+                localStorage.setItem('userTelegram', value);
+            } else if (fieldName === 'telegramChatId') {
+                if (!/^\d+$/.test(value)) {
+                    alert('Telegram Chat ID must be numeric!');
+                    return;
+                }
+                localStorage.setItem('userTelegramChatId', value);
+            } else if (fieldName === 'company') {
+                if (!value) {
+                    alert('Company name cannot be empty!');
+                    return;
+                }
+                localStorage.setItem('userCompany', value);
+            } else if (fieldName === 'country') {
+                if (!value) {
+                    alert('Please select a country!');
+                    return;
+                }
+                localStorage.setItem('userCountry', value);
+            } else if (fieldName === 'phone') {
+                localStorage.setItem('userPhone', value);
+            }
+
+            alert(`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} updated successfully!`);
+        }
+
+        function openTelegramBot() {
+            // Open Telegram bot in new window
+            window.open('https://t.me/YourBotName', '_blank');
+        }
+
+        function switchTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.settings-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tabs
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Show selected content
+            document.getElementById(tabName + '-content').classList.add('active');
+
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function changePassword() {
+            const oldPassword = document.getElementById('oldPassword').value.trim();
+            const newPassword = document.getElementById('newPassword').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+            // Validate fields
+            if (!oldPassword || !newPassword || !confirmPassword) {
+                alert('Please fill in all password fields!');
+                return;
+            }
+
+            // Check if new passwords match
+            if (newPassword !== confirmPassword) {
+                alert('New passwords do not match!');
+                return;
+            }
+
+            // Check password strength
+            if (newPassword.length < 8) {
+                alert('New password must be at least 8 characters long!');
+                return;
+            }
+
+            // In a real app, you would verify the old password with the server
+            const storedPassword = localStorage.getItem('userPassword');
+            if (storedPassword && storedPassword !== oldPassword) {
+                alert('Old password is incorrect!');
+                return;
+            }
+
+            // Save new password
+            localStorage.setItem('userPassword', newPassword);
+            
+            // Clear fields
+            document.getElementById('oldPassword').value = '';
+            document.getElementById('newPassword').value = '';
+            document.getElementById('confirmPassword').value = '';
+
+            alert('Password changed successfully!');
+        }
+
+        function togglePasswordVisibility(fieldId) {
+            const field = document.getElementById(fieldId);
+            if (field.type === 'password') {
+                field.type = 'text';
+            } else {
+                field.type = 'password';
+            }
+        }
+
+        function verify2FA() {
+            const code = document.getElementById('twoFactorCode').value.trim();
+
+            if (!code) {
+                alert('Please enter the 2FA code!');
+                return;
+            }
+
+            if (code.length !== 6) {
+                alert('2FA code must be 6 digits!');
+                return;
+            }
+
+            if (!/^\d+$/.test(code)) {
+                alert('2FA code must contain only numbers!');
+                return;
+            }
+
+            // In a real app, you would verify the code with the server
+            // For demo purposes, we'll accept any 6-digit code
+            localStorage.setItem('user2FAEnabled', 'true');
+            localStorage.setItem('user2FACode', code);
+
+            alert('Two-Factor Authentication enabled successfully!');
+            document.getElementById('twoFactorCode').value = '';
+        }
+
+        function saveNotificationSettings() {
+            alert('Notification preferences saved successfully!');
+        }
+    </script>
+
+    <!-- Global Sidebar Script -->
+    <script src="../js/sidebar.js"></script>
+</body>
+</html>
