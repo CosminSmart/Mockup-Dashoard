@@ -222,6 +222,31 @@
               </div>
             </div>
 
+            <!-- Employees (under Contact Information) -->
+<div class="um-card" id="employeesCard">
+  <div class="um-card__head" style="margin-bottom:10px;">
+    <div class="um-card__title">Employees</div>
+    <div class="um-card__head-actions">
+      <span class="um-badge um-badge--gray" id="employeesCount">0</span>
+    </div>
+  </div>
+
+  <div class="um-table-wrap" style="padding:0; background:transparent;">
+    <table class="um-table-mini" aria-label="Employees table">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody id="employeesBody"></tbody>
+    </table>
+  </div>
+
+  <div class="um-muted" id="employeesHint" style="margin-top:8px;">—</div>
+</div>
+
+
           </div>
 
           <!-- Right column -->
@@ -346,6 +371,11 @@
       phoneInput: document.getElementById("phoneInput"),
       countryInput: document.getElementById("countryInput"),
       statusInput: document.getElementById("statusInput"),
+
+      employeesBody: document.getElementById("employeesBody"),
+      employeesCount: document.getElementById("employeesCount"),
+      employeesHint: document.getElementById("employeesHint"),
+
 
       // network fees
       ercFeeText: document.getElementById("ercFeeText"),
@@ -552,6 +582,68 @@
       els.createdText.textContent = client.created || "—";
     }
 
+    function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+// Demo employees DB (înlocuiești cu API mai târziu)
+function getEmployeesDb(){
+  return [
+    // C-2002 (Michael Chen) — 5 employees
+    { id:"E-2002-01", clientId:"C-2002", firstName:"Victor", lastName:"Ivanov", created:"2026-01-21" },
+    { id:"E-2002-02", clientId:"C-2002", firstName:"Elena",  lastName:"Popescu", created:"2026-01-22" },
+    { id:"E-2002-03", clientId:"C-2002", firstName:"Andrei", lastName:"Marin", created:"2026-01-25" },
+    { id:"E-2002-04", clientId:"C-2002", firstName:"Julia",  lastName:"Stone", created:"2026-02-01" },
+    { id:"E-2002-05", clientId:"C-2002", firstName:"Daniel", lastName:"Cooper", created:"2026-02-02" },
+
+    // C-2001 (Sarah) — 3 employees
+    { id:"E-2001-01", clientId:"C-2001", firstName:"Maria", lastName:"Lopez", created:"2026-01-13" },
+    { id:"E-2001-02", clientId:"C-2001", firstName:"Nate",  lastName:"Wilson", created:"2026-01-15" },
+    { id:"E-2001-03", clientId:"C-2001", firstName:"Iris",  lastName:"Chang", created:"2026-01-18" },
+  ];
+}
+
+function renderEmployees(){
+  if (!client){
+    if (els.employeesBody) els.employeesBody.innerHTML = "";
+    if (els.employeesCount) els.employeesCount.textContent = "0";
+    if (els.employeesHint) els.employeesHint.textContent = "—";
+    return;
+  }
+
+  const all = getEmployeesDb();
+  const list = all
+    .filter(e => String(e.clientId) === String(client.id))
+    .sort((a,b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+
+  els.employeesCount.textContent = String(list.length);
+
+  if (!list.length){
+    els.employeesBody.innerHTML = `<tr><td colspan="2" class="um-muted">No employees found for this client.</td></tr>`;
+    els.employeesHint.textContent = "This section lists employees linked to the selected client.";
+    return;
+  }
+
+  els.employeesBody.innerHTML = list.map(emp => {
+    const fullName = `${emp.firstName || ""} ${emp.lastName || ""}`.trim() || "—";
+    const created = emp.created || "—";
+    return `
+      <tr>
+        <td>${escapeHtml(fullName)}</td>
+        <td>${escapeHtml(created)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  els.employeesHint.textContent = `Showing ${list.length} employees for ${client.id}.`;
+}
+
+
     function renderNetworkFees(){
       els.ercFeeText.textContent = asPercent(client.ercFee);
       els.trcFeeText.textContent = asPercent(client.trcFee);
@@ -659,6 +751,7 @@
       }
 
       renderProfile();
+      renderEmployees();
       renderNetworkFees();
       renderFeeTable();
     }

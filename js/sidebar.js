@@ -40,9 +40,8 @@ const navigationItems = {
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
         { name: 'Transactions', page: 'transactions', icon: '💰' },
-        { name: 'Orders', page: 'orders', icon: '📦' },
+        { name: 'Teams', page: 'users', icon: '👥' },
         { name: 'Finance', page: 'finance', icon: '💰' },
-        { name: 'Profile', page: 'profile', icon: '👤' },
         { name: 'Settings', page: 'settings', icon: '⚙️' }
     ]
 };
