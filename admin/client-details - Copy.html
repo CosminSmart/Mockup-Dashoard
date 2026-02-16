@@ -1,0 +1,1008 @@
+```html
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Client Details</title>
+
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/users.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+
+  <style>
+    .um-actions-row{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .um-grid{
+      display:grid;
+      grid-template-columns: .8fr 1.2fr;
+      gap:14px;
+    }
+    @media (max-width: 980px){
+      .um-grid{ grid-template-columns: 1fr; }
+    }
+    .um-field{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      margin-bottom:10px;
+    }
+    .um-field input, .um-field select{ width:100%; }
+
+    .um-card__head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .um-card__head .um-card__title{ margin:0; }
+    .um-card__head-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .um-table-mini{
+      width:100%;
+      border-collapse:collapse;
+    }
+    .um-table-mini th,
+    .um-table-mini td{
+      padding:10px 8px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      text-align:left;
+      vertical-align:middle;
+    }
+    .um-table-mini th{
+      font-weight:600;
+      opacity:.85;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .um-table-mini td:last-child,
+    .um-table-mini th:last-child{
+      text-align:left;
+      white-space:nowrap;
+    }
+
+    .um-inline-input{
+      min-width:90px;
+      max-width:140px;
+    }
+
+    .um-two-col{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    @media (max-width: 560px){
+      .um-two-col{ grid-template-columns:1fr; }
+    }
+
+    /* Discount inline editor */
+    .um-discount-wrap{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-end;
+      width:100%;
+    }
+    .um-discount-inline{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      justify-content:flex-end;
+    }
+    .um-discount-input{
+      width:90px;
+      min-width:90px;
+    }
+    .um-discount-select{
+      width:70px;
+      min-width:70px;
+    }
+    .um-cell-actions{
+      display:inline-flex;
+      gap:10px;
+      align-items:center;
+      justify-content:flex-end;
+      width:100%;
+    }
+    .um-muted{
+      opacity:.8;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>Client Details</h1>
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">AU</div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div class="content-section">
+
+        <div class="um-actions-row">
+          <button class="um-btn um-btn--ghost" type="button" id="backBtn">← Back</button>
+          <button class="um-btn" type="button" id="editBtn">Edit</button>
+          <button class="um-btn um-btn--ghost" type="button" id="saveBtn" hidden>Save</button>
+          <button class="um-btn um-btn--ghost" type="button" id="cancelBtn" hidden>Cancel</button>
+        </div>
+
+        <div class="um-grid">
+          <!-- Left column -->
+          <div>
+
+            <div class="um-card um-profile">
+              <div class="um-avatar" id="avatar">CL</div>
+              <div class="um-profile__meta">
+                <div class="um-profile__name" id="nameText">—</div>
+                <div class="um-profile__company" id="companyText">—</div>
+                <div class="um-profile__status" id="statusText">—</div>
+                <div class="um-profile__company" style="margin-top:6px;" id="idText">#—</div>
+              </div>
+            </div>
+
+            <div class="um-card">
+              <div class="um-card__title">Contact Information</div>
+
+              <!-- view mode -->
+              <div class="um-info" id="viewBlock">
+                <div class="um-info__row">
+                  <span class="um-info__label">Telegram</span>
+                  <span class="um-info__value" id="telegramText">—</span>
+                </div>
+                <div class="um-info__row">
+                  <span class="um-info__label">Email</span>
+                  <span class="um-info__value" id="emailText">—</span>
+                </div>
+                <div class="um-info__row">
+                  <span class="um-info__label">Phone</span>
+                  <span class="um-info__value" id="phoneText">—</span>
+                </div>
+                <div class="um-info__row">
+                  <span class="um-info__label">Country</span>
+                  <span class="um-info__value" id="countryText">—</span>
+                </div>
+                <div class="um-info__row">
+                  <span class="um-info__label">Created</span>
+                  <span class="um-info__value" id="createdText">—</span>
+                </div>
+              </div>
+
+              <!-- edit mode -->
+              <div id="editBlock" hidden style="margin-top:10px;">
+                <div class="um-field">
+                  <label class="um-info__label">Name</label>
+                  <input class="um-input" id="nameInput" />
+                </div>
+                <div class="um-field">
+                  <label class="um-info__label">Company</label>
+                  <input class="um-input" id="companyInput" />
+                </div>
+                <div class="um-field">
+                  <label class="um-info__label">Telegram</label>
+                  <input class="um-input" id="telegramInput" />
+                </div>
+                <div class="um-field">
+                  <label class="um-info__label">Email</label>
+                  <input class="um-input" id="emailInput" type="email" />
+                </div>
+                <div class="um-field">
+                  <label class="um-info__label">Phone</label>
+                  <input class="um-input" id="phoneInput" />
+                </div>
+                <div class="um-field">
+                  <label class="um-info__label">Country</label>
+                  <input class="um-input" id="countryInput" />
+                </div>
+                <div class="um-field">
+                  <label class="um-info__label">Status</label>
+                  <select class="um-select" id="statusInput">
+                    <option value="Active">Active</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <!-- Employees (under Contact Information) -->
+<div class="um-card" id="employeesCard">
+  <div class="um-card__head" style="margin-bottom:10px;">
+    <div class="um-card__title">Employees</div>
+    <div class="um-card__head-actions">
+      <span class="um-badge um-badge--gray" id="employeesCount">0</span>
+    </div>
+  </div>
+
+  <div class="um-table-wrap" style="padding:0; background:transparent;">
+    <table class="um-table-mini" aria-label="Employees table">
+      <thead>
+        <tr>
+          <th>Full Name</th>
+          <th>Created</th>
+        </tr>
+      </thead>
+      <tbody id="employeesBody"></tbody>
+    </table>
+  </div>
+
+  <div class="um-muted" id="employeesHint" style="margin-top:8px;">—</div>
+</div>
+
+
+          </div>
+
+          <!-- Right column -->
+          <div>
+
+            <!-- Network Fees -->
+            <div class="um-card" id="feesBlock">
+              <div class="um-card__head">
+                <div class="um-card__title">Network Fees</div>
+                <div class="um-card__head-actions">
+                  <button class="um-btn um-btn--ghost" type="button" id="netEditBtn">Edit</button>
+                  <button class="um-btn um-btn--ghost" type="button" id="netSaveBtn" hidden>Save</button>
+                  <button class="um-btn um-btn--ghost" type="button" id="netCancelBtn" hidden>Cancel</button>
+                </div>
+              </div>
+
+              <!-- view -->
+              <div id="netView" class="um-two-col">
+                <div class="um-list">
+                  <div class="um-list__item">
+                    <span>ERC Fee</span>
+                    <strong id="ercFeeText">—</strong>
+                  </div>
+                </div>
+                <div class="um-list">
+                  <div class="um-list__item">
+                    <span>TRC Fee</span>
+                    <strong id="trcFeeText">—</strong>
+                  </div>
+                </div>
+              </div>
+
+              <!-- edit (inputs only; percent stays visible above) -->
+              <div id="netEdit" hidden class="um-two-col" style="margin-top:10px;">
+                <div class="um-field" style="margin-bottom:0;">
+                  <input class="um-input um-inline-input" id="ercFeeInput" inputmode="decimal" placeholder="0" />
+                </div>
+                <div class="um-field" style="margin-bottom:0;">
+                  <input class="um-input um-inline-input" id="trcFeeInput" inputmode="decimal" placeholder="0" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Fee Table -->
+            <div class="um-card" id="feeCard">
+              <div class="um-card__head">
+                <div class="um-card__title">Fee</div>
+                <div class="um-card__head-actions">
+                  <button class="um-btn um-btn--ghost" type="button" id="feeEditBtn">Edit</button>
+                  <button class="um-btn um-btn--ghost" type="button" id="feeSaveBtn" hidden>Save</button>
+                  <button class="um-btn um-btn--ghost" type="button" id="feeCancelBtn" hidden>Cancel</button>
+                </div>
+              </div>
+
+              <div class="um-table-wrap" style="padding:0; background:transparent;">
+                <table class="um-table-mini" aria-label="Fee table">
+                  <thead>
+                    <tr>
+                      <th>Account Type</th>
+                      <th>Page Setup</th>
+                      <th>Init Interval</th>
+                      <th>Init Amount</th>
+                      <th>Rec Interval</th>
+                      <th>Rec Amount</th>
+                      <th>Fee</th>
+                    </tr>
+                  </thead>
+                  <tbody id="feeBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="um-card" id="notFound" hidden>
+              <div class="um-card__title">Client not found</div>
+              <p style="margin:0; opacity:.8;">
+                Nu am găsit date pentru acest client. Întoarce-te la listă și apasă “View” din nou.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const backBtn = document.getElementById("backBtn");
+    backBtn.addEventListener("click", () => window.location.href = "clients.html");
+
+    function qs(name){
+      const url = new URL(window.location.href);
+      return url.searchParams.get(name) || "";
+    }
+
+    const id = qs("id");
+
+    const els = {
+      avatar: document.getElementById("avatar"),
+      idText: document.getElementById("idText"),
+      nameText: document.getElementById("nameText"),
+      companyText: document.getElementById("companyText"),
+      statusText: document.getElementById("statusText"),
+
+      telegramText: document.getElementById("telegramText"),
+      emailText: document.getElementById("emailText"),
+      phoneText: document.getElementById("phoneText"),
+      countryText: document.getElementById("countryText"),
+      createdText: document.getElementById("createdText"),
+
+      viewBlock: document.getElementById("viewBlock"),
+      editBlock: document.getElementById("editBlock"),
+
+      editBtn: document.getElementById("editBtn"),
+      saveBtn: document.getElementById("saveBtn"),
+      cancelBtn: document.getElementById("cancelBtn"),
+
+      nameInput: document.getElementById("nameInput"),
+      companyInput: document.getElementById("companyInput"),
+      telegramInput: document.getElementById("telegramInput"),
+      emailInput: document.getElementById("emailInput"),
+      phoneInput: document.getElementById("phoneInput"),
+      countryInput: document.getElementById("countryInput"),
+      statusInput: document.getElementById("statusInput"),
+
+      employeesBody: document.getElementById("employeesBody"),
+      employeesCount: document.getElementById("employeesCount"),
+      employeesHint: document.getElementById("employeesHint"),
+
+
+      // network fees
+      ercFeeText: document.getElementById("ercFeeText"),
+      trcFeeText: document.getElementById("trcFeeText"),
+      ercFeeInput: document.getElementById("ercFeeInput"),
+      trcFeeInput: document.getElementById("trcFeeInput"),
+      netView: document.getElementById("netView"),
+      netEdit: document.getElementById("netEdit"),
+      netEditBtn: document.getElementById("netEditBtn"),
+      netSaveBtn: document.getElementById("netSaveBtn"),
+      netCancelBtn: document.getElementById("netCancelBtn"),
+
+      // fee table
+      feeBody: document.getElementById("feeBody"),
+      feeEditBtn: document.getElementById("feeEditBtn"),
+      feeSaveBtn: document.getElementById("feeSaveBtn"),
+      feeCancelBtn: document.getElementById("feeCancelBtn"),
+
+      notFound: document.getElementById("notFound"),
+    };
+
+    function initials(name){
+      const parts = (name || "").trim().split(/\s+/).filter(Boolean);
+      if (!parts.length) return "CL";
+      return (parts[0][0] + (parts[1]?.[0] || "")).toUpperCase();
+    }
+
+    function badge(status){
+      const isActive = (status || "").toLowerCase() === "active";
+      return `<span class="um-badge ${isActive ? "um-badge--green" : "um-badge--gray"}">${status || "—"}</span>`;
+    }
+
+    function asPercent(v){
+      if (v === null || v === undefined || v === "") return "—";
+      const n = Number(v);
+      if (Number.isNaN(n)) return String(v);
+      return n + "%";
+    }
+
+    function moneyOrPercent(v){
+      if (v === null || v === undefined || v === "") return "—";
+      const s = String(v).trim();
+      if (!s) return "—";
+      if (/%|\$|€|£/.test(s)) return s;
+      const n = Number(s);
+      if (!Number.isNaN(n)) return n + "%";
+      return s;
+    }
+
+    // Money parser: "$250" or "250$" or "250"
+    function parseMoneyOrNumber(s){
+      const raw = String(s ?? "").trim();
+      if (!raw) return { value:null, prefix:"", suffix:"" };
+
+      const m1 = raw.match(/^([$€£])\s*([\d.,]+)$/);
+      const m2 = raw.match(/^([\d.,]+)\s*([$€£])$/);
+      const m3 = raw.match(/^([\d.,]+)$/);
+
+      const toNum = (x) => {
+        const n = Number(String(x).replace(/,/g,""));
+        return Number.isNaN(n) ? null : n;
+      };
+
+      if (m1) return { value: toNum(m1[2]), prefix: m1[1], suffix:"" };
+      if (m2) return { value: toNum(m2[1]), prefix:"", suffix: m2[2] };
+      if (m3) return { value: toNum(m3[1]), prefix:"", suffix:"" };
+
+      return { value:null, prefix:"", suffix:"" };
+    }
+
+    function parsePercentValue(s){
+      const raw = String(s ?? "").trim();
+      if (!raw) return null;
+      const n = Number(raw.replace("%","").trim());
+      return Number.isNaN(n) ? null : n;
+    }
+
+    function formatMoney(prefix, value, suffix){
+      const n = Number(value);
+      if (Number.isNaN(n)) return (prefix || "") + value + (suffix || "");
+      const out = Number.isInteger(n) ? String(n) : String(+n.toFixed(2));
+      return (prefix || "") + out + (suffix || "");
+    }
+
+    function clamp0(n){ return Math.max(0, n); }
+
+    // Apply discount rules:
+    // - If target is percent (fee "5%"):
+    //    mode "%" => new = old * (1 - disc/100)
+    //    mode "$" => treat as "percentage points off": new = old - disc
+    // - If target is money (setup "$250"):
+    //    mode "%" => new = old * (1 - disc/100)
+    //    mode "$" => new = old - disc
+    function applyDiscountToValue(originalStr, discountValue, discountMode){
+      const s = String(originalStr ?? "").trim();
+      const disc = Number(discountValue);
+      if (Number.isNaN(disc) || disc < 0) return s;
+
+      const pct = parsePercentValue(s);
+      if (pct !== null){
+        let out;
+        if (discountMode === "%"){
+          out = clamp0(pct * (1 - disc/100));
+        } else {
+          out = clamp0(pct - disc);
+        }
+        const outStr = Number.isInteger(out) ? String(out) : String(+out.toFixed(2));
+        return outStr + "%";
+      }
+
+      const parsed = parseMoneyOrNumber(s);
+      if (parsed.value !== null){
+        let out;
+        if (discountMode === "%"){
+          out = clamp0(parsed.value * (1 - disc/100));
+        } else {
+          out = clamp0(parsed.value - disc);
+        }
+        return formatMoney(parsed.prefix, out, parsed.suffix);
+      }
+
+      return s;
+    }
+
+    let client = null;
+    let snapshot = null;
+
+    // snapshots
+    let netSnap = null;
+    let feeSnap = null;
+
+    let feeEditing = false;
+
+    // keep track of inline discount editor (only one open at a time)
+    let openDiscount = { rowIdx: null, col: null }; // col: "setup" | "fee"
+
+    function loadClient(){
+      if (!id) return null;
+      const raw = localStorage.getItem("client:" + id);
+      if (!raw) return null;
+      try { return JSON.parse(raw); } catch { return null; }
+    }
+
+    function ensureDefaults(){
+      if (client.ercFee === undefined || client.ercFee === null || client.ercFee === "") client.ercFee = 5;
+      if (client.trcFee === undefined || client.trcFee === null || client.trcFee === "") client.trcFee = 3;
+
+      if (!Array.isArray(client.feeTable) || client.feeTable.length === 0){
+        client.feeTable = [
+          {
+            type: "Google Ads",
+            setup: "$250",
+            initInterval: 21,
+            initAmount: "$30",
+            recInterval: 30,
+            recAmount: "$50",
+            fee: "5%"
+          },
+          {
+            type: "Facebook Ads",
+            setup: "$250",
+            initInterval: 21,
+            initAmount: "$30",
+            recInterval: 30,
+            recAmount: "$50",
+            fee: "6%"
+          },
+          {
+            type: "TikTok Ads",
+            setup: "$250",
+            initInterval: 21,
+            initAmount: "$30",
+            recInterval: 30,
+            recAmount: "$50",
+            fee: "3%"
+          },
+        ];
+      }
+
+      // ensure new fields exist on each row
+      client.feeTable.forEach(r => {
+        if (r.initInterval === undefined) r.initInterval = 21;
+        if (r.initAmount === undefined) r.initAmount = "$30";
+        if (r.recInterval === undefined) r.recInterval = 30;
+        if (r.recAmount === undefined) r.recAmount = "$50";
+      });
+    }
+
+    function persist(){
+      localStorage.setItem("client:" + client.id, JSON.stringify(client));
+    }
+
+    function renderProfile(){
+      els.idText.textContent = "#" + (client.id || "—");
+      els.nameText.textContent = client.name || "—";
+      els.companyText.textContent = client.company || "—";
+      els.statusText.innerHTML = badge(client.status);
+      els.avatar.textContent = initials(client.name);
+
+      els.telegramText.textContent = client.telegram || "—";
+      els.emailText.textContent = client.email || "—";
+      els.phoneText.textContent = client.phone || "—";
+      els.countryText.textContent = client.country || "—";
+      els.createdText.textContent = client.created || "—";
+    }
+
+    function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+// Demo employees DB (înlocuiești cu API mai târziu)
+function getEmployeesDb(){
+  return [
+    // C-2002 (Michael Chen) — 5 employees
+    { id:"E-2002-01", clientId:"C-2002", firstName:"Victor", lastName:"Ivanov", created:"2026-01-21" },
+    { id:"E-2002-02", clientId:"C-2002", firstName:"Elena",  lastName:"Popescu", created:"2026-01-22" },
+    { id:"E-2002-03", clientId:"C-2002", firstName:"Andrei", lastName:"Marin", created:"2026-01-25" },
+    { id:"E-2002-04", clientId:"C-2002", firstName:"Julia",  lastName:"Stone", created:"2026-02-01" },
+    { id:"E-2002-05", clientId:"C-2002", firstName:"Daniel", lastName:"Cooper", created:"2026-02-02" },
+
+    // C-2001 (Sarah) — 3 employees
+    { id:"E-2001-01", clientId:"C-2001", firstName:"Maria", lastName:"Lopez", created:"2026-01-13" },
+    { id:"E-2001-02", clientId:"C-2001", firstName:"Nate",  lastName:"Wilson", created:"2026-01-15" },
+    { id:"E-2001-03", clientId:"C-2001", firstName:"Iris",  lastName:"Chang", created:"2026-01-18" },
+  ];
+}
+
+function renderEmployees(){
+  if (!client){
+    if (els.employeesBody) els.employeesBody.innerHTML = "";
+    if (els.employeesCount) els.employeesCount.textContent = "0";
+    if (els.employeesHint) els.employeesHint.textContent = "—";
+    return;
+  }
+
+  const all = getEmployeesDb();
+  const list = all
+    .filter(e => String(e.clientId) === String(client.id))
+    .sort((a,b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+
+  els.employeesCount.textContent = String(list.length);
+
+  if (!list.length){
+    els.employeesBody.innerHTML = `<tr><td colspan="2" class="um-muted">No employees found for this client.</td></tr>`;
+    els.employeesHint.textContent = "This section lists employees linked to the selected client.";
+    return;
+  }
+
+  els.employeesBody.innerHTML = list.map(emp => {
+    const fullName = `${emp.firstName || ""} ${emp.lastName || ""}`.trim() || "—";
+    const created = emp.created || "—";
+    return `
+      <tr>
+        <td>${escapeHtml(fullName)}</td>
+        <td>${escapeHtml(created)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  els.employeesHint.textContent = `Showing ${list.length} employees for ${client.id}.`;
+}
+
+
+    function renderNetworkFees(){
+      els.ercFeeText.textContent = asPercent(client.ercFee);
+      els.trcFeeText.textContent = asPercent(client.trcFee);
+    }
+
+    function buildDiscountCellView(valueStr, idx, col){
+      const safeVal = valueStr || "—";
+      const label = col === "setup" ? safeVal : moneyOrPercent(safeVal);
+
+      return `
+        <div class="um-cell-actions">
+          <span class="${safeVal === "—" ? "um-muted" : ""}">${label}</span>
+          <button class="um-btn um-btn--ghost" type="button" data-discount-open data-idx="${idx}" data-col="${col}">
+            Apply discount
+          </button>
+        </div>
+      `;
+    }
+
+    function buildDiscountInlineEditor(idx, col){
+      return `
+        <div class="um-discount-wrap">
+          <div class="um-discount-inline">
+            <input class="um-input um-discount-input" data-discount-value inputmode="decimal" placeholder="0" />
+            <select class="um-select um-discount-select" data-discount-mode>
+              <option value="%" selected>%</option>
+              <option value="$">$</option>
+            </select>
+          </div>
+          <button class="um-btn um-btn--ghost" type="button" data-discount-cancel>Cancel</button>
+        </div>
+      `;
+    }
+
+    function renderFeeTable(){
+      els.feeBody.innerHTML = "";
+
+      client.feeTable.forEach((row, idx) => {
+        const tr = document.createElement("tr");
+
+        const tdType    = document.createElement("td");
+        const tdSetup   = document.createElement("td");
+        const tdInitInt = document.createElement("td");
+        const tdInitAmt = document.createElement("td");
+        const tdRecInt  = document.createElement("td");
+        const tdRecAmt  = document.createElement("td");
+        const tdFee     = document.createElement("td");
+
+        tdType.textContent = row.type || "—";
+
+        if (feeEditing){
+          tdSetup.innerHTML = `
+            <input class="um-input um-inline-input" data-setup-input data-idx="${idx}"
+              value="${String(row.setup ?? "").replace(/"/g, "&quot;")}" />
+          `;
+          tdInitInt.innerHTML = `<input class="um-input um-inline-input" data-init-int data-idx="${idx}" value="${String(row.initInterval ?? "")}">`;
+          tdInitAmt.innerHTML = `<input class="um-input um-inline-input" data-init-amt data-idx="${idx}" value="${String(row.initAmount ?? "").replace(/"/g,"&quot;")}">`;
+          tdRecInt.innerHTML  = `<input class="um-input um-inline-input" data-rec-int data-idx="${idx}" value="${String(row.recInterval ?? "")}">`;
+          tdRecAmt.innerHTML  = `<input class="um-input um-inline-input" data-rec-amt data-idx="${idx}" value="${String(row.recAmount ?? "").replace(/"/g,"&quot;")}">`;
+          tdFee.innerHTML = `
+            <input class="um-input um-inline-input" data-fee-input data-idx="${idx}"
+              value="${String(row.fee ?? "").replace(/"/g, "&quot;")}" />
+          `;
+        } else {
+          tdSetup.innerHTML =
+            (openDiscount.rowIdx === idx && openDiscount.col === "setup")
+              ? buildDiscountInlineEditor(idx, "setup")
+              : buildDiscountCellView(row.setup, idx, "setup");
+
+          tdInitInt.textContent = row.initInterval ?? "—";
+          tdInitAmt.innerHTML   = `<strong>${row.initAmount ?? "—"}</strong>`;
+          tdRecInt.textContent  = row.recInterval ?? "—";
+          tdRecAmt.innerHTML    = `<strong>${row.recAmount ?? "—"}</strong>`;
+
+          tdFee.innerHTML =
+            (openDiscount.rowIdx === idx && openDiscount.col === "fee")
+              ? buildDiscountInlineEditor(idx, "fee")
+              : buildDiscountCellView(row.fee, idx, "fee");
+        }
+
+        tr.appendChild(tdType);
+        tr.appendChild(tdSetup);
+        tr.appendChild(tdInitInt);
+        tr.appendChild(tdInitAmt);
+        tr.appendChild(tdRecInt);
+        tr.appendChild(tdRecAmt);
+        tr.appendChild(tdFee);
+
+        els.feeBody.appendChild(tr);
+      });
+
+      if (!feeEditing && openDiscount.rowIdx !== null){
+        const input = els.feeBody.querySelector("[data-discount-value]");
+        if (input) input.focus();
+      }
+    }
+
+    function renderAll(){
+      if (!client){
+        els.notFound.hidden = false;
+        els.editBtn.disabled = true;
+        els.netEditBtn.disabled = true;
+        els.feeEditBtn.disabled = true;
+        return;
+      }
+
+      renderProfile();
+      renderEmployees();
+      renderNetworkFees();
+      renderFeeTable();
+    }
+
+    // ===== Profile edit (left) =====
+    function enterEdit(){
+      snapshot = JSON.parse(JSON.stringify(client));
+
+      els.nameInput.value = client.name || "";
+      els.companyInput.value = client.company || "";
+      els.telegramInput.value = client.telegram || "";
+      els.emailInput.value = client.email || "";
+      els.phoneInput.value = client.phone || "";
+      els.countryInput.value = client.country || "";
+      els.statusInput.value = client.status || "Pending";
+
+      els.viewBlock.hidden = true;
+      els.editBlock.hidden = false;
+
+      els.editBtn.hidden = true;
+      els.saveBtn.hidden = false;
+      els.cancelBtn.hidden = false;
+    }
+
+    function exitEdit(restore){
+      if (restore && snapshot) client = snapshot;
+
+      els.viewBlock.hidden = false;
+      els.editBlock.hidden = true;
+
+      els.editBtn.hidden = false;
+      els.saveBtn.hidden = true;
+      els.cancelBtn.hidden = true;
+
+      renderAll();
+    }
+
+    function saveProfile(){
+      client.name = els.nameInput.value.trim();
+      client.company = els.companyInput.value.trim();
+      client.telegram = els.telegramInput.value.trim();
+      client.email = els.emailInput.value.trim();
+      client.phone = els.phoneInput.value.trim();
+      client.country = els.countryInput.value.trim();
+      client.status = els.statusInput.value;
+
+      persist();
+      exitEdit(false);
+    }
+
+    // ===== Network Fees edit =====
+    function enterNetEdit(){
+      netSnap = JSON.parse(JSON.stringify(client));
+
+      const erc = parsePercentValue(client.ercFee) ?? Number(client.ercFee);
+      const trc = parsePercentValue(client.trcFee) ?? Number(client.trcFee);
+
+      els.ercFeeInput.value = (erc !== null && !Number.isNaN(erc)) ? String(erc) : String(client.ercFee ?? "");
+      els.trcFeeInput.value = (trc !== null && !Number.isNaN(trc)) ? String(trc) : String(client.trcFee ?? "");
+
+      // show both view + edit (inputs under values)
+      els.netView.hidden = false;
+      els.netEdit.hidden = false;
+
+      els.netEditBtn.hidden = true;
+      els.netSaveBtn.hidden = false;
+      els.netCancelBtn.hidden = false;
+    }
+
+    function exitNetEdit(restore){
+      if (restore && netSnap) client = netSnap;
+
+      els.netView.hidden = false;
+      els.netEdit.hidden = true;
+
+      els.netEditBtn.hidden = false;
+      els.netSaveBtn.hidden = true;
+      els.netCancelBtn.hidden = true;
+
+      renderNetworkFees();
+    }
+
+    function saveNetFees(){
+      const ercVal = els.ercFeeInput.value.trim();
+      const trcVal = els.trcFeeInput.value.trim();
+
+      const ercN = Number(ercVal);
+      const trcN = Number(trcVal);
+
+      client.ercFee = Number.isNaN(ercN) ? ercVal : ercN;
+      client.trcFee = Number.isNaN(trcN) ? trcVal : trcN;
+
+      persist();
+      exitNetEdit(false);
+    }
+
+    // ===== Fee table edit (manual edit mode) =====
+    function enterFeeEdit(){
+      feeSnap = JSON.parse(JSON.stringify(client));
+      feeEditing = true;
+
+      // close any discount inline editor
+      openDiscount = { rowIdx: null, col: null };
+
+      els.feeEditBtn.hidden = true;
+      els.feeSaveBtn.hidden = false;
+      els.feeCancelBtn.hidden = false;
+
+      renderFeeTable();
+    }
+
+    function exitFeeEdit(restore){
+      if (restore && feeSnap) client = feeSnap;
+
+      feeEditing = false;
+
+      els.feeEditBtn.hidden = false;
+      els.feeSaveBtn.hidden = true;
+      els.feeCancelBtn.hidden = true;
+
+      renderFeeTable();
+    }
+
+    function saveFeeTable(){
+      document.querySelectorAll("[data-setup-input]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].setup = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-init-int]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].initInterval = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-init-amt]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].initAmount = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-rec-int]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].recInterval = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-rec-amt]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].recAmount = inp.value.trim();
+      });
+
+      document.querySelectorAll("[data-fee-input]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].fee = inp.value.trim();
+      });
+
+      persist();
+      exitFeeEdit(false);
+    }
+
+    // ===== Discount inline (per row, per cell) =====
+    function openDiscountEditor(idx, col){
+      openDiscount = { rowIdx: idx, col };
+      renderFeeTable();
+    }
+
+    function closeDiscountEditor(){
+      openDiscount = { rowIdx: null, col: null };
+      renderFeeTable();
+    }
+
+    function applyDiscountFromInline(idx, col, discValue, discMode){
+      const row = client.feeTable[idx];
+      if (!row) return;
+
+      if (col === "setup"){
+        row.setup = applyDiscountToValue(row.setup, discValue, discMode);
+      } else {
+        row.fee = applyDiscountToValue(row.fee, discValue, discMode);
+      }
+
+      persist();
+      closeDiscountEditor();
+    }
+
+    // Event delegation inside fee table
+    els.feeBody.addEventListener("click", (e) => {
+      const openBtn = e.target.closest("[data-discount-open]");
+      if (openBtn){
+        const idx = Number(openBtn.dataset.idx);
+        const col = openBtn.dataset.col;
+        if (!Number.isNaN(idx) && (col === "setup" || col === "fee")){
+          openDiscountEditor(idx, col);
+        }
+        return;
+      }
+
+      const cancelBtn = e.target.closest("[data-discount-cancel]");
+      if (cancelBtn){
+        closeDiscountEditor();
+        return;
+      }
+    });
+
+    els.feeBody.addEventListener("keydown", (e) => {
+      const input = e.target.closest("[data-discount-value]");
+      if (!input) return;
+
+      if (e.key === "Escape"){
+        e.preventDefault();
+        closeDiscountEditor();
+        return;
+      }
+
+      if (e.key === "Enter"){
+        e.preventDefault();
+
+        const wrap = input.closest(".um-discount-wrap");
+        const modeEl = wrap?.querySelector("[data-discount-mode]");
+        const discMode = modeEl?.value || "%";
+        const discValue = input.value.trim();
+
+        if (openDiscount.rowIdx !== null && openDiscount.col){
+          applyDiscountFromInline(openDiscount.rowIdx, openDiscount.col, discValue, discMode);
+        }
+      }
+    });
+
+    // ===== init =====
+    client = loadClient();
+    if (client){
+      ensureDefaults();
+      persist();
+    }
+    renderAll();
+
+    // profile events
+    els.editBtn.addEventListener("click", enterEdit);
+    els.cancelBtn.addEventListener("click", () => exitEdit(true));
+    els.saveBtn.addEventListener("click", saveProfile);
+
+    // network fees events
+    els.netEditBtn.addEventListener("click", enterNetEdit);
+    els.netCancelBtn.addEventListener("click", () => exitNetEdit(true));
+    els.netSaveBtn.addEventListener("click", saveNetFees);
+
+    // fee table events
+    els.feeEditBtn.addEventListener("click", enterFeeEdit);
+    els.feeCancelBtn.addEventListener("click", () => exitFeeEdit(true));
+    els.feeSaveBtn.addEventListener("click", saveFeeTable);
+  </script>
+
+  <script src="../js/sidebar.js"></script>
+</body>
+</html>
+```

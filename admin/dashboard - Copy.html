@@ -1,0 +1,1497 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+
+  <!-- KEEP YOUR EXISTING GLOBALS -->
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+
+  <style>
+    :root{
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: rgba(15,23,42,.10);
+      --shadow: 0 12px 30px rgba(15,23,42,.08);
+
+      --green: #10b981;
+      --red: #ef4444;
+      --blue: #2563eb;
+      --cyan: #06b6d4;
+      --amber: #f59e0b;
+      --violet: #8b5cf6;
+      --slate: #334155;
+
+      --r: 16px;
+      --r2: 18px;
+      --gap: 14px;
+      --gap2: 18px;
+    }
+
+    body{ background: var(--bg) !important; }
+
+    .header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 8px 20px rgba(15,23,42,.06);
+    }
+    .main{ padding: 18px 18px 28px !important; }
+
+    .adm-wrap{ display:grid; gap: var(--gap2); }
+
+    /* KPI grid */
+    .adm-kpis{
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--gap2);
+    }
+    @media (max-width: 1100px){ .adm-kpis{ grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 720px){ .adm-kpis{ grid-template-columns: 1fr; } }
+
+    /* charts row: chart + accounts overview */
+    .adm-charts{
+      display:grid;
+      grid-template-columns: 1.4fr .9fr;
+      gap: var(--gap2);
+      align-items: stretch;
+    }
+    @media (max-width: 1100px){ .adm-charts{ grid-template-columns: 1fr; } }
+
+    /* bottom row: clients overview + activity */
+    .adm-bottom{
+      display:grid;
+      grid-template-columns: 1.6fr .9fr;
+      gap: var(--gap2);
+      align-items: start;
+    }
+    @media (max-width: 1100px){ .adm-bottom{ grid-template-columns: 1fr; } }
+
+    /* Generic card */
+    .adm-card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--r2);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .adm-card .hd{
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(15,23,42,.02), rgba(15,23,42,0));
+    }
+    .adm-card .hd .title{
+      display:flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 0;
+    }
+    .adm-card .hd h3{
+      margin:0;
+      font-size: 15px;
+      letter-spacing:.2px;
+      color: var(--text);
+    }
+    .adm-card .hd p{
+      margin:0;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+    .adm-card .bd{ padding: 16px; }
+    .adm-card .ft{
+      padding: 12px 16px;
+      border-top: 1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      gap: 10px;
+      font-size: 12px;
+      color: var(--muted);
+      background: rgba(15,23,42,.01);
+    }
+
+    .btn{
+      appearance:none;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-size: 13px;
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      white-space: nowrap;
+      box-shadow: 0 6px 18px rgba(15,23,42,.06);
+    }
+    .btn:hover{ filter: brightness(.98); }
+    .btn.primary{
+      border-color: rgba(37,99,235,.25);
+      background: linear-gradient(180deg, rgba(37,99,235,.95), rgba(37,99,235,.82));
+      color:#fff;
+    }
+    .btn.link{
+      box-shadow:none;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.02);
+    }
+
+    /* KPI style */
+    .metric{
+      padding: 18px 18px 16px;
+      display:flex;
+      justify-content: space-between;
+      gap: 14px;
+    }
+    .metric .left{ display:flex; flex-direction:column; gap: 8px; min-width:0; }
+    .metric .k{ font-size: 13px; color: rgba(100,116,139,.9); margin:0; }
+    .metric .v{ font-size: 30px; font-weight: 800; letter-spacing:.2px; margin:0; color: var(--text); }
+    .metric .delta{ display:flex; align-items:center; gap: 8px; font-size: 13px; margin-top: 4px; }
+    .delta .pos{ color: var(--green); font-weight: 800; }
+    .delta .neg{ color: var(--red); font-weight: 800; }
+
+    .spark{
+      width: 150px;
+      height: 44px;
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      opacity: .9;
+    }
+    .icoBox{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.02);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 auto;
+    }
+
+    /* Controls for chart */
+    .controls{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .ctrl{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      background: rgba(15,23,42,.02);
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      border-radius: 14px;
+    }
+    .ctrl label{
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
+    select{
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+      border-radius: 12px;
+      padding: 8px 10px;
+      font-size: 13px;
+      outline: none;
+    }
+    .pill{
+      font-size: 12px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.02);
+      cursor:pointer;
+      color: rgba(15,23,42,.80);
+      user-select:none;
+      font-weight: 700;
+    }
+    .pill.active{
+      border-color: rgba(16,185,129,.30);
+      background: rgba(16,185,129,.12);
+      color: #065f46;
+    }
+
+    .chartWrap{
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, rgba(15,23,42,.02), rgba(15,23,42,0));
+      overflow:hidden;
+      position: relative;
+    }
+    .chartCanvas{
+      width: 100%;
+      height: 330px;
+      display:block;
+    }
+    .chartLegend{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 10px 12px 12px;
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,.65);
+      backdrop-filter: blur(8px);
+    }
+    .leg{
+      display:flex; align-items:center; gap: 8px;
+      font-size: 12px;
+      color: rgba(15,23,42,.8);
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.02);
+      padding: 7px 10px;
+      border-radius: 999px;
+    }
+    .sw{
+      width:10px; height:10px; border-radius: 999px;
+      background: #94a3b8;
+      border: 1px solid rgba(15,23,42,.18);
+    }
+
+    /* Quick Actions mock tasks */
+    .qa{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+    .task{
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      background: rgba(15,23,42,.02);
+      padding: 12px;
+      display:flex;
+      gap: 12px;
+      align-items:flex-start;
+      justify-content: space-between;
+    }
+    .task:hover{ background: rgba(37,99,235,.05); border-color: rgba(37,99,235,.18); }
+    .task .l{
+      display:flex; gap: 12px; align-items:flex-start;
+      min-width: 0;
+      flex: 1;
+    }
+    .tIco{
+      width: 40px; height: 40px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #fff;
+      display:flex; align-items:center; justify-content:center;
+      flex: 0 0 auto;
+      font-size: 18px;
+    }
+    .tTxt{ min-width:0; }
+    .tTxt .t{ margin:0; font-weight: 900; font-size: 13px; color: var(--text); }
+    .tTxt .d{ margin:6px 0 0; font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .tRight{
+      display:flex;
+      gap: 8px;
+      align-items:center;
+      flex:0 0 auto;
+    }
+    .count{
+      font-size: 12px;
+      font-weight: 900;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.02);
+      color: rgba(15,23,42,.85);
+      white-space: nowrap;
+    }
+    .count.warn{ border-color: rgba(245,158,11,.30); background: rgba(245,158,11,.12); color:#92400e; }
+    .count.ok{ border-color: rgba(16,185,129,.28); background: rgba(16,185,129,.10); color:#065f46; }
+    .count.bad{ border-color: rgba(239,68,68,.28); background: rgba(239,68,68,.10); color:#991b1b; }
+
+    /* Table */
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow:hidden;
+      background: #fff;
+    }
+    thead th{
+      text-align:left;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 12px 12px;
+      background: rgba(15,23,42,.02);
+      border-bottom: 1px solid var(--border);
+      font-weight: 900;
+      letter-spacing:.2px;
+      white-space: nowrap;
+    }
+    tbody td{
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+    tbody tr:hover td{ background: rgba(37,99,235,.04); }
+    tbody tr:last-child td{ border-bottom:none; }
+
+    .name{ font-weight: 900; color: var(--text); }
+    .sub{ font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+    .status{
+      display:inline-flex; align-items:center; gap:7px;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.02);
+      white-space: nowrap;
+      font-weight: 800;
+    }
+    .dot{ width:8px; height:8px; border-radius:999px; background: #94a3b8; }
+
+    .st-active{ border-color: rgba(16,185,129,.30); background: rgba(16,185,129,.10); color:#065f46; }
+    .st-active .dot{ background: var(--green); }
+
+    .st-susp{ border-color: rgba(239,68,68,.28); background: rgba(239,68,68,.10); color:#991b1b; }
+    .st-susp .dot{ background: var(--red); }
+
+    .st-prog{ border-color: rgba(245,158,11,.30); background: rgba(245,158,11,.12); color:#92400e; }
+    .st-prog .dot{ background: var(--amber); }
+
+    .st-appeal{ border-color: rgba(37,99,235,.25); background: rgba(37,99,235,.10); color:#1e40af; }
+    .st-appeal .dot{ background: var(--blue); }
+
+    .st-need{ border-color: rgba(139,92,246,.25); background: rgba(139,92,246,.10); color:#5b21b6; }
+    .st-need .dot{ background: var(--violet); }
+
+    .actBtn{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+    }
+
+    /* Activity list */
+    .activity{ display:grid; gap: 12px; }
+    .aItem{
+      display:flex;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,.02);
+      align-items:flex-start;
+    }
+    .aItem:hover{ background: rgba(37,99,235,.05); border-color: rgba(37,99,235,.18); }
+    .aIco{
+      width: 38px; height: 38px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #fff;
+      display:flex; align-items:center; justify-content:center;
+      flex:0 0 auto;
+      font-size: 16px;
+    }
+    .aTxt{ min-width:0; flex:1; }
+    .aTxt .t{ margin:0; font-weight: 900; font-size: 13px; color: var(--text); }
+    .aTxt .d{ margin:6px 0 0; font-size: 12px; color: var(--muted); line-height: 1.35; }
+    .aRight{
+      display:flex; flex-direction:column; gap: 8px;
+      align-items:flex-end;
+      flex:0 0 auto;
+    }
+    .time{ font-size: 12px; color: var(--muted); }
+
+    /* small note */
+    .note{
+      font-size: 12px;
+      color: rgba(100,116,139,.75);
+    }
+
+    .user-info span{ color: rgba(15,23,42,.8); font-weight: 700; }
+
+    /* Platforms Status Overview */
+.statusTableWrap{
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: #fff;
+}
+
+.statusTable{
+  width:100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.statusTable thead th{
+  background: rgba(15,23,42,.02);
+  border-bottom: 1px solid var(--border);
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+
+.statusTable tbody td{
+  border-bottom: 1px solid var(--border);
+  background: #fff;
+}
+
+.statusTable tbody tr:hover td{
+  background: rgba(37,99,235,.04);
+}
+
+.platHead{
+  display:inline-flex;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: rgba(15,23,42,.02);
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  color: rgba(15,23,42,.80);
+}
+
+.sRow{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+}
+
+.sDot{
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: #94a3b8;
+  border: 1px solid rgba(15,23,42,.12);
+}
+
+.sDot.active{ background: var(--green); }
+.sDot.suspended{ background: var(--red); }
+.sDot.need_appeal{ background: var(--violet); }
+.sDot.in_appeal{ background: var(--blue); }
+.sDot.in_progress{ background: var(--amber); }
+
+.sName{
+  font-weight: 900;
+  color: var(--text);
+  font-size: 13px;
+}
+
+.num{
+  display:inline-flex;
+  min-width: 38px;
+  justify-content:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(15,23,42,.02);
+  font-weight: 900;
+  font-size: 12px;
+  color: rgba(15,23,42,.85);
+}
+
+.num.zero{
+  opacity: .55;
+}
+
+.onlyColNote{
+  font-size: 12px;
+  color: var(--muted);
+}
+
+
+
+/* Tabs (Transactions card) */
+.tabs{
+  display:flex;
+  gap: 8px;
+  align-items:center;
+  background: rgba(15,23,42,.02);
+  border: 1px solid var(--border);
+  padding: 6px;
+  border-radius: 14px;
+}
+.tabBtn{
+  border: 1px solid transparent;
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(15,23,42,.70);
+  cursor: pointer;
+}
+.tabBtn:hover{ background: rgba(37,99,235,.06); }
+.tabBtn.active{
+  background: #fff;
+  border-color: rgba(37,99,235,.22);
+  box-shadow: 0 8px 18px rgba(15,23,42,.08);
+  color: rgba(15,23,42,.92);
+}
+
+.tableWrap{
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  background: #fff;
+}
+
+.txLink{
+  color: rgba(37,99,235,.95);
+  text-decoration: none;
+  font-weight: 800;
+}
+.txLink:hover{ text-decoration: underline; }
+
+/* Make tables a bit tighter for admin */
+#txTabsCard table thead th{ padding: 11px 12px; }
+#txTabsCard table tbody td{ padding: 11px 12px; }
+
+
+/* Pending Users card (dashboard) */
+#pendingUsersCard .bd{ padding: 16px; }
+
+.pendingEmpty{
+  height: 220px;               /* ca in screenshot */
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(15,23,42,.02);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.pendingEmpty__text{
+  color: rgba(100,116,139,.85);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.pendingList{
+  display:grid;
+  gap: 10px;
+}
+
+.pendingItem{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: rgba(15,23,42,.02);
+  padding: 12px;
+}
+
+.pendingName{
+  font-weight: 900;
+  color: var(--text);
+  font-size: 13px;
+}
+.pendingSub{
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.pendingActions{
+  display:flex;
+  gap: 8px;
+  align-items:center;
+}
+
+#pendingUsersCard .bd{
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+
+
+
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1 style="font-size:20px; letter-spacing:.2px;">Admin Dashboard</h1>
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">AU</div>
+      </div>
+    </header>
+
+    <!-- SIDEBAR (DO NOT TOUCH) -->
+    <aside class="sidebar"></aside>
+
+    <main class="main">
+      <div class="adm-wrap">
+
+        <!-- KPI -->
+        <section class="adm-kpis">
+          <article class="adm-card">
+            <div class="metric">
+              <div class="left">
+                <p class="k">Total Deposited</p>
+                <p class="v">$2,847,500</p>
+                <div class="delta"><span class="pos">↗ +12.5%</span><span class="note">vs last 30d</span></div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
+                <div class="icoBox">$</div>
+                <div class="spark">
+                  <svg viewBox="0 0 140 40" width="140" height="40">
+                    <path d="M2 30 C 20 20, 35 22, 48 24 S 80 28, 98 18 S 120 22, 138 12"
+                          fill="none" stroke="rgba(16,185,129,.95)" stroke-width="2.6" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="adm-card">
+            <div class="metric">
+              <div class="left">
+                <p class="k">Credit Allocation</p>
+                <p class="v">$2,456,200</p>
+                <div class="delta"><span class="pos">↗ +8.3%</span><span class="note">this month</span></div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
+                <div class="icoBox">💳</div>
+                <div class="spark">
+                  <svg viewBox="0 0 140 40" width="140" height="40">
+                    <path d="M2 26 C 18 26, 34 24, 50 22 S 86 20, 104 18 S 124 18, 138 14"
+                          fill="none" stroke="rgba(16,185,129,.95)" stroke-width="2.6" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <article class="adm-card">
+            <div class="metric">
+              <div class="left">
+                <p class="k">Active Spending</p>
+                <p class="v">$1,923,400</p>
+                <div class="delta"><span class="pos">↗ +15.7%</span><span class="note">vs last 7d</span></div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
+                <div class="icoBox">📈</div>
+                <div class="spark">
+                  <svg viewBox="0 0 140 40" width="140" height="40">
+                    <path d="M2 28 C 18 24, 34 26, 50 20 S 86 18, 104 16 S 124 16, 138 12"
+                          fill="none" stroke="rgba(16,185,129,.95)" stroke-width="2.6" stroke-linecap="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </article>
+        </section>
+
+        <!-- CHART + RIGHT CARD (Quick Actions instead of Status Distribution) -->
+        <section class="adm-charts">
+          <!-- Spending Trends -->
+          <article class="adm-card">
+            <div class="hd">
+              <div class="title">
+                <h3>Spending Trends</h3>
+                <p>Animated chart example • filter by platform • Line/Bar toggle.</p>
+              </div>
+
+              <div class="controls">
+                <div class="ctrl">
+                  <label for="platformSel">Platform</label>
+                  <select id="platformSel">
+                    <option value="all" selected>All platforms</option>
+                    <option value="google">Google Ads</option>
+                    <option value="facebook">Facebook Ads</option>
+                    <option value="tiktok">TikTok Ads</option>
+                    <option value="microsoft">Microsoft Ads</option>
+                  </select>
+                </div>
+
+                <div class="ctrl">
+                  <span id="modeLine" class="pill active">Line</span>
+                  <span id="modeBar" class="pill">Bar</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="bd">
+              <div class="chartWrap">
+                <canvas id="trendCanvas" class="chartCanvas"></canvas>
+                <div class="chartLegend" id="trendLegend">
+                  <span class="leg"><span class="sw" style="background:rgba(37,99,235,.95)"></span>Google Ads</span>
+                  <span class="leg"><span class="sw" style="background:rgba(6,182,212,.95)"></span>Facebook Ads</span>
+                  <span class="leg"><span class="sw" style="background:rgba(15,23,42,.80)"></span>TikTok Ads</span>
+                  <span class="leg"><span class="sw" style="background:rgba(16,185,129,.95)"></span>Microsoft Ads</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ft">
+              <span>Tip: schimbă platforma → re-render animat (mock).</span>
+              <span id="trendMeta"><b>Last 7 days</b></span>
+            </div>
+          </article>
+
+          <!-- Accounts Overview moved here (in place of status distribution) -->
+<article class="adm-card" id="platformStatusCard">
+  <div class="hd">
+    <div class="title">
+      <h3>Platforms Status Overview</h3>
+      <p>Status counts across platforms • filter by platform.</p>
+    </div>
+
+    <div class="controls">
+      <div class="ctrl">
+        <label for="statusPlatformSel">Select Platform</label>
+        <select id="statusPlatformSel">
+          <option value="all" selected>All Platforms</option>
+          <option value="facebook">Facebook</option>
+          <option value="google">Google</option>
+          <option value="tiktok">TikTok</option>
+          <option value="microsoft">Microsoft</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="bd" style="padding-top:12px;">
+    <div class="statusTableWrap">
+      <table class="statusTable">
+        <thead>
+          <tr>
+            <th style="width:40%;">Status</th>
+            <th class="platCol" data-plat="facebook" style="width:15%; text-align:center;">
+              <span class="platHead">f</span>
+            </th>
+            <th class="platCol" data-plat="google" style="width:15%; text-align:center;">
+              <span class="platHead">G</span>
+            </th>
+            <th class="platCol" data-plat="tiktok" style="width:15%; text-align:center;">
+              <span class="platHead">T</span>
+            </th>
+            <th class="platCol" data-plat="microsoft" style="width:15%; text-align:center;">
+              <span class="platHead">M</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="statusBody">
+          <!-- rows generated by JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="ft">
+    <span class="note">Tip: choose a platform → table collapses to one column.</span>
+    <span id="statusMeta">Updated: <b>just now</b></span>
+  </div>
+</article>
+
+        </section>
+
+        <!-- Quick Actions moved where Status Distribution used to be: now it stays separate as a strong admin block -->
+        <article class="adm-card">
+          <div class="hd">
+            <div class="title">
+              <h3>Quick Actions</h3>
+              <p>Mock tasks (admin-first). Tap “View” → redirects directly.</p>
+            </div>
+            <button class="btn primary" onclick="location.href='./finance.html'">Open Finance</button>
+          </div>
+
+          <div class="bd">
+            <div class="qa">
+              <div class="task">
+                <div class="l">
+                  <div class="tIco">⏳</div>
+                  <div class="tTxt">
+                    <p class="t">Review Pending Top-Ups</p>
+                    <p class="d">Approve/decline requests • set USDT rate & FX for wire transfers.</p>
+                  </div>
+                </div>
+                <div class="tRight">
+                  <span class="count warn">7 pending</span>
+                  <button class="btn link" onclick="location.href='./finance.html'">View</button>
+                </div>
+              </div>
+
+              <div class="task">
+                <div class="l">
+                  <div class="tIco">👤</div>
+                  <div class="tTxt">
+                    <p class="t">Approve New Users</p>
+                    <p class="d">KYC checks • role assignment • activation.</p>
+                  </div>
+                </div>
+                <div class="tRight">
+                  <span class="count warn">3 waiting</span>
+                  <button class="btn link" onclick="location.href='./users.html'">View</button>
+                </div>
+              </div>
+
+              <div class="task">
+                <div class="l">
+                  <div class="tIco">🛡️</div>
+                  <div class="tTxt">
+                    <p class="t">Audit Suspicious Activity</p>
+                    <p class="d">Recent logins • unusual spending spikes • repeated declines.</p>
+                  </div>
+                </div>
+                <div class="tRight">
+                  <span class="count bad">2 alerts</span>
+                  <button class="btn link" onclick="location.href='./transactions.html'">View</button>
+                </div>
+              </div>
+
+              <div class="task">
+                <div class="l">
+                  <div class="tIco">🧩</div>
+                  <div class="tTxt">
+                    <p class="t">Fix Suspended Accounts</p>
+                    <p class="d">Open appeal • attach proof • track status.</p>
+                  </div>
+                </div>
+                <div class="tRight">
+                  <span class="count bad">5 suspended</span>
+                  <button class="btn link" onclick="location.href='./accounts.html'">View</button>
+                </div>
+              </div>
+
+              <div class="task">
+                <div class="l">
+                  <div class="tIco">📤</div>
+                  <div class="tTxt">
+                    <p class="t">Export Monthly Report</p>
+                    <p class="d">Deposits • spending • fees • balances • approvals.</p>
+                  </div>
+                </div>
+                <div class="tRight">
+                  <span class="count ok">ready</span>
+                  <button class="btn link" onclick="alert('Mock export (JS later)')">View</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="ft">
+            <span>Note: aici vei avea și “Pending Users/Top-Ups” în producție.</span>
+            <span>Mock: <b>5</b> tasks</span>
+          </div>
+        </article>
+
+        <!-- Bottom: Clients Overview (instead of Accounts Overview) + Activity -->
+        <section class="adm-bottom">
+<article class="adm-card" id="txTabsCard">
+  <div class="hd">
+    <div class="title">
+      <h3>Transactions</h3>
+      <p>Quick admin view: latest top-ups & internal transfers (mock).</p>
+    </div>
+
+    <div class="tabs">
+      <button class="tabBtn active" type="button" data-tab="topups">Recent Top-Ups</button>
+      <button class="tabBtn" type="button" data-tab="internal">Internal Transactions</button>
+    </div>
+  </div>
+
+  <div class="bd" style="padding-top:12px;">
+    <!-- TAB: Topups -->
+    <div class="tabPanel" data-panel="topups">
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:16%;">ID</th>
+              <th style="width:18%;">Date</th>
+              <th style="width:16%;">Amount</th>
+              <th style="width:20%;">Type</th>
+              <th style="width:18%;">Proof</th>
+              <th style="width:12%;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>750</b></td>
+              <td>16 Feb 2026</td>
+              <td>$5,880.00</td>
+              <td>Crypto TRC-20</td>
+              <td><a class="txLink" href="#" onclick="return false;">https://tr...</a></td>
+              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
+            </tr>
+            <tr>
+              <td><b>749</b></td>
+              <td>15 Feb 2026</td>
+              <td>$3,479.98</td>
+              <td>Crypto TRC-20</td>
+              <td><a class="txLink" href="#" onclick="return false;">85b2144c2c...</a></td>
+              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
+            </tr>
+            <tr>
+              <td><b>748</b></td>
+              <td>15 Feb 2026</td>
+              <td>$14,700.00</td>
+              <td>Crypto TRC-20</td>
+              <td><a class="txLink" href="#" onclick="return false;">29202231cb...</a></td>
+              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
+            </tr>
+            <tr>
+              <td><b>747</b></td>
+              <td>14 Feb 2026</td>
+              <td>$1,200.00</td>
+              <td>Wire Transfer</td>
+              <td><a class="txLink" href="#" onclick="return false;">invoice_0047</a></td>
+              <td><span class="status st-prog"><span class="dot"></span>Approved</span></td>
+            </tr>
+            <tr>
+              <td><b>746</b></td>
+              <td>14 Feb 2026</td>
+              <td>$9,990.00</td>
+              <td>USDT ERC-20</td>
+              <td><a class="txLink" href="#" onclick="return false;">0x9d3a...a1f</a></td>
+              <td><span class="status st-appeal"><span class="dot"></span>Pending</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- TAB: Internal -->
+    <div class="tabPanel" data-panel="internal" hidden>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:16%;">ID</th>
+              <th style="width:18%;">Date</th>
+              <th style="width:16%;">Amount</th>
+              <th style="width:18%;">From</th>
+              <th style="width:20%;">To</th>
+              <th style="width:12%;">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>1086</b></td>
+              <td>16 Feb 2026</td>
+              <td>$5,880.00</td>
+              <td>Main Balance</td>
+              <td>Google</td>
+              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
+            </tr>
+            <tr>
+              <td><b>1085</b></td>
+              <td>16 Feb 2026</td>
+              <td>$3,479.98</td>
+              <td>Main Balance</td>
+              <td>FB Business Manager</td>
+              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
+            </tr>
+            <tr>
+              <td><b>1084</b></td>
+              <td>15 Feb 2026</td>
+              <td>$14,700.00</td>
+              <td>Main Balance</td>
+              <td>FB Business Manager</td>
+              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
+            </tr>
+            <tr>
+              <td><b>1083</b></td>
+              <td>15 Feb 2026</td>
+              <td>$1,250.00</td>
+              <td>Main Balance</td>
+              <td>TikTok</td>
+              <td><span class="status st-prog"><span class="dot"></span>Approved</span></td>
+            </tr>
+            <tr>
+              <td><b>1082</b></td>
+              <td>14 Feb 2026</td>
+              <td>$900.00</td>
+              <td>Main Balance</td>
+              <td>Microsoft</td>
+              <td><span class="status st-appeal"><span class="dot"></span>Pending</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="ft">
+    <span class="note">Next: click row → open right drawer with details + actions.</span>
+    <span>Showing: <b>5</b></span>
+  </div>
+</article>
+
+
+        <article class="adm-card" id="pendingUsersCard">
+  <div class="hd">
+    <div class="title">
+      <h3>Pending Users</h3>
+      <p>Users waiting approval / verification.</p>
+    </div>
+    <button class="btn link" type="button" onclick="location.href='./users.html'">View All ↗</button>
+  </div>
+
+<div class="bd">
+
+  <!-- Empty state (se ascunde automat când există items) -->
+  <div class="pendingEmpty" id="pendingEmpty">
+    <div class="pendingEmpty__text">No pending users</div>
+  </div>
+
+  <!-- Pending users list -->
+  <div class="pendingList" id="pendingList">
+    <div class="pendingItem">
+      <div class="pendingMeta">
+        <div class="pendingName">Michael Chen</div>
+        <div class="pendingSub">@michael_chen • michael.chen@brightlabs.io</div>
+      </div>
+      <div class="pendingActions">
+        <button class="btn" type="button">Approve</button>
+        <button class="btn link" type="button">Decline</button>
+      </div>
+    </div>
+
+    <div class="pendingItem">
+      <div class="pendingMeta">
+        <div class="pendingName">Aisha Khan</div>
+        <div class="pendingSub">@aisha_khan • aisha.khan@northpeak.co</div>
+      </div>
+      <div class="pendingActions">
+        <button class="btn" type="button">Approve</button>
+        <button class="btn link" type="button">Decline</button>
+      </div>
+    </div>
+
+    <div class="pendingItem">
+      <div class="pendingMeta">
+        <div class="pendingName">David Romero</div>
+        <div class="pendingSub">@david_romero • david.romero@retaildynamics.com</div>
+      </div>
+      <div class="pendingActions">
+        <button class="btn" type="button">Approve</button>
+        <button class="btn link" type="button">Decline</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+  </div>
+
+  <div class="ft">
+    <span class="note">Tip: “View All” → User Management (pending filter).</span>
+    <span>Last 24h</span>
+  </div>
+</article>
+
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+
+  <script>
+    // ===== Animated Spending Trends (Canvas) =====
+    // Mock data (7 days). Values are "k$" style for readability.
+    const trendData = {
+      labels: ["02/04","02/05","02/06","02/07","02/08","02/09","02/10"],
+      series: {
+        google:   { name: "Google Ads",    color: "rgba(37,99,235,.95)",   values: [45,52,48,61,58,67,71] },
+        facebook: { name: "Facebook Ads",  color: "rgba(6,182,212,.95)",  values: [32,38,35,42,40,46,49] },
+        tiktok:   { name: "TikTok Ads",    color: "rgba(15,23,42,.80)",   values: [18,21,19,24,22,26,28] },
+        microsoft:{ name: "Microsoft Ads", color: "rgba(16,185,129,.95)", values: [12,15,13,17,16,19,21] }
+      }
+    };
+
+    const canvas = document.getElementById("trendCanvas");
+    const ctx = canvas.getContext("2d");
+    const platformSel = document.getElementById("platformSel");
+    const modeLine = document.getElementById("modeLine");
+    const modeBar = document.getElementById("modeBar");
+
+    let mode = "line"; // "line" | "bar"
+    let platform = "all";
+    let animReq = null;
+
+    function dprResize() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = Math.round(rect.width * dpr);
+      canvas.height = Math.round(rect.height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    function getActiveSeries() {
+      const s = trendData.series;
+      if (platform === "all") return [s.google, s.facebook, s.tiktok, s.microsoft];
+      return [s[platform]];
+    }
+
+    function niceMax(values){
+      const max = Math.max(...values);
+      // Round up to nearest 10
+      return Math.ceil(max / 10) * 10;
+    }
+
+    function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
+
+    function drawAxes(pad, w, h, yMax){
+      // grid + axes labels
+      ctx.save();
+      ctx.clearRect(0,0,w,h);
+
+      // background subtle
+      ctx.fillStyle = "rgba(255,255,255,0)";
+      ctx.fillRect(0,0,w,h);
+
+      const gridColor = "rgba(15,23,42,.08)";
+      const textColor = "rgba(100,116,139,.85)";
+
+      // horizontal grid lines (0..yMax)
+      const steps = 4;
+      ctx.strokeStyle = gridColor;
+      ctx.lineWidth = 1;
+
+      for(let i=0;i<=steps;i++){
+        const y = pad.top + (h - pad.top - pad.bottom) * (i/steps);
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(w - pad.right, y);
+        ctx.stroke();
+
+        // y labels (reverse)
+        const val = Math.round(yMax * (1 - i/steps));
+        ctx.fillStyle = textColor;
+        ctx.font = "12px ui-sans-serif, system-ui";
+        ctx.fillText(`$${val}k`, 10, y + 4);
+      }
+
+      // x labels
+      const labels = trendData.labels;
+      const plotW = (w - pad.left - pad.right);
+      const plotH = (h - pad.top - pad.bottom);
+      ctx.fillStyle = textColor;
+      ctx.font = "12px ui-sans-serif, system-ui";
+
+      labels.forEach((lab, i) => {
+        const x = pad.left + plotW * (i/(labels.length-1));
+        ctx.fillText(lab, x - 18, pad.top + plotH + 24);
+      });
+
+      ctx.restore();
+    }
+
+    function mapPoint(i, value, pad, w, h, yMax){
+      const labels = trendData.labels;
+      const plotW = (w - pad.left - pad.right);
+      const plotH = (h - pad.top - pad.bottom);
+      const x = pad.left + plotW * (i/(labels.length-1));
+      const y = pad.top + plotH * (1 - (value / yMax));
+      return {x, y};
+    }
+
+    function drawLineSeries(series, t, pad, w, h, yMax){
+      const vals = series.values;
+      // progress-based reveal: draw up to index + interpolate
+      const n = vals.length;
+      const prog = (n - 1) * t;
+      const full = Math.floor(prog);
+      const frac = prog - full;
+
+      ctx.save();
+      ctx.lineWidth = 2.6;
+      ctx.strokeStyle = series.color;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      // soft fill under line
+      ctx.beginPath();
+      for(let i=0;i<=full;i++){
+        const p = mapPoint(i, vals[i], pad, w, h, yMax);
+        if(i===0) ctx.moveTo(p.x, p.y);
+        else ctx.lineTo(p.x, p.y);
+      }
+      if(full < n-1){
+        const v = vals[full] + (vals[full+1] - vals[full]) * frac;
+        const p = mapPoint(full+1, v, pad, w, h, yMax);
+        ctx.lineTo(p.x, p.y);
+      }
+      ctx.stroke();
+
+      // dots
+      for(let i=0;i<=full;i++){
+        const p = mapPoint(i, vals[i], pad, w, h, yMax);
+        ctx.fillStyle = series.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
+        ctx.fill();
+      }
+      if(full < n-1){
+        const v = vals[full] + (vals[full+1] - vals[full]) * frac;
+        const p = mapPoint(full+1, v, pad, w, h, yMax);
+        ctx.fillStyle = series.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    function drawBarSeries(series, t, pad, w, h, yMax){
+      const vals = series.values;
+      const n = vals.length;
+      const plotW = (w - pad.left - pad.right);
+      const plotH = (h - pad.top - pad.bottom);
+
+      // bar width
+      const groupW = plotW / n;
+      const barW = Math.min(18, groupW * 0.45);
+
+      ctx.save();
+      for(let i=0;i<n;i++){
+        const x = pad.left + groupW * i + (groupW - barW)/2;
+        const targetH = plotH * (vals[i]/yMax);
+        const currH = targetH * t;
+        const y = pad.top + plotH - currH;
+
+        // rounded bars
+        const r = 6;
+        ctx.fillStyle = series.color;
+        ctx.beginPath();
+        ctx.moveTo(x, y + r);
+        ctx.arcTo(x, y, x + r, y, r);
+        ctx.arcTo(x + barW, y, x + barW, y + r, r);
+        ctx.lineTo(x + barW, pad.top + plotH);
+        ctx.lineTo(x, pad.top + plotH);
+        ctx.closePath();
+        ctx.globalAlpha = 0.9;
+        ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function renderAnimated(){
+      cancelAnimationFrame(animReq);
+      dprResize();
+
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+
+      const pad = { left: 64, right: 18, top: 16, bottom: 40 };
+
+      const activeSeries = getActiveSeries();
+      const allVals = activeSeries.flatMap(s => s.values);
+      const yMax = niceMax(allVals);
+
+      const start = performance.now();
+      const dur = 900;
+
+      function frame(now){
+        const raw = (now - start) / dur;
+        const tt = Math.max(0, Math.min(1, raw));
+        const t = easeOutCubic(tt);
+
+        drawAxes(pad, w, h, yMax);
+
+        if(mode === "line"){
+          activeSeries.forEach(s => drawLineSeries(s, t, pad, w, h, yMax));
+        } else {
+          // if all platforms, draw stacked-ish? keep simple: draw only selected platform in bar mode
+          const bars = (platform === "all") ? [trendData.series.google] : activeSeries;
+          bars.forEach(s => drawBarSeries(s, t, pad, w, h, yMax));
+        }
+
+        if(tt < 1) animReq = requestAnimationFrame(frame);
+      }
+      animReq = requestAnimationFrame(frame);
+
+      // legend visibility: hide others if filtered
+      const legend = document.getElementById("trendLegend");
+      const showAll = (platform === "all");
+      [...legend.querySelectorAll(".leg")].forEach((el) => {
+        const txt = el.textContent.toLowerCase();
+        if(showAll) el.style.display = "inline-flex";
+        else {
+          const ok =
+            (platform==="google" && txt.includes("google")) ||
+            (platform==="facebook" && txt.includes("facebook")) ||
+            (platform==="tiktok" && txt.includes("tiktok")) ||
+            (platform==="microsoft" && txt.includes("microsoft"));
+          el.style.display = ok ? "inline-flex" : "none";
+        }
+      });
+    }
+
+    // events
+    platformSel.addEventListener("change", () => {
+      platform = platformSel.value;
+      renderAnimated();
+    });
+
+    modeLine.addEventListener("click", () => {
+      mode = "line";
+      modeLine.classList.add("active");
+      modeBar.classList.remove("active");
+      renderAnimated();
+    });
+    modeBar.addEventListener("click", () => {
+      mode = "bar";
+      modeBar.classList.add("active");
+      modeLine.classList.remove("active");
+      renderAnimated();
+    });
+
+    window.addEventListener("resize", () => {
+      renderAnimated();
+    });
+
+    // init
+    // ensure canvas has height (CSS sets it, but some layouts need a tick)
+    requestAnimationFrame(() => renderAnimated());
+  </script>
+
+  <script>
+  // ===== Platforms Status Overview (table + filter) =====
+  const statusPlatformSel = document.getElementById("statusPlatformSel");
+  const statusBody = document.getElementById("statusBody");
+
+  // mock counts (adjust anytime)
+  const platformStatusData = {
+    facebook:  { active: 1577, suspended: 100, need_appeal: 0, in_appeal: 0, in_progress: 0 },
+    google:    { active: 197,  suspended: 1019, need_appeal: 0, in_appeal: 0, in_progress: 0 },
+    tiktok:    { active: 88,   suspended: 22,   need_appeal: 4, in_appeal: 9, in_progress: 18 },
+    microsoft: { active: 210,  suspended: 11,   need_appeal: 2, in_appeal: 6, in_progress: 14 }
+  };
+
+  const statusRows = [
+    { key: "active",       label: "Active",       dot: "active" },
+    { key: "suspended",    label: "Suspended",    dot: "suspended" },
+    { key: "need_appeal",  label: "Need Appeal",  dot: "need_appeal" },
+    { key: "in_appeal",    label: "In Appeal",    dot: "in_appeal" },
+    { key: "in_progress",  label: "In Progress",  dot: "in_progress" }
+  ];
+
+  function renderStatusTable(selected){
+    // show/hide platform columns in header + body
+    const cols = document.querySelectorAll(".platCol");
+    cols.forEach(c => {
+      const plat = c.getAttribute("data-plat");
+      c.style.display = (selected === "all" || selected === plat) ? "" : "none";
+    });
+
+    // build rows
+    statusBody.innerHTML = "";
+    statusRows.forEach(r => {
+      const tr = document.createElement("tr");
+
+      const tdStatus = document.createElement("td");
+      tdStatus.innerHTML = `
+        <div class="sRow">
+          <span class="sDot ${r.dot}"></span>
+          <span class="sName">${r.label}</span>
+        </div>
+      `;
+      tr.appendChild(tdStatus);
+
+      const platforms = ["facebook","google","tiktok","microsoft"];
+      platforms.forEach(p => {
+        if(selected !== "all" && selected !== p) return;
+
+        const td = document.createElement("td");
+        td.style.textAlign = "center";
+
+        const val = platformStatusData[p]?.[r.key] ?? 0;
+        td.innerHTML = `<span class="num ${val===0 ? "zero": ""}">${val}</span>`;
+        tr.appendChild(td);
+      });
+
+      statusBody.appendChild(tr);
+    });
+  }
+
+  statusPlatformSel?.addEventListener("change", () => {
+    renderStatusTable(statusPlatformSel.value);
+  });
+
+  // init
+  renderStatusTable("all");
+</script>
+
+<script>
+  // ===== Transactions Tabs =====
+  (function(){
+    const card = document.getElementById("txTabsCard");
+    if(!card) return;
+
+    const btns = card.querySelectorAll(".tabBtn");
+    const panels = card.querySelectorAll(".tabPanel");
+
+    function show(tab){
+      btns.forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
+      panels.forEach(p => {
+        const on = p.dataset.panel === tab;
+        p.hidden = !on;
+      });
+    }
+
+    btns.forEach(b => {
+      b.addEventListener("click", () => show(b.dataset.tab));
+    });
+
+    show("topups");
+  })();
+</script>
+
+
+<script>
+  // Pending Users: show either empty OR list (not both)
+  (function(){
+    const empty = document.getElementById("pendingEmpty");
+    const list = document.getElementById("pendingList");
+    if(!empty || !list) return;
+
+    const hasItems = list.querySelectorAll(".pendingItem").length > 0;
+    empty.style.display = hasItems ? "none" : "flex";
+    list.style.display  = hasItems ? "grid" : "none";
+  })();
+</script>
+
+
+
+
+
+</body>
+</html>
