@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Finance</title>
+  <title>Client Finance</title>
 
   <link rel="stylesheet" href="../css/layout.css" />
   <link rel="stylesheet" href="../css/dashboard.css" />
@@ -85,6 +85,49 @@
       margin-top: 1rem;
     }
 
+    .topups-table-wrap{
+  border:1px solid #eee;
+  border-radius: 10px;
+  overflow:hidden;
+  background:#fff;
+}
+
+.topups-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:.92rem;
+}
+
+.topups-table thead th{
+  background:#fafafa;
+  color:#6c7a89;
+  font-size:.78rem;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+  padding:.85rem .9rem;
+  text-align:left;
+  border-bottom:1px solid #eee;
+}
+
+.topups-table td{
+  padding: 1rem .9rem;
+  border-bottom:1px solid #f0f0f0;
+  vertical-align: middle;
+}
+
+.topups-table tr.row-clickable{
+  cursor:pointer;
+}
+.topups-table tr.row-clickable:hover{
+  background: rgba(52,152,219,.06);
+}
+
+.topups-proof{
+  color:#6c7a89;
+  font-weight: 700;
+}
+
+
     .topups-header{
       display:flex;
       align-items:flex-start;
@@ -98,235 +141,12 @@
       font-size: 1.35rem;
     }
 
-    /* ✅ NEW: Topups table (like screenshot #1) */
-    .topups-table-wrap{
-      border:1px solid #eee;
-      border-radius: 10px;
-      overflow:auto;
-      background:#fff;
-    }
-    .topups-table{
-      width:100%;
-      border-collapse: collapse;
-      font-size: .92rem;
-      min-width: 920px;
-    }
-    .topups-table th, .topups-table td{
-      padding:.85rem .75rem;
-      border-bottom:1px solid #f0f0f0;
-      text-align:left;
-      vertical-align: middle;
-      white-space: nowrap;
-    }
-    .topups-table th{
-      font-size:.78rem;
-      letter-spacing:.03em;
-      text-transform: uppercase;
-      color:#6c7a89;
-      background:#fafafa;
-    }
-    .topups-row{
-      cursor:pointer;
-      transition: background .12s ease;
-    }
-    .topups-row:hover{ background:#fafafa; }
-    .td-muted{ color:#6c7a89; }
-    .td-right{ text-align:right; }
-
-    /* Status badge like screenshot */
-    .status-badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:.28rem .65rem;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size:.8rem;
-      border:1px solid #e6e6e6;
-      background:#fafafa;
-      color:#2c3e50;
-    }
-    .status-badge.approved{
-      background: rgba(46, 204, 113, .14);
-      border-color: rgba(46, 204, 113, .35);
-      color: #1f8a4c;
-    }
-    .status-badge.pending{
-      background: rgba(241, 196, 15, .14);
-      border-color: rgba(241, 196, 15, .35);
-      color: #8a6d00;
-    }
-    .status-badge.declined{
-      background: rgba(231, 76, 60, .12);
-      border-color: rgba(231, 76, 60, .30);
-      color:#a93226;
-    }
-    .status-badge.past_due{
-      background: rgba(149, 165, 166, .16);
-      border-color: rgba(149, 165, 166, .35);
-      color:#5f6a6a;
-    }
-
-    /* ✅ NEW: Topup details modal (like screenshot #2) */
-    /* RIGHT DRAWER MODAL */
-.tx-modal{
-  position:fixed;
-  inset:0;
-  z-index:3000;
-  display:none;
-}
-
-.tx-modal.active{
-  display:block;
-}
-
-.tx-modal__overlay{
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,.45);
-  backdrop-filter: blur(2px);
-}
-
-.tx-modal__panel{
-  position:absolute;
-  top:0;
-  right:0;
-
-  height:100%;
-  width:min(480px, 95vw);
-
-  background:#fff;
-
-  box-shadow:-10px 0 30px rgba(0,0,0,.18);
-
-  transform:translateX(100%);
-  transition:transform .25s ease;
-
-  display:flex;
-  flex-direction:column;
-}
-
-.tx-modal.active .tx-modal__panel{
-  transform:translateX(0);
-}
-
-/* header */
-.tx-modal__header{
-  padding:1rem;
-  border-bottom:1px solid #eee;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-/* body scrollable */
-.tx-modal__body{
-  padding:1rem;
-  overflow:auto;
-  flex:1;
-}
-
-/* footer pinned bottom */
-.modal-footer{
-  padding:1rem;
-  border-top:1px solid #eee;
-  background:#fff;
-}
-
-.tx-modal__overlay{
-  opacity:0;
-  transition:opacity .25s ease;
-}
-
-.tx-modal.active .tx-modal__overlay{
-  opacity:1;
-}
-
-
-    .tx-close{
-      width: 36px; height: 36px;
-      border:none;
-      border-radius: 10px;
-      background:#f2f2f2;
-      cursor:pointer;
-      font-size: 18px;
-      line-height: 36px;
-    }
-    .tx-modal__body{ padding: 1rem; }
-
-    .kv-card{
-      border:1px solid #eee;
-      border-radius: 12px;
-      background:#fff;
-      overflow:hidden;
-      margin-bottom: 1rem;
-    }
-    .kv-row{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .75rem;
-      padding: .65rem .9rem;
-      border-bottom:1px solid #f1f1f1;
-      align-items:center;
-    }
-    .kv-row:last-child{ border-bottom:none; }
-    .kv-key{
-      font-weight: 900;
-      color:#2c3e50;
-      font-size: .88rem;
-    }
-    .kv-val{
-      text-align:right;
-      color:#6c7a89;
-      font-weight: 800;
-      font-size: .9rem;
-    }
-
-    .segmented-status{
+    .topup-item{
+      padding: .9rem 0;
+      border-bottom:1px solid #eee;
       display:flex;
-      gap:.5rem;
-      flex-wrap: wrap;
-      margin: .5rem 0 1rem 0;
-    }
-    .seg-pill{
-      border:1px solid #ddd;
-      background:#f8f8f8;
-      padding:.55rem .85rem;
-      border-radius: 999px;
-      cursor:pointer;
-      font-weight: 900;
-      font-size: .9rem;
-      color:#6c7a89;
-      user-select:none;
-    }
-    .seg-pill.active{
-      background: rgba(46, 204, 113, .14);
-      border-color: rgba(46, 204, 113, .35);
-      color:#1f8a4c;
-    }
-    .seg-pill.active.pending{
-      background: rgba(241, 196, 15, .14);
-      border-color: rgba(241, 196, 15, .35);
-      color:#8a6d00;
-    }
-    .seg-pill.active.declined{
-      background: rgba(231, 76, 60, .12);
-      border-color: rgba(231, 76, 60, .30);
-      color:#a93226;
-    }
-    .seg-pill.active.past_due{
-      background: rgba(149, 165, 166, .16);
-      border-color: rgba(149, 165, 166, .35);
-      color:#5f6a6a;
-    }
-
-    .modal-footer{
-      padding: 1rem;
-      border-top:1px solid #eee;
-      display:flex;
-      gap:.75rem;
-      justify-content:flex-start;
-      background:#fff;
+      justify-content:space-between;
+      gap: 1rem;
     }
 
     .modal-simple{
@@ -458,6 +278,21 @@
       color:#2c3e50;
       margin-right: .35rem;
     }
+    .tag.pending{
+      background: rgba(255,193,7,.18);
+      border-color: rgba(255,193,7,.45);
+      color:#8a6d00;
+    }
+    .tag.approved{
+      background: rgba(46,204,113,.12);
+      border-color: rgba(46,204,113,.35);
+      color:#1f8a4c;
+    }
+    .tag.rejected{
+      background: rgba(231,76,60,.10);
+      border-color: rgba(231,76,60,.30);
+      color:#c0392b;
+    }
 
     .split{
       display:flex;
@@ -469,7 +304,6 @@
     }
 
     .quick-actions{ display:flex; gap: .6rem; flex-wrap: wrap; }
-
     .muted{ color:#6c7a89; font-size: .9rem; }
 
     .stat-box select.kpi-select{
@@ -546,6 +380,116 @@
       flex-wrap: wrap;
       margin-bottom: .5rem;
     }
+
+    /* ===== Topup Details (CLIENT) - RIGHT DRAWER (read-only) ===== */
+    .tx-modal{
+      position:fixed;
+      inset:0;
+      z-index:3000;
+      display:none;
+    }
+    .tx-modal.active{ display:block; }
+
+    .tx-modal__overlay{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,.45);
+      backdrop-filter: blur(2px);
+      opacity:0;
+      transition: opacity .25s ease;
+    }
+    .tx-modal.active .tx-modal__overlay{ opacity:1; }
+
+    .tx-modal__panel{
+      position:absolute;
+      top:0; right:0;
+      height:100%;
+      width:min(480px, 95vw);
+      background:#fff;
+      box-shadow:-10px 0 30px rgba(0,0,0,.18);
+      transform:translateX(100%);
+      transition: transform .25s ease;
+      display:flex;
+      flex-direction:column;
+    }
+    .tx-modal.active .tx-modal__panel{ transform:translateX(0); }
+
+    .tx-modal__header{
+      padding:1rem;
+      border-bottom:1px solid #eee;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+    }
+    .tx-modal__title{
+      margin:0;
+      font-size:1.2rem;
+      font-weight:900;
+      color:#2c3e50;
+    }
+    .tx-modal__close{
+      width:34px; height:34px;
+      border:none; background:#f2f2f2;
+      border-radius:10px; cursor:pointer;
+      font-size:18px; line-height:34px;
+    }
+
+    .tx-modal__body{
+      padding:1rem;
+      overflow:auto;
+      flex:1;
+    }
+
+    .details-card{
+      border:1px solid #eee;
+      border-radius:12px;
+      padding:.75rem;
+      background:#fafafa;
+    }
+    .details-row{
+      display:flex;
+      justify-content:space-between;
+      gap:1rem;
+      padding:.55rem .35rem;
+      border-bottom:1px solid #eaeaea;
+    }
+    .details-row:last-child{ border-bottom:none; }
+    .details-row strong{ color:#2c3e50; }
+    .details-row span{ color:#6c7a89; text-align:right; }
+
+    .readonly-box{
+      margin-top:.75rem;
+      background:#fff;
+      border:1px solid #eee;
+      border-radius:10px;
+      padding:.75rem;
+    }
+
+    .readonly-field{
+      margin-top:.65rem;
+    }
+    .readonly-field label{
+      display:block;
+      margin-bottom:.35rem;
+      font-weight:800;
+      color:#2c3e50;
+      font-size:.9rem;
+    }
+    .readonly-value{
+      width:100%;
+      padding:.6rem .7rem;
+      border:1px solid #e6e6e6;
+      border-radius:8px;
+      background:#f8f9fa;
+      color:#2c3e50;
+      font-size:.95rem;
+      word-break: break-word;
+    }
+
+    /* nice hover for clickable topups */
+    .topup-item[role="button"]:hover{
+      background: rgba(52,152,219,.06);
+    }
   </style>
 </head>
 
@@ -559,8 +503,8 @@
           <button class="theme-btn">Dark</button>
         </div>
         <div class="user-info">
-          <span>Admin User</span>
-          <div class="user-avatar">AU</div>
+          <span id="clientHeaderName">Client</span>
+          <div class="user-avatar" id="clientAvatar">CL</div>
         </div>
       </div>
     </header>
@@ -570,17 +514,10 @@
     <main class="main">
       <div class="finance-container">
 
-        <!-- GLOBAL FILTERS -->
+        <!-- GLOBAL FILTERS (CLIENT VIEW: only date range) -->
         <div class="global-filters">
           <div class="global-filters__row">
             <div class="global-filters__left">
-              <div class="form-group filter-group">
-                <label>Client</label>
-                <select id="global_client" onchange="onGlobalFiltersChanged()">
-                  <option value="__all__">All clients</option>
-                </select>
-              </div>
-
               <div class="form-group filter-group small">
                 <label>Date from</label>
                 <input type="date" id="global_from" onchange="onGlobalFiltersChanged()">
@@ -589,18 +526,6 @@
               <div class="form-group filter-group small">
                 <label>Date to</label>
                 <input type="date" id="global_to" onchange="onGlobalFiltersChanged()">
-              </div>
-
-              <!-- ✅ NEW: Single filter by status (for Topups table only) -->
-              <div class="form-group filter-group small">
-                <label>Status</label>
-                <select id="topups_status" onchange="onTopupsStatusChanged()">
-                  <option value="__all__">All</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="declined">Declined</option>
-                  <option value="past_due">Past Due</option>
-                </select>
               </div>
             </div>
 
@@ -617,13 +542,13 @@
           <div class="stat-box">
             <h4>TOTAL TOPUPS</h4>
             <div class="stat-value" id="kpi_totalTopups">$0.00</div>
-            <div class="stat-description">Filtered by client/date</div>
+            <div class="stat-description" id="kpi_totalTopups_desc">Approved topups</div>
           </div>
 
           <div class="stat-box">
             <h4>MAIN WALLET</h4>
             <div class="stat-value" id="kpi_mainWallet">$0.00</div>
-            <div class="stat-description">Filtered by client/date</div>
+            <div class="stat-description">Available balance</div>
           </div>
 
           <div class="stat-box">
@@ -636,38 +561,38 @@
                 <option value="google">Google</option>
                 <option value="tiktok">TikTok</option>
               </select>
-              <div class="mini-hint">Filtered by client/date</div>
+              <div class="mini-hint">Filtered by date range</div>
             </div>
           </div>
 
           <div class="stat-box">
             <h4>GENERAL BALANCE</h4>
             <div class="stat-value" id="kpi_generalBalance">$0.00</div>
-            <div class="stat-description">Filtered by client/date</div>
+            <div class="stat-description">Shared accounts</div>
           </div>
 
           <div class="stat-box">
             <h4>INDIVIDUAL BALANCE</h4>
             <div class="stat-value" id="kpi_individualBalance">$0.00</div>
-            <div class="stat-description">Filtered by client/date</div>
+            <div class="stat-description">Your individual budget</div>
           </div>
 
           <div class="stat-box">
             <h4>SPEND</h4>
             <div class="stat-value" id="kpi_spend">$0.00</div>
-            <div class="stat-description">Filtered by client/date</div>
+            <div class="stat-description">Total spend</div>
           </div>
 
           <div class="stat-box">
             <h4>TOTAL FEES</h4>
             <div class="stat-value" id="kpi_totalFees">$0.00</div>
-            <div class="stat-description">Filtered by client/date</div>
+            <div class="stat-description">Fees collected</div>
           </div>
 
           <div class="stat-box">
             <h4>SETUP ACCOUNT + SERVICES</h4>
             <div class="stat-value" id="kpi_setupServices">$0.00</div>
-            <div class="stat-description">Filtered by client/date</div>
+            <div class="stat-description">Setup costs</div>
           </div>
         </div>
 
@@ -679,26 +604,25 @@
               <div>
                 <h2>Finance Workspace</h2>
                 <div class="mini-hint">
-                  Acțiunile se aplică pe <strong>clientul selectat</strong>. Dacă e "All clients", acțiunile sunt blocate.
+                  Vizualizezi doar datele tale. Topup-urile adăugate sunt <strong>request</strong> și apar după aprobarea adminului.
                 </div>
               </div>
 
-              <!-- MAIN WORKSPACE TABS -->
+              <!-- MAIN WORKSPACE TABS (client: hidden in demo; keep structure) -->
               <div class="pillbar" id="workspaceTabs">
-                <div class="pill active" data-tab="funding" style="display: none;">Funding</div>
-                <div class="pill" data-tab="setup" style="display: none;">Setup & Services</div>
+                <div class="pill active" data-tab="funding" style="display:none;">Funding</div>
+                <div class="pill" data-tab="setup" style="display:none;">Setup & Services</div>
               </div>
             </div>
 
             <!-- TAB: Funding -->
             <div id="tab_funding">
-
               <!-- SUBTABS IN FUNDING -->
               <div class="subtab-header">
-                <div class="mini-hint">Alege fluxul (funding / allocate / individual send).</div>
+                <div class="mini-hint">Fluxuri interne (demo): Main → Vault, Vault → General/Individual, Individual → Account.</div>
                 <div class="pillbar" id="fundingSubTabs">
                   <div class="pill active" data-subtab="main_to_vault">Main → Vault</div>
-                  <div class="pill" data-subtab="vault_allocate">Vault → (General/Individual/Account)</div>
+                  <div class="pill" data-subtab="vault_allocate">Vault → (General/Individual)</div>
                   <div class="pill" data-subtab="individual_to_account">Individual → Account</div>
                 </div>
               </div>
@@ -760,7 +684,7 @@
               <!-- SUBTAB: Vault -> Allocate -->
               <div id="subtab_vault_allocate" style="display:none;">
                 <div class="mini-hint" style="margin-bottom:.6rem;">
-                  <strong>Allocate from Platform Vault</strong> către General / Individual / Accounts:
+                  <strong>Allocate from Platform Vault</strong> către General / Individual:
                 </div>
 
                 <div class="form-row">
@@ -776,7 +700,7 @@
 
                   <div class="form-group">
                     <label>Allocate To</label>
-                    <select id="alloc_to" onchange="toggleAllocAccountSelect(); updateAllocationPreview();">
+                    <select id="alloc_to" onchange="updateAllocationPreview();">
                       <option value="generalBalance">General Balance</option>
                       <option value="individualBalance">Individual Balance</option>
                     </select>
@@ -784,24 +708,15 @@
                 </div>
 
                 <div class="form-row">
-                  <div class="form-group" id="alloc_accountGroup" style="display:none;">
-                    <label>Select Account</label>
-                    <select id="alloc_account" onchange="updateAllocationPreview()">
-                      <option value="acc_1">acc_1</option>
-                      <option value="acc_2">acc_2</option>
-                      <option value="acc_3">acc_3</option>
-                    </select>
-                  </div>
-
                   <div class="form-group">
                     <label>Amount (USD)</label>
                     <input type="number" id="alloc_amount" min="0" step="0.01" placeholder="e.g. 120" oninput="updateAllocationPreview()">
                   </div>
-                </div>
 
-                <div class="form-group">
-                  <label>Note (optional)</label>
-                  <input type="text" id="alloc_note" placeholder="e.g. allocate to acc_1" oninput="updateAllocationPreview()">
+                  <div class="form-group">
+                    <label>Note (optional)</label>
+                    <input type="text" id="alloc_note" placeholder="e.g. allocate to Individual" oninput="updateAllocationPreview()">
+                  </div>
                 </div>
 
                 <div class="split">
@@ -856,63 +771,10 @@
                   </div>
                 </div>
               </div>
-
             </div>
 
-            <!-- TAB: Setup & Services -->
-            <div id="tab_setup" style="display:none;">
-              <div class="mini-hint" style="margin-bottom:.75rem;">
-                Setup/Services se ia <strong>direct</strong> din Main Wallet.
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Charge Type</label>
-                  <select id="charge_type">
-                    <option value="setup">Setup</option>
-                    <option value="service">Service</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label>Model</label>
-                  <select id="charge_model">
-                    <option value="one-time">one-time</option>
-                    <option value="recurring">recurring</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="form-row">
-                <div class="form-group">
-                  <label>Linked (Account)</label>
-                  <select id="charge_linked">
-                    <option value="acc_1">Account: acc_1</option>
-                    <option value="acc_2">Account: acc_2</option>
-                    <option value="acc_3">Account: acc_3</option>
-                  </select>
-                </div>
-
-                <div class="form-group">
-                  <label>Amount (USD)</label>
-                  <input type="number" id="charge_amount" min="0" step="0.01" placeholder="e.g. 80">
-                </div>
-              </div>
-
-              <div class="form-group">
-                <label>Details (JSON/text)</label>
-                <textarea id="charge_details" rows="3" placeholder='e.g. {"region":"US","level":"Standard","note":"BOV verification"}'></textarea>
-              </div>
-
-              <div class="fee-notice">
-                <strong>Logic:</strong> Main Wallet scade cu amount, iar KPI <strong>Setup Account + Services</strong> crește cu amount.
-              </div>
-
-              <div class="quick-actions">
-                <button class="transfer-btn secondary" onclick="submitSetupServiceCharge()">+ Add Charge</button>
-                <button class="transfer-btn gray" onclick="seedDemo()">Reset Demo Data</button>
-              </div>
-            </div>
+            <!-- TAB: Setup (hidden in client demo) -->
+            <div id="tab_setup" style="display:none;"></div>
           </div>
 
           <!-- LEDGER -->
@@ -920,7 +782,7 @@
             <div class="widget-title">
               <div>
                 <h2>Ledger</h2>
-                <div class="mini-hint">Preview filtrat de client/date.</div>
+                <div class="mini-hint">Preview filtrat de date + tab selection.</div>
               </div>
 
               <div class="pillbar" id="ledgerTabs">
@@ -953,42 +815,82 @@
           </div>
         </div>
 
-        <!-- Total Topups -->
+        <!-- Total Topups (client only) -->
         <div class="topups-section">
           <div class="topups-header">
             <div>
               <h2>Total Topups</h2>
-              <div class="mini-hint">Listă filtrată de client/date + Status (doar pentru tabel).</div>
+              <div class="mini-hint">Afișează doar topup-urile tale (approved/pending) în funcție de date.</div>
             </div>
             <div class="quick-actions">
-              <!-- ✅ keep button exactly here (as you requested) -->
               <button class="transfer-btn secondary" onclick="openTopupDrawer()">+ Add Topup</button>
             </div>
           </div>
 
-          <!-- ✅ NEW table -->
           <div class="topups-table-wrap">
-            <table class="topups-table">
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Client</th>
-                  <th>Account</th>
-                  <th>Proof</th>
-                  <th class="td-right">Amount</th>
-                  <th>Status</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody id="topupsTableBody"></tbody>
-            </table>
-          </div>
+  <table class="topups-table">
+    <thead>
+      <tr>
+        <th>DATE</th>
+        <th>CLIENT</th>
+        <th>ACCOUNT</th>
+        <th>PROOF</th>
+        <th style="text-align:right;">AMOUNT</th>
+        <th>STATUS</th>
+        <th>DESCRIPTION</th>
+      </tr>
+    </thead>
+    <tbody id="topupsList"></tbody>
+  </table>
 
-          <div class="mini-hint" id="topupsTableHint" style="margin-top:.6rem;"></div>
+  <div class="mini-hint" id="topupsFooterHint" style="margin-top:.75rem;"></div>
+</div>
+
         </div>
 
       </div>
     </main>
+  </div>
+
+  <!-- RIGHT DRAWER: Topup Details (CLIENT - read-only) -->
+  <div class="tx-modal" id="topupDetailsModal" aria-hidden="true">
+    <div class="tx-modal__overlay" onclick="closeTopupDetails()"></div>
+
+    <div class="tx-modal__panel" role="dialog" aria-modal="true" aria-label="Top-Up Details">
+      <div class="tx-modal__header">
+        <h3 class="tx-modal__title">Top-Up Details</h3>
+        <button class="tx-modal__close" onclick="closeTopupDetails()" aria-label="Close">×</button>
+      </div>
+
+      <div class="tx-modal__body">
+        <div class="details-card" id="td_card">
+          <div class="details-row"><strong>Client ID:</strong> <span id="td_clientId">—</span></div>
+          <div class="details-row"><strong>Top-Up ID:</strong> <span id="td_topupId">—</span></div>
+          <div class="details-row"><strong>Type:</strong> <span id="td_type">—</span></div>
+          <div class="details-row"><strong>Account:</strong> <span id="td_account">—</span></div>
+          <div class="details-row"><strong>Gross Amount:</strong> <span id="td_gross">—</span></div>
+          <div class="details-row"><strong>Fee Amount:</strong> <span id="td_fee">—</span></div>
+          <div class="details-row"><strong>Net Amount:</strong> <span id="td_net">—</span></div>
+          <div class="details-row"><strong>Status:</strong> <span id="td_status">—</span></div>
+        </div>
+
+        <div class="readonly-box">
+          <div class="readonly-field">
+            <label>Description</label>
+            <div class="readonly-value" id="td_desc">—</div>
+          </div>
+
+          <div class="readonly-field">
+            <label>Date</label>
+            <div class="readonly-value" id="td_date">—</div>
+          </div>
+
+          <div class="mini-hint" style="margin-top:.75rem;">
+            Read-only view. Pentru modificări/confirmări, admin-ul gestionează statusul.
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Ledger Modal -->
@@ -997,7 +899,7 @@
       <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap;">
         <div>
           <h2 style="margin:0;">Ledger (Filtered)</h2>
-          <div class="mini-hint">Același filtru global (client/date) + tab selection (All/Topups/Fees/Internal).</div>
+          <div class="mini-hint">Filtru: date range + tab selection (All/Topups/Fees/Internal).</div>
         </div>
         <div class="quick-actions">
           <button class="transfer-btn gray" onclick="closeLedgerModal()">Close</button>
@@ -1011,7 +913,7 @@
               <th>Date</th>
               <th>Type</th>
               <th>From → To</th>
-              <th>Client</th>
+              <th>Status</th>
               <th>Platform</th>
               <th>Category</th>
               <th>Note</th>
@@ -1031,65 +933,19 @@
     </div>
   </div>
 
-  <!-- ✅ NEW: Topup Details Modal -->
-  <div class="tx-modal" id="topupDetailsModal" aria-hidden="true">
-    <div class="tx-modal__overlay" onclick="closeTopupDetails()"></div>
-
-    <div class="tx-modal__panel" role="dialog" aria-modal="true" aria-label="Topup Details">
-      <div class="tx-modal__header">
-        <h3>Top-Up Details</h3>
-        <button class="tx-close" onclick="closeTopupDetails()" aria-label="Close">×</button>
-      </div>
-
-      <div class="tx-modal__body">
-        <div class="kv-card" id="topupKvCard"></div>
-
-        <div style="margin-top:.25rem;">
-          <div class="kv-key" style="margin-bottom:.35rem;">Status</div>
-          <div class="segmented-status" id="topupStatusSeg">
-            <div class="seg-pill" data-status="pending" onclick="setTopupModalStatus('pending')">Pending</div>
-            <div class="seg-pill" data-status="approved" onclick="setTopupModalStatus('approved')">Approved</div>
-            <div class="seg-pill" data-status="declined" onclick="setTopupModalStatus('declined')">Declined</div>
-            <div class="seg-pill" data-status="past_due" onclick="setTopupModalStatus('past_due')">Past Due</div>
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label>Description</label>
-          <textarea id="topupModalDesc" rows="3" placeholder="--"></textarea>
-        </div>
-
-        <div class="form-group">
-          <label>Date</label>
-          <input type="datetime-local" id="topupModalDate">
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="transfer-btn secondary" onclick="saveTopupDetails()">Save Changes</button>
-        <button class="transfer-btn gray" onclick="closeTopupDetails()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT DRAWER: Add Topup -->
+  <!-- RIGHT DRAWER: Add Topup (CLIENT VIEW: no Client dropdown; submit = REQUEST) -->
   <div class="drawer" id="topupDrawer" aria-hidden="true">
     <div class="drawer__overlay" onclick="closeTopupDrawer()"></div>
 
     <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Add Top-Up">
       <div class="drawer__header">
-        <h3 class="drawer__title">Add Top-Up</h3>
+        <h3 class="drawer__title">Add Top-Up Request</h3>
         <button class="drawer__close" onclick="closeTopupDrawer()" aria-label="Close">×</button>
       </div>
 
       <div class="drawer__body">
-        <div class="form-group">
-          <label>Client</label>
-          <select id="topup_client">
-            <option value="100">100 - Alex</option>
-            <option value="101">101 - Maria</option>
-            <option value="102">102 - John</option>
-          </select>
+        <div class="mini-hint">
+          This will create a <strong>request</strong>. Admin must approve it before funds appear in Main Wallet.
         </div>
 
         <div class="segmented" id="topupTabs">
@@ -1192,7 +1048,7 @@
           </div>
         </div>
 
-        <!-- SPECIAL (kept, but not exposed in tabs - if you want it later, add button back) -->
+        <!-- SPECIAL (kept but not exposed in tabs) -->
         <div id="tab_special" style="display:none;">
           <div class="form-group">
             <label>Account</label>
@@ -1243,14 +1099,13 @@
           </div>
 
           <div class="notice-box" style="background:#e7f5ff;border-color:#74c0fc;color:#0b4a6f;">
-            Refund scade din Main Wallet (filtrat pe client).
+            Refund scade din Main Wallet (date range filter).
           </div>
         </div>
-
       </div>
 
       <div class="drawer__footer">
-        <button class="transfer-btn secondary" id="topupSubmitBtn" onclick="submitTopup()">Submit</button>
+        <button class="transfer-btn secondary" id="topupSubmitBtn" onclick="submitTopupRequest()">Request</button>
         <button class="transfer-btn gray" onclick="closeTopupDrawer()">Cancel</button>
       </div>
     </div>
@@ -1258,21 +1113,18 @@
 
   <script src="../js/sidebar.js"></script>
   <script>
-    const LS_KEY = "admin_finance_demo_v7";
+    /***********************
+     * CLIENT CONFIG
+     ***********************/
+    const CURRENT_CLIENT_ID = localStorage.getItem("currentClientId") || "100"; // demo
+    const LS_KEY = "client_finance_demo_v1_" + CURRENT_CLIENT_ID;
 
     const state = {
       ledger: [],
       platformFilter: "__all__",
-      globalClient: "__all__",
       globalFrom: "",
       globalTo: "",
-      ledgerTab: "all", // all | topups | fees | internal
-
-      // ✅ NEW: topups status filter (only affects Topups table)
-      topupsStatus: "__all__",
-
-      // ✅ NEW: modal selection
-      activeTopupModalId: null
+      ledgerTab: "all" // all | topups | fees | internal
     };
 
     function money(n){
@@ -1296,10 +1148,11 @@
       return map[String(id)] || String(id);
     }
 
-    function getClientNameById(id){
-      const label = getClientLabelById(id);
-      const parts = String(label).split(" - ");
-      return parts[1] ? parts.slice(1).join(" - ").trim() : label;
+    function setClientHeader(){
+      const label = getClientLabelById(CURRENT_CLIENT_ID);
+      document.getElementById("clientHeaderName").textContent = label;
+      const initials = label.split("-")[1]?.trim()?.split(" ").map(x=>x[0]).slice(0,2).join("").toUpperCase() || "CL";
+      document.getElementById("clientAvatar").textContent = initials;
     }
 
     function load(){
@@ -1309,109 +1162,54 @@
         const parsed = JSON.parse(raw);
         state.ledger = Array.isArray(parsed.ledger) ? parsed.ledger : [];
         state.platformFilter = parsed.platformFilter || "__all__";
-        state.globalClient = parsed.globalClient || "__all__";
         state.globalFrom = parsed.globalFrom || "";
         state.globalTo = parsed.globalTo || "";
         state.ledgerTab = parsed.ledgerTab || "all";
-        state.topupsStatus = parsed.topupsStatus || "__all__";
       }catch(e){ seedDemo(); }
     }
     function save(){
       localStorage.setItem(LS_KEY, JSON.stringify({
         ledger: state.ledger,
         platformFilter: state.platformFilter,
-        globalClient: state.globalClient,
         globalFrom: state.globalFrom,
         globalTo: state.globalTo,
-        ledgerTab: state.ledgerTab,
-        topupsStatus: state.topupsStatus
+        ledgerTab: state.ledgerTab
       }));
     }
 
     function seedDemo(){
+      // demo includes ONLY this client's data (client view)
       state.ledger = [
-        // ✅ topups now contain fields required by table + modal
-        {
-          id: uid(),
-          topupId: "100147",
-          date: "1/15/2024, 10:00:00 AM",
-          type:"topup",
-          clientId:"100",
-          from:"external",
-          to:"topups",
-          platform:"",
-          category:"wire",
-          status:"approved",
-          account:"USD",
-          proof:"INV_100147.pdf",
-          description:"--",
-          grossAmount: 1000,
-          feeAmount: 0,
-          netAmount: 1000,
-          note:"Topup #1 (Wire)",
-          amount: 1000
-        },
-        {
-          id: uid(),
-          topupId: "100148",
-          date: "1/20/2024, 10:00:00 AM",
-          type:"topup",
-          clientId:"100",
-          from:"external",
-          to:"topups",
-          platform:"",
-          category:"wire",
-          status:"pending",
-          account:"USD",
-          proof:"INV_100148.pdf",
-          description:"Bank wire topup",
-          grossAmount: 2000,
-          feeAmount: 0,
-          netAmount: 2000,
-          note:"Topup #2 (Wire)",
-          amount: 2000
-        },
-        {
-          id: uid(),
-          topupId: "100149",
-          date: "1/25/2024, 10:00:00 AM",
-          type:"topup",
-          clientId:"101",
-          from:"external",
-          to:"topups",
-          platform:"",
-          category:"crypto",
-          status:"approved",
-          account:"USDT",
-          proof:"0x7a1b...9c2f",
-          description:"USDT TRC20",
-          grossAmount: 2000,
-          feeAmount: 0,
-          netAmount: 2000,
-          note:"Topup #3 (Crypto)",
-          amount: 2000
-        },
+        // Approved topups (informative)
+        { id: uid(), date: "1/15/2024, 10:00:00 AM", type:"topup", status:"approved", clientId: CURRENT_CLIENT_ID, from:"external", to:"topups", platform:"", category:"wire", note:"Topup #1 (Wire)", amount: 1000 },
+        { id: uid(), date: "1/20/2024, 10:00:00 AM", type:"topup", status:"approved", clientId: CURRENT_CLIENT_ID, from:"external", to:"topups", platform:"", category:"wire", note:"Topup #2 (Wire)", amount: 2000 },
 
-        { id: uid(), date: "1/26/2024, 09:00:00 AM", type:"deposit", clientId:"100", from:"external", to:"mainWallet", platform:"", category:"deposit", note:"Initial funding into Main Wallet", amount: 5000 },
-        { id: uid(), date: "1/26/2024, 09:01:00 AM", type:"fee", clientId:"100", from:"", to:"feesCollected", platform:"", category:"wire_fee", note:"Wire processing fee", amount: 200 },
+        // Deposit into Main Wallet after approval
+        { id: uid(), date: "1/26/2024, 09:00:00 AM", type:"deposit", status:"approved", clientId: CURRENT_CLIENT_ID, from:"external", to:"mainWallet", platform:"", category:"deposit", note:"Initial funding into Main Wallet", amount: 5000 },
+        { id: uid(), date: "1/26/2024, 09:01:00 AM", type:"fee", status:"approved", clientId: CURRENT_CLIENT_ID, from:"", to:"feesCollected", platform:"", category:"wire_fee", note:"Wire processing fee", amount: 200 },
 
-        { id: uid(), date: "2/01/2024, 09:16:05 AM", type:"transfer", clientId:"100", from:"mainWallet", to:"platformVault", platform:"facebook", category:"spend", note:"Funding Facebook vault", amount: 700 },
-        { id: uid(), date: "2/02/2024, 10:10:00 AM", type:"transfer", clientId:"100", from:"mainWallet", to:"platformVault", platform:"google", category:"spend", note:"Funding Google vault", amount: 300 },
+        // Spend main -> vault
+        { id: uid(), date: "2/01/2024, 09:16:05 AM", type:"transfer", status:"approved", clientId: CURRENT_CLIENT_ID, from:"mainWallet", to:"platformVault", platform:"facebook", category:"spend", note:"Funding Facebook vault", amount: 700 },
+        { id: uid(), date: "2/02/2024, 10:10:00 AM", type:"transfer", status:"approved", clientId: CURRENT_CLIENT_ID, from:"mainWallet", to:"platformVault", platform:"google", category:"spend", note:"Funding Google vault", amount: 300 },
 
-        { id: uid(), date: "2/03/2024, 11:00:00 AM", type:"allocation", clientId:"100", from:"platformVault", to:"generalBalance", platform:"facebook", category:"budget_general", note:"Allocate to General", amount: 200 },
-        { id: uid(), date: "2/03/2024, 11:05:00 AM", type:"allocation", clientId:"100", from:"platformVault", to:"individualBalance", platform:"google", category:"budget_individual", note:"Allocate to Individual", amount: 150 },
+        // Allocate vault -> balances
+        { id: uid(), date: "2/03/2024, 11:00:00 AM", type:"allocation", status:"approved", clientId: CURRENT_CLIENT_ID, from:"platformVault", to:"generalBalance", platform:"facebook", category:"budget_general", note:"Allocate to General", amount: 200 },
+        { id: uid(), date: "2/03/2024, 11:05:00 AM", type:"allocation", status:"approved", clientId: CURRENT_CLIENT_ID, from:"platformVault", to:"individualBalance", platform:"google", category:"budget_individual", note:"Allocate to Individual", amount: 150 },
 
-        { id: uid(), date: "2/04/2024, 12:00:00 PM", type:"ind_to_account", clientId:"100", from:"individualBalance", to:"account:acc_2", platform:"", category:"ind_to_account", note:"Assign to acc_2", amount: 50 },
+        // Individual -> account
+        { id: uid(), date: "2/04/2024, 12:00:00 PM", type:"ind_to_account", status:"approved", clientId: CURRENT_CLIENT_ID, from:"individualBalance", to:"account:acc_2", platform:"", category:"ind_to_account", note:"Assign to acc_2", amount: 50 },
 
-        { id: uid(), date: "2/16/2026, 10:12:55 AM", type:"setup_service", clientId:"100", from:"mainWallet", to:"setupServices", platform:"", category:"service", note:"Account: acc_1 | Service | BOV {...}", amount: 50 },
-        { id: uid(), date: "2/16/2026, 10:12:55 AM", type:"setup_service", clientId:"100", from:"mainWallet", to:"setupServices", platform:"", category:"setup", note:"Account: acc_1 | one-time - Setup account #1", amount: 80 }
+        // Setup/services (read-only in client UI but shown in KPIs / ledger)
+        { id: uid(), date: "2/16/2026, 10:12:55 AM", type:"setup_service", status:"approved", clientId: CURRENT_CLIENT_ID, from:"mainWallet", to:"setupServices", platform:"", category:"service", note:"Account: acc_1 | Service | BOV {...}", amount: 50 },
+        { id: uid(), date: "2/16/2026, 10:12:55 AM", type:"setup_service", status:"approved", clientId: CURRENT_CLIENT_ID, from:"mainWallet", to:"setupServices", platform:"", category:"setup", note:"Account: acc_1 | one-time - Setup account #1", amount: 80 },
+
+        // Example pending request (client created)
+        { id: uid(), date: "2/10/2026, 09:20:00 AM", type:"topup_request", status:"pending", clientId: CURRENT_CLIENT_ID, from:"external", to:"topups", platform:"", category:"crypto", note:"Request: Crypto USDT TRC20 | Hash: 0xabc...", amount: 600 }
       ];
       state.platformFilter = "__all__";
-      state.globalClient = "__all__";
       state.globalFrom = "";
       state.globalTo = "";
       state.ledgerTab = "all";
-      state.topupsStatus = "__all__";
       save();
       refreshAll();
     }
@@ -1432,10 +1230,10 @@
       return `${yyyy}-${mm}-${dd}`;
     }
 
-    function passesGlobalFilters(tx){
-      if(state.globalClient !== "__all__"){
-        if(String(tx.clientId || "") !== String(state.globalClient)) return false;
-      }
+    function passesDateRange(tx){
+      // Always restrict to this client
+      if(String(tx.clientId || "") !== String(CURRENT_CLIENT_ID)) return false;
+
       const iso = txDateToISO(tx.date);
       if(iso){
         if(state.globalFrom && iso < state.globalFrom) return false;
@@ -1447,75 +1245,62 @@
     function matchesLedgerTab(tx){
       const t = state.ledgerTab;
       if(t === "all") return true;
-      if(t === "topups") return tx.type === "topup" || tx.type === "deposit" || tx.to === "topups";
-      if(t === "fees") return tx.type === "fee" || tx.to === "feesCollected";
+
+      if(t === "topups"){
+        // includes requests too
+        return tx.type === "topup" || tx.type === "deposit" || tx.type === "topup_request";
+      }
+
+      if(t === "fees"){
+        return tx.type === "fee" || tx.to === "feesCollected";
+      }
+
+      // internal
       return ["transfer","allocation","ind_to_account","setup_service","refund"].includes(tx.type);
     }
 
     function getFilteredLedger(){
-      return state.ledger.filter(tx => passesGlobalFilters(tx) && matchesLedgerTab(tx));
+      return state.ledger.filter(tx => passesDateRange(tx) && matchesLedgerTab(tx));
     }
 
     function onGlobalFiltersChanged(){
-      state.globalClient = document.getElementById("global_client").value;
       state.globalFrom = document.getElementById("global_from").value;
       state.globalTo = document.getElementById("global_to").value;
       save();
       refreshAll();
     }
 
-    function onTopupsStatusChanged(){
-      state.topupsStatus = document.getElementById("topups_status").value;
-      save();
-      renderTopupsTable();
-      populateGlobalClientFilter(); // refresh hint text
-    }
-
     function clearGlobalFilters(){
-      state.globalClient = "__all__";
       state.globalFrom = "";
       state.globalTo = "";
-      state.topupsStatus = "__all__";
-      document.getElementById("global_client").value = "__all__";
       document.getElementById("global_from").value = "";
       document.getElementById("global_to").value = "";
-      document.getElementById("topups_status").value = "__all__";
       save();
       refreshAll();
     }
 
-    function populateGlobalClientFilter(){
-      const clientIds = new Set(["100","101","102"]);
-      for(const tx of state.ledger){
-        if(tx.clientId) clientIds.add(String(tx.clientId));
-      }
-      const sel = document.getElementById("global_client");
-      const current = state.globalClient || "__all__";
-      sel.innerHTML = `<option value="__all__">All clients</option>` +
-        [...clientIds].sort().map(cid => `<option value="${cid}">${escapeHtml(getClientLabelById(cid))}</option>`).join("");
-      sel.value = current;
-
+    function updateGlobalHint(){
+      const rangeText = (state.globalFrom || state.globalTo)
+        ? `${state.globalFrom || "…"} → ${state.globalTo || "…"}`
+        : "All dates";
+      document.getElementById("global_hint").textContent =
+        `Client: ${getClientLabelById(CURRENT_CLIENT_ID)} • ${rangeText} • Ledger Tab: ${state.ledgerTab.toUpperCase()}`;
       document.getElementById("global_from").value = state.globalFrom || "";
       document.getElementById("global_to").value = state.globalTo || "";
-      document.getElementById("topups_status").value = state.topupsStatus || "__all__";
-
-      const hint = document.getElementById("global_hint");
-      const clientText = current === "__all__" ? "All clients" : getClientLabelById(current);
-      const rangeText = (state.globalFrom || state.globalTo) ? `${state.globalFrom || "…"} → ${state.globalTo || "…"}`
-                                                           : "All dates";
-      const stText = (state.topupsStatus === "__all__") ? "All statuses" : state.topupsStatus.toUpperCase();
-      hint.textContent = `Current view: ${clientText} • ${rangeText} • Topups Status: ${stText} • Ledger Tab: ${state.ledgerTab.toUpperCase()}`;
     }
 
-    /* KPIs - based on FULL filtered by client/date ONLY */
-    function getLedgerFilteredForKPIs(){
-      return state.ledger.filter(passesGlobalFilters);
+    /* KPIs - based on date range only; requests DO NOT affect balances */
+    function getLedgerForKPIs(){
+      return state.ledger.filter(passesDateRange);
     }
 
     function calcKpis(){
-      const ledger = getLedgerFilteredForKPIs();
+      const ledger = getLedgerForKPIs();
       const out = {
-        totalTopups: 0,
+        totalTopupsApproved: 0,
+        topupsPendingCount: 0,
+        topupsPendingSum: 0,
+
         mainWallet: 0,
         platformVault: { facebook:0, google:0, tiktok:0 },
         generalBalance: 0,
@@ -1527,8 +1312,23 @@
 
       for(const tx of ledger){
         const amt = Number(tx.amount || 0);
+        const status = (tx.status || "approved");
 
-        if(tx.type === "topup") out.totalTopups += amt;
+        // total topups: only approved
+        if(tx.type === "topup"){
+          if(status === "approved") out.totalTopupsApproved += amt;
+        }
+
+        // requests: track but don't add to balances
+        if(tx.type === "topup_request"){
+          if(status === "pending"){
+            out.topupsPendingCount += 1;
+            out.topupsPendingSum += amt;
+          }
+        }
+
+        // balances: only approved items affect money movement
+        if(status !== "approved") continue;
 
         if(tx.to === "mainWallet") out.mainWallet += amt;
         if(tx.from === "mainWallet") out.mainWallet -= amt;
@@ -1556,13 +1356,19 @@
           out.totalFees += amt;
         }
       }
+
       return out;
     }
 
     function refreshKPIs(){
       const k = calcKpis();
 
-      document.getElementById("kpi_totalTopups").textContent = money(k.totalTopups);
+      document.getElementById("kpi_totalTopups").textContent = money(k.totalTopupsApproved);
+      document.getElementById("kpi_totalTopups_desc").textContent =
+        k.topupsPendingCount
+          ? `Approved topups • Pending: ${k.topupsPendingCount} (${money(k.topupsPendingSum)})`
+          : "Approved topups";
+
       document.getElementById("kpi_mainWallet").textContent = money(k.mainWallet);
 
       const pf = state.platformFilter;
@@ -1586,54 +1392,89 @@
       refreshKPIs();
     });
 
-    /* ✅ NEW: TOPUPS TABLE (client/date + status) */
-    function passesTopupsStatusFilter(tx){
-      if(state.topupsStatus === "__all__") return true;
-      return String(tx.status || "").toLowerCase() === String(state.topupsStatus).toLowerCase();
+    /* TOPUPS LIST (client only) */
+    function statusTag(status){
+      const s = (status || "approved").toLowerCase();
+      if(s === "pending") return `<span class="tag pending">PENDING</span>`;
+      if(s === "rejected") return `<span class="tag rejected">REJECTED</span>`;
+      return `<span class="tag approved">APPROVED</span>`;
     }
 
-    function renderTopupsTable(){
-      const topups = getLedgerFilteredForKPIs()
-        .filter(tx => tx.type === "topup")
-        .filter(passesTopupsStatusFilter)
-        .slice()
-        .sort((a,b) => (new Date(b.date)).getTime() - (new Date(a.date)).getTime());
+function renderTopupsList(){
+  const items = getLedgerForKPIs()
+    .filter(tx => tx.type === "topup" || tx.type === "topup_request")
+    .slice()
+    .reverse();
 
-      const body = document.getElementById("topupsTableBody");
-      const hint = document.getElementById("topupsTableHint");
+  const body = document.getElementById("topupsList");
+  const footer = document.getElementById("topupsFooterHint");
 
-      if(!topups.length){
-        body.innerHTML = `<tr><td colspan="7" class="td-muted">No topups found for current filters.</td></tr>`;
-        hint.textContent = "";
-        return;
-      }
+  if(!items.length){
+    body.innerHTML = `
+      <tr><td colspan="7" class="muted" style="padding:1rem;">
+        No topups found for selected date range.
+      </td></tr>`;
+    if(footer) footer.textContent = "";
+    return;
+  }
 
-      body.innerHTML = topups.map(t => {
-        const proof = t.proof ? escapeHtml(t.proof) : "-";
-        const account = t.account ? escapeHtml(t.account) : "USD";
-        const st = String(t.status || "pending").toLowerCase();
-        const stLabel = st === "past_due" ? "Past Due" : (st.charAt(0).toUpperCase() + st.slice(1));
-        const desc = (t.description && String(t.description).trim()) ? escapeHtml(t.description) : (t.note ? escapeHtml(t.note) : "--");
+  // helper: proof + account + description
+  function extractProof(tx){
+    // hash: "Hash: 0xabc..." OR invoice: "Invoice: INV_00148.pdf"
+    const n = String(tx.note || "");
+    const mh = n.match(/Hash:\s*([^\s|]+)/i);
+    if(mh) return mh[1];
+    const mi = n.match(/Invoice:\s*([^\s|]+)/i);
+    if(mi) return mi[1];
+    return "—";
+  }
 
-        return `
-          <tr class="topups-row" onclick="openTopupDetails('${escapeHtml(t.id)}')">
-            <td>${escapeHtml(t.date)}</td>
-            <td>${escapeHtml(t.clientId || "")}</td>
-            <td>${account}</td>
-            <td class="td-muted">${proof}</td>
-            <td class="td-right"><strong>${money(t.amount)}</strong></td>
-            <td><span class="status-badge ${st}">${stLabel}</span></td>
-            <td class="td-muted" style="max-width: 360px; overflow:hidden; text-overflow:ellipsis;">${desc}</td>
-          </tr>
-        `;
-      }).join("");
+  function extractAccount(tx){
+    // "Account: acc_1" or fallback
+    const n = String(tx.note || "");
+    const m = n.match(/Account:\s*([a-zA-Z0-9_:-]+)/i);
+    return m ? m[1] : "—";
+  }
 
-      hint.textContent = `Showing ${topups.length} topups • Filtered by client/date + status. Click a row for details.`;
+  function extractDesc(tx){
+    // show category as clean label (wire/crypto) OR note
+    if(tx.type === "topup_request"){
+      // example: "Request: Crypto USDT TRC20 | Hash: ..."
+      return String(tx.note || "—").replace(/^Request:\s*/i, "");
     }
+    return tx.note ? String(tx.note) : "—";
+  }
 
-    /* LEDGER PREVIEW (tabbed) */
+  body.innerHTML = items.map((t) => {
+    const proof = extractProof(t);
+    const account = extractAccount(t);
+    const desc = extractDesc(t);
+
+    return `
+      <tr class="row-clickable" role="button" tabindex="0"
+          onclick="openTopupDetails('${String(t.id)}')"
+          onkeydown="if(event.key==='Enter') openTopupDetails('${String(t.id)}')">
+        <td style="white-space:nowrap;">${escapeHtml(t.date || "—")}</td>
+        <td>${escapeHtml(String(t.clientId || CURRENT_CLIENT_ID))}</td>
+        <td>${escapeHtml(account)}</td>
+        <td class="topups-proof">${escapeHtml(proof)}</td>
+        <td style="text-align:right; font-weight:900;">${money(t.amount)}</td>
+        <td>${statusTag(t.status)}</td>
+        <td>${escapeHtml(desc)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  if(footer){
+    footer.textContent = `Showing ${items.length} topups • Filtered by date range. Click a row for details.`;
+  }
+}
+
+
+    /* LEDGER PREVIEW */
     function buildShortDetails(tx){
       if(tx.type === "topup") return `${escapeHtml(tx.note || "Topup")} <span class="muted">(informative)</span>`;
+      if(tx.type === "topup_request") return `${escapeHtml(tx.note || "Topup request")} <span class="muted">(awaiting admin approval)</span>`;
       if(tx.type === "deposit") return `Deposit → <span class="muted">Main Wallet</span> • ${escapeHtml(tx.note || "")}`;
       if(tx.type === "fee") return `Fee → <span class="muted">Total Fees</span> • ${escapeHtml(tx.note || "")}`;
       if(tx.type === "refund") return `Refund → <span class="muted">External</span> • ${escapeHtml(tx.note || "")}`;
@@ -1644,21 +1485,25 @@
       return `${escapeHtml(tx.type)} • ${escapeHtml(tx.note || "")}`;
     }
 
+    function typeTags(tx){
+      const base = `<span class="tag">${escapeHtml(tx.type.toUpperCase())}</span>`;
+      const st = tx.status ? statusTag(tx.status) : "";
+      const pf = tx.platform ? `<span class="tag">${escapeHtml(tx.platform)}</span>` : "";
+      return `${base} ${st} ${pf}`.trim();
+    }
+
     function refreshLedgerPreview(){
       const body = document.getElementById("ledgerPreviewBody");
       const preview = getFilteredLedger().slice(0, 8);
 
       body.innerHTML = preview.map(tx => {
-        const amountClass = (tx.from === "mainWallet" || tx.from === "individualBalance") ? "amount-neg" : "amount-pos";
-        const tags = [
-          `<span class="tag">${escapeHtml(tx.type.toUpperCase())}</span>`,
-          tx.platform ? `<span class="tag">${escapeHtml(tx.platform)}</span>` : ""
-        ].join(" ");
+        const isOut = (tx.status === "approved") && (tx.from === "mainWallet" || tx.from === "individualBalance");
+        const amountClass = isOut ? "amount-neg" : "amount-pos";
 
         return `
           <tr>
             <td style="white-space:nowrap;">${escapeHtml(tx.date)}</td>
-            <td>${tags}</td>
+            <td>${typeTags(tx)}</td>
             <td>${buildShortDetails(tx)}</td>
             <td style="text-align:right;" class="${amountClass}">${money(tx.amount)}</td>
           </tr>
@@ -1666,7 +1511,7 @@
       }).join("");
 
       document.getElementById("ledgerHint").textContent =
-        `Showing latest ${preview.length} entries • Filtered by global client/date • Tab: ${state.ledgerTab.toUpperCase()}`;
+        `Showing latest ${preview.length} entries • Filtered by date range • Tab: ${state.ledgerTab.toUpperCase()}`;
     }
 
     function refreshLedgerModal(){
@@ -1675,13 +1520,16 @@
       const k = calcKpis();
 
       body.innerHTML = ledger.map(tx => {
-        const amountClass = (tx.from === "mainWallet" || tx.from === "individualBalance") ? "amount-neg" : "amount-pos";
+        const isOut = (tx.status === "approved") && (tx.from === "mainWallet" || tx.from === "individualBalance");
+        const amountClass = isOut ? "amount-neg" : "amount-pos";
+        const st = (tx.status || "approved").toUpperCase();
+
         return `
           <tr>
             <td style="white-space:nowrap;">${escapeHtml(tx.date)}</td>
             <td>${escapeHtml(tx.type)}</td>
             <td>${escapeHtml((tx.from||"—") + " → " + (tx.to||"—"))}</td>
-            <td>${escapeHtml(getClientLabelById(tx.clientId || "—"))}</td>
+            <td>${escapeHtml(st)}</td>
             <td>${escapeHtml(tx.platform || "—")}</td>
             <td>${escapeHtml(tx.category || "—")}</td>
             <td>${escapeHtml(tx.note || "")}</td>
@@ -1692,13 +1540,13 @@
 
       const vaultTotal = k.platformVault.facebook + k.platformVault.google + k.platformVault.tiktok;
       document.getElementById("ledgerTotalsHint").textContent =
-        `MainWallet: ${money(k.mainWallet)} • VaultTotal: ${money(vaultTotal)} • General: ${money(k.generalBalance)} • Individual: ${money(k.individualBalance)} • Spend: ${money(k.spend)} • Fees: ${money(k.totalFees)} • Setup/Services: ${money(k.setupServices)} • TotalTopups: ${money(k.totalTopups)}`;
+        `MainWallet: ${money(k.mainWallet)} • VaultTotal: ${money(vaultTotal)} • General: ${money(k.generalBalance)} • Individual: ${money(k.individualBalance)} • Spend: ${money(k.spend)} • Fees: ${money(k.totalFees)} • Setup/Services: ${money(k.setupServices)} • ApprovedTopups: ${money(k.totalTopupsApproved)}`;
     }
 
     function openLedgerModal(){ refreshLedgerModal(); document.getElementById("ledgerModal").classList.add("active"); }
     function closeLedgerModal(){ document.getElementById("ledgerModal").classList.remove("active"); }
 
-    /* WORKSPACE tabs (Funding / Setup) */
+    /* WORKSPACE tabs */
     document.getElementById("workspaceTabs").addEventListener("click", (e) => {
       const pill = e.target.closest(".pill");
       if(!pill) return;
@@ -1733,21 +1581,11 @@
       document.querySelector(`#ledgerTabs .pill[data-ledger="${tab}"]`)?.classList.add("active");
       refreshAll();
     }
-
     document.getElementById("ledgerTabs").addEventListener("click", (e) => {
       const pill = e.target.closest(".pill");
       if(!pill) return;
       setLedgerTab(pill.getAttribute("data-ledger"));
     });
-
-    /* ACTION GUARD */
-    function requireSpecificClient(){
-      if(state.globalClient === "__all__"){
-        alert("Select a specific client first (not 'All clients') to perform actions.");
-        return false;
-      }
-      return true;
-    }
 
     /* FUNDING / ALLOCATION / INDIVIDUAL SEND */
     function refreshFundingUI(){
@@ -1755,7 +1593,6 @@
       document.getElementById("tx_fromHint").textContent =
         `Available in Main Wallet (filtered view): ${money(k.mainWallet)}`;
 
-      toggleAllocAccountSelect();
       updateFundingPreview();
       updateAllocationPreview();
       updateIndToAccountPreview();
@@ -1765,15 +1602,11 @@
       const platform = document.getElementById("tx_platform").value;
       const amount = Number(document.getElementById("tx_amount").value || 0);
       const note = (document.getElementById("tx_note").value || "").trim();
-      const clientText = state.globalClient === "__all__" ? "All clients" : getClientLabelById(state.globalClient);
-
       document.getElementById("tx_preview").textContent =
-        `Client: ${clientText} • Send ${money(amount)} Main → Vault (${platform})${note ? " • " + note : ""}`;
+        `Send ${money(amount)} Main → Vault (${platform})${note ? " • " + note : ""}`;
     }
 
     function submitMainToVault(){
-      if(!requireSpecificClient()) return;
-
       const k = calcKpis();
       const platform = document.getElementById("tx_platform").value;
       const amount = Number(document.getElementById("tx_amount").value || 0);
@@ -1789,7 +1622,8 @@
         id: uid(),
         date: nowISO(),
         type: "transfer",
-        clientId: String(state.globalClient),
+        status: "approved",
+        clientId: String(CURRENT_CLIENT_ID),
         from: "mainWallet",
         to: "platformVault",
         platform,
@@ -1803,34 +1637,25 @@
       updateFundingPreview();
     }
 
-    function toggleAllocAccountSelect(){
-      const to = document.getElementById("alloc_to").value;
-      document.getElementById("alloc_accountGroup").style.display = (to === "account") ? "block" : "none";
-    }
-
     function updateAllocationPreview(){
       const k = calcKpis();
       const platform = document.getElementById("alloc_platform").value;
       const to = document.getElementById("alloc_to").value;
-      const account = document.getElementById("alloc_account").value;
       const amount = Number(document.getElementById("alloc_amount").value || 0);
       const note = (document.getElementById("alloc_note").value || "").trim();
 
       const available = k.platformVault[platform] || 0;
-      document.getElementById("alloc_platformHint").textContent = `Available in ${platform} vault (filtered): ${money(available)}`;
+      document.getElementById("alloc_platformHint").textContent =
+        `Available in ${platform} vault (filtered): ${money(available)}`;
 
-      const targetText = (to === "account") ? `Account (${account})` : to;
       document.getElementById("alloc_preview").textContent =
-        `Allocate ${money(amount)} Vault(${platform}) → ${targetText}${note ? " • " + note : ""}`;
+        `Allocate ${money(amount)} Vault(${platform}) → ${to}${note ? " • " + note : ""}`;
     }
 
     function submitAllocation(){
-      if(!requireSpecificClient()) return;
-
       const k = calcKpis();
       const platform = document.getElementById("alloc_platform").value;
       const to = document.getElementById("alloc_to").value;
-      const account = document.getElementById("alloc_account").value;
       const amount = Number(document.getElementById("alloc_amount").value || 0);
       const note = (document.getElementById("alloc_note").value || "").trim();
 
@@ -1846,14 +1671,13 @@
         id: uid(),
         date: nowISO(),
         type: "allocation",
-        clientId: String(state.globalClient),
+        status: "approved",
+        clientId: String(CURRENT_CLIENT_ID),
         from: "platformVault",
         to: to,
         platform,
-        category: to === "generalBalance" ? "budget_general"
-                : to === "individualBalance" ? "budget_individual"
-                : "budget_account",
-        note: (to === "account" ? `Account: ${account}` : "") + (note ? (" • " + note) : ""),
+        category: to === "generalBalance" ? "budget_general" : "budget_individual",
+        note: note || (to === "generalBalance" ? "Allocate to General" : "Allocate to Individual"),
         amount
       });
 
@@ -1872,14 +1696,11 @@
       document.getElementById("ind_fromHint").textContent =
         `Available in Individual Balance (filtered): ${money(k.individualBalance)}`;
 
-      const clientText = state.globalClient === "__all__" ? "All clients" : getClientLabelById(state.globalClient);
       document.getElementById("ind_preview").textContent =
-        `Client: ${clientText} • Send ${money(amount)} Individual → ${account}${note ? " • " + note : ""}`;
+        `Send ${money(amount)} Individual → ${account}${note ? " • " + note : ""}`;
     }
 
     function submitIndividualToAccount(){
-      if(!requireSpecificClient()) return;
-
       const k = calcKpis();
       const account = document.getElementById("ind_toAccount").value;
       const amount = Number(document.getElementById("ind_amount").value || 0);
@@ -1899,7 +1720,8 @@
         id: uid(),
         date: nowISO(),
         type: "ind_to_account",
-        clientId: String(state.globalClient),
+        status: "approved",
+        clientId: String(CURRENT_CLIENT_ID),
         from: "individualBalance",
         to: `account:${account}`,
         platform: "",
@@ -1913,52 +1735,12 @@
       updateIndToAccountPreview();
     }
 
-    function submitSetupServiceCharge(){
-      if(!requireSpecificClient()) return;
-
-      const k = calcKpis();
-      const type = document.getElementById("charge_type").value;
-      const model = document.getElementById("charge_model").value;
-      const linked = document.getElementById("charge_linked").value;
-      const amount = Number(document.getElementById("charge_amount").value || 0);
-      const details = (document.getElementById("charge_details").value || "").trim();
-
-      if(!amount || amount <= 0){ alert("Please enter a valid amount."); return; }
-      if(amount > k.mainWallet){
-        alert(`Not enough funds in Main Wallet (filtered). Available: ${money(k.mainWallet)}`);
-        return;
-      }
-
-      const title = type === "setup" ? "Setup" : "Service";
-      const note = `Account: ${linked} | ${model} - ${title}${details ? " | " + details : ""}`;
-
-      addLedger({
-        id: uid(),
-        date: nowISO(),
-        type: "setup_service",
-        clientId: String(state.globalClient),
-        from: "mainWallet",
-        to: "setupServices",
-        platform: "",
-        category: type,
-        note,
-        amount
-      });
-
-      document.getElementById("charge_amount").value = "";
-      document.getElementById("charge_details").value = "";
-    }
-
-    /* Add Topup Drawer logic */
+    /* Add Topup Drawer logic (CLIENT: REQUEST only) */
     let activeTopupTab = "wire";
 
     function openTopupDrawer(){
       document.getElementById("topupDrawer").classList.add("active");
       document.getElementById("topupDrawer").setAttribute("aria-hidden", "false");
-
-      if(state.globalClient !== "__all__"){
-        document.getElementById("topup_client").value = String(state.globalClient);
-      }
       recalcWireNet();
       validateTopupForm();
     }
@@ -1971,7 +1753,7 @@
       activeTopupTab = tab;
 
       document.querySelectorAll("#topupTabs .seg-btn").forEach(b => b.classList.remove("active"));
-      document.querySelector(`#topupTabs .seg-btn[data-tab="${tab}"]`).classList.add("active");
+      document.querySelector(`#topupTabs .seg-btn[data-tab="${tab}"]`)?.classList.add("active");
 
       document.getElementById("tab_wire").style.display = tab === "wire" ? "block" : "none";
       document.getElementById("tab_crypto").style.display = tab === "crypto" ? "block" : "none";
@@ -2025,102 +1807,27 @@
       }
     });
 
-    function submitTopup(){
+    function submitTopupRequest(){
       validateTopupForm();
       const btn = document.getElementById("topupSubmitBtn");
       if(btn.classList.contains("btn-disabled")) return;
 
-      const clientId = document.getElementById("topup_client").value;
-
-      function nextTopupId(){
-        // simple demo topupId generator
-        const base = 100100;
-        const count = state.ledger.filter(x => x.type === "topup").length;
-        return String(base + count + 1);
-      }
-
-      function addTopupDepositAndFee({ topupAmount, netAmount, feeAmount, category, note, proof, account, description, grossAmount }){
-        const topupId = nextTopupId();
-
-        addLedger({
-          id: uid(),
-          topupId,
-          date: nowISO(),
-          type: "topup",
-          clientId,
-          from: "external",
-          to: "topups",
-          platform: "",
-          category,
-          status: "pending",           // ✅ default, editable in modal
-          account: account || "USD",
-          proof: proof || "-",
-          description: description || "--",
-          grossAmount: Number(grossAmount || topupAmount || 0),
-          feeAmount: Number(feeAmount || 0),
-          netAmount: Number(netAmount || topupAmount || 0),
-          note: note || "Topup",
-          amount: Number(topupAmount)
-        });
-
-        addLedger({
-          id: uid(),
-          date: nowISO(),
-          type: "deposit",
-          clientId,
-          from: "external",
-          to: "mainWallet",
-          platform: "",
-          category: "deposit",
-          note: `Topup credited to Main Wallet (${category})`,
-          amount: Number(netAmount)
-        });
-
-        const f = Number(feeAmount || 0);
-        if(f > 0){
-          addLedger({
-            id: uid(),
-            date: nowISO(),
-            type: "fee",
-            clientId,
-            from: "",
-            to: "feesCollected",
-            platform: "",
-            category: category + "_fee",
-            note: `Fee collected (${category})`,
-            amount: f
-          });
-        }
-      }
+      // CLIENT REQUEST: create only topup_request (pending).
+      // Admin approval (later) would create approved TOPUP + DEPOSIT + FEE.
+      let amount = 0;
+      let category = activeTopupTab;
+      let note = "";
 
       if(activeTopupTab === "wire"){
         const company = (document.getElementById("wire_company").value || "").trim();
-        const accountSel = document.getElementById("wire_account").value;
+        const account = document.getElementById("wire_account").value;
         const gross = Number(document.getElementById("wire_gross").value || 0);
         const fee = Number(document.getElementById("wire_fee").value || 0);
         const net = Number(document.getElementById("wire_net").value || 0);
         const desc = (document.getElementById("wire_desc").value || "").trim();
         const invoice = document.getElementById("wire_invoice").files?.[0]?.name || "";
-
-        addTopupDepositAndFee({
-          topupAmount: net,
-          netAmount: net,
-          feeAmount: fee,
-          grossAmount: gross || net,
-          category: "wire",
-          account: "USD",
-          proof: invoice || "-",
-          description: desc || "--",
-          note: `Client ${getClientLabelById(clientId)} | Wire${company ? " | " + company : ""} | Account: ${accountSel} | Gross: ${gross || net}`
-        });
-
-        document.getElementById("wire_company").value = "";
-        document.getElementById("wire_account").value = "";
-        document.getElementById("wire_gross").value = "";
-        document.getElementById("wire_fee").value = "";
-        document.getElementById("wire_net").value = "";
-        document.getElementById("wire_desc").value = "";
-        document.getElementById("wire_invoice").value = "";
+        amount = net;
+        note = `Request: Wire${company ? " | " + company : ""} | Account: ${account}${desc ? " | " + desc : ""}${invoice ? " | Invoice: " + invoice : ""} | Gross: ${gross} | Fee: ${fee}`;
       }
 
       if(activeTopupTab === "crypto"){
@@ -2130,29 +1837,19 @@
         const desc = (document.getElementById("crypto_desc").value || "").trim();
         const network = document.getElementById("crypto_network").value;
         const hash = (document.getElementById("crypto_hash").value || "").trim();
-
+        amount = net;
         const fee = gross > 0 ? Math.max(0, +(gross - net).toFixed(2)) : 0;
         document.getElementById("crypto_fee_hint").textContent = "Fee: " + fee.toFixed(2);
+        note = `Request: Crypto ${method} | ${network} | Hash: ${hash}${desc ? " | " + desc : ""}${gross ? " | Gross: " + gross : ""}`;
+      }
 
-        addTopupDepositAndFee({
-          topupAmount: net,
-          netAmount: net,
-          feeAmount: fee,
-          grossAmount: gross || net,
-          category: "crypto",
-          account: method || "USDT",
-          proof: hash,
-          description: desc || `${method || "Crypto"} ${network}`,
-          note: `Client ${getClientLabelById(clientId)} | Crypto ${method} | ${network} | Hash: ${hash}`
-        });
-
-        document.getElementById("crypto_method").value = "";
-        document.getElementById("crypto_net").value = "";
-        document.getElementById("crypto_gross").value = "";
-        document.getElementById("crypto_desc").value = "";
-        document.getElementById("crypto_network").value = "";
-        document.getElementById("crypto_hash").value = "";
-        document.getElementById("crypto_fee_hint").textContent = "Fee: 0.00";
+      if(activeTopupTab === "special"){
+        const account = document.getElementById("special_account").value;
+        const net = Number(document.getElementById("special_net").value || 0);
+        const desc = (document.getElementById("special_desc").value || "").trim();
+        const invoice = document.getElementById("special_invoice").files?.[0]?.name || "";
+        amount = net;
+        note = `Request: Special${account ? " | Account: " + account : ""}${desc ? " | " + desc : ""}${invoice ? " | Invoice: " + invoice : ""}`;
       }
 
       if(activeTopupTab === "refund"){
@@ -2160,145 +1857,166 @@
         const net = Number(document.getElementById("refund_net").value || 0);
         const account = document.getElementById("refund_account").value;
         const desc = (document.getElementById("refund_desc").value || "").trim();
-
         if(net > k.mainWallet){
-          alert(`Refund amount exceeds filtered Main Wallet. Available: ${money(k.mainWallet)}`);
+          alert(`Refund amount exceeds Main Wallet (filtered). Available: ${money(k.mainWallet)}`);
           return;
         }
-
         addLedger({
           id: uid(),
           date: nowISO(),
           type: "refund",
-          clientId,
+          status: "approved",
+          clientId: String(CURRENT_CLIENT_ID),
           from: "mainWallet",
           to: "external",
           platform: "",
           category: "refund",
-          note: `Client ${getClientLabelById(clientId)} | Refund${account ? " | Account: " + account : ""}${desc ? " | " + desc : ""}`,
+          note: `Refund${account ? " | Account: " + account : ""}${desc ? " | " + desc : ""}`,
           amount: net
         });
-
-        document.getElementById("refund_account").value = "";
-        document.getElementById("refund_net").value = "";
-        document.getElementById("refund_desc").value = "";
+        closeTopupDrawer();
+        return;
       }
+
+      if(!amount || amount <= 0){
+        alert("Please enter a valid amount.");
+        return;
+      }
+
+      addLedger({
+        id: uid(),
+        date: nowISO(),
+        type: "topup_request",
+        status: "pending",
+        clientId: String(CURRENT_CLIENT_ID),
+        from: "external",
+        to: "topups",
+        platform: "",
+        category,
+        note,
+        amount
+      });
+
+      // reset form fields
+      document.getElementById("wire_company").value = "";
+      document.getElementById("wire_account").value = "";
+      document.getElementById("wire_gross").value = "";
+      document.getElementById("wire_fee").value = "";
+      document.getElementById("wire_net").value = "";
+      document.getElementById("wire_desc").value = "";
+      document.getElementById("wire_invoice").value = "";
+
+      document.getElementById("crypto_method").value = "";
+      document.getElementById("crypto_net").value = "";
+      document.getElementById("crypto_gross").value = "";
+      document.getElementById("crypto_desc").value = "";
+      document.getElementById("crypto_network").value = "";
+      document.getElementById("crypto_hash").value = "";
+      document.getElementById("crypto_fee_hint").textContent = "Fee: 0.00";
+
+      document.getElementById("special_account").value = "";
+      document.getElementById("special_net").value = "";
+      document.getElementById("special_desc").value = "";
+      document.getElementById("special_invoice").value = "";
+
+      document.getElementById("refund_account").value = "";
+      document.getElementById("refund_net").value = "";
+      document.getElementById("refund_desc").value = "";
 
       closeTopupDrawer();
     }
 
     function exportLedgerJson(){
-      const json = JSON.stringify({ ledger: state.ledger }, null, 2);
+      const json = JSON.stringify({ clientId: CURRENT_CLIENT_ID, ledger: state.ledger }, null, 2);
       const blob = new Blob([json], { type: "application/json" });
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = "finance-ledger-demo.json";
+      a.download = "client-finance-ledger-demo.json";
       document.body.appendChild(a);
       a.click();
       a.remove();
     }
 
-    /* ✅ NEW: Topup details modal logic */
-    function findTopupById(id){
-      return state.ledger.find(tx => String(tx.id) === String(id));
+    /***************
+     * Topup Details drawer (read-only)
+     ***************/
+    function moneyPlain(n){
+      const v = Number(n || 0);
+      return v.toLocaleString(undefined, { style:"currency", currency:"USD" });
     }
 
-    function statusBadgeClass(st){
-      const s = String(st || "pending").toLowerCase();
-      if(s === "approved") return "approved";
-      if(s === "declined") return "declined";
-      if(s === "past_due") return "past_due";
-      return "pending";
+    function statusText(s){
+      const v = String(s || "approved").toLowerCase();
+      if(v === "pending") return "Pending";
+      if(v === "rejected") return "Rejected";
+      if(v === "approved") return "Approved";
+      return v;
     }
 
-    function formatDatetimeLocalFromTx(tx){
-      const d = new Date(tx.date);
-      if(isNaN(d.getTime())) return "";
-      const pad = (n)=>String(n).padStart(2,"0");
-      const yyyy = d.getFullYear();
-      const mm = pad(d.getMonth()+1);
-      const dd = pad(d.getDate());
-      const hh = pad(d.getHours());
-      const mi = pad(d.getMinutes());
-      return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+    function parseFeeFromNote(note){
+      const m = String(note || "").match(/Fee:\s*([0-9]+(?:\.[0-9]+)?)/i);
+      return m ? Number(m[1]) : 0;
+    }
+    function parseGrossFromNote(note){
+      const m = String(note || "").match(/Gross:\s*([0-9]+(?:\.[0-9]+)?)/i);
+      return m ? Number(m[1]) : 0;
+    }
+    function parseAccountFromNote(note){
+      const m = String(note || "").match(/Account:\s*([a-zA-Z0-9_:-]+)/i);
+      return m ? m[1] : "—";
     }
 
-    function openTopupDetails(id){
-      const tx = findTopupById(id);
-      if(!tx || tx.type !== "topup") return;
+    function openTopupDetails(txId){
+      const tx = state.ledger.find(x => String(x.id) === String(txId));
+      if(!tx) return;
 
-      state.activeTopupModalId = id;
+      document.getElementById("td_clientId").textContent = String(tx.clientId || "—");
+      document.getElementById("td_topupId").textContent = String(tx.id || "—");
 
-      const kv = document.getElementById("topupKvCard");
-      kv.innerHTML = `
-        <div class="kv-row"><div class="kv-key">User ID:</div><div class="kv-val">${escapeHtml(tx.clientId || "")}</div></div>
-        <div class="kv-row"><div class="kv-key">Top-Up ID:</div><div class="kv-val">${escapeHtml(tx.topupId || tx.id)}</div></div>
-        <div class="kv-row"><div class="kv-key">Full Name:</div><div class="kv-val">${escapeHtml(getClientNameById(tx.clientId || ""))}</div></div>
-        <div class="kv-row"><div class="kv-key">Gross Amount:</div><div class="kv-val">${escapeHtml(String(Number(tx.grossAmount ?? tx.amount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
-        <div class="kv-row"><div class="kv-key">Fee Amount:</div><div class="kv-val">${escapeHtml(String(Number(tx.feeAmount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
-        <div class="kv-row"><div class="kv-key">Net Amount:</div><div class="kv-val">${escapeHtml(String(Number(tx.netAmount ?? tx.amount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
-        <div class="kv-row"><div class="kv-key">Account:</div><div class="kv-val">${escapeHtml(tx.account || "USD")}</div></div>
-        <div class="kv-row"><div class="kv-key">Type:</div><div class="kv-val">${escapeHtml(tx.category || "—")}</div></div>
-      `;
+      const isRequest = tx.type === "topup_request";
+      const typeLabel = isRequest ? "REQUEST" : ((tx.category ? String(tx.category).toUpperCase() : "TOPUP"));
+      document.getElementById("td_type").textContent = typeLabel;
 
-      document.getElementById("topupModalDesc").value = (tx.description && String(tx.description).trim()) ? tx.description : (tx.note || "--");
-      document.getElementById("topupModalDate").value = formatDatetimeLocalFromTx(tx);
+      const gross = parseGrossFromNote(tx.note);
+      const fee = parseFeeFromNote(tx.note);
+      const net = Number(tx.amount || 0);
+      const account = parseAccountFromNote(tx.note);
 
-      setTopupModalStatus(String(tx.status || "pending").toLowerCase(), true);
+      document.getElementById("td_account").textContent = account;
+      document.getElementById("td_gross").textContent = gross ? `${moneyPlain(gross)} USD` : "—";
+      document.getElementById("td_fee").textContent = fee ? `${moneyPlain(fee)} USD` : "—";
+      document.getElementById("td_net").textContent = `${moneyPlain(net)} USD`;
+      document.getElementById("td_status").textContent = statusText(tx.status);
 
-      document.getElementById("topupDetailsModal").classList.add("active");
-      document.getElementById("topupDetailsModal").setAttribute("aria-hidden", "false");
+      document.getElementById("td_desc").textContent = tx.note ? String(tx.note) : "—";
+      document.getElementById("td_date").textContent = tx.date ? String(tx.date) : "—";
+
+      const modal = document.getElementById("topupDetailsModal");
+      modal.classList.add("active");
+      modal.setAttribute("aria-hidden", "false");
     }
 
     function closeTopupDetails(){
-      state.activeTopupModalId = null;
-      document.getElementById("topupDetailsModal").classList.remove("active");
-      document.getElementById("topupDetailsModal").setAttribute("aria-hidden", "true");
+      const modal = document.getElementById("topupDetailsModal");
+      modal.classList.remove("active");
+      modal.setAttribute("aria-hidden", "true");
     }
 
-    function setTopupModalStatus(status, silent){
-      const st = String(status || "pending").toLowerCase();
-      const seg = document.getElementById("topupStatusSeg");
-      seg.querySelectorAll(".seg-pill").forEach(p => {
-        p.classList.remove("active","pending","approved","declined","past_due");
-      });
-
-      const el = seg.querySelector(`.seg-pill[data-status="${st}"]`);
-      if(el){
-        el.classList.add("active", st);
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape"){
+        closeTopupDetails();
+        closeTopupDrawer();
+        closeLedgerModal();
       }
-
-      if(!silent){
-        const tx = findTopupById(state.activeTopupModalId);
-        if(tx) tx.status = st;
-      }
-    }
-
-    function saveTopupDetails(){
-      const tx = findTopupById(state.activeTopupModalId);
-      if(!tx) return;
-
-      tx.description = (document.getElementById("topupModalDesc").value || "").trim() || "--";
-
-      const dt = document.getElementById("topupModalDate").value;
-      if(dt){
-        const d = new Date(dt);
-        if(!isNaN(d.getTime())){
-          tx.date = d.toLocaleString();
-        }
-      }
-
-      save();
-      refreshAll();
-      closeTopupDetails();
-    }
+    });
 
     /* Boot */
     function refreshAll(){
-      populateGlobalClientFilter();
+      setClientHeader();
+      updateGlobalHint();
       refreshKPIs();
       refreshFundingUI();
-      renderTopupsTable();
+      renderTopupsList();
       refreshLedgerPreview();
 
       if(document.getElementById("ledgerModal").classList.contains("active")){
@@ -2308,7 +2026,6 @@
 
     load();
 
-    // init ledger tabs active state
     document.querySelectorAll("#ledgerTabs .pill").forEach(p => p.classList.remove("active"));
     document.querySelector(`#ledgerTabs .pill[data-ledger="${state.ledgerTab}"]`)?.classList.add("active");
 

@@ -23,8 +23,8 @@ const navigationItems = {
         { name: 'Users', page: 'users', icon: '👥' },
         { name: 'Accounts', page: 'accounts', icon: '💳' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
-        { name: 'Transactions', page: 'transactions', icon: '💰' }
-        
+        { name: 'Transactions', page: 'transactions', icon: '💰' },
+        { name: 'Finance', page: 'finance', icon: '🏦' }   
     ],
     employee: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
@@ -38,7 +38,8 @@ const navigationItems = {
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
         { name: 'Transactions', page: 'transactions', icon: '💰' },
         { name: 'Orders', page: 'orders', icon: '📦' },
-        { name: 'Profile', page: 'profile', icon: '👤' }
+        { name: 'Profile', page: 'profile', icon: '👤' },
+        { name: 'Finance', page: 'finance', icon: '🏦' }   
     ]
 };
 
