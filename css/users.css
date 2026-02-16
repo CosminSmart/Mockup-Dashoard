@@ -461,3 +461,81 @@
   opacity:.7;
 }
 
+/* Drawer Permissions (like screenshot) */
+/* Drawer Permissions (force 1-row layout like screenshot #1) */
+.permBox{
+  display:flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.permRow{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+
+  /* IMPORTANT: keep in one line */
+  flex-wrap: nowrap;
+
+  padding: 12px 12px;
+  border: 1px solid rgba(15,23,42,.10);
+  border-radius: 14px;
+  background: rgba(15,23,42,.02);
+  overflow: hidden;
+}
+
+.permRow strong{
+  flex: 0 0 120px;   /* fixed width like screenshot */
+  font-size: 13px;
+  font-weight: 900;
+  color: rgba(15,23,42,.92);
+  white-space: nowrap;
+}
+
+/* group right-side checkboxes so they never break */
+.permActions{
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.permCheck{
+  display:inline-flex;
+  align-items:center;
+  gap: 8px;
+
+  font-size: 13px;
+  color: rgba(15,23,42,.85);
+
+  padding: 6px 10px;
+  border-radius: 12px;
+  border: 1px solid rgba(15,23,42,.08);
+  background: #fff;
+
+  white-space: nowrap; /* keep "Delete" on same line */
+  flex: 0 0 auto;
+}
+
+.permCheck input{
+  width: 14px;
+  height: 14px;
+}
+
+.permCheck.is-disabled{
+  opacity: .55;
+}
+
+/* If drawer becomes very narrow, allow horizontal scroll rather than wrapping */
+@media (max-width: 420px){
+  .permRow{
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+

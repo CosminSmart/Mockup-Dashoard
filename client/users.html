@@ -202,22 +202,55 @@
       </div>
 
       <div class="um-card">
-        <div class="um-card__title">Platforms</div>
-        <div class="um-list">
-          <div class="um-list__item">
-            <span>Google Ads</span>
-            <strong>$145K</strong>
-          </div>
-          <div class="um-list__item">
-            <span>Facebook Ads</span>
-            <strong>$89K</strong>
-          </div>
-          <div class="um-list__item">
-            <span>LinkedIn Ads</span>
-            <strong>$50.5K</strong>
-          </div>
-        </div>
-      </div>
+  <div class="um-card__title">Permissions</div>
+  <div class="ae-sub" style="margin-top:-6px;">Viewer disables all edit permissions automatically.</div>
+
+  <div class="permBox" id="dPerms">
+    <div class="permRow" data-module="m1">
+  <strong>Module #1</strong>
+
+  <div class="permActions">
+    <label class="permCheck"><input type="checkbox" class="perm-view" checked> View</label>
+    <label class="permCheck"><input type="checkbox" class="perm-edit"> Edit</label>
+    <label class="permCheck"><input type="checkbox" class="perm-del"> Delete</label>
+  </div>
+</div>
+
+
+    <div class="permRow" data-module="m2">
+  <strong>Module #2</strong>
+
+  <div class="permActions">
+    <label class="permCheck"><input type="checkbox" class="perm-view" checked> View</label>
+    <label class="permCheck"><input type="checkbox" class="perm-edit"> Edit</label>
+    <label class="permCheck"><input type="checkbox" class="perm-del"> Delete</label>
+  </div>
+</div>
+
+
+    <div class="permRow" data-module="m3">
+  <strong>Module #3</strong>
+
+  <div class="permActions">
+    <label class="permCheck"><input type="checkbox" class="perm-view" checked> View</label>
+    <label class="permCheck"><input type="checkbox" class="perm-edit"> Edit</label>
+    <label class="permCheck"><input type="checkbox" class="perm-del"> Delete</label>
+  </div>
+</div>
+
+    <div class="permRow" data-module="m4">
+  <strong>Module #4</strong>
+
+  <div class="permActions">
+    <label class="permCheck"><input type="checkbox" class="perm-view" checked> View</label>
+    <label class="permCheck"><input type="checkbox" class="perm-edit"> Edit</label>
+    <label class="permCheck"><input type="checkbox" class="perm-del"> Delete</label>
+  </div>
+</div>
+
+  </div>
+</div>
+
 
       <!-- Activity Logs -->
 <div class="um-card">
@@ -412,12 +445,57 @@ function openDrawer(data) {
   const isActive = (data.status || "").toLowerCase() === "active";
   dStatus.innerHTML = `<span class="um-badge ${isActive ? "um-badge--green" : "um-badge--gray"}">${data.status}</span>`;
 
+    // init permissions rules in drawer
+  dPermsBind();
+  dPermsApplyRules();
+
+
 
   overlay.hidden = false;
   overlay.classList.add("is-open");
   drawer.classList.add("is-open");
   drawer.setAttribute("aria-hidden", "false");
 }
+
+function dPermsApplyRules(){
+  const box = document.getElementById("dPerms");
+  if(!box) return;
+
+  box.querySelectorAll(".permRow").forEach(row => {
+    const view = row.querySelector(".perm-view");
+    const edit = row.querySelector(".perm-edit");
+    const del  = row.querySelector(".perm-del");
+
+    const allow = !!view.checked;
+
+    // when View OFF -> Edit/Delete OFF + disabled
+    [edit, del].forEach(ch => {
+      ch.disabled = !allow;
+      if(!allow) ch.checked = false;
+
+      const wrap = ch.closest(".permCheck");
+      if(wrap) wrap.classList.toggle("is-disabled", !allow);
+    });
+  });
+}
+
+function dPermsBind(){
+  const box = document.getElementById("dPerms");
+  if(!box) return;
+
+  // bind once
+  if(box.dataset.bound === "1") return;
+  box.dataset.bound = "1";
+
+  box.addEventListener("change", (e) => {
+    if(e.target.classList.contains("perm-view")){
+      dPermsApplyRules();
+    }
+  });
+
+  dPermsApplyRules();
+}
+
 
 
 function closeDrawer() {
