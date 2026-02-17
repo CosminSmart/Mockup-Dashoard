@@ -449,80 +449,82 @@
                 <div class="settings-content" id="privacy-content">
                     <h2 style="font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin-bottom: 2rem;">Privacy & Security</h2>
 
-                    <!-- Change Password Section -->
-                    <div class="settings-section">
-                        <h3>Change Password</h3>
-                        <div style="max-width: 500px;">
-                            <div class="form-group">
-                                <label>Old Password <span style="color: #e74c3c;">*</span></label>
-                                <div style="position: relative;">
-                                    <input type="password" id="oldPassword" placeholder="Enter the old password" style="padding-right: 3rem;">
-                                    <button onclick="togglePasswordVisibility('oldPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
-                                        👁️
-                                    </button>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                        <!-- Change Password Section -->
+                        <div class="settings-section" style="margin-bottom: 0;">
+                            <h3>Change Password</h3>
+                            <div>
+                                <div class="form-group">
+                                    <label>Old Password <span style="color: #e74c3c;">*</span></label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="oldPassword" placeholder="Enter the old password" style="padding-right: 3rem;">
+                                        <button onclick="togglePasswordVisibility('oldPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
+                                            👁️
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label>New Password <span style="color: #e74c3c;">*</span></label>
-                                <div style="position: relative;">
-                                    <input type="password" id="newPassword" placeholder="Enter the new password" style="padding-right: 3rem;">
-                                    <button onclick="togglePasswordVisibility('newPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
-                                        👁️
-                                    </button>
+                                <div class="form-group">
+                                    <label>New Password <span style="color: #e74c3c;">*</span></label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="newPassword" placeholder="Enter the new password" style="padding-right: 3rem;">
+                                        <button onclick="togglePasswordVisibility('newPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
+                                            👁️
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label>Confirm Password <span style="color: #e74c3c;">*</span></label>
-                                <div style="position: relative;">
-                                    <input type="password" id="confirmPassword" placeholder="Confirm the password" style="padding-right: 3rem;">
-                                    <button onclick="togglePasswordVisibility('confirmPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
-                                        👁️
-                                    </button>
+                                <div class="form-group">
+                                    <label>Confirm Password <span style="color: #e74c3c;">*</span></label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="confirmPassword" placeholder="Confirm the password" style="padding-right: 3rem;">
+                                        <button onclick="togglePasswordVisibility('confirmPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
+                                            👁️
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <button class="btn-primary" onclick="changePassword()" style="display: flex; align-items: center; gap: 0.5rem;">
-                                Save Changes
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Two-Factor Authentication Section -->
-                    <div class="settings-section">
-                        <h3>Enable Two-Factor Authentication</h3>
-                        <div style="max-width: 500px;">
-                            <div style="text-align: center; margin-bottom: 2rem;">
-                                <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                        <path d="M9 12l2 2 4-4"></path>
+                                <button class="btn-primary" onclick="changePassword()" style="display: flex; align-items: center; gap: 0.5rem;">
+                                    Save Changes
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
                                     </svg>
-                                </div>
-                                <h4 style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">Enable Two-Factor Authentication</h4>
-                                <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1.5rem;">Scan the QR code below with your 2FA app:</p>
-                                
-                                <!-- QR Code -->
-                                <div style="background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid #e5e5e5; display: inline-block; margin-bottom: 1.5rem;">
-                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%23fff'/%3E%3Cpath d='M0 0h40v40H0zm40 0h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40zM0 40h40v40H0zm80 40h40v40H80zm120 0h40v40h-40zM0 80h40v40H0zm40 80h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40zM0 120h40v40H0zm80 0h40v40H80zm120 0h40v40h-40zM0 160h40v40H0zm40 0h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40z' fill='%23000'/%3E%3C/svg%3E" alt="QR Code" style="width: 200px; height: 200px; display: block;">
-                                </div>
+                                </button>
                             </div>
+                        </div>
 
-                            <div class="form-group">
-                                <label>Verify Two-Factor Authentication</label>
-                                <input type="text" id="twoFactorCode" placeholder="Enter your 2FA code" maxlength="6" style="text-align: center; font-size: 1.2rem; letter-spacing: 0.5rem; font-weight: 600;">
+                        <!-- Two-Factor Authentication Section -->
+                        <div class="settings-section" style="margin-bottom: 0;">
+                            <h3>Enable Two-Factor Authentication</h3>
+                            <div>
+                                <div style="text-align: center; margin-bottom: 2rem;">
+                                    <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                            <path d="M9 12l2 2 4-4"></path>
+                                        </svg>
+                                    </div>
+                                    <h4 style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">Enable Two-Factor Authentication</h4>
+                                    <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1.5rem;">Scan the QR code below with your 2FA app:</p>
+                                    
+                                    <!-- QR Code -->
+                                    <div style="background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid #e5e5e5; display: inline-block; margin-bottom: 1.5rem;">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%23fff'/%3E%3Cpath d='M0 0h40v40H0zm40 0h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40zM0 40h40v40H0zm80 40h40v40H80zm120 0h40v40h-40zM0 80h40v40H0zm40 80h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40zM0 120h40v40H0zm80 0h40v40H80zm120 0h40v40h-40zM0 160h40v40H0zm40 0h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40z' fill='%23000'/%3E%3C/svg%3E" alt="QR Code" style="width: 200px; height: 200px; display: block;">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Verify Two-Factor Authentication</label>
+                                    <input type="text" id="twoFactorCode" placeholder="Enter your 2FA code" maxlength="6" style="text-align: center; font-size: 1.2rem; letter-spacing: 0.5rem; font-weight: 600;">
+                                </div>
+
+                                <button class="btn-primary" onclick="verify2FA()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                                    Verify 2FA
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polyline points="20 6 9 17 4 12"></polyline>
+                                    </svg>
+                                </button>
                             </div>
-
-                            <button class="btn-primary" onclick="verify2FA()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                Verify 2FA
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="20 6 9 17 4 12"></polyline>
-                                </svg>
-                            </button>
                         </div>
                     </div>
                 </div>
