@@ -682,6 +682,23 @@
             padding: 0.5rem;
         }
 
+        /* Profile status dropdown styling */
+        .profile-status-dropdown {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 12px;
+            padding-right: 1.5rem !important;
+        }
+
+        .profile-status-dropdown option {
+            background: white !important;
+            color: #333 !important;
+            padding: 0.5rem;
+        }
+
         @media (max-width: 768px) {
             .statistics {
                 grid-template-columns: 1fr;
@@ -1249,6 +1266,7 @@
                         <th>Profile Name</th>
                         <th>Email</th>
                         <th class="center">Tag</th>
+                        <th class="center">Status</th>
                         <th class="center">Active</th>
                     </tr>
                 </thead>
@@ -1260,6 +1278,12 @@
                             <span class="tag tag-primary">Primary</span>
                         </td>
                         <td class="center">
+                            <select class="profile-status-dropdown" style="background: #d4f4dd; color: #0d7a2c; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active" selected>● Active</option>
+                                <option value="suspended">● Suspended</option>
+                            </select>
+                        </td>
+                        <td class="center">
                             <input type="radio" name="activeProfile" checked onchange="switchToProfile(1)">
                         </td>
                     </tr>
@@ -1269,6 +1293,12 @@
                         <td>backup.profile@example.com</td>
                         <td class="center">
                             <span class="tag tag-backup">Backup</span>
+                        </td>
+                        <td class="center">
+                            <select class="profile-status-dropdown" style="background: #d4f4dd; color: #0d7a2c; border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                                <option value="active" selected>● Active</option>
+                                <option value="suspended">● Suspended</option>
+                            </select>
                         </td>
                         <td class="center">
                             <input type="radio" name="activeProfile" onchange="switchToProfile(2)">
@@ -1609,29 +1639,29 @@
         // Profiles data for each account
         const accountProfiles = {
             1: [ // Facebook account - Dennis Robertson
-                { id: 1, name: 'Main Profile', email: 'main.fb@example.com', password: '********', twoFA: 'JBSWY3DPEHPK3PXP', tag: 'Primary' }
+                { id: 1, name: 'Main Profile', email: 'main.fb@example.com', password: '********', twoFA: 'JBSWY3DPEHPK3PXP', tag: 'Primary', status: 'active' }
             ],
             2: [ // Google account - Ada Account Pro
-                { id: 2, name: 'Gmail Main', email: 'gmail.main@example.com', password: '********', twoFA: 'ABCDE12345', tag: 'Primary' },
-                { id: 6, name: 'Gmail Backup', email: 'gmail.backup@example.com', password: '********', twoFA: 'FGHIJ67890', tag: 'Backup' }
+                { id: 2, name: 'Gmail Main', email: 'gmail.main@example.com', password: '********', twoFA: 'ABCDE12345', tag: 'Primary', status: 'active' },
+                { id: 6, name: 'Gmail Backup', email: 'gmail.backup@example.com', password: '********', twoFA: 'FGHIJ67890', tag: 'Backup', status: 'active' }
             ],
             3: [ // TikTok account - TikTok Campaign
-                { id: 3, name: 'TikTok Pro', email: 'tiktok.pro@example.com', password: '********', twoFA: 'KLMNO11111', tag: 'Primary' }
+                { id: 3, name: 'TikTok Pro', email: 'tiktok.pro@example.com', password: '********', twoFA: 'KLMNO11111', tag: 'Primary', status: 'active' }
             ],
             4: [ // Taboola account - Native Ads Pro
-                { id: 4, name: 'Taboola Master', email: 'taboola.master@example.com', password: '********', twoFA: 'PQRST22222', tag: 'Primary' }
+                { id: 4, name: 'Taboola Master', email: 'taboola.master@example.com', password: '********', twoFA: 'PQRST22222', tag: 'Primary', status: 'active' }
             ],
             5: [ // Snapchat account - Snap Ads Elite
-                { id: 5, name: 'Snap Main', email: 'snap.main@example.com', password: '********', twoFA: 'UVWXY33333', tag: 'Primary' }
+                { id: 5, name: 'Snap Main', email: 'snap.main@example.com', password: '********', twoFA: 'UVWXY33333', tag: 'Primary', status: 'suspended' }
             ],
             6: [ // Facebook unassigned - FB Premium Account
-                { id: 8, name: 'FB Premium', email: 'fb.premium@example.com', password: '********', twoFA: 'AAAAA44444', tag: 'Primary' }
+                { id: 8, name: 'FB Premium', email: 'fb.premium@example.com', password: '********', twoFA: 'AAAAA44444', tag: 'Primary', status: 'active' }
             ],
             7: [ // Google unassigned - Google Ads Fresh
-                { id: 9, name: 'Google Fresh', email: 'google.fresh@example.com', password: '********', twoFA: 'BBBBB55555', tag: 'Primary' }
+                { id: 9, name: 'Google Fresh', email: 'google.fresh@example.com', password: '********', twoFA: 'BBBBB55555', tag: 'Primary', status: 'active' }
             ],
             8: [ // TikTok unassigned - TikTok New Profile
-                { id: 10, name: 'TikTok New', email: 'tiktok.new@example.com', password: '********', twoFA: 'CCCCC66666', tag: 'Primary' }
+                { id: 10, name: 'TikTok New', email: 'tiktok.new@example.com', password: '********', twoFA: 'CCCCC66666', tag: 'Primary', status: 'active' }
             ]
         };
 
@@ -1901,6 +1931,42 @@
             console.log(`Account ${accountId} status updated to: ${newStatus} and saved to localStorage`);
         }
 
+        function updateProfileStatus(accountId, profileId, newStatus) {
+            // Find the profile in accountProfiles
+            const profiles = accountProfiles[accountId];
+            if (!profiles) return;
+
+            const profile = profiles.find(p => p.id === profileId);
+            if (!profile) return;
+
+            // Update profile status
+            profile.status = newStatus;
+
+            // Save to localStorage
+            saveProfilesToStorage();
+
+            // Update dropdown styling
+            const dropdown = document.querySelector(`select[data-profile-id="${profileId}"][data-account-id="${accountId}"]`);
+            if (dropdown) {
+                updateProfileDropdownStyle(dropdown, newStatus);
+            }
+
+            console.log(`Profile ${profileId} status updated to: ${newStatus} and saved to localStorage`);
+        }
+
+        function updateProfileDropdownStyle(dropdown, status) {
+            switch(status) {
+                case 'active':
+                    dropdown.style.background = '#d4f4dd';
+                    dropdown.style.color = '#0d7a2c';
+                    break;
+                case 'suspended':
+                    dropdown.style.background = '#ffebee';
+                    dropdown.style.color = '#c62828';
+                    break;
+            }
+        }
+
         function openModal(accountId) {
             const account = accountsData[accountId];
             if (!account) {
@@ -1946,6 +2012,11 @@
                 const isActive = profile.id === account.activeProfileId;
                 if (isActive) hasCheckedProfile = true;
                 
+                // Determine status dropdown styling
+                const statusStyle = profile.status === 'active' 
+                    ? 'background: #d4f4dd; color: #0d7a2c;' 
+                    : 'background: #ffebee; color: #c62828;';
+                
                 const row = document.createElement('tr');
                 row.setAttribute('data-profile', profile.id);
                 row.innerHTML = `
@@ -1953,6 +2024,12 @@
                     <td>${profile.email}</td>
                     <td class="center">
                         <span class="tag ${profile.tag === 'Primary' ? 'tag-primary' : 'tag-backup'}">${profile.tag}</span>
+                    </td>
+                    <td class="center">
+                        <select class="profile-status-dropdown" data-profile-id="${profile.id}" data-account-id="${currentAccountId}" onchange="updateProfileStatus(${currentAccountId}, ${profile.id}, this.value)" style="${statusStyle} border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                            <option value="active" ${profile.status === 'active' ? 'selected' : ''}>● Active</option>
+                            <option value="suspended" ${profile.status === 'suspended' ? 'selected' : ''}>● Suspended</option>
+                        </select>
                     </td>
                     <td class="center">
                         <input type="radio" name="activeProfile" ${isActive ? 'checked' : ''} onchange="switchToProfile(${profile.id})">
