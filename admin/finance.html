@@ -788,6 +788,40 @@
       border-radius: var(--r-xl) !important;
     }
 
+    /* ✅ Make your existing .transfer-btn use the same styling as .btn */
+.transfer-btn{
+  border: 1px solid var(--line2);
+  background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+  color: var(--text);
+  padding: .7rem .95rem;
+  border-radius: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+  user-select:none;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:.55rem;
+}
+.transfer-btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+.transfer-btn:active{ transform: translateY(0px); }
+
+.transfer-btn.secondary{
+  background: color-mix(in srgb, rgba(37,99,235,.18) 65%, var(--glass));
+  border-color: color-mix(in srgb, rgba(37,99,235,.32) 55%, var(--line2));
+}
+
+.transfer-btn.gray{
+  background: color-mix(in srgb, rgba(148,163,184,.18) 70%, var(--glass));
+}
+
+.transfer-btn.btn-disabled{
+  opacity:.55;
+  pointer-events:none;
+}
+
+
   </style>
 </head>
 
@@ -1760,28 +1794,44 @@
       refreshAll();
     }
 
-    function populateGlobalClientFilter(){
-      const clientIds = new Set(["100","101","102"]);
-      for(const tx of state.ledger){
-        if(tx.clientId) clientIds.add(String(tx.clientId));
-      }
-      const sel = document.getElementById("global_client");
-      const current = state.globalClient || "__all__";
-      sel.innerHTML = `<option value="__all__">All clients</option>` +
-        [...clientIds].sort().map(cid => `<option value="${cid}">${escapeHtml(getClientLabelById(cid))}</option>`).join("");
-      sel.value = current;
+    function setValueIfExists(id, value){
+  const el = document.getElementById(id);
+  if(el) el.value = value ?? "";
+}
 
-      document.getElementById("global_from").value = state.globalFrom || "";
-      document.getElementById("global_to").value = state.globalTo || "";
-      document.getElementById("topups_status").value = state.topupsStatus || "__all__";
+function populateGlobalClientFilter(){
+  const clientIds = new Set(["100","101","102"]);
+  for(const tx of state.ledger){
+    if(tx.clientId) clientIds.add(String(tx.clientId));
+  }
 
-      const hint = document.getElementById("global_hint");
-      const clientText = current === "__all__" ? "All clients" : getClientLabelById(current);
-      const rangeText = (state.globalFrom || state.globalTo) ? `${state.globalFrom || "…"} → ${state.globalTo || "…"}`
-                                                           : "All dates";
-      const stText = (state.topupsStatus === "__all__") ? "All statuses" : state.topupsStatus.toUpperCase();
-      hint.textContent = `Current view: ${clientText} • ${rangeText} • Topups Status: ${stText} • Ledger Tab: ${state.ledgerTab.toUpperCase()}`;
-    }
+  const sel = document.getElementById("global_client");
+  const current = state.globalClient || "__all__";
+
+  sel.innerHTML =
+    `<option value="__all__">All clients</option>` +
+    [...clientIds].sort().map(cid =>
+      `<option value="${cid}">${escapeHtml(getClientLabelById(cid))}</option>`
+    ).join("");
+
+  sel.value = current;
+
+  // ✅ SAFE setters (nu mai aruncă TypeError dacă lipsește elementul)
+  setValueIfExists("global_from", state.globalFrom || "");
+  setValueIfExists("global_to", state.globalTo || "");
+  setValueIfExists("topups_status", state.topupsStatus || "__all__"); // <- dacă e comentat, nu crapă
+
+  const hint = document.getElementById("global_hint");
+  const clientText = current === "__all__" ? "All clients" : getClientLabelById(current);
+  const rangeText = (state.globalFrom || state.globalTo)
+    ? `${state.globalFrom || "…"} → ${state.globalTo || "…"}`
+    : "All dates";
+  const stText = (state.topupsStatus === "__all__") ? "All statuses" : state.topupsStatus.toUpperCase();
+
+  hint.textContent =
+    `Current view: ${clientText} • ${rangeText} • Topups Status: ${stText} • Ledger Tab: ${state.ledgerTab.toUpperCase()}`;
+}
+
 
     /* KPIs - based on FULL filtered by client/date ONLY */
     function getLedgerFilteredForKPIs(){
