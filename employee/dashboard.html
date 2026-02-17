@@ -1417,6 +1417,27 @@
 </script>
 
 
+<script>
+  // My Team: show either empty OR list (not both)
+  (function(){
+    const empty = document.getElementById("teamEmpty");
+    const list  = document.getElementById("teamList");
+    if(!empty || !list) return;
+
+    const hasItems = list.querySelectorAll(".teamItem").length > 0;
+
+    // Varianta 1: cu hidden (recomandat)
+    empty.hidden = hasItems;
+    // dacă vrei să ascunzi și containerul listei complet când nu sunt membri:
+    list.style.display = hasItems ? "grid" : "none";
+
+    // (opțional) dacă vrei să te asiguri că empty are flex:
+    empty.style.display = hasItems ? "none" : "flex";
+  })();
+</script>
+
+
+
 
 
 
