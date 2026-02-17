@@ -118,6 +118,14 @@ th {
     display: block;
 }
 
+#addProfileOverlay {
+    z-index: 1001;
+}
+
+#addProfileModal {
+    z-index: 1002;
+}
+
 .cards-section {
     border-top: 2px solid #eee;
     padding-top: 1rem;

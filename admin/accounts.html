@@ -1130,6 +1130,7 @@
     <div class="overlay" id="overlay" onclick="closeModal()"></div>
     <div class="overlay" id="notesOverlay" onclick="closeNotesModal()"></div>
     <div class="overlay" id="addAccountOverlay" onclick="closeAddAccountModal()"></div>
+    <div class="overlay" id="addProfileOverlay" onclick="closeAddProfileModal()"></div>
     
     <div class="modal" id="accountModal">
         <div class="modal-content" style="padding: 2.5rem;">
@@ -1500,6 +1501,45 @@
         </div>
     </div>
 
+    <div class="modal" id="addProfileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Profile</h2>
+                <button class="close-btn" onclick="closeAddProfileModal()">&times;</button>
+            </div>
+
+            <div class="field-group">
+                <label>Profile Name</label>
+                <input type="text" id="addProfileName" placeholder="Enter profile name">
+            </div>
+
+            <div class="field-group">
+                <label>Email</label>
+                <input type="email" id="addProfileEmail" placeholder="Enter email">
+            </div>
+
+            <div class="field-group">
+                <label>Password</label>
+                <input type="password" id="addProfilePassword" placeholder="Enter password">
+            </div>
+
+            <div class="field-group">
+                <label>2FA Code (Optional)</label>
+                <input type="text" id="addProfileTwoFA" placeholder="Enter 2FA code">
+            </div>
+
+            <div class="field-group">
+                <label>Tag</label>
+                <select id="addProfileTag" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="Primary">Primary</option>
+                    <option value="Backup">Backup</option>
+                </select>
+            </div>
+
+            <button class="btn" style="width: 100%;" onclick="submitAddProfile()">Create Profile</button>
+        </div>
+    </div>
+
     <script>
         // Account Tab Switching
         function switchAccountTab(tabName) {
@@ -1585,38 +1625,243 @@
         }
 
         function addProfile() {
-            alert('Add Profile functionality - opens modal to add new profile');
+            if (!currentAccountId) {
+                alert('No account selected');
+                return;
+            }
+            openAddProfileModal();
+        }
+
+        function openAddProfileModal() {
+            document.getElementById('addProfileModal').classList.add('active');
+            document.getElementById('addProfileOverlay').classList.add('active');
+            
+            // Clear form fields
+            document.getElementById('addProfileName').value = '';
+            document.getElementById('addProfileEmail').value = '';
+            document.getElementById('addProfilePassword').value = '';
+            document.getElementById('addProfileTwoFA').value = '';
+            document.getElementById('addProfileTag').value = 'Primary';
+        }
+
+        function closeAddProfileModal() {
+            document.getElementById('addProfileModal').classList.remove('active');
+            document.getElementById('addProfileOverlay').classList.remove('active');
+        }
+
+        function submitAddProfile() {
+            // Get form values
+            const profileName = document.getElementById('addProfileName').value.trim();
+            const profileEmail = document.getElementById('addProfileEmail').value.trim();
+            const profilePassword = document.getElementById('addProfilePassword').value;
+            const profileTwoFA = document.getElementById('addProfileTwoFA').value.trim();
+            const profileTag = document.getElementById('addProfileTag').value;
+
+            // Validate required fields
+            if (!profileName) {
+                alert('Please enter a profile name');
+                return;
+            }
+            if (!profileEmail) {
+                alert('Please enter an email');
+                return;
+            }
+            if (!profilePassword) {
+                alert('Please enter a password');
+                return;
+            }
+
+            // Get current account profiles
+            if (!accountProfiles[currentAccountId]) {
+                accountProfiles[currentAccountId] = [];
+            }
+
+            // Generate new profile ID (find max ID and add 1)
+            let maxId = 0;
+            Object.values(accountProfiles).forEach(profiles => {
+                profiles.forEach(profile => {
+                    if (profile.id > maxId) maxId = profile.id;
+                });
+            });
+            const newProfileId = maxId + 1;
+
+            // Create new profile object
+            const newProfile = {
+                id: newProfileId,
+                name: profileName,
+                email: profileEmail,
+                password: profilePassword,
+                twoFA: profileTwoFA,
+                tag: profileTag,
+                status: 'active'
+            };
+
+            // Add to accountProfiles
+            accountProfiles[currentAccountId].push(newProfile);
+
+            // Save to localStorage
+            saveProfilesToStorage();
+
+            // Add to the profiles table
+            const profilesListBody = document.getElementById('profilesList');
+            const row = document.createElement('tr');
+            row.setAttribute('data-profile', newProfile.id);
+            row.innerHTML = `
+                <td class="strong">${newProfile.name}</td>
+                <td>${newProfile.email}</td>
+                <td class="center">
+                    <span class="tag ${newProfile.tag === 'Primary' ? 'tag-primary' : 'tag-backup'}">${newProfile.tag}</span>
+                </td>
+                <td class="center">
+                    <select class="profile-status-dropdown" data-profile-id="${newProfile.id}" data-account-id="${currentAccountId}" onchange="updateProfileStatus(${currentAccountId}, ${newProfile.id}, this.value)">
+                        <option value="active" selected>● Active</option>
+                        <option value="suspended">● Suspended</option>
+                    </select>
+                </td>
+                <td class="center">
+                    <input type="radio" name="activeProfile" onchange="switchToProfile(${newProfile.id})">
+                </td>
+            `;
+            profilesListBody.appendChild(row);
+
+            // Initialize dropdown style
+            const dropdown = row.querySelector('.profile-status-dropdown');
+            if (dropdown) {
+                updateProfileDropdownStyle(dropdown, newProfile.status);
+            }
+
+            // Create profile details section
+            const profileDetailsContainer = document.querySelector('.profile-details-box');
+            const newProfileDetails = document.createElement('div');
+            newProfileDetails.className = 'profile-details-content';
+            newProfileDetails.id = 'profileDetails' + newProfile.id;
+            newProfileDetails.style.display = 'none';
+            newProfileDetails.innerHTML = `
+                <div class="field-group-grid">
+                    <div class="field-group">
+                        <label>Profile Name</label>
+                        <input type="text" value="${newProfile.name}">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Email</label>
+                        <input type="email" value="${newProfile.email}">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Password</label>
+                        <input type="password" value="${newProfile.password}">
+                    </div>
+
+                    <div class="field-group">
+                        <label>2FA Code</label>
+                        <input type="text" value="${newProfile.twoFA}">
+                    </div>
+                </div>
+
+                <div class="profile-custom-fields">
+                    <h4>Custom Fields</h4>
+                    <div class="custom-fields-list" id="customFieldsList${newProfile.id}">
+                        <!-- Custom fields will be added here -->
+                    </div>
+                    <button class="btn btn-secondary" onclick="addProfileCustomField(${newProfile.id})">+ Add Custom Field</button>
+                </div>
+
+                <div class="profile-actions">
+                    <button class="btn btn-danger" onclick="deleteProfile(${newProfile.id})">Delete Profile</button>
+                </div>
+            `;
+            
+            // Insert before the last profile details or at the end
+            const existingDetails = profileDetailsContainer.querySelectorAll('.profile-details-content');
+            if (existingDetails.length > 0) {
+                existingDetails[existingDetails.length - 1].after(newProfileDetails);
+            } else {
+                profileDetailsContainer.appendChild(newProfileDetails);
+            }
+
+            // Close modal
+            closeAddProfileModal();
+
+            alert(`Profile "${newProfile.name}" added successfully!`);
         }
 
         function deleteProfile(profileId) {
+            if (!currentAccountId) {
+                alert('No account selected');
+                return;
+            }
+
+            const profiles = accountProfiles[currentAccountId];
+            if (!profiles) return;
+
             // Check if this is the only profile
-            const totalProfiles = document.querySelectorAll('#profilesList tr').length;
-            
-            if (totalProfiles === 1) {
+            if (profiles.length === 1) {
                 alert('Cannot delete the last profile. At least one profile must exist.');
                 return;
             }
             
             // Check if this is the active profile
-            const activeRadio = document.querySelector('input[name="activeProfile"]:checked');
-            if (activeRadio) {
-                const activeProfileRow = activeRadio.closest('tr');
-                const activeProfileId = parseInt(activeProfileRow.getAttribute('data-profile'));
-                
-                if (activeProfileId === profileId) {
-                    alert('Cannot delete the active profile. Please activate another profile first.');
-                    return;
-                }
+            const account = accountsData[currentAccountId];
+            if (account && account.activeProfileId === profileId) {
+                alert('Cannot delete the active profile. Please activate another profile first.');
+                return;
             }
             
             if (confirm('Are you sure you want to delete this profile?')) {
-                alert('Profile ' + profileId + ' deleted');
-                // TODO: Implement actual profile deletion logic
+                // Remove from accountProfiles array
+                const profileIndex = profiles.findIndex(p => p.id === profileId);
+                if (profileIndex !== -1) {
+                    profiles.splice(profileIndex, 1);
+                }
+
+                // Save to localStorage
+                saveProfilesToStorage();
+
+                // Remove from table
+                const row = document.querySelector(`#profilesList tr[data-profile="${profileId}"]`);
+                if (row) {
+                    row.remove();
+                }
+
+                // Remove profile details section
+                const profileDetails = document.getElementById('profileDetails' + profileId);
+                if (profileDetails) {
+                    profileDetails.remove();
+                }
+
+                alert('Profile deleted successfully!');
             }
         }
 
         function addProfileCustomField(profileId) {
-            alert('Add custom field to profile ' + profileId);
+            const fieldName = prompt('Enter field name:');
+            if (!fieldName || fieldName.trim() === '') {
+                return;
+            }
+
+            const fieldValue = prompt('Enter field value:');
+            if (fieldValue === null) {
+                return; // User cancelled
+            }
+
+            // Find the custom fields list for this profile
+            const customFieldsList = document.getElementById('customFieldsList' + profileId);
+            if (!customFieldsList) {
+                alert('Profile details not found');
+                return;
+            }
+
+            // Create new custom field element
+            const customFieldItem = document.createElement('div');
+            customFieldItem.className = 'custom-field-item';
+            customFieldItem.innerHTML = `
+                <input type="text" value="${fieldName.trim()}" placeholder="Field Name">
+                <input type="text" value="${fieldValue.trim()}" placeholder="Field Value">
+                <button class="btn btn-danger" onclick="this.parentElement.remove()">Remove</button>
+            `;
+
+            customFieldsList.appendChild(customFieldItem);
         }
 
         // Profile names mapping
@@ -2012,11 +2257,6 @@
                 const isActive = profile.id === account.activeProfileId;
                 if (isActive) hasCheckedProfile = true;
                 
-                // Determine status dropdown styling
-                const statusStyle = profile.status === 'active' 
-                    ? 'background: #d4f4dd; color: #0d7a2c;' 
-                    : 'background: #ffebee; color: #c62828;';
-                
                 const row = document.createElement('tr');
                 row.setAttribute('data-profile', profile.id);
                 row.innerHTML = `
@@ -2026,7 +2266,7 @@
                         <span class="tag ${profile.tag === 'Primary' ? 'tag-primary' : 'tag-backup'}">${profile.tag}</span>
                     </td>
                     <td class="center">
-                        <select class="profile-status-dropdown" data-profile-id="${profile.id}" data-account-id="${currentAccountId}" onchange="updateProfileStatus(${currentAccountId}, ${profile.id}, this.value)" style="${statusStyle} border: none; padding: 0.3rem 0.6rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500; cursor: pointer;">
+                        <select class="profile-status-dropdown" data-profile-id="${profile.id}" data-account-id="${currentAccountId}" onchange="updateProfileStatus(${currentAccountId}, ${profile.id}, this.value)">
                             <option value="active" ${profile.status === 'active' ? 'selected' : ''}>● Active</option>
                             <option value="suspended" ${profile.status === 'suspended' ? 'selected' : ''}>● Suspended</option>
                         </select>
@@ -2036,6 +2276,12 @@
                     </td>
                 `;
                 profilesListBody.appendChild(row);
+                
+                // Initialize dropdown style after adding to DOM
+                const dropdown = row.querySelector('.profile-status-dropdown');
+                if (dropdown) {
+                    updateProfileDropdownStyle(dropdown, profile.status);
+                }
                 
                 // Force check the radio button if it should be active
                 if (isActive) {
