@@ -30,19 +30,19 @@ const navigationItems = {
     ],
     employee: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
-        { name: 'Tasks', page: 'tasks', icon: '✓' },
-        { name: 'Schedule', page: 'schedule', icon: '📅' },
-        { name: 'Timesheet', page: 'timesheet', icon: '⏰' },
+        { name: 'Users', page: 'users', icon: '👥' },
+        { name: 'Accounts', page: 'accounts', icon: '💳' },
+        { name: 'Finance', page: 'finance', icon: '💰' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
+        { name: 'Transactions', page: 'transactions', icon: '💰' },
         { name: 'Settings', page: 'settings', icon: '⚙️' }
     ],
     client: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
         { name: 'Transactions', page: 'transactions', icon: '💰' },
-        { name: 'Orders', page: 'orders', icon: '📦' },
+        { name: 'Teams', page: 'users', icon: '👥' },
         { name: 'Finance', page: 'finance', icon: '💰' },
-        { name: 'Profile', page: 'profile', icon: '👤' },
         { name: 'Settings', page: 'settings', icon: '⚙️' }
     ]
 };
