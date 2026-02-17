@@ -629,7 +629,7 @@
               </div>
 
               <!-- ✅ NEW: Single filter by status (for Topups table only) -->
-              <div class="form-group filter-group small">
+              <!-- <div class="form-group filter-group small">
                 <label>Status</label>
                 <select id="topups_status" onchange="onTopupsStatusChanged()">
                   <option value="__all__">All</option>
@@ -638,7 +638,7 @@
                   <option value="declined">Declined</option>
                   <option value="past_due">Past Due</option>
                 </select>
-              </div>
+              </div> -->
             </div>
 
             <div class="quick-actions">
@@ -781,10 +781,7 @@
                   <input type="text" id="tx_note" placeholder="e.g. Funding for campaigns Feb" oninput="updateFundingPreview()">
                 </div>
 
-                <div class="fee-notice">
-                  <strong>Spend logic:</strong> Orice transfer Main → Platform Vault crește automat <strong>Spend</strong>.
-                </div>
-
+     
                 <div class="split">
                   <div class="muted" id="tx_preview"></div>
                   <div class="quick-actions">
