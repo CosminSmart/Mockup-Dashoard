@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Clients • Platforms & Fees</title>
+
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/users.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+
+  <style>
+    /* Actions bar */
+    .um-actionsbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap; margin:14px 0 12px;
+    }
+    .um-actionsbar__left{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .um-actionsbar__right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .um-bulk{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      padding:10px 12px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:12px;
+      background:#fff;
+    }
+    .um-bulk__count{ color:#64748b; font-size:13px; }
+
+    .um-small{ font-size:13px; color:#64748b; }
+    .um-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      font-size:13px;
+      color:#0f172a;
+    }
+
+    .um-table th:first-child, .um-table td:first-child{ width:46px; }
+    .um-table td:last-child, .um-table th:last-child{ width:170px; }
+
+    /* Right Drawer */
+    .pf-overlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+      z-index: 9998;
+    }
+    .pf-overlay[hidden]{ display:none; }
+
+    .pf-drawer{
+      position:fixed; top:0; right:0; height:100vh;
+      width: min(560px, 92vw);
+      background:#fff;
+      border-left:1px solid rgba(15,23,42,.10);
+      box-shadow: -20px 0 60px rgba(15,23,42,.20);
+      z-index: 9999;
+      transform: translateX(110%);
+      transition: transform .22s ease;
+      display:flex; flex-direction:column;
+    }
+    .pf-drawer.is-open{ transform: translateX(0); }
+
+    .pf-drawer__header{
+      padding:16px;
+      border-bottom:1px solid rgba(15,23,42,.10);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .pf-drawer__title{ font-size:16px; font-weight:700; color:#0f172a; }
+    .pf-drawer__sub{ margin-top:4px; color:#64748b; font-size:13px; }
+    .pf-drawer__body{
+      padding:14px 16px;
+      overflow:auto;
+      flex:1;
+    }
+    .pf-drawer__footer{
+      padding:12px 16px;
+      border-top:1px solid rgba(15,23,42,.10);
+      background: rgba(246,247,251,.65);
+      display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;
+    }
+
+    .pf-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+    .pf-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width:520px){ .pf-row{ grid-template-columns:1fr; } }
+
+    .pf-field{ display:flex; flex-direction:column; gap:6px; }
+    .pf-field label{ font-size:12px; color:#64748b; }
+    .pf-field input, .pf-field select{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      outline:none;
+    }
+
+    .pf-hint{
+      margin-top:10px;
+      padding:10px 12px;
+      border:1px dashed rgba(15,23,42,.18);
+      border-radius:12px;
+      background: rgba(246,247,251,.55);
+      color:#64748b;
+      font-size:13px;
+      line-height: 1.35;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>User Management</h1>
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">AU</div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div class="content-section">
+
+        <!-- SWITCHER -->
+        <div class="um-switcher um-switcher--top" role="tablist" aria-label="Clients/Employees Switcher">
+          <button class="um-tab is-active" type="button" data-top-tab="all-clients" role="tab" aria-selected="true">
+            All Clients
+          </button>
+          <button class="um-tab" type="button" data-top-tab="clients" role="tab" aria-selected="false">
+            Clients
+          </button>
+          <button class="um-tab" type="button" data-top-tab="employees" role="tab" aria-selected="false">
+            Employees
+          </button>
+        </div>
+
+        <h2>Platforms & Fees</h2>
+        <p class="um-small">
+          Global settings or client-specific overrides.
+          If <b>Assigned Client</b> is empty, the row applies to <b>All Clients</b>.
+        </p>
+
+        <!-- ACTIONS BAR -->
+        <div class="um-actionsbar">
+          <div class="um-actionsbar__left">
+            <div class="um-bulk">
+              <span class="um-pill">Selected: <b id="selCount">0</b></span>
+              <span class="um-bulk__count" id="selHint">Select rows to enable bulk actions</span>
+              <button class="um-btn um-btn--ghost" type="button" id="bulkModify" disabled>Modify</button>
+              <button class="um-btn um-btn--ghost" type="button" id="bulkDelete" disabled>Delete</button>
+            </div>
+          </div>
+
+          <div class="um-actionsbar__right">
+            <button class="um-btn" type="button" id="openAddPlatform">Add New Platform</button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <section class="um-view is-active">
+          <div class="um-table-wrap">
+            <table class="um-table" id="pfTable">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectAll" aria-label="Select all rows"></th>
+                  <th>Account Type</th>
+                  <th>Setup</th>
+                  <th>Init Interval</th>
+                  <th>Init Amount</th>
+                  <th>Rec Interval</th>
+                  <th>Rec Amount</th>
+                  <th>Fee</th>
+                  <th>Assigned Client</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="pfTbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== Platform Drawer (Add/Edit) ===== -->
+  <div class="pf-overlay" id="pfOverlay" hidden></div>
+  <aside class="pf-drawer" id="pfDrawer" aria-hidden="true">
+    <div class="pf-drawer__header">
+      <div>
+        <div class="pf-drawer__title" id="pfTitle">Add New Platform</div>
+        <div class="pf-drawer__sub" id="pfSub">Create global row or assign to a specific client.</div>
+      </div>
+      <button class="um-btn um-btn--icon" type="button" id="pfCloseBtn" aria-label="Close">✕</button>
+    </div>
+
+    <div class="pf-drawer__body">
+      <div class="pf-grid">
+        <div class="pf-field">
+          <label>Platform Name (Account Type)</label>
+          <input id="pfName" type="text" placeholder="e.g. Google Ads">
+        </div>
+
+        <div class="pf-field">
+          <label>Assigned Client (optional)</label>
+          <select id="pfAssigned">
+            <option value="">All Clients (default)</option>
+            <option value="C-2001">Sarah Mitchell • TechVision</option>
+            <option value="C-2002">Michael Chen • BrightLabs</option>
+            <option value="C-2003">Emily Rodriguez • NorthPeak</option>
+          </select>
+        </div>
+
+        <div class="pf-row">
+          <div class="pf-field">
+            <label>Setup ($)</label>
+            <input id="pfPageSetup" type="number" min="0" step="0.01" placeholder="250">
+          </div>
+          <div class="pf-field">
+            <label>Fee (%)</label>
+            <input id="pfFee" type="number" min="0" step="0.01" placeholder="5">
+          </div>
+        </div>
+
+        <div class="pf-row">
+          <div class="pf-field">
+            <label>Init Interval (days)</label>
+            <input id="pfInitInterval" type="number" min="0" step="1" placeholder="21">
+          </div>
+          <div class="pf-field">
+            <label>Init Amount ($)</label>
+            <input id="pfInitAmount" type="number" min="0" step="0.01" placeholder="30">
+          </div>
+        </div>
+
+        <div class="pf-row">
+          <div class="pf-field">
+            <label>Rec Interval (days)</label>
+            <input id="pfRecInterval" type="number" min="0" step="1" placeholder="30">
+          </div>
+          <div class="pf-field">
+            <label>Rec Amount ($)</label>
+            <input id="pfRecAmount" type="number" min="0" step="0.01" placeholder="50">
+          </div>
+        </div>
+
+        <div class="pf-hint">
+          <b>Rule:</b> if assigned to a client → override. If not assigned → applies to <b>All Clients</b>.
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-drawer__footer">
+      <button class="um-btn um-btn--ghost" type="button" id="pfCancelBtn">Cancel</button>
+      <button class="um-btn" type="button" id="pfSaveBtn">Save</button>
+    </div>
+  </aside>
+
+  <!-- ===== Bulk Drawer ===== -->
+  <div class="pf-overlay" id="bulkOverlay" hidden></div>
+  <aside class="pf-drawer" id="bulkDrawer" aria-hidden="true">
+    <div class="pf-drawer__header">
+      <div>
+        <div class="pf-drawer__title">Bulk Modify</div>
+        <div class="pf-drawer__sub">Only fields you fill will be applied to all selected rows.</div>
+      </div>
+      <button class="um-btn um-btn--icon" type="button" id="bulkCloseBtn" aria-label="Close">✕</button>
+    </div>
+
+    <div class="pf-drawer__body">
+      <div class="pf-grid">
+        <div class="pf-field">
+          <label>Platform Name (optional)</label>
+          <input id="bName" type="text" placeholder="leave empty to keep">
+        </div>
+
+        <div class="pf-field">
+          <label>Assigned Client (optional)</label>
+          <select id="bAssigned">
+            <option value="">(No change)</option>
+            <option value="__ALL__">Set to All Clients</option>
+            <option value="C-2001">Sarah Mitchell • TechVision</option>
+            <option value="C-2002">Michael Chen • BrightLabs</option>
+            <option value="C-2003">Emily Rodriguez • NorthPeak</option>
+          </select>
+        </div>
+
+        <div class="pf-row">
+          <div class="pf-field">
+            <label>Setup ($) (optional)</label>
+            <input id="bPageSetup" type="number" min="0" step="0.01" placeholder="leave empty to keep">
+          </div>
+          <div class="pf-field">
+            <label>Fee (%) (optional)</label>
+            <input id="bFee" type="number" min="0" step="0.01" placeholder="leave empty to keep">
+          </div>
+        </div>
+
+        <div class="pf-row">
+          <div class="pf-field">
+            <label>Init Interval (days) (optional)</label>
+            <input id="bInitInterval" type="number" min="0" step="1" placeholder="leave empty to keep">
+          </div>
+          <div class="pf-field">
+            <label>Init Amount ($) (optional)</label>
+            <input id="bInitAmount" type="number" min="0" step="0.01" placeholder="leave empty to keep">
+          </div>
+        </div>
+
+        <div class="pf-row">
+          <div class="pf-field">
+            <label>Rec Interval (days) (optional)</label>
+            <input id="bRecInterval" type="number" min="0" step="1" placeholder="leave empty to keep">
+          </div>
+          <div class="pf-field">
+            <label>Rec Amount ($) (optional)</label>
+            <input id="bRecAmount" type="number" min="0" step="0.01" placeholder="leave empty to keep">
+          </div>
+        </div>
+
+        <div class="pf-hint">
+          Completezi doar ce vrei să modifici în masă. Restul rămâne neschimbat.
+        </div>
+      </div>
+    </div>
+
+    <div class="pf-drawer__footer">
+      <button class="um-btn um-btn--ghost" type="button" id="bulkCancelBtn">Cancel</button>
+      <button class="um-btn" type="button" id="bulkApplyBtn">Apply Changes</button>
+    </div>
+  </aside>
+
+  <script>
+    // ========= Switcher redirect =========
+    document.querySelectorAll(".um-switcher--top .um-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const t = btn.dataset.topTab;
+        if (t === "clients") window.location.href = "clients.html";
+        if (t === "employees") window.location.href = "users.html";
+        if (t === "all-clients") window.location.href = "all-clients.html";
+      });
+    });
+  </script>
+
+  <script>
+    // ========= Helpers =========
+    function escapeHtml(str){
+      return (str ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function numberOrNull(v){
+      const s = (v ?? "").toString().trim();
+      if (!s) return null;
+      const n = Number(s);
+      return Number.isFinite(n) ? n : null;
+    }
+    function money(n){
+      const num = Number(n);
+      if (!Number.isFinite(num)) return "—";
+      return `$${num.toFixed(2).replace(/\.00$/, "")}`;
+    }
+    function pct(n){
+      const num = Number(n);
+      if (!Number.isFinite(num)) return "—";
+      return `${num}%`;
+    }
+
+    // ========= Mock Data =========
+    const clientMap = {
+      "": "All Clients",
+      "C-2001": "Sarah Mitchell • TechVision",
+      "C-2002": "Michael Chen • BrightLabs",
+      "C-2003": "Emily Rodriguez • NorthPeak",
+    };
+
+    let rows = [
+      { id: "p1", name:"Google Ads",   pageSetup:250, initInterval:21, initAmount:30, recInterval:30, recAmount:50, fee:5, assigned:"" },
+      { id: "p2", name:"Facebook Ads", pageSetup:250, initInterval:21, initAmount:30, recInterval:30, recAmount:50, fee:6, assigned:"" },
+      { id: "p3", name:"TikTok Ads",   pageSetup:250, initInterval:21, initAmount:30, recInterval:30, recAmount:50, fee:3, assigned:"C-2002" },
+    ];
+
+    // ========= Table refs =========
+    const tbody = document.getElementById("pfTbody");
+    const selectAll = document.getElementById("selectAll");
+
+    const selCount = document.getElementById("selCount");
+    const selHint  = document.getElementById("selHint");
+    const bulkModify = document.getElementById("bulkModify");
+    const bulkDelete = document.getElementById("bulkDelete");
+
+    function getSelectedRowIds(){
+      return Array.from(document.querySelectorAll(".rowCheck"))
+        .filter(ch => ch.checked)
+        .map(ch => ch.closest("tr")?.dataset.rowId)
+        .filter(Boolean);
+    }
+
+    function syncBulkState(){
+      const selected = getSelectedRowIds();
+      const enabled = selected.length > 0;
+
+      selCount.textContent = String(selected.length);
+      selHint.textContent = enabled ? "Bulk actions enabled" : "Select rows to enable bulk actions";
+      bulkModify.disabled = !enabled;
+      bulkDelete.disabled = !enabled;
+
+      const checks = Array.from(document.querySelectorAll(".rowCheck"));
+      const allChecked = checks.length && checks.every(c => c.checked);
+      const noneChecked = checks.every(c => !c.checked);
+
+      selectAll.indeterminate = !allChecked && !noneChecked;
+      selectAll.checked = allChecked;
+    }
+
+    function render(){
+      tbody.innerHTML = rows.map(r => `
+        <tr data-row-id="${escapeHtml(r.id)}">
+          <td><input type="checkbox" class="rowCheck" aria-label="Select row"></td>
+          <td><b>${escapeHtml(r.name)}</b></td>
+          <td>${money(r.pageSetup)}</td>
+          <td>${escapeHtml(String(r.initInterval ?? ""))}</td>
+          <td><b>${money(r.initAmount)}</b></td>
+          <td>${escapeHtml(String(r.recInterval ?? ""))}</td>
+          <td><b>${money(r.recAmount)}</b></td>
+          <td>${pct(r.fee)}</td>
+          <td>${escapeHtml(clientMap[r.assigned] ?? "All Clients")}</td>
+          <td style="text-align:right;">
+            <button class="um-btn um-btn--ghost" type="button" data-edit-one>Edit</button>
+            <button class="um-btn um-btn--ghost" type="button" data-del-one>Delete</button>
+          </td>
+        </tr>
+      `).join("");
+
+      wireRowHandlers();
+      syncBulkState();
+    }
+
+    function wireRowHandlers(){
+      document.querySelectorAll(".rowCheck").forEach(ch => {
+        ch.addEventListener("change", syncBulkState);
+      });
+
+      document.querySelectorAll("[data-del-one]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tr = btn.closest("tr");
+          const id = tr?.dataset.rowId;
+          if (!id) return;
+
+          if (!confirm("Delete this platform row?")) return;
+          rows = rows.filter(x => x.id !== id);
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-edit-one]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tr = btn.closest("tr");
+          const id = tr?.dataset.rowId;
+          const row = rows.find(x => x.id === id);
+          if (!row) return;
+
+          openPlatformDrawer("edit", row);
+        });
+      });
+    }
+
+    selectAll.addEventListener("change", () => {
+      const checked = selectAll.checked;
+      document.querySelectorAll(".rowCheck").forEach(ch => ch.checked = checked);
+      syncBulkState();
+    });
+
+    // ========= Drawer helpers =========
+    function openDrawer(overlayEl, drawerEl){
+      overlayEl.hidden = false;
+      drawerEl.classList.add("is-open");
+      drawerEl.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+    function closeDrawer(overlayEl, drawerEl){
+      overlayEl.hidden = true;
+      drawerEl.classList.remove("is-open");
+      drawerEl.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    // ========= Platform Drawer (Add/Edit) =========
+    const pfOverlay = document.getElementById("pfOverlay");
+    const pfDrawer  = document.getElementById("pfDrawer");
+
+    const pfTitle = document.getElementById("pfTitle");
+    const pfSub   = document.getElementById("pfSub");
+
+    const pfCloseBtn  = document.getElementById("pfCloseBtn");
+    const pfCancelBtn = document.getElementById("pfCancelBtn");
+    const pfSaveBtn   = document.getElementById("pfSaveBtn");
+    const openAddPlatform = document.getElementById("openAddPlatform");
+
+    const pfName = document.getElementById("pfName");
+    const pfAssigned = document.getElementById("pfAssigned");
+    const pfPageSetup = document.getElementById("pfPageSetup");
+    const pfFee = document.getElementById("pfFee");
+    const pfInitInterval = document.getElementById("pfInitInterval");
+    const pfInitAmount = document.getElementById("pfInitAmount");
+    const pfRecInterval = document.getElementById("pfRecInterval");
+    const pfRecAmount = document.getElementById("pfRecAmount");
+
+    let pfMode = "add";
+    let pfEditingId = null;
+
+    function openPlatformDrawer(mode, row){
+      pfMode = mode;
+      pfEditingId = row?.id ?? null;
+
+      if (mode === "edit") {
+        pfTitle.textContent = "Edit Platform";
+        pfSub.textContent = "Update values for this row.";
+      } else {
+        pfTitle.textContent = "Add New Platform";
+        pfSub.textContent = "Create global row or assign to a specific client.";
+      }
+
+      pfName.value = row?.name ?? "";
+      pfAssigned.value = row?.assigned ?? "";
+      pfPageSetup.value = (row?.pageSetup ?? "");
+      pfFee.value = (row?.fee ?? "");
+      pfInitInterval.value = (row?.initInterval ?? "");
+      pfInitAmount.value = (row?.initAmount ?? "");
+      pfRecInterval.value = (row?.recInterval ?? "");
+      pfRecAmount.value = (row?.recAmount ?? "");
+
+      openDrawer(pfOverlay, pfDrawer);
+    }
+
+    function readPlatformForm(){
+      return {
+        name: pfName.value.trim(),
+        assigned: pfAssigned.value || "",
+        pageSetup: numberOrNull(pfPageSetup.value),
+        fee: numberOrNull(pfFee.value),
+        initInterval: numberOrNull(pfInitInterval.value),
+        initAmount: numberOrNull(pfInitAmount.value),
+        recInterval: numberOrNull(pfRecInterval.value),
+        recAmount: numberOrNull(pfRecAmount.value),
+      };
+    }
+
+    openAddPlatform.addEventListener("click", () => openPlatformDrawer("add", null));
+
+    pfOverlay.addEventListener("click", () => closeDrawer(pfOverlay, pfDrawer));
+    pfCloseBtn.addEventListener("click", () => closeDrawer(pfOverlay, pfDrawer));
+    pfCancelBtn.addEventListener("click", () => closeDrawer(pfOverlay, pfDrawer));
+
+    pfSaveBtn.addEventListener("click", () => {
+      const data = readPlatformForm();
+      if (!data.name) { alert("Platform Name is required."); return; }
+
+      if (pfMode === "add") {
+        rows.unshift({ id: "p_" + Math.random().toString(16).slice(2), ...data });
+      } else {
+        rows = rows.map(r => r.id === pfEditingId ? { ...r, ...data } : r);
+      }
+
+      closeDrawer(pfOverlay, pfDrawer);
+      render();
+    });
+
+    // ========= Bulk Drawer =========
+    const bulkOverlayEl = document.getElementById("bulkOverlay");
+    const bulkDrawerEl  = document.getElementById("bulkDrawer");
+
+    const bulkCloseBtn  = document.getElementById("bulkCloseBtn");
+    const bulkCancelBtn = document.getElementById("bulkCancelBtn");
+    const bulkApplyBtn  = document.getElementById("bulkApplyBtn");
+
+    const bName = document.getElementById("bName");
+    const bAssigned = document.getElementById("bAssigned");
+    const bPageSetup = document.getElementById("bPageSetup");
+    const bFee = document.getElementById("bFee");
+    const bInitInterval = document.getElementById("bInitInterval");
+    const bInitAmount = document.getElementById("bInitAmount");
+    const bRecInterval = document.getElementById("bRecInterval");
+    const bRecAmount = document.getElementById("bRecAmount");
+
+    function resetBulk(){
+      [bName,bPageSetup,bFee,bInitInterval,bInitAmount,bRecInterval,bRecAmount].forEach(i => i.value = "");
+      bAssigned.value = "";
+    }
+
+    bulkModify.addEventListener("click", () => {
+      const sel = getSelectedRowIds();
+      if (!sel.length) return;
+      resetBulk();
+      openDrawer(bulkOverlayEl, bulkDrawerEl);
+    });
+
+    bulkDelete.addEventListener("click", () => {
+      const sel = getSelectedRowIds();
+      if (!sel.length) return;
+
+      if (!confirm(`Delete ${sel.length} selected row(s)?`)) return;
+      rows = rows.filter(r => !sel.includes(r.id));
+      render();
+    });
+
+    bulkOverlayEl.addEventListener("click", () => closeDrawer(bulkOverlayEl, bulkDrawerEl));
+    bulkCloseBtn.addEventListener("click", () => closeDrawer(bulkOverlayEl, bulkDrawerEl));
+    bulkCancelBtn.addEventListener("click", () => closeDrawer(bulkOverlayEl, bulkDrawerEl));
+
+    bulkApplyBtn.addEventListener("click", () => {
+      const sel = getSelectedRowIds();
+      if (!sel.length) return;
+
+      const patch = {
+        name: bName.value.trim(),
+        assigned: bAssigned.value,
+        pageSetup: numberOrNull(bPageSetup.value),
+        fee: numberOrNull(bFee.value),
+        initInterval: numberOrNull(bInitInterval.value),
+        initAmount: numberOrNull(bInitAmount.value),
+        recInterval: numberOrNull(bRecInterval.value),
+        recAmount: numberOrNull(bRecAmount.value),
+      };
+
+      rows = rows.map(r => {
+        if (!sel.includes(r.id)) return r;
+        const next = { ...r };
+
+        if (patch.name) next.name = patch.name;
+
+        if (patch.assigned) next.assigned = (patch.assigned === "__ALL__") ? "" : patch.assigned;
+
+        if (patch.pageSetup !== null) next.pageSetup = patch.pageSetup;
+        if (patch.fee !== null) next.fee = patch.fee;
+
+        if (patch.initInterval !== null) next.initInterval = patch.initInterval;
+        if (patch.initAmount !== null) next.initAmount = patch.initAmount;
+
+        if (patch.recInterval !== null) next.recInterval = patch.recInterval;
+        if (patch.recAmount !== null) next.recAmount = patch.recAmount;
+
+        return next;
+      });
+
+      closeDrawer(bulkOverlayEl, bulkDrawerEl);
+      render();
+    });
+
+    // ESC closes any open drawer
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      closeDrawer(pfOverlay, pfDrawer);
+      closeDrawer(bulkOverlayEl, bulkDrawerEl);
+    });
+
+    // init
+    render();
+  </script>
+
+  <script src="../js/sidebar.js"></script>
+</body>
+</html>

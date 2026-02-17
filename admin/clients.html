@@ -28,6 +28,9 @@
 
         <!-- SWITCHER -->
         <div class="um-switcher um-switcher--top" role="tablist" aria-label="Clients/Employees Switcher">
+            <button class="um-tab" type="button" data-top-tab="all-clients" role="tab">
+              All Clients
+            </button>
           <button class="um-tab is-active" type="button" data-tab="clients" role="tab" aria-selected="true">
             Clients
           </button>
@@ -146,6 +149,8 @@
     document.querySelectorAll(".um-switcher--top .um-tab").forEach(btn => {
       btn.addEventListener("click", () => {
         if (btn.dataset.tab === "employees") window.location.href = "users.html";
+        if (btn.dataset.topTab === "all-clients") window.location.href = "all-clients.html";
+
       });
     });
 
