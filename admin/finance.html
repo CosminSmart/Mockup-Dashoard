@@ -933,6 +933,9 @@
     <div class="layout">
 <header class="header">
   <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+      <button class="page-tab" data-page="topups" type="button">
+    Topups
+  </button>
   <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">
     Finance
   </button>
@@ -2937,6 +2940,71 @@ function renderLedgerPage(){
       next.click();
     }
   });
+</script>
+
+<script>
+/* ==============================
+   GLOBAL TAB SWITCHER
+============================== */
+
+const TAB_ROUTES = {
+  finance: "finance.html",
+  topups: "topups.html",
+  transactions: "transactions.html",
+  ledger: "ledger.html"
+};
+
+function getCurrentPageKey(){
+
+  const file = window.location.pathname
+    .split("/")
+    .pop()
+    .toLowerCase();
+
+  if(file.includes("finance")) return "finance";
+  if(file.includes("topup")) return "topups";
+  if(file.includes("transaction")) return "transactions";
+  if(file.includes("ledger")) return "ledger";
+
+  return "finance";
+}
+
+function setActiveTab(){
+
+  const active = getCurrentPageKey();
+
+  document.querySelectorAll(".page-tab").forEach(tab => {
+
+    const isActive = tab.dataset.page === active;
+
+    tab.classList.toggle("active", isActive);
+
+  });
+
+}
+
+function initTabSwitcher(){
+
+  setActiveTab();
+
+  document.querySelectorAll(".page-tab").forEach(tab => {
+
+    tab.addEventListener("click", () => {
+
+      const page = tab.dataset.page;
+
+      if(page === getCurrentPageKey())
+        return;
+
+      window.location.href = TAB_ROUTES[page];
+
+    });
+
+  });
+
+}
+
+initTabSwitcher();
 </script>
 
 

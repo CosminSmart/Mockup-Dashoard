@@ -1,0 +1,1757 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Finance • Topups</title>
+
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/accounts.css" />
+
+  <style>
+    /* =========================================================
+       LIQUID GLASS (WHITE) – MATCH FINANCE STYLE (TOPUPS PAGE)
+    ========================================================= */
+    :root{
+      --bg0:#f7f8fb;
+      --bg1:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+
+      --line: rgba(15,23,42,.10);
+      --line2: rgba(15,23,42,.07);
+
+      --glass: rgba(255,255,255,.72);
+      --glass2: rgba(255,255,255,.58);
+
+      --shadow: 0 18px 50px rgba(15,23,42,.12);
+      --shadow2: 0 12px 28px rgba(15,23,42,.10);
+
+      --r-xl: 18px;
+      --r-lg: 14px;
+      --r-md: 12px;
+
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --info:#2563eb;
+
+      --focus: rgba(37,99,235,.25);
+    }
+    [data-theme="dark"]{
+      --bg0:#0b1220;
+      --bg1:#0f172a;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.08);
+
+      --glass: rgba(17,24,39,.58);
+      --glass2: rgba(17,24,39,.45);
+
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --shadow2: 0 12px 28px rgba(0,0,0,.35);
+
+      --focus: rgba(96,165,250,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+
+    body{
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(37,99,235,.14), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(99,102,241,.14), transparent 55%),
+        radial-gradient(900px 600px at 35% 95%, rgba(16,185,129,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0) 0%, color-mix(in srgb, var(--bg0) 55%, var(--bg1)) 100%);
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    }
+
+    .muted{ color: var(--muted); }
+    .mini-hint{ font-size:.9rem; color: var(--muted); line-height:1.35; margin-top:.2rem; }
+
+    input, select, textarea{
+      width:100%;
+      padding:.7rem .8rem;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      outline:none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: color-mix(in srgb, var(--info) 45%, var(--line2));
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    /* Header (tabs + theme + user) */
+    .header{
+      background: rgba(255,255,255,.55);
+      border-bottom: 1px solid var(--line2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 12px 18px;
+    }
+    [data-theme="dark"] .header{ background: rgba(15,23,42,.55); }
+
+    .header-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 280px;
+    }
+
+    .page-tabs{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius:999px;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      width: fit-content;
+    }
+    .page-tab{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 950;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+      user-select:none;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    .page-tab:hover{ transform: translateY(-1px); }
+    .page-tab.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .header-right{ display:flex; align-items:center; gap:14px; }
+
+    .theme-toggle{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius: 999px;
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .theme-btn{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease;
+    }
+    .theme-btn.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .main{ padding: 18px; }
+    @media (max-width: 720px){ .main{ padding: 14px; } }
+
+    @media (max-width: 980px){
+      .header{ flex-wrap:wrap; align-items:flex-start; }
+      .header-left{ width:100%; }
+      .page-tabs{ width:100%; justify-content:space-between; }
+      .page-tab{ flex:1; text-align:center; }
+    }
+
+    /* Panels */
+    .glass-panel{
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--r-xl);
+      padding: 16px;
+    }
+
+    /* Filters bar */
+    .filters{
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      padding: 12px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    /* ONE LINE FILTER BAR */
+.filters__row{
+  display:grid;
+  grid-template-columns:
+    220px   /* Client */
+    160px   /* Date from */
+    160px   /* Date to */
+    180px   /* Status */
+    1fr     /* Search */
+    auto    /* Buttons */
+    360px;  /* Hint */
+  gap: 12px;
+  align-items:end;
+}
+
+.filters__left{ display: contents; }
+.filters__right{ display:flex; gap:10px; align-items:center; justify-content:flex-end; }
+
+/* remove old min-width so grid can work */
+.fg, .fg.small{ min-width: 0; }
+
+    .label{
+      display:block;
+      margin: 0 0 .45rem 0;
+      font-weight: 900;
+      font-size: .88rem;
+      color: color-mix(in srgb, var(--text) 85%, var(--muted));
+      letter-spacing:.2px;
+    }
+
+    /* Buttons (reuse your transfer-btn names) */
+    .transfer-btn{
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      padding: .7rem .95rem;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.55rem;
+      white-space:nowrap;
+    }
+    .transfer-btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .transfer-btn:active{ transform: translateY(0px); }
+    .transfer-btn.secondary{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.32) 55%, var(--line2));
+    }
+    .transfer-btn.gray{
+      background: color-mix(in srgb, rgba(148,163,184,.18) 70%, var(--glass));
+    }
+    .btn-disabled{ opacity:.55; pointer-events:none; }
+
+    /* Stats */
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+    }
+    @media (max-width: 1200px){ .stats{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 620px){ .stats{ grid-template-columns: 1fr; } }
+
+    .stat-box{
+      padding: 14px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      min-height: 108px;
+    }
+    .stat-box h4{
+      margin:0;
+      font-size: 11px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 950;
+    }
+    .stat-value{
+      font-size: 28px;
+      font-weight: 950;
+      margin-top: 6px;
+      letter-spacing: .2px;
+    }
+    .stat-desc{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    /* Topups table */
+    .table-wrap{
+      border:1px solid var(--line2);
+      border-radius: var(--r-xl);
+      overflow:auto;
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow2);
+    }
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .92rem;
+      min-width: 980px;
+    }
+    th, td{
+      padding: .85rem .75rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      text-align:left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    th{
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 88%, var(--bg1));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    tr.row{
+      cursor:pointer;
+      transition: background .12s ease;
+    }
+    tr.row:hover{
+      background: color-mix(in srgb, rgba(37,99,235,.10) 60%, transparent);
+    }
+    .td-muted{ color: var(--muted); }
+    .td-right{ text-align:right; }
+
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.28rem .65rem;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size:.82rem;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 72%, transparent);
+      color: color-mix(in srgb, var(--text) 92%, var(--muted));
+    }
+    .status-badge.approved{
+      background: color-mix(in srgb, rgba(22,163,74,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(22,163,74,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--good) 85%, var(--text));
+    }
+    .status-badge.pending{
+      background: color-mix(in srgb, rgba(245,158,11,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--warn) 82%, var(--text));
+    }
+    .status-badge.declined{
+      background: color-mix(in srgb, rgba(239,68,68,.16) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(239,68,68,.32) 55%, var(--line2));
+      color: color-mix(in srgb, var(--bad) 82%, var(--text));
+    }
+    .status-badge.past_due{
+      background: color-mix(in srgb, rgba(148,163,184,.16) 70%, var(--glass));
+      border-color: color-mix(in srgb, rgba(148,163,184,.28) 60%, var(--line2));
+      color: color-mix(in srgb, var(--muted) 88%, var(--text));
+    }
+
+    /* Right modal (details) */
+    .tx-modal{
+      position:fixed; inset:0; z-index:3000;
+      display:none;
+    }
+    .tx-modal.active{ display:block; }
+    .tx-modal__overlay{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.38);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity:0;
+      transition:opacity .22s ease;
+    }
+    .tx-modal.active .tx-modal__overlay{ opacity:1; }
+
+    .tx-modal__panel{
+      position:absolute; top:0; right:0;
+      height:100%;
+      width:min(520px, 95vw);
+      background: var(--glass);
+      border-left: 1px solid var(--line2);
+      box-shadow:-22px 0 60px rgba(15,23,42,.22);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      transform:translateX(100%);
+      transition:transform .22s ease;
+      display:flex;
+      flex-direction:column;
+    }
+    .tx-modal.active .tx-modal__panel{ transform:translateX(0); }
+
+    .tx-modal__header{
+      padding: 14px 14px 10px 14px;
+      border-bottom:1px solid var(--line2);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    .tx-modal__header h3{ margin:0; font-size: 1.2rem; font-weight: 950; }
+    .tx-close{
+      width: 38px; height: 38px;
+      border:1px solid var(--line2);
+      border-radius: 14px;
+      background: color-mix(in srgb, var(--glass) 75%, transparent);
+      cursor:pointer;
+      font-size: 18px;
+      color: var(--text);
+    }
+    .tx-modal__body{ padding: 14px; overflow:auto; flex:1; }
+    .modal-footer{
+      padding: 14px;
+      border-top:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 85%, transparent);
+      display:flex;
+      gap:10px;
+      justify-content:flex-start;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      flex-wrap:wrap;
+    }
+
+    .kv-card{
+      border:1px solid var(--line2);
+      border-radius: var(--r-xl);
+      background: color-mix(in srgb, var(--glass) 72%, transparent);
+      overflow:hidden;
+      box-shadow: var(--shadow2);
+    }
+    .kv-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom:1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      align-items:center;
+    }
+    .kv-row:last-child{ border-bottom:none; }
+    .kv-key{
+      font-weight: 950;
+      font-size: .9rem;
+      color: color-mix(in srgb, var(--text) 92%, var(--muted));
+    }
+    .kv-val{
+      text-align:right;
+      color: var(--muted);
+      font-weight: 900;
+      font-size: .9rem;
+    }
+
+    .segmented-status{
+      display:flex; gap:8px; flex-wrap: wrap;
+      margin: 8px 0 12px 0;
+    }
+    .seg-pill{
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      padding:.55rem .85rem;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight: 950;
+      font-size: .9rem;
+      color: var(--muted);
+      user-select:none;
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .seg-pill:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .seg-pill.active{
+      color: var(--text);
+      background: color-mix(in srgb, rgba(37,99,235,.20) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.35) 55%, var(--line2));
+    }
+    .seg-pill.active.pending{
+      background: color-mix(in srgb, rgba(245,158,11,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
+    }
+    .seg-pill.active.approved{
+      background: color-mix(in srgb, rgba(22,163,74,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(22,163,74,.35) 55%, var(--line2));
+    }
+    .seg-pill.active.declined{
+      background: color-mix(in srgb, rgba(239,68,68,.16) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(239,68,68,.32) 55%, var(--line2));
+    }
+    .seg-pill.active.past_due{
+      background: color-mix(in srgb, rgba(148,163,184,.16) 70%, var(--glass));
+      border-color: color-mix(in srgb, rgba(148,163,184,.28) 60%, var(--line2));
+    }
+
+    /* Drawer (Add Topup) */
+    .drawer{ position: fixed; inset: 0; z-index: 2600; display: none; }
+    .drawer.active{ display:block; }
+    .drawer__overlay{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.38);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .drawer__panel{
+      position:absolute; top:0; right:0;
+      height: 100%;
+      width: min(520px, 95vw);
+      background: var(--glass);
+      border-left: 1px solid var(--line2);
+      box-shadow: -22px 0 60px rgba(15,23,42,.22);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display:flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform .22s ease;
+    }
+    .drawer.active .drawer__panel{ transform: translateX(0); }
+    .drawer__header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px 10px 14px;
+      border-bottom:1px solid var(--line2);
+      gap:12px;
+    }
+    .drawer__title{ font-size: 1.25rem; font-weight: 950; margin: 0; color: var(--text); }
+    .drawer__close{
+      width: 38px; height: 38px;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 75%, transparent);
+      border-radius: 14px; cursor:pointer;
+      font-size: 18px; line-height: 36px;
+      color: var(--text);
+    }
+    .drawer__body{ padding: 14px; overflow:auto; }
+    .drawer__footer{
+      padding: 14px; border-top:1px solid var(--line2);
+      display:flex; gap:10px; justify-content:flex-start; flex-wrap:wrap;
+      background: color-mix(in srgb, var(--glass) 85%, transparent);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .segmented{ display:flex; gap:8px; flex-wrap: wrap; margin: 10px 0 12px 0; }
+    .seg-btn{
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      padding:.58rem .88rem;
+      border-radius: 999px;
+      cursor:pointer;
+      font-weight: 950;
+      font-size: .9rem;
+      color: color-mix(in srgb, var(--text) 88%, var(--muted));
+      transition: transform .12s ease, box-shadow .12s ease;
+    }
+    .seg-btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .seg-btn.active{
+      background: color-mix(in srgb, rgba(37,99,235,.22) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.35) 55%, var(--line2));
+      color: var(--text);
+    }
+
+    .notice-box{
+      margin-top: 10px;
+      background: color-mix(in srgb, rgba(245,158,11,.18) 65%, var(--glass));
+      border: 1px solid color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--text) 85%, var(--muted));
+      padding: 12px;
+      border-radius: 14px;
+      font-size: .88rem;
+      line-height: 1.35;
+    }
+
+    /* Small top area */
+    .top-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .top-head__title{
+      font-weight:950;
+      font-size:1.15rem;
+      letter-spacing:.2px;
+    }
+
+
+
+    .filters__row{
+  display:grid;
+  grid-template-columns:
+    230px   /* Search (first, bigger) */
+    220px   /* Client */
+    160px   /* Date from */
+    160px   /* Date to */
+    180px   /* Status */
+    auto    /* Buttons */
+    360px;  /* Hint */
+  gap: 12px;
+  align-items:end;
+}
+
+.filters__left{ display: contents; }
+.filters__right{ display:flex; gap:10px; align-items:center; justify-content:flex-end; }
+
+/* ensure search can grow nicely */
+.fg-search input{ width:100%; }
+
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <header class="header">
+      <div class="header-left">
+        <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+            <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="true">Topups</button>
+          <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
+          <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
+          <button type="button" class="page-tab" data-page="ledger" role="tab" aria-selected="false">Ledger</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="theme-toggle" id="themeToggle">
+          <button class="theme-btn active" data-theme="light" type="button">Light</button>
+          <button class="theme-btn" data-theme="dark" type="button">Dark</button>
+        </div>
+
+        <div class="user-info">
+          <span>Admin User</span>
+          <div class="user-avatar">AU</div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+
+        <div class="glass-panel top-head">
+          <div>
+            <div class="top-head__title">Topups</div>
+            <div class="mini-hint">Filtrele sunt sticky și se aplică pe tabel + statistici.</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="transfer-btn secondary" type="button" onclick="openTopupDrawer()">+ Add Topup</button>
+            <button class="transfer-btn gray" type="button" onclick="seedDemo()">Reset Demo Data</button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+          <div class="filters__row">
+            <div class="filters__left">
+
+            <div class="fg">
+                <label class="label">Search</label>
+                <input id="topups_search" type="search" placeholder="Search (proof, desc, client id, topup id)..." oninput="renderAll()" />
+              </div>
+              <div class="fg">
+                <label class="label">Client</label>
+                <select id="global_client" onchange="onFiltersChanged()">
+                  <option value="__all__">All clients</option>
+                </select>
+              </div>
+
+              <div class="fg small">
+                <label class="label">Date from</label>
+                <input type="date" id="global_from" onchange="onFiltersChanged()" />
+              </div>
+
+              <div class="fg small">
+                <label class="label">Date to</label>
+                <input type="date" id="global_to" onchange="onFiltersChanged()" />
+              </div>
+
+              <div class="fg small">
+                <label class="label">Status</label>
+                <select id="topups_status" onchange="onFiltersChanged()">
+                  <option value="__all__">All</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="declined">Declined</option>
+                  <option value="past_due">Past Due</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="filters__right">
+              <button class="transfer-btn gray" type="button" onclick="clearFilters()">Clear</button>
+              <button class="transfer-btn" type="button" onclick="exportTopupsCSV()">Export CSV</button>
+            </div>
+          </div>
+
+          <div class="mini-hint" id="filtersHint"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+          <div class="stat-box">
+            <h4>TOTAL TOPUPS</h4>
+            <div class="stat-value" id="kpi_total">$0.00</div>
+            <div class="stat-desc"><span>Filtered</span><span class="muted" id="kpi_total_cnt">0</span></div>
+          </div>
+
+          <div class="stat-box">
+            <h4>PENDING</h4>
+            <div class="stat-value" id="kpi_pending">$0.00</div>
+            <div class="stat-desc"><span>Needs action</span><span class="muted" id="kpi_pending_cnt">0</span></div>
+          </div>
+
+          <div class="stat-box">
+            <h4>APPROVED</h4>
+            <div class="stat-value" id="kpi_approved">$0.00</div>
+            <div class="stat-desc"><span>Processed</span><span class="muted" id="kpi_approved_cnt">0</span></div>
+          </div>
+
+          <div class="stat-box">
+            <h4>DECLINED</h4>
+            <div class="stat-value" id="kpi_declined">$0.00</div>
+            <div class="stat-desc"><span>Rejected</span><span class="muted" id="kpi_declined_cnt">0</span></div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="glass-panel" style="padding:16px;">
+          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
+            <div>
+              <div style="font-size:1.18rem; font-weight:950;">Total Topups</div>
+              <div class="mini-hint">Click pe un rând → modal dreapta (status + descriere + dată).</div>
+            </div>
+            <div class="mini-hint" id="tableHint"></div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Client</th>
+                  <th>Topup ID</th>
+                  <th>Type</th>
+                  <th>Account</th>
+                  <th>Proof</th>
+                  <th class="td-right">Amount</th>
+                  <th>Status</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody id="topupsBody"></tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Details Modal (right) -->
+  <div class="tx-modal" id="topupDetailsModal" aria-hidden="true">
+    <div class="tx-modal__overlay" onclick="closeTopupDetails()"></div>
+
+    <div class="tx-modal__panel" role="dialog" aria-modal="true" aria-label="Topup Details">
+      <div class="tx-modal__header">
+        <div>
+          <h3 style="margin:0;">Top-Up Details</h3>
+          <div class="mini-hint" id="d_sub">—</div>
+        </div>
+        <button class="tx-close" onclick="closeTopupDetails()" aria-label="Close">×</button>
+      </div>
+
+      <div class="tx-modal__body">
+        <div class="kv-card" id="topupKvCard"></div>
+
+        <div style="margin-top:.35rem;">
+          <div class="kv-key" style="margin-bottom:.35rem;">Status</div>
+          <div class="segmented-status" id="topupStatusSeg">
+            <div class="seg-pill" data-status="pending" onclick="setTopupModalStatus('pending')">Pending</div>
+            <div class="seg-pill" data-status="approved" onclick="setTopupModalStatus('approved')">Approved</div>
+            <div class="seg-pill" data-status="declined" onclick="setTopupModalStatus('declined')">Declined</div>
+            <div class="seg-pill" data-status="past_due" onclick="setTopupModalStatus('past_due')">Past Due</div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <label class="label">Description</label>
+          <textarea id="topupModalDesc" rows="3" placeholder="--"></textarea>
+        </div>
+
+        <div style="margin-top:10px;">
+          <label class="label">Date</label>
+          <input type="datetime-local" id="topupModalDate">
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="transfer-btn secondary" onclick="saveTopupDetails()">Save Changes</button>
+        <button class="transfer-btn gray" onclick="closeTopupDetails()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Topup Drawer (right) -->
+  <div class="drawer" id="topupDrawer" aria-hidden="true">
+    <div class="drawer__overlay" onclick="closeTopupDrawer()"></div>
+
+    <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Add Topup">
+      <div class="drawer__header">
+        <h3 class="drawer__title">Add Top-Up</h3>
+        <button class="drawer__close" onclick="closeTopupDrawer()" aria-label="Close">×</button>
+      </div>
+
+      <div class="drawer__body">
+        <div style="margin-bottom:10px;">
+          <label class="label">Client</label>
+          <select id="topup_client"></select>
+          <div class="mini-hint">Dacă ai selectat un client în filtre, îl preselectăm aici.</div>
+        </div>
+
+        <div class="segmented" id="topupTabs">
+          <button class="seg-btn active" data-tab="wire" type="button" onclick="switchTopupTab('wire')">Wire</button>
+          <button class="seg-btn" data-tab="crypto" type="button" onclick="switchTopupTab('crypto')">Crypto</button>
+          <button class="seg-btn" data-tab="refund" type="button" onclick="switchTopupTab('refund')">Refund</button>
+        </div>
+
+        <!-- WIRE -->
+        <div id="tab_wire">
+          <label class="label">Company</label>
+          <input id="wire_company" type="text" placeholder="e.g. Wise / Revolut / Bank" />
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:10px;">
+            <div>
+              <label class="label">Account</label>
+              <select id="wire_account">
+                <option value="">Select</option>
+                <option value="acc_1">acc_1</option>
+                <option value="acc_2">acc_2</option>
+                <option value="acc_3">acc_3</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Invoice (PDF)</label>
+              <input id="wire_invoice" type="file" accept="application/pdf" />
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-top:10px;">
+            <div>
+              <label class="label">Gross</label>
+              <input id="wire_gross" type="number" min="0" step="0.01" placeholder="e.g. 1000" oninput="recalcWireNet()" />
+            </div>
+            <div>
+              <label class="label">Fee</label>
+              <input id="wire_fee" type="number" min="0" step="0.01" placeholder="e.g. 10" oninput="recalcWireNet()" />
+            </div>
+            <div>
+              <label class="label">Net</label>
+              <input id="wire_net" type="number" min="0" step="0.01" placeholder="auto" readonly />
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label class="label">Description</label>
+            <input id="wire_desc" type="text" placeholder="Optional note" />
+          </div>
+
+          <div class="notice-box">
+            Minimum deposit: $500<br />
+            Make sure the full amount arrives without fee deductions.
+          </div>
+        </div>
+
+        <!-- CRYPTO -->
+        <div id="tab_crypto" style="display:none;">
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div>
+              <label class="label">Method</label>
+              <select id="crypto_method">
+                <option value="">Select</option>
+                <option value="USDT">USDT</option>
+                <option value="USDC">USDC</option>
+                <option value="BTC">BTC</option>
+                <option value="ETH">ETH</option>
+              </select>
+            </div>
+            <div>
+              <label class="label">Wallet / Network</label>
+              <select id="crypto_network">
+                <option value="">Select</option>
+                <option value="ERC20">ERC20</option>
+                <option value="TRC20">TRC20</option>
+                <option value="BEP20">BEP20</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:10px;">
+            <div>
+              <label class="label">Net Amount</label>
+              <input id="crypto_net" type="number" min="0" step="0.01" placeholder="e.g. 500" />
+            </div>
+            <div>
+              <label class="label">Gross Amount (optional)</label>
+              <input id="crypto_gross" type="number" min="0" step="0.01" placeholder="optional" />
+            </div>
+          </div>
+
+          <div style="margin-top:10px;">
+            <label class="label">Hash</label>
+            <input id="crypto_hash" type="text" placeholder="Transaction hash" />
+          </div>
+
+          <div style="margin-top:10px;">
+            <label class="label">Description</label>
+            <input id="crypto_desc" type="text" placeholder="Optional note" />
+          </div>
+
+          <div class="mini-hint" id="crypto_fee_hint">Fee: 0.00</div>
+        </div>
+
+        <!-- REFUND -->
+        <div id="tab_refund" style="display:none;">
+          <label class="label">Account</label>
+          <select id="refund_account">
+            <option value="">Select</option>
+            <option value="acc_1">acc_1</option>
+            <option value="acc_2">acc_2</option>
+            <option value="acc_3">acc_3</option>
+          </select>
+
+          <div style="margin-top:10px;">
+            <label class="label">Net Amount (refund)</label>
+            <input id="refund_net" type="number" min="0" step="0.01" placeholder="e.g. 120" />
+          </div>
+
+          <div style="margin-top:10px;">
+            <label class="label">Description</label>
+            <input id="refund_desc" type="text" placeholder="Refund reason / note" />
+          </div>
+
+          <div class="notice-box" style="background:#e7f5ff;border-color:#74c0fc;color:#0b4a6f;">
+            Refund scade din Main Wallet (în finance). Aici logăm tranzacția ca “refund”.
+          </div>
+        </div>
+
+      </div>
+
+      <div class="drawer__footer">
+        <button class="transfer-btn secondary" id="topupSubmitBtn" type="button" onclick="submitTopup()">Submit</button>
+        <button class="transfer-btn gray" type="button" onclick="closeTopupDrawer()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    /* ==============================
+       ROUTES (tabs navigate to pages)
+    ============================== */
+    const PAGE_ROUTES = {
+      finance: "finance.html",
+      topups: "topups.html",
+      transactions: "transactions.html",
+      ledger: "ledger.html",
+    };
+    function getCurrentFileName(){
+      const p = window.location.pathname || "";
+      const parts = p.split("/");
+      return (parts[parts.length - 1] || "").toLowerCase();
+    }
+    function detectActivePage(){
+      const file = getCurrentFileName();
+      for(const [key, filename] of Object.entries(PAGE_ROUTES)){
+        if(String(filename).toLowerCase() === file) return key;
+      }
+      // fallback
+      return "topups";
+    }
+    function setActiveTabUI(activeKey){
+      document.querySelectorAll("#pageTabs .page-tab").forEach(btn=>{
+        const isOn = btn.dataset.page === activeKey;
+        btn.classList.toggle("active", isOn);
+        btn.setAttribute("aria-selected", isOn ? "true" : "false");
+      });
+    }
+    function navigateTo(key){
+      const target = PAGE_ROUTES[key];
+      if(!target) return;
+      window.location.href = target;
+    }
+    setActiveTabUI(detectActivePage());
+    document.getElementById("pageTabs")?.addEventListener("click",(e)=>{
+      const btn = e.target.closest(".page-tab");
+      if(!btn) return;
+      const key = btn.dataset.page;
+      setActiveTabUI(key);
+      if(key === detectActivePage()) return;
+      navigateTo(key);
+    });
+
+    /* ==============================
+       THEME TOGGLE (same behavior)
+    ============================== */
+    (function initTheme(){
+      const root = document.documentElement;
+      const saved = localStorage.getItem("ui_theme") || "light";
+      if(saved === "dark") root.setAttribute("data-theme","dark");
+
+      const buttons = document.querySelectorAll("#themeToggle .theme-btn");
+      function setTheme(t){
+        if(t === "dark") root.setAttribute("data-theme","dark");
+        else root.removeAttribute("data-theme");
+        localStorage.setItem("ui_theme", t);
+        buttons.forEach(b=> b.classList.toggle("active", b.dataset.theme === t));
+      }
+      buttons.forEach(b=> b.addEventListener("click", ()=> setTheme(b.dataset.theme)));
+      setTheme(saved);
+    })();
+
+    /* ==============================
+       DATA (shared with finance pages)
+    ============================== */
+    const LS_KEY = "admin_finance_demo_v7";
+
+    const state = {
+      ledger: [],
+      globalClient: "__all__",
+      globalFrom: "",
+      globalTo: "",
+      topupsStatus: "__all__",
+      activeTopupModalId: null
+    };
+
+    function money(n){
+      const v = Number(n || 0);
+      return v.toLocaleString(undefined, { style:"currency", currency:"USD" });
+    }
+    function nowISO(){ return new Date().toLocaleString(); }
+    function uid(){ return Math.random().toString(16).slice(2) + "_" + Date.now(); }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function getClientLabelById(id){
+      const map = { "100":"100 - Alex", "101":"101 - Maria", "102":"102 - John" };
+      return map[String(id)] || String(id);
+    }
+    function getClientNameById(id){
+      const label = getClientLabelById(id);
+      const parts = String(label).split(" - ");
+      return parts[1] ? parts.slice(1).join(" - ").trim() : label;
+    }
+
+    function load(){
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw){ seedDemo(); return; }
+      try{
+        const parsed = JSON.parse(raw);
+        state.ledger = Array.isArray(parsed.ledger) ? parsed.ledger : [];
+        state.globalClient = parsed.globalClient || "__all__";
+        state.globalFrom = parsed.globalFrom || "";
+        state.globalTo = parsed.globalTo || "";
+        state.topupsStatus = parsed.topupsStatus || "__all__";
+      }catch(e){
+        seedDemo();
+      }
+    }
+
+    function save(){
+      // preserve extra keys used by other pages if they exist
+      const raw = localStorage.getItem(LS_KEY);
+      let prev = {};
+      try{ prev = raw ? JSON.parse(raw) : {}; }catch(e){ prev = {}; }
+
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        ...prev,
+        ledger: state.ledger,
+        globalClient: state.globalClient,
+        globalFrom: state.globalFrom,
+        globalTo: state.globalTo,
+        topupsStatus: state.topupsStatus
+      }));
+    }
+
+function fmtLocal(d){
+  return d.toLocaleString();
+}
+function daysAgo(n){
+  const d = new Date();
+  d.setDate(d.getDate() - n);
+  return fmtLocal(d);
+}
+
+function seedDemo(){
+  state.ledger = [
+    {
+      id: uid(),
+      topupId: "100147",
+      date: daysAgo(7),
+      type:"topup",
+      clientId:"100",
+      from:"external",
+      to:"topups",
+      category:"wire",
+      status:"approved",
+      account:"USD",
+      proof:"INV_100147.pdf",
+      description:"--",
+      grossAmount: 1000,
+      feeAmount: 0,
+      netAmount: 1000,
+      note:"Topup #1 (Wire)",
+      amount: 1000
+    },
+    {
+      id: uid(),
+      topupId: "100148",
+      date: daysAgo(4),
+      type:"topup",
+      clientId:"100",
+      from:"external",
+      to:"topups",
+      category:"wire",
+      status:"pending",
+      account:"USD",
+      proof:"INV_100148.pdf",
+      description:"Bank wire topup",
+      grossAmount: 2000,
+      feeAmount: 0,
+      netAmount: 2000,
+      note:"Topup #2 (Wire)",
+      amount: 2000
+    },
+    {
+      id: uid(),
+      topupId: "100149",
+      date: daysAgo(2),
+      type:"topup",
+      clientId:"101",
+      from:"external",
+      to:"topups",
+      category:"crypto",
+      status:"approved",
+      account:"USDT",
+      proof:"0x7a1b...9c2f",
+      description:"USDT TRC20",
+      grossAmount: 2000,
+      feeAmount: 0,
+      netAmount: 2000,
+      note:"Topup #3 (Crypto)",
+      amount: 2000
+    },
+
+    // optional finance entries
+    { id: uid(), date: daysAgo(1), type:"deposit", clientId:"100", from:"external", to:"mainWallet", category:"deposit", note:"Initial funding into Main Wallet", amount: 5000 },
+    { id: uid(), date: daysAgo(1), type:"fee", clientId:"100", from:"", to:"feesCollected", category:"wire_fee", note:"Wire processing fee", amount: 200 },
+  ];
+
+  // IMPORTANT: reset filters so you SEE demo instantly
+  state.globalClient = "__all__";
+  state.globalFrom = "";
+  state.globalTo = "";
+  state.topupsStatus = "__all__";
+
+  save();
+  renderAll();
+}
+
+    /* ==============================
+       FILTERS
+    ============================== */
+    function txDateToISO(txDateString){
+      const d = new Date(txDateString);
+      if(isNaN(d.getTime())) return null;
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function passesGlobalFilters(tx){
+      if(state.globalClient !== "__all__"){
+        if(String(tx.clientId || "") !== String(state.globalClient)) return false;
+      }
+      const iso = txDateToISO(tx.date);
+      if(iso){
+        if(state.globalFrom && iso < state.globalFrom) return false;
+        if(state.globalTo && iso > state.globalTo) return false;
+      }
+      return true;
+    }
+
+    function populateClientSelect(){
+      const clientIds = new Set(["100","101","102"]);
+      for(const tx of state.ledger){
+        if(tx.clientId) clientIds.add(String(tx.clientId));
+      }
+
+      const sel = document.getElementById("global_client");
+      const current = state.globalClient || "__all__";
+      sel.innerHTML =
+        `<option value="__all__">All clients</option>` +
+        [...clientIds].sort().map(cid =>
+          `<option value="${cid}">${escapeHtml(getClientLabelById(cid))}</option>`
+        ).join("");
+      sel.value = current;
+
+      document.getElementById("global_from").value = state.globalFrom || "";
+      document.getElementById("global_to").value = state.globalTo || "";
+      document.getElementById("topups_status").value = state.topupsStatus || "__all__";
+
+      // drawer client select
+      const drawerSel = document.getElementById("topup_client");
+      drawerSel.innerHTML = [...clientIds].sort().map(cid =>
+        `<option value="${cid}">${escapeHtml(getClientLabelById(cid))}</option>`
+      ).join("");
+    }
+
+    function onFiltersChanged(){
+      state.globalClient = document.getElementById("global_client").value;
+      state.globalFrom = document.getElementById("global_from").value;
+      state.globalTo = document.getElementById("global_to").value;
+      state.topupsStatus = document.getElementById("topups_status").value;
+      save();
+      renderAll();
+    }
+
+    function clearFilters(){
+      state.globalClient = "__all__";
+      state.globalFrom = "";
+      state.globalTo = "";
+      state.topupsStatus = "__all__";
+
+      document.getElementById("global_client").value = "__all__";
+      document.getElementById("global_from").value = "";
+      document.getElementById("global_to").value = "";
+      document.getElementById("topups_status").value = "__all__";
+      document.getElementById("topups_search").value = "";
+      save();
+      renderAll();
+    }
+
+    /* ==============================
+       TOPUPS LIST + KPIs
+    ============================== */
+    function getFilteredTopups(){
+      const q = (document.getElementById("topups_search").value || "").trim().toLowerCase();
+      const status = state.topupsStatus;
+
+      return state.ledger
+        .filter(tx => tx.type === "topup")
+        .filter(passesGlobalFilters)
+        .filter(tx => status === "__all__" ? true : String(tx.status || "").toLowerCase() === String(status).toLowerCase())
+        .filter(tx => {
+          if(!q) return true;
+          const blob = [
+            tx.clientId, tx.topupId, tx.id, tx.proof, tx.description, tx.note, tx.category, tx.account
+          ].join(" ").toLowerCase();
+          return blob.includes(q);
+        })
+        .slice()
+        .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    }
+
+    function calcTopupKPIs(topups){
+      const out = {
+        total: 0, totalCnt: 0,
+        pending: 0, pendingCnt: 0,
+        approved: 0, approvedCnt: 0,
+        declined: 0, declinedCnt: 0
+      };
+      for(const t of topups){
+        const amt = Number(t.amount || 0);
+        out.total += amt; out.totalCnt++;
+
+        const st = String(t.status || "pending").toLowerCase();
+        if(st === "pending"){ out.pending += amt; out.pendingCnt++; }
+        if(st === "approved"){ out.approved += amt; out.approvedCnt++; }
+        if(st === "declined"){ out.declined += amt; out.declinedCnt++; }
+      }
+      return out;
+    }
+
+    function renderKPIs(topups){
+      const k = calcTopupKPIs(topups);
+      document.getElementById("kpi_total").textContent = money(k.total);
+      document.getElementById("kpi_total_cnt").textContent = `${k.totalCnt} items`;
+
+      document.getElementById("kpi_pending").textContent = money(k.pending);
+      document.getElementById("kpi_pending_cnt").textContent = `${k.pendingCnt} items`;
+
+      document.getElementById("kpi_approved").textContent = money(k.approved);
+      document.getElementById("kpi_approved_cnt").textContent = `${k.approvedCnt} items`;
+
+      document.getElementById("kpi_declined").textContent = money(k.declined);
+      document.getElementById("kpi_declined_cnt").textContent = `${k.declinedCnt} items`;
+    }
+
+    function renderTable(topups){
+      const body = document.getElementById("topupsBody");
+      const hint = document.getElementById("tableHint");
+
+      if(!topups.length){
+        body.innerHTML = `<tr><td colspan="9" class="td-muted">No topups found for current filters.</td></tr>`;
+        hint.textContent = "";
+        return;
+      }
+
+      body.innerHTML = topups.map(t => {
+        const st = String(t.status || "pending").toLowerCase();
+        const stLabel = st === "past_due" ? "Past Due" : (st.charAt(0).toUpperCase() + st.slice(1));
+        const proof = t.proof ? escapeHtml(t.proof) : "-";
+        const desc = (t.description && String(t.description).trim()) ? escapeHtml(t.description) : (t.note ? escapeHtml(t.note) : "--");
+
+        return `
+          <tr class="row" onclick="openTopupDetails('${escapeHtml(t.id)}')">
+            <td>${escapeHtml(t.date)}</td>
+            <td>${escapeHtml(getClientLabelById(t.clientId || ""))}</td>
+            <td>${escapeHtml(t.topupId || t.id)}</td>
+            <td>${escapeHtml((t.category || "—").toUpperCase())}</td>
+            <td>${escapeHtml(t.account || "USD")}</td>
+            <td class="td-muted">${proof}</td>
+            <td class="td-right"><strong>${money(t.amount)}</strong></td>
+            <td><span class="status-badge ${st}">${stLabel}</span></td>
+            <td class="td-muted" style="max-width: 360px; overflow:hidden; text-overflow:ellipsis;">${desc}</td>
+          </tr>
+        `;
+      }).join("");
+
+      hint.textContent = `${topups.length} items`;
+    }
+
+    function renderHints(topups){
+      const clientText = state.globalClient === "__all__" ? "All clients" : getClientLabelById(state.globalClient);
+      const rangeText = (state.globalFrom || state.globalTo)
+        ? `${state.globalFrom || "…"} → ${state.globalTo || "…"}`
+        : "All dates";
+      const stText = state.topupsStatus === "__all__" ? "All statuses" : state.topupsStatus.toUpperCase();
+    }
+
+    function renderAll(){
+      populateClientSelect();
+      const topups = getFilteredTopups();
+      renderKPIs(topups);
+      renderTable(topups);
+      renderHints(topups);
+    }
+
+    /* ==============================
+       DETAILS MODAL
+    ============================== */
+    function findTopupById(id){
+      return state.ledger.find(tx => String(tx.id) === String(id));
+    }
+
+    function formatDatetimeLocalFromTx(tx){
+      const d = new Date(tx.date);
+      if(isNaN(d.getTime())) return "";
+      const pad = (n)=>String(n).padStart(2,"0");
+      const yyyy = d.getFullYear();
+      const mm = pad(d.getMonth()+1);
+      const dd = pad(d.getDate());
+      const hh = pad(d.getHours());
+      const mi = pad(d.getMinutes());
+      return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+    }
+
+    function openTopupDetails(id){
+      const tx = findTopupById(id);
+      if(!tx || tx.type !== "topup") return;
+
+      state.activeTopupModalId = id;
+
+      document.getElementById("d_sub").textContent =
+        `${getClientLabelById(tx.clientId || "—")} • #${tx.topupId || tx.id}`;
+
+      const kv = document.getElementById("topupKvCard");
+      kv.innerHTML = `
+        <div class="kv-row"><div class="kv-key">User ID</div><div class="kv-val">${escapeHtml(tx.clientId || "")}</div></div>
+        <div class="kv-row"><div class="kv-key">Top-Up ID</div><div class="kv-val">${escapeHtml(tx.topupId || tx.id)}</div></div>
+        <div class="kv-row"><div class="kv-key">Full Name</div><div class="kv-val">${escapeHtml(getClientNameById(tx.clientId || ""))}</div></div>
+        <div class="kv-row"><div class="kv-key">Gross Amount</div><div class="kv-val">${escapeHtml(String(Number(tx.grossAmount ?? tx.amount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
+        <div class="kv-row"><div class="kv-key">Fee Amount</div><div class="kv-val">${escapeHtml(String(Number(tx.feeAmount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
+        <div class="kv-row"><div class="kv-key">Net Amount</div><div class="kv-val">${escapeHtml(String(Number(tx.netAmount ?? tx.amount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
+        <div class="kv-row"><div class="kv-key">Account</div><div class="kv-val">${escapeHtml(tx.account || "USD")}</div></div>
+        <div class="kv-row"><div class="kv-key">Type</div><div class="kv-val">${escapeHtml((tx.category || "—").toUpperCase())}</div></div>
+        <div class="kv-row"><div class="kv-key">Proof</div><div class="kv-val">${escapeHtml(tx.proof || "-")}</div></div>
+      `;
+
+      document.getElementById("topupModalDesc").value =
+        (tx.description && String(tx.description).trim()) ? tx.description : (tx.note || "--");
+      document.getElementById("topupModalDate").value = formatDatetimeLocalFromTx(tx);
+
+      setTopupModalStatus(String(tx.status || "pending").toLowerCase(), true);
+
+      document.getElementById("topupDetailsModal").classList.add("active");
+      document.getElementById("topupDetailsModal").setAttribute("aria-hidden", "false");
+    }
+
+    function closeTopupDetails(){
+      state.activeTopupModalId = null;
+      document.getElementById("topupDetailsModal").classList.remove("active");
+      document.getElementById("topupDetailsModal").setAttribute("aria-hidden", "true");
+    }
+
+    function setTopupModalStatus(status, silent){
+      const st = String(status || "pending").toLowerCase();
+      const seg = document.getElementById("topupStatusSeg");
+      seg.querySelectorAll(".seg-pill").forEach(p => p.classList.remove("active","pending","approved","declined","past_due"));
+      const el = seg.querySelector(`.seg-pill[data-status="${st}"]`);
+      if(el) el.classList.add("active", st);
+
+      if(!silent){
+        const tx = findTopupById(state.activeTopupModalId);
+        if(tx) tx.status = st;
+      }
+    }
+
+    function saveTopupDetails(){
+      const tx = findTopupById(state.activeTopupModalId);
+      if(!tx) return;
+
+      tx.description = (document.getElementById("topupModalDesc").value || "").trim() || "--";
+
+      const dt = document.getElementById("topupModalDate").value;
+      if(dt){
+        const d = new Date(dt);
+        if(!isNaN(d.getTime())) tx.date = d.toLocaleString();
+      }
+
+      save();
+      renderAll();
+      closeTopupDetails();
+    }
+
+    /* ==============================
+       ADD TOPUP DRAWER
+    ============================== */
+    let activeTopupTab = "wire";
+
+    function openTopupDrawer(){
+      document.getElementById("topupDrawer").classList.add("active");
+      document.getElementById("topupDrawer").setAttribute("aria-hidden", "false");
+
+      // preselect client if filter has one
+      if(state.globalClient !== "__all__"){
+        document.getElementById("topup_client").value = String(state.globalClient);
+      }
+      recalcWireNet();
+      validateTopupForm();
+    }
+
+    function closeTopupDrawer(){
+      document.getElementById("topupDrawer").classList.remove("active");
+      document.getElementById("topupDrawer").setAttribute("aria-hidden", "true");
+    }
+
+    function switchTopupTab(tab){
+      activeTopupTab = tab;
+
+      document.querySelectorAll("#topupTabs .seg-btn").forEach(b => b.classList.remove("active"));
+      document.querySelector(`#topupTabs .seg-btn[data-tab="${tab}"]`)?.classList.add("active");
+
+      document.getElementById("tab_wire").style.display = tab === "wire" ? "block" : "none";
+      document.getElementById("tab_crypto").style.display = tab === "crypto" ? "block" : "none";
+      document.getElementById("tab_refund").style.display = tab === "refund" ? "block" : "none";
+
+      validateTopupForm();
+    }
+
+    function recalcWireNet(){
+      const gross = Number(document.getElementById("wire_gross").value || 0);
+      const fee = Number(document.getElementById("wire_fee").value || 0);
+      const net = Math.max(0, +(gross - fee).toFixed(2));
+      document.getElementById("wire_net").value = net ? net : "";
+      validateTopupForm();
+    }
+
+    function validateTopupForm(){
+      const btn = document.getElementById("topupSubmitBtn");
+      let ok = true;
+
+      if(activeTopupTab === "wire"){
+        const account = document.getElementById("wire_account").value;
+        const net = Number(document.getElementById("wire_net").value || 0);
+        ok = !!account && net > 0;
+      }
+      if(activeTopupTab === "crypto"){
+        const method = document.getElementById("crypto_method").value;
+        const net = Number(document.getElementById("crypto_net").value || 0);
+        const network = document.getElementById("crypto_network").value;
+        const hash = (document.getElementById("crypto_hash").value || "").trim();
+        ok = !!method && net > 0 && !!network && !!hash;
+      }
+      if(activeTopupTab === "refund"){
+        const net = Number(document.getElementById("refund_net").value || 0);
+        ok = net > 0;
+      }
+
+      btn.classList.toggle("btn-disabled", !ok);
+    }
+
+    ["crypto_method","crypto_net","crypto_network","crypto_hash","refund_net","wire_account","wire_gross","wire_fee"].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el){
+        el.addEventListener("input", validateTopupForm);
+        el.addEventListener("change", validateTopupForm);
+      }
+    });
+
+    function nextTopupId(){
+      const base = 100100;
+      const count = state.ledger.filter(x => x.type === "topup").length;
+      return String(base + count + 1);
+    }
+
+    function addTopupDepositAndFee({ clientId, topupAmount, netAmount, feeAmount, category, note, proof, account, description, grossAmount }){
+      const topupId = nextTopupId();
+
+      addLedger({
+        id: uid(),
+        topupId,
+        date: nowISO(),
+        type: "topup",
+        clientId,
+        from: "external",
+        to: "topups",
+        category,
+        status: "pending",
+        account: account || "USD",
+        proof: proof || "-",
+        description: description || "--",
+        grossAmount: Number(grossAmount || topupAmount || 0),
+        feeAmount: Number(feeAmount || 0),
+        netAmount: Number(netAmount || topupAmount || 0),
+        note: note || "Topup",
+        amount: Number(topupAmount)
+      });
+
+      // finance uses these
+      addLedger({
+        id: uid(),
+        date: nowISO(),
+        type: "deposit",
+        clientId,
+        from: "external",
+        to: "mainWallet",
+        category: "deposit",
+        note: `Topup credited to Main Wallet (${category})`,
+        amount: Number(netAmount)
+      });
+
+      const f = Number(feeAmount || 0);
+      if(f > 0){
+        addLedger({
+          id: uid(),
+          date: nowISO(),
+          type: "fee",
+          clientId,
+          from: "",
+          to: "feesCollected",
+          category: category + "_fee",
+          note: `Fee collected (${category})`,
+          amount: f
+        });
+      }
+    }
+
+    function submitTopup(){
+      validateTopupForm();
+      const btn = document.getElementById("topupSubmitBtn");
+      if(btn.classList.contains("btn-disabled")) return;
+
+      const clientId = document.getElementById("topup_client").value;
+
+      if(activeTopupTab === "wire"){
+        const company = (document.getElementById("wire_company").value || "").trim();
+        const accountSel = document.getElementById("wire_account").value;
+        const gross = Number(document.getElementById("wire_gross").value || 0);
+        const fee = Number(document.getElementById("wire_fee").value || 0);
+        const net = Number(document.getElementById("wire_net").value || 0);
+        const desc = (document.getElementById("wire_desc").value || "").trim();
+        const invoice = document.getElementById("wire_invoice").files?.[0]?.name || "";
+
+        addTopupDepositAndFee({
+          clientId,
+          topupAmount: net,
+          netAmount: net,
+          feeAmount: fee,
+          grossAmount: gross || net,
+          category: "wire",
+          account: "USD",
+          proof: invoice || "-",
+          description: desc || "--",
+          note: `Client ${getClientLabelById(clientId)} | Wire${company ? " | " + company : ""} | Account: ${accountSel} | Gross: ${gross || net}`
+        });
+
+        document.getElementById("wire_company").value = "";
+        document.getElementById("wire_account").value = "";
+        document.getElementById("wire_gross").value = "";
+        document.getElementById("wire_fee").value = "";
+        document.getElementById("wire_net").value = "";
+        document.getElementById("wire_desc").value = "";
+        document.getElementById("wire_invoice").value = "";
+      }
+
+      if(activeTopupTab === "crypto"){
+        const method = document.getElementById("crypto_method").value;
+        const net = Number(document.getElementById("crypto_net").value || 0);
+        const gross = Number(document.getElementById("crypto_gross").value || 0);
+        const desc = (document.getElementById("crypto_desc").value || "").trim();
+        const network = document.getElementById("crypto_network").value;
+        const hash = (document.getElementById("crypto_hash").value || "").trim();
+
+        const fee = gross > 0 ? Math.max(0, +(gross - net).toFixed(2)) : 0;
+        document.getElementById("crypto_fee_hint").textContent = "Fee: " + fee.toFixed(2);
+
+        addTopupDepositAndFee({
+          clientId,
+          topupAmount: net,
+          netAmount: net,
+          feeAmount: fee,
+          grossAmount: gross || net,
+          category: "crypto",
+          account: method || "USDT",
+          proof: hash,
+          description: desc || `${method || "Crypto"} ${network}`,
+          note: `Client ${getClientLabelById(clientId)} | Crypto ${method} | ${network} | Hash: ${hash}`
+        });
+
+        document.getElementById("crypto_method").value = "";
+        document.getElementById("crypto_net").value = "";
+        document.getElementById("crypto_gross").value = "";
+        document.getElementById("crypto_desc").value = "";
+        document.getElementById("crypto_network").value = "";
+        document.getElementById("crypto_hash").value = "";
+        document.getElementById("crypto_fee_hint").textContent = "Fee: 0.00";
+      }
+
+      if(activeTopupTab === "refund"){
+        const net = Number(document.getElementById("refund_net").value || 0);
+        const account = document.getElementById("refund_account").value;
+        const desc = (document.getElementById("refund_desc").value || "").trim();
+
+        addLedger({
+          id: uid(),
+          date: nowISO(),
+          type: "refund",
+          clientId,
+          from: "mainWallet",
+          to: "external",
+          category: "refund",
+          note: `Client ${getClientLabelById(clientId)} | Refund${account ? " | Account: " + account : ""}${desc ? " | " + desc : ""}`,
+          amount: net
+        });
+
+        document.getElementById("refund_account").value = "";
+        document.getElementById("refund_net").value = "";
+        document.getElementById("refund_desc").value = "";
+      }
+
+      closeTopupDrawer();
+      renderAll();
+    }
+
+    /* ==============================
+       EXPORT CSV
+    ============================== */
+    function exportTopupsCSV(){
+      const topups = getFilteredTopups();
+      const rows = [
+        ["date","client","topupId","type","account","proof","amount","status","description"].join(",")
+      ];
+
+      for(const t of topups){
+        const cols = [
+          t.date,
+          getClientLabelById(t.clientId || ""),
+          t.topupId || t.id,
+          (t.category || ""),
+          (t.account || ""),
+          (t.proof || ""),
+          String(Number(t.amount || 0)),
+          (t.status || ""),
+          (t.description || t.note || "")
+        ].map(v => {
+          const s = String(v ?? "");
+          const esc = s.replaceAll('"','""');
+          return `"${esc}"`;
+        });
+        rows.push(cols.join(","));
+      }
+
+      const csv = rows.join("\n");
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "topups.csv";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    /* ==============================
+       BOOT
+    ============================== */
+    load();
+    renderAll();
+
+    // keyboard: ESC closes modal/drawer
+    document.addEventListener("keydown", (e)=>{
+      if(e.key === "Escape"){
+        if(document.getElementById("topupDetailsModal").classList.contains("active")) closeTopupDetails();
+        if(document.getElementById("topupDrawer").classList.contains("active")) closeTopupDrawer();
+      }
+    });
+  </script>
+</body>
+</html>
