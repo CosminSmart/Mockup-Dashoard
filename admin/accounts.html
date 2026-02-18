@@ -295,6 +295,25 @@
             padding: 16px !important;
         }
         
+        /* 2FA Code styling */
+        .code-2fa:hover {
+            background: #e3f2fd !important;
+            transform: scale(1.05);
+        }
+        
+        .code-2fa:active {
+            transform: scale(0.95);
+        }
+        
+        /* Visibility toggle styling */
+        .visibility-toggle:hover {
+            transform: scale(1.2);
+        }
+        
+        .visibility-toggle:active {
+            transform: scale(0.9);
+        }
+        
         /* Cards section - realistic credit card style */
         #cardsList {
             display: flex;
@@ -1327,11 +1346,6 @@
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Provider</label>
                         <input type="text" id="modalProvider" value="Adi" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
                     </div>
-
-                    <div class="field-group">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Setup Account</label>
-                        <input type="text" id="modalSetupAccount" value="$500" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
-                    </div>
                 </div>
             </div>
 
@@ -1352,12 +1366,18 @@
                         <th>Email</th>
                         <th class="center">Tag</th>
                         <th class="center">Status</th>
+                        <th class="center">Visibility</th>
                         <th class="center">Active</th>
                     </tr>
                 </thead>
                 <tbody id="profilesList">
                     <tr data-profile="1">
-                        <td class="strong">Main Profile</td>
+                        <td class="strong">
+                            Main Profile
+                            <span class="code-2fa" onclick="copy2FACode(this)" style="margin-left: 8px; padding: 4px 8px; background: #f0f0f0; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; cursor: pointer; color: #3498db; font-weight: 600; transition: all 0.2s;" title="Click to copy">
+                                123456
+                            </span>
+                        </td>
                         <td>main.profile@example.com</td>
                         <td class="center">
                             <span class="tag tag-primary">Primary</span>
@@ -1369,12 +1389,22 @@
                             </select>
                         </td>
                         <td class="center">
+                            <span class="visibility-toggle" onclick="toggleVisibility(this)" style="cursor: pointer; font-size: 20px; transition: all 0.2s;" data-visible="true" title="Click to toggle visibility">
+                                👁️
+                            </span>
+                        </td>
+                        <td class="center">
                             <input type="radio" name="activeProfile" checked onchange="switchToProfile(1, false, event)">
                         </td>
                     </tr>
 
                     <tr data-profile="2">
-                        <td class="strong">Backup Profile</td>
+                        <td class="strong">
+                            Backup Profile
+                            <span class="code-2fa" onclick="copy2FACode(this)" style="margin-left: 8px; padding: 4px 8px; background: #f0f0f0; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; cursor: pointer; color: #3498db; font-weight: 600; transition: all 0.2s;" title="Click to copy">
+                                789012
+                            </span>
+                        </td>
                         <td>backup.profile@example.com</td>
                         <td class="center">
                             <span class="tag tag-backup">Backup</span>
@@ -1384,6 +1414,11 @@
                                 <option value="active" selected>● Active</option>
                                 <option value="suspended">● Suspended</option>
                             </select>
+                        </td>
+                        <td class="center">
+                            <span class="visibility-toggle" onclick="toggleVisibility(this)" style="cursor: pointer; font-size: 20px; transition: all 0.2s;" data-visible="true" title="Click to toggle visibility">
+                                👁️
+                            </span>
                         </td>
                         <td class="center">
                             <input type="radio" name="activeProfile" onchange="switchToProfile(2, false, event)">
@@ -1953,8 +1988,17 @@
             const profilesListBody = document.getElementById('profilesList');
             const row = document.createElement('tr');
             row.setAttribute('data-profile', newProfile.id);
+            
+            // Generate random 6-digit 2FA code
+            const random2FA = Math.floor(100000 + Math.random() * 900000);
+            
             row.innerHTML = `
-                <td class="strong">${newProfile.name}</td>
+                <td class="strong">
+                    ${newProfile.name}
+                    <span class="code-2fa" onclick="copy2FACode(this)" style="margin-left: 8px; padding: 4px 8px; background: #f0f0f0; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; cursor: pointer; color: #3498db; font-weight: 600; transition: all 0.2s;" title="Click to copy">
+                        ${random2FA}
+                    </span>
+                </td>
                 <td>${newProfile.email}</td>
                 <td class="center">
                     <span class="tag ${newProfile.tag === 'Primary' ? 'tag-primary' : 'tag-backup'}">${newProfile.tag}</span>
@@ -1964,6 +2008,11 @@
                         <option value="active" selected>● Active</option>
                         <option value="suspended">● Suspended</option>
                     </select>
+                </td>
+                <td class="center">
+                    <span class="visibility-toggle" onclick="toggleVisibility(this)" style="cursor: pointer; font-size: 20px; transition: all 0.2s;" data-visible="true" title="Click to toggle visibility">
+                        👁️
+                    </span>
                 </td>
                 <td class="center">
                     <input type="radio" name="activeProfile" onchange="switchToProfile(${newProfile.id}, false, event)">
@@ -2548,7 +2597,6 @@
             document.getElementById('modalAccountType').value = account.accountType;
             document.getElementById('modalBilling').value = account.billing;
             document.getElementById('modalProvider').value = account.provider;
-            document.getElementById('modalSetupAccount').value = account.setupAccount;
 
             // Populate Profiles tab with account-specific profiles
             const profiles = accountProfiles[accountId] || [];
@@ -2568,10 +2616,18 @@
                 const isActive = profile.id === account.activeProfileId;
                 if (isActive) hasCheckedProfile = true;
                 
+                // Generate random 6-digit 2FA code for display
+                const random2FA = Math.floor(100000 + Math.random() * 900000);
+                
                 const row = document.createElement('tr');
                 row.setAttribute('data-profile', profile.id);
                 row.innerHTML = `
-                    <td class="strong">${profile.name}</td>
+                    <td class="strong">
+                        ${profile.name}
+                        <span class="code-2fa" onclick="copy2FACode(this)" style="margin-left: 8px; padding: 4px 8px; background: #f0f0f0; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; cursor: pointer; color: #3498db; font-weight: 600; transition: all 0.2s;" title="Click to copy">
+                            ${random2FA}
+                        </span>
+                    </td>
                     <td>${profile.email}</td>
                     <td class="center">
                         <span class="tag ${profile.tag === 'Primary' ? 'tag-primary' : 'tag-backup'}">${profile.tag}</span>
@@ -2581,6 +2637,11 @@
                             <option value="active" ${profile.status === 'active' ? 'selected' : ''}>● Active</option>
                             <option value="suspended" ${profile.status === 'suspended' ? 'selected' : ''}>● Suspended</option>
                         </select>
+                    </td>
+                    <td class="center">
+                        <span class="visibility-toggle" onclick="toggleVisibility(this)" style="cursor: pointer; font-size: 20px; transition: all 0.2s;" data-visible="true" title="Click to toggle visibility">
+                            👁️
+                        </span>
                     </td>
                     <td class="center">
                         <input type="radio" name="activeProfile" ${isActive ? 'checked' : ''} onchange="switchToProfile(${profile.id}, false, event)">
@@ -2716,7 +2777,6 @@
             account.billing = document.getElementById('modalBilling').value;
             account.proxy = document.getElementById('modalProxy').value;
             account.provider = document.getElementById('modalProvider').value;
-            account.setupAccount = document.getElementById('modalSetupAccount').value;
 
             // Save Profiles data
             const profiles = accountProfiles[currentAccountId] || [];
@@ -3300,6 +3360,46 @@
     <script src="../js/sidebar.js"></script>
     
     <script>
+        // Toggle Visibility Function
+        function toggleVisibility(element) {
+            const isVisible = element.getAttribute('data-visible') === 'true';
+            
+            if (isVisible) {
+                element.textContent = '👁️‍🗨️'; // Eye with slash (hidden)
+                element.setAttribute('data-visible', 'false');
+                element.style.opacity = '0.5';
+            } else {
+                element.textContent = '👁️'; // Eye (visible)
+                element.setAttribute('data-visible', 'true');
+                element.style.opacity = '1';
+            }
+        }
+
+        // Copy 2FA Code Function
+        function copy2FACode(element) {
+            const code = element.textContent.trim();
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(code).then(() => {
+                // Visual feedback
+                const originalBg = element.style.background;
+                const originalText = element.textContent;
+                
+                element.style.background = '#2ecc71';
+                element.style.color = 'white';
+                element.textContent = '✓ Copied!';
+                
+                setTimeout(() => {
+                    element.style.background = originalBg;
+                    element.style.color = '#3498db';
+                    element.textContent = originalText;
+                }, 1500);
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+                alert('Failed to copy code');
+            });
+        }
+
         // Close dropdown when clicking outside
         document.addEventListener('click', function(event) {
             const dropdown = document.getElementById('moreFiltersDropdown');
