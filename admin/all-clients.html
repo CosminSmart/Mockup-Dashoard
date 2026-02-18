@@ -42,6 +42,21 @@
     .um-table th:first-child, .um-table td:first-child{ width:46px; }
     .um-table td:last-child, .um-table th:last-child{ width:170px; }
 
+    /* NEW: icon column sizing */
+    .um-table th[data-col="icon"],
+    .um-table td[data-col="icon"]{ width:56px; text-align:center; }
+
+    .pf-icon{
+      width:28px; height:28px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:10px;
+      background: rgba(246,247,251,.75);
+      overflow:hidden;
+    }
+    .pf-icon svg{ width:18px; height:18px; display:block; }
+    .pf-icon img{ width:18px; height:18px; display:block; object-fit:contain; }
+
     /* Right Drawer */
     .pf-overlay{
       position:fixed; inset:0;
@@ -89,14 +104,16 @@
 
     .pf-field{ display:flex; flex-direction:column; gap:6px; }
     .pf-field label{ font-size:12px; color:#64748b; }
-    .pf-field input, .pf-field select{
+    .pf-field input, .pf-field select, .pf-field textarea{
       width:100%;
       padding:10px 12px;
       border-radius:12px;
       border:1px solid rgba(15,23,42,.12);
       background:#fff;
       outline:none;
+      font: inherit;
     }
+    .pf-field textarea{ min-height: 120px; resize: vertical; }
 
     .pf-hint{
       margin-top:10px;
@@ -108,6 +125,146 @@
       font-size:13px;
       line-height: 1.35;
     }
+
+    /* Custom dropdown (platform + icon preset) */
+    .pf-select{ position:relative; }
+    .pf-select__btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pf-select__btn:focus{
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+      border-color: rgba(37,99,235,.35);
+    }
+    .pf-select__left{
+      display:flex; align-items:center; gap:10px;
+      min-width:0;
+    }
+    .pf-select__label{
+      font-size:14px;
+      color:#0f172a;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .pf-select__chev{ color:#64748b; font-size:14px; }
+    .pf-select__menu{
+      position:absolute;
+      top: calc(100% + 8px);
+      left:0;
+      right:0;
+      z-index: 50;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.12);
+      border-radius:14px;
+      box-shadow: 0 18px 45px rgba(15,23,42,.14);
+      padding:6px;
+      max-height: 240px;
+      overflow:auto;
+    }
+    .pf-select__menu[hidden]{ display:none; }
+    .pf-opt{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 10px;
+      border-radius:12px;
+      border:0;
+      background:transparent;
+      cursor:pointer;
+      text-align:left;
+    }
+    .pf-opt:hover{ background: rgba(246,247,251,.9); }
+    .pf-opt[aria-selected="true"]{
+      background: rgba(37,99,235,.08);
+      outline: 1px solid rgba(37,99,235,.18);
+    }
+
+    /* Icon controls */
+    .pf-iconbox{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:14px;
+      padding:12px;
+      background: rgba(246,247,251,.35);
+      display:grid;
+      gap:10px;
+    }
+    .pf-iconbox__top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pf-icon-preview{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#0f172a;
+      font-size:13px;
+    }
+    .pf-icon-preview .pf-icon{
+      width:34px; height:34px; border-radius:12px;
+      background:#fff;
+    }
+    .pf-chiprow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .pf-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pf-chip input{ display:none; }
+    .pf-chip.is-active{
+      background: rgba(37,99,235,.08);
+      border-color: rgba(37,99,235,.25);
+    }
+    .pf-actions-inline{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .pf-file{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .pf-file input[type="file"]{
+      padding:8px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      width:auto;
+      max-width: 100%;
+    }
+    .pf-note{
+      font-size:12px;
+      color:#64748b;
+      line-height:1.35;
+    }
+    .pf-error{
+      font-size:12px;
+      color:#b91c1c;
+      display:none;
+    }
+    .pf-error.is-show{ display:block; }
   </style>
 </head>
 
@@ -168,13 +325,14 @@
               <thead>
                 <tr>
                   <th><input type="checkbox" id="selectAll" aria-label="Select all rows"></th>
-                  <th>Account Type</th>
+                  <th data-col="icon" aria-label="Platform Icon"></th>
+                  <th>Platform</th>
                   <th>Setup</th>
+                  <th>Fee</th>
                   <th>Init Interval</th>
                   <th>Init Amount</th>
                   <th>Rec Interval</th>
                   <th>Rec Amount</th>
-                  <th>Fee</th>
                   <th>Assigned Client</th>
                   <th style="text-align:right;">Actions</th>
                 </tr>
@@ -201,9 +359,89 @@
 
     <div class="pf-drawer__body">
       <div class="pf-grid">
+
+        <!-- Platform dropdown -->
         <div class="pf-field">
-          <label>Platform Name (Account Type)</label>
-          <input id="pfName" type="text" placeholder="e.g. Google Ads">
+          <label>Platform</label>
+
+          <input type="hidden" id="pfPlatformKey" value="google">
+
+          <div class="pf-select" id="pfPlatformSelect">
+            <button class="pf-select__btn" type="button" id="pfPlatformBtn" aria-haspopup="listbox" aria-expanded="false">
+              <span class="pf-select__left">
+                <span class="pf-icon" id="pfPlatformIcon"></span>
+                <span class="pf-select__label" id="pfPlatformLabel">Google Ads</span>
+              </span>
+              <span class="pf-select__chev">▾</span>
+            </button>
+            <div class="pf-select__menu" id="pfPlatformMenu" role="listbox" tabindex="-1" hidden></div>
+          </div>
+        </div>
+
+        <!-- NEW: Icon settings (separate from platform) -->
+        <div class="pf-field">
+          <label>Icon (independent)</label>
+
+          <div class="pf-iconbox">
+            <div class="pf-iconbox__top">
+              <div class="pf-icon-preview">
+                <span class="pf-icon" id="pfIconPreview"></span>
+                <span id="pfIconPreviewLabel">Current icon</span>
+              </div>
+
+              <div class="pf-actions-inline">
+                <button class="um-btn um-btn--ghost" type="button" id="pfIconUsePlatformDefault">Use platform default</button>
+              </div>
+            </div>
+
+            <div class="pf-chiprow" role="radiogroup" aria-label="Icon source">
+              <label class="pf-chip is-active" id="chipPreset">
+                <input type="radio" name="pfIconMode" value="preset" checked>
+                Preset dropdown
+              </label>
+              <label class="pf-chip" id="chipUpload">
+                <input type="radio" name="pfIconMode" value="upload">
+                Upload SVG
+              </label>
+              <label class="pf-chip" id="chipPaste" style="display: none;">
+                <input type="radio" name="pfIconMode" value="paste">
+                Paste SVG
+              </label>
+            </div>
+
+            <!-- Preset dropdown -->
+            <div id="pfIconPresetWrap">
+              <input type="hidden" id="pfIconPresetKey" value="google">
+              <div class="pf-select" id="pfIconSelect">
+                <button class="pf-select__btn" type="button" id="pfIconBtn" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="pf-select__left">
+                    <span class="pf-icon" id="pfIconPresetIcon"></span>
+                    <span class="pf-select__label" id="pfIconPresetLabel">Google</span>
+                  </span>
+                  <span class="pf-select__chev">▾</span>
+                </button>
+                <div class="pf-select__menu" id="pfIconMenu" role="listbox" tabindex="-1" hidden></div>
+              </div>
+              <div class="pf-note">Alegi din setul de iconuri preset (poate fi diferit de platform).</div>
+            </div>
+
+            <!-- Upload -->
+            <div id="pfIconUploadWrap" hidden>
+              <div class="pf-file">
+                <input id="pfIconFile" type="file" accept=".svg,image/svg+xml">
+                <button class="um-btn um-btn--ghost" type="button" id="pfIconClearUpload">Clear</button>
+              </div>
+              <div class="pf-note">Upload doar SVG. Noi citim fișierul și îl salvăm ca text SVG în rând.</div>
+            </div>
+
+            <!-- Paste -->
+            <div id="pfIconPasteWrap" hidden>
+              <textarea id="pfIconSvg" placeholder='<svg viewBox="0 0 24 24">...</svg>'></textarea>
+              <div class="pf-note">Paste SVG complet. Se salvează exact ce pui aici.</div>
+            </div>
+
+            <div class="pf-error" id="pfIconError">SVG invalid. Trebuie să conțină tag-ul &lt;svg ...&gt;.</div>
+          </div>
         </div>
 
         <div class="pf-field">
@@ -216,6 +454,7 @@
           </select>
         </div>
 
+        <!-- Fee moved next to Setup -->
         <div class="pf-row">
           <div class="pf-field">
             <label>Setup ($)</label>
@@ -261,7 +500,7 @@
     </div>
   </aside>
 
-  <!-- ===== Bulk Drawer ===== -->
+  <!-- ===== Bulk Drawer (unchanged) ===== -->
   <div class="pf-overlay" id="bulkOverlay" hidden></div>
   <aside class="pf-drawer" id="bulkDrawer" aria-hidden="true">
     <div class="pf-drawer__header">
@@ -275,7 +514,7 @@
     <div class="pf-drawer__body">
       <div class="pf-grid">
         <div class="pf-field">
-          <label>Platform Name (optional)</label>
+          <label>Platform (optional)</label>
           <input id="bName" type="text" placeholder="leave empty to keep">
         </div>
 
@@ -373,6 +612,51 @@
       if (!Number.isFinite(num)) return "—";
       return `${num}%`;
     }
+    function isSvgText(s){
+      const t = (s ?? "").toString().trim();
+      return t.toLowerCase().includes("<svg") && t.toLowerCase().includes("</svg>");
+    }
+    function safeSvgOrNull(s){
+      // minimal sanity; in production you'd sanitize stronger server-side
+      const t = (s ?? "").toString().trim();
+      if (!isSvgText(t)) return null;
+      return t;
+    }
+
+    // ========= Platform list (for "Platform" dropdown only) =========
+    const PLATFORM_MAP = {
+      google: {
+        label: "Google Ads",
+        svg: `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21.8 10.2H12v3.9h5.6c-.3 1.7-2 4-5.6 4-3.4 0-6.1-2.8-6.1-6.1S8.6 5.9 12 5.9c1.9 0 3.1.8 3.9 1.5l2.7-2.6C16.9 3.2 14.7 2 12 2 6.9 2 2.7 6.1 2.7 12S6.9 22 12 22c5.7 0 9.5-4 9.5-9.7 0-.7-.1-1.2-.2-1.7z"></path>
+          </svg>`
+      },
+      facebook: {
+        label: "Facebook Ads",
+        svg: `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M13.6 22v-8.4h2.8l.4-3.3h-3.2V8.2c0-1 .3-1.6 1.7-1.6h1.7V3.7c-.3 0-1.4-.1-2.8-.1-2.8 0-4.7 1.7-4.7 4.9v1.8H6.7v3.3h2.8V22h4.1z"></path>
+          </svg>`
+      },
+      tiktok: {
+        label: "TikTok Ads",
+        svg: `
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M16.6 3c.4 2.4 1.8 3.9 4.1 4.1v3.2c-1.5.1-2.8-.4-4-1.2v6.2c0 4.2-4.5 6.9-8.4 5.1-2.6-1.2-3.9-4.3-2.9-7.1.9-2.6 3.9-4.4 6.8-3.6v3.4c-1.1-.3-2.3.2-2.9 1.2-.8 1.2-.2 2.9 1.1 3.4 1.7.7 3.4-.5 3.4-2.2V3h2.8z"></path>
+          </svg>`
+      }
+    };
+
+    // ========= Preset icons list (for "Icon" dropdown) =========
+    // You can add many here (Meta, Taboola etc.)
+    const ICON_PRESETS = {
+      google: { label: "Google", svg: PLATFORM_MAP.google.svg },
+      facebook: { label: "Facebook", svg: PLATFORM_MAP.facebook.svg },
+      tiktok: { label: "TikTok", svg: PLATFORM_MAP.tiktok.svg },
+      bolt: { label: "Bolt", svg: `<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>` },
+      star: { label: "Star", svg: `<svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.9 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>` }
+    };
 
     // ========= Mock Data =========
     const clientMap = {
@@ -382,11 +666,35 @@
       "C-2003": "Emily Rodriguez • NorthPeak",
     };
 
+    /**
+     * row fields:
+     * - platformKey: for Platform label dropdown
+     * - iconType: "platform" | "preset" | "custom"
+     * - iconKey: when iconType="preset" (key in ICON_PRESETS)
+     * - iconSvg: when iconType="custom" (raw svg text)
+     */
     let rows = [
-      { id: "p1", name:"Google Ads",   pageSetup:250, initInterval:21, initAmount:30, recInterval:30, recAmount:50, fee:5, assigned:"" },
-      { id: "p2", name:"Facebook Ads", pageSetup:250, initInterval:21, initAmount:30, recInterval:30, recAmount:50, fee:6, assigned:"" },
-      { id: "p3", name:"TikTok Ads",   pageSetup:250, initInterval:21, initAmount:30, recInterval:30, recAmount:50, fee:3, assigned:"C-2002" },
+      { id:"p1", platformKey:"google",   iconType:"platform", iconKey:"", iconSvg:"", pageSetup:250, fee:5, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"" },
+      { id:"p2", platformKey:"facebook", iconType:"preset",   iconKey:"star", iconSvg:"", pageSetup:250, fee:6, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"" },
+      { id:"p3", platformKey:"tiktok",   iconType:"custom",   iconKey:"", iconSvg:`<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5v6l5 3-1 2-6-4V7h2z"/></svg>`, pageSetup:250, fee:3, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"C-2002" },
     ];
+
+    // ========= Icon resolver =========
+    function resolveRowIcon(row){
+      if (!row) return ICON_PRESETS.star.svg;
+
+      if (row.iconType === "custom") {
+        const ok = safeSvgOrNull(row.iconSvg);
+        if (ok) return ok;
+      }
+      if (row.iconType === "preset") {
+        const p = ICON_PRESETS[row.iconKey];
+        if (p?.svg) return p.svg;
+      }
+      // default: platform
+      const pl = PLATFORM_MAP[row.platformKey];
+      return pl?.svg || ICON_PRESETS.star.svg;
+    }
 
     // ========= Table refs =========
     const tbody = document.getElementById("pfTbody");
@@ -422,23 +730,32 @@
     }
 
     function render(){
-      tbody.innerHTML = rows.map(r => `
-        <tr data-row-id="${escapeHtml(r.id)}">
-          <td><input type="checkbox" class="rowCheck" aria-label="Select row"></td>
-          <td><b>${escapeHtml(r.name)}</b></td>
-          <td>${money(r.pageSetup)}</td>
-          <td>${escapeHtml(String(r.initInterval ?? ""))}</td>
-          <td><b>${money(r.initAmount)}</b></td>
-          <td>${escapeHtml(String(r.recInterval ?? ""))}</td>
-          <td><b>${money(r.recAmount)}</b></td>
-          <td>${pct(r.fee)}</td>
-          <td>${escapeHtml(clientMap[r.assigned] ?? "All Clients")}</td>
-          <td style="text-align:right;">
-            <button class="um-btn um-btn--ghost" type="button" data-edit-one>Edit</button>
-            <button class="um-btn um-btn--ghost" type="button" data-del-one>Delete</button>
-          </td>
-        </tr>
-      `).join("");
+      tbody.innerHTML = rows.map(r => {
+        const p = PLATFORM_MAP[r.platformKey] || PLATFORM_MAP.google;
+        const iconSvg = resolveRowIcon(r);
+        return `
+          <tr data-row-id="${escapeHtml(r.id)}">
+            <td><input type="checkbox" class="rowCheck" aria-label="Select row"></td>
+
+            <td data-col="icon">
+              <span class="pf-icon" title="Icon">${iconSvg}</span>
+            </td>
+
+            <td><b>${escapeHtml(p.label)}</b></td>
+            <td>${money(r.pageSetup)}</td>
+            <td>${pct(r.fee)}</td>
+            <td>${escapeHtml(String(r.initInterval ?? ""))}</td>
+            <td><b>${money(r.initAmount)}</b></td>
+            <td>${escapeHtml(String(r.recInterval ?? ""))}</td>
+            <td><b>${money(r.recAmount)}</b></td>
+            <td>${escapeHtml(clientMap[r.assigned] ?? "All Clients")}</td>
+            <td style="text-align:right;">
+              <button class="um-btn um-btn--ghost" type="button" data-edit-one>Edit</button>
+              <button class="um-btn um-btn--ghost" type="button" data-del-one>Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
 
       wireRowHandlers();
       syncBulkState();
@@ -505,7 +822,41 @@
     const pfSaveBtn   = document.getElementById("pfSaveBtn");
     const openAddPlatform = document.getElementById("openAddPlatform");
 
-    const pfName = document.getElementById("pfName");
+    // platform dropdown elements
+    const pfPlatformKey = document.getElementById("pfPlatformKey");
+    const pfPlatformSelect = document.getElementById("pfPlatformSelect");
+    const pfPlatformBtn = document.getElementById("pfPlatformBtn");
+    const pfPlatformMenu = document.getElementById("pfPlatformMenu");
+    const pfPlatformIcon = document.getElementById("pfPlatformIcon");
+    const pfPlatformLabel = document.getElementById("pfPlatformLabel");
+
+    // icon controls
+    const chipPreset = document.getElementById("chipPreset");
+    const chipUpload = document.getElementById("chipUpload");
+    const chipPaste  = document.getElementById("chipPaste");
+
+    const pfIconUsePlatformDefault = document.getElementById("pfIconUsePlatformDefault");
+
+    const pfIconPreview = document.getElementById("pfIconPreview");
+    const pfIconPreviewLabel = document.getElementById("pfIconPreviewLabel");
+
+    const pfIconPresetWrap = document.getElementById("pfIconPresetWrap");
+    const pfIconUploadWrap = document.getElementById("pfIconUploadWrap");
+    const pfIconPasteWrap  = document.getElementById("pfIconPasteWrap");
+
+    const pfIconPresetKey = document.getElementById("pfIconPresetKey");
+    const pfIconSelect = document.getElementById("pfIconSelect");
+    const pfIconBtn = document.getElementById("pfIconBtn");
+    const pfIconMenu = document.getElementById("pfIconMenu");
+    const pfIconPresetIcon = document.getElementById("pfIconPresetIcon");
+    const pfIconPresetLabel = document.getElementById("pfIconPresetLabel");
+
+    const pfIconFile = document.getElementById("pfIconFile");
+    const pfIconClearUpload = document.getElementById("pfIconClearUpload");
+    const pfIconSvg = document.getElementById("pfIconSvg");
+    const pfIconError = document.getElementById("pfIconError");
+
+    // fields
     const pfAssigned = document.getElementById("pfAssigned");
     const pfPageSetup = document.getElementById("pfPageSetup");
     const pfFee = document.getElementById("pfFee");
@@ -517,6 +868,225 @@
     let pfMode = "add";
     let pfEditingId = null;
 
+    // -------- platform dropdown
+    function setPlatformSelection(key){
+      const p = PLATFORM_MAP[key] || PLATFORM_MAP.google;
+      pfPlatformKey.value = key;
+      pfPlatformIcon.innerHTML = p.svg;
+      pfPlatformLabel.textContent = p.label;
+
+      // if icon mode is "platform", preview should update instantly
+      updateIconPreview();
+      // keep menu selection state
+      pfPlatformMenu.querySelectorAll(".pf-opt").forEach(b => {
+        b.setAttribute("aria-selected", b.dataset.value === key ? "true" : "false");
+      });
+    }
+
+    function buildPlatformMenu(){
+      pfPlatformMenu.innerHTML = Object.entries(PLATFORM_MAP).map(([key, p]) => `
+        <button type="button"
+          class="pf-opt"
+          role="option"
+          data-value="${escapeHtml(key)}"
+          aria-selected="${key === pfPlatformKey.value ? "true" : "false"}">
+          <span class="pf-icon">${p.svg}</span>
+          <span>${escapeHtml(p.label)}</span>
+        </button>
+      `).join("");
+
+      pfPlatformMenu.querySelectorAll(".pf-opt").forEach(btn => {
+        btn.addEventListener("click", () => {
+          setPlatformSelection(btn.dataset.value);
+          closePlatformMenu();
+        });
+      });
+    }
+
+    function openPlatformMenu(){
+      pfPlatformMenu.hidden = false;
+      pfPlatformBtn.setAttribute("aria-expanded", "true");
+      buildPlatformMenu();
+    }
+    function closePlatformMenu(){
+      pfPlatformMenu.hidden = true;
+      pfPlatformBtn.setAttribute("aria-expanded", "false");
+    }
+    function togglePlatformMenu(){
+      if (pfPlatformMenu.hidden) openPlatformMenu();
+      else closePlatformMenu();
+    }
+    pfPlatformBtn.addEventListener("click", togglePlatformMenu);
+
+    // -------- icon preset dropdown
+    function setIconPresetSelection(key){
+      const p = ICON_PRESETS[key] || ICON_PRESETS.google;
+      pfIconPresetKey.value = key;
+      pfIconPresetIcon.innerHTML = p.svg;
+      pfIconPresetLabel.textContent = p.label;
+
+      updateIconPreview();
+
+      pfIconMenu.querySelectorAll(".pf-opt").forEach(b => {
+        b.setAttribute("aria-selected", b.dataset.value === key ? "true" : "false");
+      });
+    }
+
+    function buildIconMenu(){
+      pfIconMenu.innerHTML = Object.entries(ICON_PRESETS).map(([key, p]) => `
+        <button type="button"
+          class="pf-opt"
+          role="option"
+          data-value="${escapeHtml(key)}"
+          aria-selected="${key === pfIconPresetKey.value ? "true" : "false"}">
+          <span class="pf-icon">${p.svg}</span>
+          <span>${escapeHtml(p.label)}</span>
+        </button>
+      `).join("");
+
+      pfIconMenu.querySelectorAll(".pf-opt").forEach(btn => {
+        btn.addEventListener("click", () => {
+          setIconPresetSelection(btn.dataset.value);
+          closeIconMenu();
+        });
+      });
+    }
+
+    function openIconMenu(){
+      pfIconMenu.hidden = false;
+      pfIconBtn.setAttribute("aria-expanded", "true");
+      buildIconMenu();
+    }
+    function closeIconMenu(){
+      pfIconMenu.hidden = true;
+      pfIconBtn.setAttribute("aria-expanded", "false");
+    }
+    function toggleIconMenu(){
+      if (pfIconMenu.hidden) openIconMenu();
+      else closeIconMenu();
+    }
+    pfIconBtn.addEventListener("click", toggleIconMenu);
+
+    // close dropdowns outside click
+    document.addEventListener("click", (e) => {
+      if (!pfPlatformSelect.contains(e.target)) closePlatformMenu();
+      if (!pfIconSelect.contains(e.target)) closeIconMenu();
+    });
+
+    // -------- icon mode switching
+    function setIconMode(mode){
+      // chips UI
+      [chipPreset, chipUpload, chipPaste].forEach(c => c.classList.remove("is-active"));
+      if (mode === "preset") chipPreset.classList.add("is-active");
+      if (mode === "upload") chipUpload.classList.add("is-active");
+      if (mode === "paste")  chipPaste.classList.add("is-active");
+
+      // panels
+      pfIconPresetWrap.hidden = (mode !== "preset");
+      pfIconUploadWrap.hidden = (mode !== "upload");
+      pfIconPasteWrap.hidden  = (mode !== "paste");
+
+      // clear error on switch
+      pfIconError.classList.remove("is-show");
+
+      updateIconPreview();
+    }
+
+    function getIconMode(){
+      const checked = document.querySelector('input[name="pfIconMode"]:checked');
+      return checked?.value || "preset";
+    }
+
+    // clicking chips toggles radio
+    [chipPreset, chipUpload, chipPaste].forEach(chip => {
+      chip.addEventListener("click", () => {
+        chip.querySelector("input").checked = true;
+        setIconMode(getIconMode());
+      });
+    });
+
+    // use platform default button
+    pfIconUsePlatformDefault.addEventListener("click", () => {
+      // set to "platform" virtual mode (we store this in row as iconType="platform")
+      // UI: select preset tab but show preview from platform + mark internally using a hidden flag
+      _iconTypeOverride = "platform";
+      pfIconError.classList.remove("is-show");
+      updateIconPreview();
+      pfIconPreviewLabel.textContent = "Platform default icon";
+    });
+
+    // we keep an internal override while editing
+    let _iconTypeOverride = "preset"; // "platform" | "preset" | "custom(upload/paste)"
+
+    function setInternalIconType(t){
+      _iconTypeOverride = t;
+      updateIconPreview();
+    }
+
+    // Any interaction with preset/upload/paste sets override away from platform
+    pfIconBtn.addEventListener("click", () => setInternalIconType("preset"));
+    pfIconSvg.addEventListener("input", () => setInternalIconType("custom"));
+    pfIconFile.addEventListener("change", () => setInternalIconType("custom"));
+
+    // upload svg file -> read text
+    pfIconFile.addEventListener("change", async () => {
+      const file = pfIconFile.files?.[0];
+      if (!file) { updateIconPreview(); return; }
+      const text = await file.text();
+      pfIconSvg.value = text; // store it in textarea too (handy)
+      setIconMode("upload");
+      setInternalIconType("custom");
+      updateIconPreview();
+    });
+
+    pfIconClearUpload.addEventListener("click", () => {
+      pfIconFile.value = "";
+      if (getIconMode() === "upload") {
+        // don't destroy pasted content, but clear if it came from upload
+        // we'll just keep textarea as is; user can decide
+      }
+      updateIconPreview();
+    });
+
+    // preview logic
+    function updateIconPreview(){
+      pfIconError.classList.remove("is-show");
+
+      const platformKey = pfPlatformKey.value || "google";
+      const platformSvg = PLATFORM_MAP[platformKey]?.svg || ICON_PRESETS.star.svg;
+
+      // if user forced platform default
+      if (_iconTypeOverride === "platform") {
+        pfIconPreview.innerHTML = platformSvg;
+        pfIconPreviewLabel.textContent = "Platform default icon";
+        return;
+      }
+
+      const mode = getIconMode();
+
+      if (mode === "preset") {
+        const k = pfIconPresetKey.value || "google";
+        const presetSvg = ICON_PRESETS[k]?.svg || ICON_PRESETS.star.svg;
+        pfIconPreview.innerHTML = presetSvg;
+        pfIconPreviewLabel.textContent = `Preset: ${ICON_PRESETS[k]?.label || k}`;
+        return;
+      }
+
+      // upload/paste -> use textarea content
+      const svgText = pfIconSvg.value;
+      const ok = safeSvgOrNull(svgText);
+      if (!ok) {
+        pfIconPreview.innerHTML = platformSvg; // fallback visual
+        pfIconPreviewLabel.textContent = "Invalid SVG (fallback shown)";
+        if (svgText.trim().length) pfIconError.classList.add("is-show");
+        return;
+      }
+
+      pfIconPreview.innerHTML = ok;
+      pfIconPreviewLabel.textContent = (mode === "upload") ? "Custom: uploaded SVG" : "Custom: pasted SVG";
+    }
+
+    // ========= open drawer + fill =========
     function openPlatformDrawer(mode, row){
       pfMode = mode;
       pfEditingId = row?.id ?? null;
@@ -529,7 +1099,10 @@
         pfSub.textContent = "Create global row or assign to a specific client.";
       }
 
-      pfName.value = row?.name ?? "";
+      // Platform
+      setPlatformSelection(row?.platformKey ?? "google");
+
+      // Assigned + numbers
       pfAssigned.value = row?.assigned ?? "";
       pfPageSetup.value = (row?.pageSetup ?? "");
       pfFee.value = (row?.fee ?? "");
@@ -538,12 +1111,74 @@
       pfRecInterval.value = (row?.recInterval ?? "");
       pfRecAmount.value = (row?.recAmount ?? "");
 
+      // Icon state
+      // default internal override based on row.iconType
+      if (!row || row.iconType === "platform") {
+        _iconTypeOverride = "platform";
+      } else if (row.iconType === "preset") {
+        _iconTypeOverride = "preset";
+      } else {
+        _iconTypeOverride = "custom";
+      }
+
+      // reset UI panels
+      pfIconFile.value = "";
+
+      // preset key
+      pfIconPresetKey.value = row?.iconKey || "google";
+      setIconPresetSelection(pfIconPresetKey.value);
+
+      // custom svg
+      pfIconSvg.value = row?.iconSvg || "";
+
+      // mode tab selection
+      if (!row || row.iconType === "platform" || row.iconType === "preset") {
+        // show preset by default (even if platform forced, preview will show platform)
+        document.querySelector('input[name="pfIconMode"][value="preset"]').checked = true;
+        setIconMode("preset");
+      } else {
+        // custom
+        document.querySelector('input[name="pfIconMode"][value="paste"]').checked = true;
+        setIconMode("paste");
+      }
+
+      // set preview correct
+      updateIconPreview();
+
+      closePlatformMenu();
+      closeIconMenu();
       openDrawer(pfOverlay, pfDrawer);
     }
 
     function readPlatformForm(){
+      // Decide iconType + data:
+      // - if override is platform => iconType="platform"
+      // - else if mode preset => iconType="preset", iconKey = chosen
+      // - else => iconType="custom", iconSvg = textarea (validated)
+      const platformKey = pfPlatformKey.value || "google";
+      const mode = getIconMode();
+
+      let iconType = "platform";
+      let iconKey = "";
+      let iconSvg = "";
+
+      if (_iconTypeOverride === "platform") {
+        iconType = "platform";
+      } else if (mode === "preset") {
+        iconType = "preset";
+        iconKey = pfIconPresetKey.value || "google";
+      } else {
+        iconType = "custom";
+        const ok = safeSvgOrNull(pfIconSvg.value);
+        if (!ok) return { __error: "Invalid SVG. Please paste/upload a valid <svg>...</svg>." };
+        iconSvg = ok;
+      }
+
       return {
-        name: pfName.value.trim(),
+        platformKey,
+        iconType,
+        iconKey,
+        iconSvg,
         assigned: pfAssigned.value || "",
         pageSetup: numberOrNull(pfPageSetup.value),
         fee: numberOrNull(pfFee.value),
@@ -554,6 +1189,7 @@
       };
     }
 
+    // ========= drawer buttons =========
     openAddPlatform.addEventListener("click", () => openPlatformDrawer("add", null));
 
     pfOverlay.addEventListener("click", () => closeDrawer(pfOverlay, pfDrawer));
@@ -562,7 +1198,8 @@
 
     pfSaveBtn.addEventListener("click", () => {
       const data = readPlatformForm();
-      if (!data.name) { alert("Platform Name is required."); return; }
+      if (data.__error) { alert(data.__error); return; }
+      if (!data.platformKey) { alert("Platform is required."); return; }
 
       if (pfMode === "add") {
         rows.unshift({ id: "p_" + Math.random().toString(16).slice(2), ...data });
@@ -574,7 +1211,7 @@
       render();
     });
 
-    // ========= Bulk Drawer =========
+    // ========= Bulk Drawer (unchanged) =========
     const bulkOverlayEl = document.getElementById("bulkOverlay");
     const bulkDrawerEl  = document.getElementById("bulkDrawer");
 
@@ -635,7 +1272,14 @@
         if (!sel.includes(r.id)) return r;
         const next = { ...r };
 
-        if (patch.name) next.name = patch.name;
+        // map typed platform label -> platformKey if matches
+        if (patch.name) {
+          const target = patch.name.toLowerCase();
+          const foundKey = Object.entries(PLATFORM_MAP).find(([k,v]) =>
+            v.label.toLowerCase() === target || k === target
+          )?.[0];
+          if (foundKey) next.platformKey = foundKey;
+        }
 
         if (patch.assigned) next.assigned = (patch.assigned === "__ALL__") ? "" : patch.assigned;
 
@@ -655,15 +1299,29 @@
       render();
     });
 
-    // ESC closes any open drawer
+    // ESC closes any open drawer + dropdowns
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
+      closePlatformMenu();
+      closeIconMenu();
       closeDrawer(pfOverlay, pfDrawer);
       closeDrawer(bulkOverlayEl, bulkDrawerEl);
     });
 
-    // init
-    render();
+    // ========= init dropdown defaults =========
+    (function initDropdownDefaults(){
+      // Platform default
+      setPlatformSelection("google");
+
+      // Icon preset default
+      setIconPresetSelection("google");
+
+      // Default icon type is platform for fresh add (but UI shows preset tab)
+      _iconTypeOverride = "platform";
+      updateIconPreview();
+
+      render();
+    })();
   </script>
 
   <script src="../js/sidebar.js"></script>
