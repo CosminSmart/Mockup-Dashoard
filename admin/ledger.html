@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ledger • Admin Finance</title>
+
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/accounts.css" />
+
+  <style>
+    /* =========================================================
+      LEDGER PAGE (FULL) — SAME LOOK AS FINANCE (GLASS WHITE)
+      - Full table (like mini-ledger) but page-wide
+      - Filters: Type, Client, Time, Search
+      - Drawer details (right)
+    ========================================================= */
+
+    :root{
+      --bg0:#f7f8fb;
+      --bg1:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+
+      --line: rgba(15,23,42,.10);
+      --line2: rgba(15,23,42,.07);
+
+      --glass: rgba(255,255,255,.72);
+      --glass2: rgba(255,255,255,.58);
+
+      --shadow: 0 18px 50px rgba(15,23,42,.12);
+      --shadow2: 0 12px 28px rgba(15,23,42,.10);
+
+      --r-xl: 18px;
+      --r-lg: 14px;
+      --r-md: 12px;
+
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --info:#2563eb;
+
+      --focus: rgba(37,99,235,.25);
+    }
+
+    [data-theme="dark"]{
+      --bg0:#0b1220;
+      --bg1:#0f172a;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.08);
+
+      --glass: rgba(17,24,39,.58);
+      --glass2: rgba(17,24,39,.45);
+
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --shadow2: 0 12px 28px rgba(0,0,0,.35);
+
+      --focus: rgba(96,165,250,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+
+    body{
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(37,99,235,.14), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(99,102,241,.14), transparent 55%),
+        radial-gradient(900px 600px at 35% 95%, rgba(16,185,129,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0) 0%, color-mix(in srgb, var(--bg0) 55%, var(--bg1)) 100%);
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    }
+
+    .muted{ color: var(--muted); }
+    .mini-hint{
+      font-size:.9rem;
+      color: var(--muted);
+      line-height:1.35;
+      margin-top:.2rem;
+    }
+
+    input, select{
+      width:100%;
+      padding:.7rem .8rem;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      outline:none;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .08s ease;
+    }
+    input:focus, select:focus{
+      border-color: color-mix(in srgb, var(--info) 45%, var(--line2));
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+    input::placeholder{ color: color-mix(in srgb, var(--muted) 78%, transparent); }
+
+    .transfer-btn{
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      padding: .7rem .95rem;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.55rem;
+    }
+    .transfer-btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .transfer-btn:active{ transform: translateY(0px); }
+    .transfer-btn.secondary{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.32) 55%, var(--line2));
+    }
+    .transfer-btn.gray{
+      background: color-mix(in srgb, rgba(148,163,184,.18) 70%, var(--glass));
+    }
+
+    /* Header tabs (Finance/Transactions/Ledger) */
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 12px 18px;
+      background: rgba(255,255,255,.55);
+      border-bottom: 1px solid var(--line2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    [data-theme="dark"] .header{ background: rgba(15,23,42,.55); }
+
+    .page-tabs{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius:999px;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      width: fit-content;
+    }
+    .page-tab{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 950;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+      letter-spacing: .2px;
+      user-select:none;
+    }
+    .page-tab:hover{ transform: translateY(-1px); }
+    .page-tab.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+    @media (max-width: 820px){
+      .header{ flex-wrap:wrap; align-items:flex-start; }
+      .page-tabs{ width:100%; justify-content:space-between; }
+      .page-tab{ flex:1; text-align:center; }
+    }
+
+    .main{ padding: 18px; }
+    @media (max-width: 720px){ .main{ padding: 14px; } }
+
+    .glass-panel{
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--r-xl);
+    }
+
+    /* Filters bar */
+    .ledger-filters{
+      padding: 14px;
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+    }
+    .ledger-filters__row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      justify-content:space-between;
+    }
+    .ledger-filters__left{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      align-items:flex-end;
+      flex:1;
+    }
+    .filter-group{ min-width: 240px; }
+    .filter-group.small{ min-width: 180px; }
+    @media (max-width: 980px){
+      .filter-group{ min-width: 100%; }
+      .filter-group.small{ min-width: 100%; }
+    }
+    .form-group{ margin:0; }
+    .form-group label{
+      display:block;
+      margin: 0 0 .45rem 0;
+      font-weight: 900;
+      font-size: .88rem;
+      color: color-mix(in srgb, var(--text) 85%, var(--muted));
+      letter-spacing:.2px;
+    }
+    .quick-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    /* Table wrap */
+    .table-wrap{
+      padding: 14px;
+    }
+    .ledger-table-wrap{
+      border:1px solid var(--line2);
+      border-radius: var(--r-xl);
+      overflow:auto;
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow2);
+    }
+    table.ledger-table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      min-width: 1100px;
+      font-size: .92rem;
+    }
+    .ledger-table th, .ledger-table td{
+      padding: .85rem .75rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      text-align:left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .ledger-table th{
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 88%, var(--bg1));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .ledger-row{
+      cursor:pointer;
+      transition: background .12s ease;
+    }
+    .ledger-row:hover{
+      background: color-mix(in srgb, rgba(37,99,235,.10) 60%, transparent);
+    }
+    .td-muted{ color: var(--muted); }
+    .td-right{ text-align:right; }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:.18rem .55rem;
+      border-radius: 999px;
+      font-size:.78rem;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      font-weight: 900;
+      color: color-mix(in srgb, var(--text) 88%, var(--muted));
+      margin-right: .35rem;
+      white-space: nowrap;
+    }
+    .amount-pos{ font-weight: 950; color: color-mix(in srgb, var(--good) 92%, var(--text)); }
+    .amount-neg{ font-weight: 950; color: color-mix(in srgb, var(--bad) 92%, var(--text)); }
+
+    .status-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.28rem .65rem;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size:.82rem;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 72%, transparent);
+      color: color-mix(in srgb, var(--text) 92%, var(--muted));
+    }
+    .status-badge.approved{
+      background: color-mix(in srgb, rgba(22,163,74,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(22,163,74,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--good) 85%, var(--text));
+    }
+    .status-badge.pending{
+      background: color-mix(in srgb, rgba(245,158,11,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--warn) 82%, var(--text));
+    }
+    .status-badge.declined{
+      background: color-mix(in srgb, rgba(239,68,68,.16) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(239,68,68,.32) 55%, var(--line2));
+      color: color-mix(in srgb, var(--bad) 82%, var(--text));
+    }
+    .status-badge.past_due{
+      background: color-mix(in srgb, rgba(148,163,184,.16) 70%, var(--glass));
+      border-color: color-mix(in srgb, rgba(148,163,184,.28) 60%, var(--line2));
+      color: color-mix(in srgb, var(--muted) 88%, var(--text));
+    }
+
+    /* Right drawer (Details) */
+    .drawer{ position: fixed; inset: 0; z-index: 3000; display:none; }
+    .drawer.active{ display:block; }
+    .drawer__overlay{
+      position:absolute; inset:0;
+      background: rgba(0,0,0,.38);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .drawer__panel{
+      position:absolute; top:0; right:0;
+      height:100%;
+      width:min(520px, 95vw);
+      background: var(--glass);
+      border-left: 1px solid var(--line2);
+      box-shadow:-22px 0 60px rgba(15,23,42,.22);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display:flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform .22s ease;
+    }
+    .drawer.active .drawer__panel{ transform: translateX(0); }
+    .drawer__header{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 14px 14px 10px 14px;
+      border-bottom:1px solid var(--line2);
+    }
+    .drawer__title{ font-size: 1.15rem; font-weight: 950; margin: 0; }
+    .drawer__subtitle{ margin-top:4px; font-weight: 900; color: var(--muted); font-size:.9rem; }
+    .drawer__close{
+      width: 38px; height: 38px;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 75%, transparent);
+      border-radius: 14px; cursor:pointer;
+      font-size: 18px; line-height: 36px;
+      color: var(--text);
+    }
+    .drawer__body{ padding: 14px; overflow:auto; }
+    .kv-card{
+      border:1px solid var(--line2);
+      border-radius: var(--r-xl);
+      background: color-mix(in srgb, var(--glass) 72%, transparent);
+      overflow:hidden;
+      box-shadow: var(--shadow2);
+    }
+    .kv-row{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 10px 12px;
+      border-bottom:1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      align-items:center;
+    }
+    .kv-row:last-child{ border-bottom:none; }
+    .kv-key{
+      font-weight: 950;
+      font-size: .9rem;
+      color: color-mix(in srgb, var(--text) 92%, var(--muted));
+    }
+    .kv-val{
+      text-align:right;
+      color: var(--muted);
+      font-weight: 900;
+      font-size: .9rem;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .drawer__footer{
+      padding: 14px;
+      border-top:1px solid var(--line2);
+      display:flex;
+      gap:10px;
+      justify-content:flex-start;
+      background: color-mix(in srgb, var(--glass) 85%, transparent);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <header class="header">
+      <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+        <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
+        <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
+        <button type="button" class="page-tab active" data-page="ledger" role="tab" aria-selected="true">Ledger</button>
+      </div>
+
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">AU</div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div class="glass-panel ledger-filters">
+        <div class="ledger-filters__row">
+          <div class="ledger-filters__left">
+            <div class="form-group filter-group">
+              <label>Search</label>
+              <input id="lg_search" type="search" placeholder="Search (type, note, platform, from/to, proof, etc.)">
+            </div>
+
+            <div class="form-group filter-group small">
+              <label>Client</label>
+              <select id="lg_client">
+                <option value="__all__">All clients</option>
+              </select>
+            </div>
+
+            <div class="form-group filter-group small">
+              <label>Type</label>
+              <select id="lg_type">
+                <option value="__all__">All types</option>
+              </select>
+            </div>
+
+            <div class="form-group filter-group small">
+              <label>Time</label>
+              <select id="lg_time">
+                <option value="all">All time</option>
+                <option value="30">Last 30 days</option>
+                <option value="7">Last 7 days</option>
+                <option value="today">Today</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="quick-actions">
+            <button class="transfer-btn" id="lg_export_csv">Export CSV</button>
+            <button class="transfer-btn gray" id="lg_export_json">Export JSON</button>
+            <button class="transfer-btn gray" id="lg_clear">Clear</button>
+          </div>
+        </div>
+
+        <div class="mini-hint" id="lg_hint"></div>
+      </div>
+
+      <div class="glass-panel table-wrap" style="margin-top:14px;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
+          <div>
+            <h2 style="margin:0; font-weight:950; letter-spacing:.2px;">Ledger</h2>
+            <div class="mini-hint">Tabel complet (audit trail). Click pe rând pentru detalii.</div>
+          </div>
+          <div class="mini-hint" id="lg_totals" style="text-align:right;"></div>
+        </div>
+
+        <div class="ledger-table-wrap">
+          <table class="ledger-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>From → To</th>
+                <th>Client</th>
+                <th>Platform</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Note / Proof</th>
+                <th class="td-right">Amount</th>
+              </tr>
+            </thead>
+            <tbody id="lg_body"></tbody>
+          </table>
+        </div>
+
+        <div class="mini-hint" id="lg_table_hint" style="margin-top:.65rem;"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Details Drawer -->
+  <div class="drawer" id="lg_drawer" aria-hidden="true">
+    <div class="drawer__overlay" id="lg_drawer_overlay"></div>
+
+    <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Ledger Details">
+      <div class="drawer__header">
+        <div>
+          <div class="drawer__title">Entry Details</div>
+          <div class="drawer__subtitle" id="lg_d_title">—</div>
+        </div>
+        <button class="drawer__close" id="lg_drawer_close" aria-label="Close">×</button>
+      </div>
+
+      <div class="drawer__body">
+        <div class="kv-card" id="lg_kv"></div>
+
+        <div class="mini-hint" style="margin-top:10px; display: none;">
+          <strong>Tip:</strong> Dacă vrei și edit aici (status/description), zici și ți-l fac ca la topups modal.
+        </div>
+      </div>
+
+      <div class="drawer__footer" style="margin-top:30px;">
+        <button class="transfer-btn gray" id="lg_copy_json">Copy JSON</button>
+        <button class="transfer-btn gray" id="lg_close2">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+
+  <script>
+    /* =========================================================
+      LEDGER PAGE JS
+      - Reads SAME storage key as finance page
+      - Filters: search, client, type, time
+      - Full table + details drawer
+    ========================================================= */
+
+    const LS_KEY = "admin_finance_demo_v7";
+
+    const state = {
+      ledger: [],
+      activeId: null
+    };
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function money(n){
+      const v = Number(n || 0);
+      return v.toLocaleString(undefined, { style:"currency", currency:"USD" });
+    }
+
+    function getClientLabelById(id){
+      const map = { "100":"100 - Alex", "101":"101 - Maria", "102":"102 - John" };
+      return map[String(id)] || String(id || "—");
+    }
+
+    function statusClass(st){
+      const s = String(st || "").toLowerCase();
+      if(s === "approved") return "approved";
+      if(s === "declined") return "declined";
+      if(s === "past_due") return "past_due";
+      if(s === "pending") return "pending";
+      return "";
+    }
+
+    function statusLabel(st){
+      const s = String(st || "").toLowerCase();
+      if(!s) return "—";
+      if(s === "past_due") return "Past Due";
+      return s.charAt(0).toUpperCase() + s.slice(1);
+    }
+
+    function load(){
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw){
+        state.ledger = [];
+        return;
+      }
+      try{
+        const parsed = JSON.parse(raw);
+        state.ledger = Array.isArray(parsed.ledger) ? parsed.ledger : [];
+      }catch(e){
+        state.ledger = [];
+      }
+    }
+
+    function normalize(s){ return (s || "").toString().trim().toLowerCase(); }
+
+    function txISO(tx){
+      const d = new Date(tx.date);
+      if(isNaN(d.getTime())) return null;
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const dd = String(d.getDate()).padStart(2,"0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function inTimeRange(tx, mode){
+      if(mode === "all") return true;
+      const d = new Date(tx.date);
+      if(isNaN(d.getTime())) return false;
+
+      const now = new Date();
+      if(mode === "today"){
+        return d.toDateString() === now.toDateString();
+      }
+
+      const days = Number(mode);
+      if(!days) return true;
+      const diffDays = (now.getTime() - d.getTime()) / (1000 * 60 * 60 * 24);
+      return diffDays <= days;
+    }
+
+    function buildTypeOptions(){
+      const sel = document.getElementById("lg_type");
+      const types = new Set();
+
+      state.ledger.forEach(tx => {
+        if(tx && tx.type) types.add(String(tx.type));
+      });
+
+      const current = sel.value || "__all__";
+
+      sel.innerHTML = `<option value="__all__">All types</option>` +
+        [...types].sort().map(t => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join("");
+
+      sel.value = (current && [...sel.options].some(o => o.value === current)) ? current : "__all__";
+    }
+
+    function buildClientOptions(){
+      const sel = document.getElementById("lg_client");
+      const clients = new Set();
+
+      state.ledger.forEach(tx => {
+        if(tx && tx.clientId) clients.add(String(tx.clientId));
+      });
+
+      const current = sel.value || "__all__";
+
+      sel.innerHTML = `<option value="__all__">All clients</option>` +
+        [...clients].sort().map(cid => `<option value="${escapeHtml(cid)}">${escapeHtml(getClientLabelById(cid))}</option>`).join("");
+
+      sel.value = (current && [...sel.options].some(o => o.value === current)) ? current : "__all__";
+    }
+
+    function matchesSearch(tx, q){
+      if(!q) return true;
+      const blob = normalize([
+        tx.id, tx.topupId, tx.type, tx.from, tx.to, tx.platform, tx.category, tx.note,
+        tx.proof, tx.description, tx.account, tx.status, tx.clientId, tx.date
+      ].join(" "));
+      return blob.includes(q);
+    }
+
+    function getFiltered(){
+      const q = normalize(document.getElementById("lg_search").value);
+      const client = document.getElementById("lg_client").value;
+      const type = document.getElementById("lg_type").value;
+      const time = document.getElementById("lg_time").value;
+
+      return state.ledger
+        .filter(tx => !!tx)
+        .filter(tx => (client === "__all__") ? true : String(tx.clientId || "") === String(client))
+        .filter(tx => (type === "__all__") ? true : String(tx.type || "") === String(type))
+        .filter(tx => inTimeRange(tx, time))
+        .filter(tx => matchesSearch(tx, q))
+        .slice()
+        .sort((a,b) => new Date(b.date) - new Date(a.date));
+    }
+
+    function render(){
+      const body = document.getElementById("lg_body");
+      const hint = document.getElementById("lg_table_hint");
+      const totals = document.getElementById("lg_totals");
+      const topHint = document.getElementById("lg_hint");
+
+      const rows = getFiltered();
+
+      if(!rows.length){
+        body.innerHTML = `<tr><td colspan="9" class="td-muted">No ledger entries for current filters.</td></tr>`;
+        hint.textContent = "";
+        totals.textContent = "";
+        topHint.textContent = "Current view: 0 entries";
+        return;
+      }
+
+      // totals
+      const sum = rows.reduce((acc, tx) => acc + Number(tx.amount || 0), 0);
+      const pos = rows.reduce((acc, tx) => acc + (Number(tx.amount || 0) > 0 ? Number(tx.amount || 0) : 0), 0);
+      const neg = rows.reduce((acc, tx) => acc + (Number(tx.amount || 0) < 0 ? Number(tx.amount || 0) : 0), 0);
+
+      totals.innerHTML = `
+        <div><span class="muted">Entries:</span> <strong>${rows.length}</strong></div>
+        <div><span class="muted">Sum:</span> <strong>${money(sum)}</strong></div>
+        <div><span class="muted">In:</span> <strong class="amount-pos">${money(pos)}</strong></div>
+        <div><span class="muted">Out:</span> <strong class="amount-neg">${money(neg)}</strong></div>
+      `;
+
+      // header hint
+      const c = document.getElementById("lg_client").value;
+      const t = document.getElementById("lg_type").value;
+      const tm = document.getElementById("lg_time").value;
+      topHint.textContent =
+        `Current view: ${rows.length} entries • Client: ${c === "__all__" ? "All" : getClientLabelById(c)} • Type: ${t === "__all__" ? "All" : t} • Time: ${tm}`;
+
+      body.innerHTML = rows.map(tx => {
+        const amount = Number(tx.amount || 0);
+        const amountClass = (tx.from === "mainWallet" || tx.from === "individualBalance") ? "amount-neg" : "amount-pos";
+
+        const tagBits = [
+          `<span class="tag">${escapeHtml(String(tx.type || "—").toUpperCase())}</span>`,
+          tx.platform ? `<span class="tag">${escapeHtml(tx.platform)}</span>` : ""
+        ].join(" ");
+
+        const fromTo = `${tx.from || "—"} → ${tx.to || "—"}`;
+        const st = tx.type === "topup" ? (tx.status || "pending") : "";
+
+        const noteProof = tx.type === "topup"
+          ? (tx.proof ? `Proof: ${tx.proof}` : (tx.note || tx.description || "—"))
+          : (tx.note || tx.description || "—");
+
+        return `
+          <tr class="ledger-row" data-id="${escapeHtml(tx.id)}">
+            <td>${escapeHtml(tx.date || "—")}</td>
+            <td>${tagBits}</td>
+            <td class="td-muted">${escapeHtml(fromTo)}</td>
+            <td>${escapeHtml(getClientLabelById(tx.clientId || "—"))}</td>
+            <td>${escapeHtml(tx.platform || "—")}</td>
+            <td>${escapeHtml(tx.category || "—")}</td>
+            <td>
+              ${st ? `<span class="status-badge ${statusClass(st)}">${escapeHtml(statusLabel(st))}</span>` : `<span class="td-muted">—</span>`}
+            </td>
+            <td class="td-muted" style="max-width:420px; overflow:hidden; text-overflow:ellipsis;">
+              ${escapeHtml(noteProof)}
+            </td>
+            <td class="td-right ${amountClass}">${money(amount)}</td>
+          </tr>
+        `;
+      }).join("");
+
+      hint.textContent = `Tip: Click pe un rând pentru drawer (detalii complete).`;
+      bindRowClicks();
+    }
+
+    function bindRowClicks(){
+      document.querySelectorAll("#lg_body tr[data-id]").forEach(tr => {
+        tr.addEventListener("click", () => openDrawer(tr.dataset.id));
+      });
+    }
+
+    /* Drawer */
+    const drawer = document.getElementById("lg_drawer");
+    const overlay = document.getElementById("lg_drawer_overlay");
+    const btnClose = document.getElementById("lg_drawer_close");
+    const btnClose2 = document.getElementById("lg_close2");
+    const kv = document.getElementById("lg_kv");
+    const dTitle = document.getElementById("lg_d_title");
+    const btnCopyJson = document.getElementById("lg_copy_json");
+
+    function findById(id){
+      return state.ledger.find(tx => String(tx.id) === String(id));
+    }
+
+    function openDrawer(id){
+      const tx = findById(id);
+      if(!tx) return;
+
+      state.activeId = id;
+
+      dTitle.textContent = `${tx.type || "entry"} • ${tx.date || "—"}`;
+
+      const pairs = [
+        ["ID", tx.id],
+        ["Topup ID", tx.topupId || "—"],
+        ["Date", tx.date || "—"],
+        ["Client", getClientLabelById(tx.clientId || "—")],
+        ["Type", tx.type || "—"],
+        ["From", tx.from || "—"],
+        ["To", tx.to || "—"],
+        ["Platform", tx.platform || "—"],
+        ["Category", tx.category || "—"],
+        ["Status", tx.status ? statusLabel(tx.status) : "—"],
+        ["Account", tx.account || "—"],
+        ["Gross", (tx.grossAmount != null ? String(Number(tx.grossAmount).toFixed(2)) : "—")],
+        ["Fee", (tx.feeAmount != null ? String(Number(tx.feeAmount).toFixed(2)) : "—")],
+        ["Net", (tx.netAmount != null ? String(Number(tx.netAmount).toFixed(2)) : "—")],
+        ["Proof", tx.proof || "—"],
+        ["Description", tx.description || "—"],
+        ["Note", tx.note || "—"],
+        ["Amount (USD)", money(tx.amount)]
+      ];
+
+      kv.innerHTML = pairs.map(([k,v]) => `
+        <div class="kv-row">
+          <div class="kv-key">${escapeHtml(k)}</div>
+          <div class="kv-val" title="${escapeHtml(String(v ?? "—"))}">${escapeHtml(String(v ?? "—"))}</div>
+        </div>
+      `).join("");
+
+      drawer.classList.add("active");
+      drawer.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDrawer(){
+      state.activeId = null;
+      drawer.classList.remove("active");
+      drawer.setAttribute("aria-hidden", "true");
+    }
+
+    overlay.addEventListener("click", closeDrawer);
+    btnClose.addEventListener("click", closeDrawer);
+    btnClose2.addEventListener("click", closeDrawer);
+
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape" && drawer.classList.contains("active")) closeDrawer();
+    });
+
+    btnCopyJson.addEventListener("click", async () => {
+      const tx = findById(state.activeId);
+      if(!tx) return;
+      const text = JSON.stringify(tx, null, 2);
+      try{
+        await navigator.clipboard.writeText(text);
+        btnCopyJson.textContent = "Copied!";
+        setTimeout(()=> btnCopyJson.textContent = "Copy JSON", 900);
+      }catch(e){
+        alert("Clipboard blocked by browser. Copy manually from console.");
+        console.log(text);
+      }
+    });
+
+    /* Export */
+    function download(name, content, type){
+      const blob = new Blob([content], { type: type || "text/plain" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = name;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    document.getElementById("lg_export_json").addEventListener("click", () => {
+      const rows = getFiltered();
+      download("ledger-filtered.json", JSON.stringify({ ledger: rows }, null, 2), "application/json");
+    });
+
+    document.getElementById("lg_export_csv").addEventListener("click", () => {
+      const rows = getFiltered();
+      const headers = ["date","type","from","to","clientId","platform","category","status","note","proof","amount"];
+      const csv = [
+        headers.join(","),
+        ...rows.map(tx => headers.map(h => {
+          const val = (tx[h] ?? (h === "clientId" ? tx.clientId : ""));
+          // CSV escape
+          const s = String(val ?? "");
+          return `"${s.replaceAll('"','""')}"`;
+        }).join(","))
+      ].join("\n");
+
+      download("ledger-filtered.csv", csv, "text/csv");
+    });
+
+    /* Filters events */
+    ["lg_search","lg_client","lg_type","lg_time"].forEach(id => {
+      const el = document.getElementById(id);
+      el.addEventListener(id === "lg_search" ? "input" : "change", render);
+    });
+
+    document.getElementById("lg_clear").addEventListener("click", () => {
+      document.getElementById("lg_search").value = "";
+      document.getElementById("lg_client").value = "__all__";
+      document.getElementById("lg_type").value = "__all__";
+      document.getElementById("lg_time").value = "all";
+      render();
+    });
+
+    /* Page tabs navigation (same as you used) */
+    const PAGE_ROUTES = {
+      finance: "finance.html",
+      transactions: "transactions.html",
+      ledger: "ledger.html"
+    };
+
+    function getCurrentFileName(){
+      const p = window.location.pathname || "";
+      const parts = p.split("/");
+      return (parts[parts.length - 1] || "").toLowerCase();
+    }
+    function detectActivePage(){
+      const file = getCurrentFileName();
+      for (const [key, filename] of Object.entries(PAGE_ROUTES)){
+        if ((filename || "").toLowerCase() === file) return key;
+      }
+      return "ledger";
+    }
+    function setActiveTabUI(activeKey){
+      document.querySelectorAll("#pageTabs .page-tab").forEach(btn=>{
+        const isOn = btn.dataset.page === activeKey;
+        btn.classList.toggle("active", isOn);
+        btn.setAttribute("aria-selected", isOn ? "true" : "false");
+      });
+    }
+    function navigateTo(key){
+      const target = PAGE_ROUTES[key];
+      if(!target) return;
+      window.location.href = target;
+    }
+    const active = detectActivePage();
+    setActiveTabUI(active);
+
+    document.getElementById("pageTabs")?.addEventListener("click", (e)=>{
+      const btn = e.target.closest(".page-tab");
+      if(!btn) return;
+
+      const key = btn.dataset.page;
+      setActiveTabUI(key);
+
+      if(key === detectActivePage()) return;
+      navigateTo(key);
+    });
+
+    document.getElementById("pageTabs")?.addEventListener("keydown", (e)=>{
+      const tabs = [...document.querySelectorAll("#pageTabs .page-tab")];
+      const idx = tabs.findIndex(t => t.classList.contains("active"));
+      if(idx < 0) return;
+
+      if(e.key === "ArrowRight" || e.key === "ArrowLeft"){
+        e.preventDefault();
+        const next = e.key === "ArrowRight"
+          ? tabs[(idx + 1) % tabs.length]
+          : tabs[(idx - 1 + tabs.length) % tabs.length];
+        next.focus();
+        next.click();
+      }
+    });
+
+    /* Boot */
+    load();
+    buildClientOptions();
+    buildTypeOptions();
+    render();
+  </script>
+</body>
+</html>
