@@ -2590,8 +2590,14 @@
             loadAccountsFromStorage();
             initializeTable();
             updateAllStatusDropdowns();
-            // Apply initial filter to show only assigned accounts
-            applyAllFilters();
+            
+            // Load saved filter preferences
+            loadFilterPreferences();
+            
+            // If no saved preferences, apply initial filter to show only assigned accounts
+            if (!sessionStorage.getItem('accountsFilterPreferences') && !localStorage.getItem('accountsFilterPreferences')) {
+                applyAllFilters();
+            }
         });
 
         // Load accounts data from localStorage
@@ -3272,6 +3278,9 @@
             const contract = document.getElementById('contractFilter').value.toLowerCase();
             const tag = document.getElementById('tagFilter').value.toLowerCase();
 
+            // Save filter preferences to sessionStorage
+            saveFilterPreferences();
+
             const rows = document.querySelectorAll('#accountsTable tr');
             rows.forEach(row => {
                 let show = true;
@@ -3334,6 +3343,64 @@
 
                 row.style.display = show ? '' : 'none';
             });
+        }
+        
+        // ================= FILTER PREFERENCES (SESSION & PERSISTENT) =================
+        
+        function saveFilterPreferences() {
+            const preferences = {
+                searchTerm: document.getElementById('searchInput').value,
+                platform: document.getElementById('platformFilter').value,
+                status: document.getElementById('statusFilter').value,
+                assigned: document.getElementById('assignedFilter').value,
+                assetType: document.getElementById('assetTypeFilter').value,
+                balanceType: document.getElementById('balanceTypeFilter').value,
+                contract: document.getElementById('contractFilter').value,
+                tag: document.getElementById('tagFilter').value
+            };
+            
+            // Save to sessionStorage (for current session only)
+            sessionStorage.setItem('accountsFilterPreferences', JSON.stringify(preferences));
+            
+            // Optionally save to localStorage (persistent across sessions)
+            // Uncomment the line below if you want filters to persist between sessions
+            // localStorage.setItem('accountsFilterPreferences', JSON.stringify(preferences));
+        }
+        
+        function loadFilterPreferences() {
+            // Try to load from sessionStorage first (current session)
+            let savedPreferences = sessionStorage.getItem('accountsFilterPreferences');
+            
+            // If not in session, try localStorage (persistent)
+            if (!savedPreferences) {
+                savedPreferences = localStorage.getItem('accountsFilterPreferences');
+            }
+            
+            if (savedPreferences) {
+                try {
+                    const preferences = JSON.parse(savedPreferences);
+                    
+                    // Restore filter values
+                    if (preferences.searchTerm) document.getElementById('searchInput').value = preferences.searchTerm;
+                    if (preferences.platform) document.getElementById('platformFilter').value = preferences.platform;
+                    if (preferences.status) document.getElementById('statusFilter').value = preferences.status;
+                    if (preferences.assigned) document.getElementById('assignedFilter').value = preferences.assigned;
+                    if (preferences.assetType) document.getElementById('assetTypeFilter').value = preferences.assetType;
+                    if (preferences.balanceType) document.getElementById('balanceTypeFilter').value = preferences.balanceType;
+                    if (preferences.contract) document.getElementById('contractFilter').value = preferences.contract;
+                    if (preferences.tag) document.getElementById('tagFilter').value = preferences.tag;
+                    
+                    // Apply filters
+                    applyAllFilters();
+                } catch (e) {
+                    console.error('Error loading filter preferences:', e);
+                }
+            }
+        }
+        
+        function clearFilterPreferences() {
+            sessionStorage.removeItem('accountsFilterPreferences');
+            localStorage.removeItem('accountsFilterPreferences');
         }
 
         // ================= DELETE ACCOUNTS FUNCTIONALITY =================
