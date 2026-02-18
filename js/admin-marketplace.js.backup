@@ -767,62 +767,44 @@
             }
             
             const discountHTML = `
-                <div class="discount-item" data-index="${index}" style="border: 1px solid #e0e0e0; border-radius: 8px; background: white; margin-bottom: 0.75rem; overflow: hidden;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); cursor: pointer;" onclick="toggleDiscountCollapse('${prefix}', ${index})">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <span style="color: white; font-weight: 600; font-size: 0.9rem;">🏷️ Discount #${index + 1}</span>
-                            <span class="collapse-icon" id="${prefix}_collapse_${index}" style="color: white; font-size: 0.8rem;">▼</span>
-                        </div>
-                        <button type="button" class="btn btn-small" style="background: rgba(255,255,255,0.2); color: white; padding: 0.25rem 0.6rem; font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.3);" onclick="event.stopPropagation(); removeDiscountRow('${prefix}', ${index})">🗑️ Remove</button>
+                <div class="discount-item" data-index="${index}" style="border: 1px solid #e5e5e5; padding: 16px; border-radius: 8px; background: #fafafa;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <strong style="color: #2c3e50;">Discount #${index + 1}</strong>
+                        <button type="button" class="btn btn-small" style="background: #e74c3c; color: white; padding: 0.3rem 0.6rem;" onclick="removeDiscountRow('${prefix}', ${index})">Remove</button>
                     </div>
                     
-                    <div class="discount-content" id="${prefix}_content_${index}" style="padding: 1rem;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
-                            <label style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem; border: 2px solid #e0e0e0; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onchange="this.style.borderColor = this.querySelector('input').checked ? '#667eea' : '#e0e0e0'">
-                                <input type="radio" name="${prefix}_discountType_${index}" value="percentage" style="margin: 0;">
-                                <span style="font-size: 0.85rem; font-weight: 500;">📊 Percentage (%)</span>
-                            </label>
-                            <label style="display: flex; align-items: center; gap: 0.4rem; padding: 0.5rem; border: 2px solid #e0e0e0; border-radius: 6px; cursor: pointer; transition: all 0.2s;" onchange="this.style.borderColor = this.querySelector('input').checked ? '#667eea' : '#e0e0e0'">
-                                <input type="radio" name="${prefix}_discountType_${index}" value="fixed" style="margin: 0;">
-                                <span style="font-size: 0.85rem; font-weight: 500;">💵 Fixed ($)</span>
-                            </label>
-                        </div>
-                        
-                        <div class="form-group" style="margin-bottom: 0.75rem;">
-                            <label style="font-size: 0.85rem; font-weight: 500; color: #555; margin-bottom: 0.3rem; display: block;">Discount Value</label>
-                            <input type="number" class="discount-value" data-index="${index}" placeholder="0" min="0" step="0.01" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;">
-                        </div>
-                        
-                        <div class="form-group" style="margin-bottom: 0.75rem;">
-                            <label style="font-size: 0.85rem; font-weight: 500; color: #555; margin-bottom: 0.3rem; display: block;">Apply To</label>
-                            <select class="discount-target" data-index="${index}" onchange="toggleSpecificClients('${prefix}', ${index})" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem;">
-                                <option value="all">🌍 All Clients</option>
-                                <option value="specific">👤 Specific Clients</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group specific-clients-group" data-index="${index}" style="display: none;">
-                            <label style="font-size: 0.85rem; font-weight: 500; color: #555; margin-bottom: 0.3rem; display: block;">Client IDs (comma separated)</label>
-                            <input type="text" class="discount-clients" data-index="${index}" placeholder="e.g. client_001, client_002" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; font-family: monospace;">
-                        </div>
+                    <div class="discount-type-selector" style="margin-bottom: 12px;">
+                        <label>
+                            <input type="radio" name="${prefix}_discountType_${index}" value="percentage">
+                            Percentage (%)
+                        </label>
+                        <label>
+                            <input type="radio" name="${prefix}_discountType_${index}" value="fixed">
+                            Fixed Amount ($)
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Discount Value</label>
+                        <input type="number" class="discount-value" data-index="${index}" placeholder="0" min="0" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Apply To:</label>
+                        <select class="discount-target" data-index="${index}" onchange="toggleSpecificClients('${prefix}', ${index})">
+                            <option value="all">All Clients</option>
+                            <option value="specific">Specific Clients</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group specific-clients-group" data-index="${index}" style="display: none;">
+                        <label>Client IDs (comma separated)</label>
+                        <input type="text" class="discount-clients" data-index="${index}" placeholder="e.g. client_001, client_002">
                     </div>
                 </div>
             `;
             
             discountsList.insertAdjacentHTML('beforeend', discountHTML);
-        }
-
-        function toggleDiscountCollapse(prefix, index) {
-            const content = document.getElementById(`${prefix}_content_${index}`);
-            const icon = document.getElementById(`${prefix}_collapse_${index}`);
-            
-            if (content.style.display === 'none') {
-                content.style.display = 'block';
-                icon.textContent = '▼';
-            } else {
-                content.style.display = 'none';
-                icon.textContent = '▶';
-            }
         }
 
         function removeDiscountRow(prefix, index) {
@@ -993,7 +975,7 @@ function addPackageToGrid(pkg) {
         priceHTML = `
             <div class="package-price" style="display: flex; justify-content: space-between; align-items: center; gap: 0.5rem;">
                 <span>from ${pkg.price}</span>
-                <button class="btn btn-small" style="background: #f39c12; color: white; padding: 0.3rem 0.6rem; font-size: 0.75rem; white-space: nowrap;" onclick="event.stopPropagation(); openDiscountsView(` + pkg.id + `);">View Discounts</button>
+                <button class="btn btn-small" style="background: #f39c12; color: white; padding: 0.3rem 0.6rem; font-size: 0.75rem; white-space: nowrap;" onclick="event.stopPropagation(); openDiscountsView(${pkg.id});">View Discounts</button>
             </div>
         `;
     } else {
@@ -1075,67 +1057,52 @@ function openDiscountsView(packageId) {
         `;
     } else {
         content += `
-            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="background: white; width: 50px; height: 50px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="background: white; width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
                         ${pkg.icon}
                     </div>
                     <div style="flex: 1; color: white;">
-                        <h3 style="margin: 0; font-size: 1rem; font-weight: 600;">${pkg.name}</h3>
-                        <p style="margin: 0.2rem 0 0 0; opacity: 0.9; font-size: 0.8rem;">${pkg.subtitle}</p>
-                        <div style="margin-top: 0.4rem; display: inline-block; background: rgba(255,255,255,0.2); padding: 0.2rem 0.6rem; border-radius: 15px; font-size: 0.75rem; font-weight: 600;">
+                        <h3 style="margin: 0; font-size: 1.2rem; font-weight: 600;">${pkg.name}</h3>
+                        <p style="margin: 0.25rem 0 0 0; opacity: 0.9; font-size: 0.9rem;">${pkg.subtitle}</p>
+                        <div style="margin-top: 0.5rem; display: inline-block; background: rgba(255,255,255,0.2); padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.85rem; font-weight: 600;">
                             Base: ${pkg.price}
                         </div>
                     </div>
-                    <button class="btn btn-small" style="background: rgba(255,255,255,0.2); color: white; padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 6px; border: 1px solid rgba(255,255,255,0.3);" onclick="editPackageInPanel(${pkg.id})">
+                    <button class="btn btn-small" style="background: rgba(255,255,255,0.2); color: white; padding: 0.5rem 1rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.3);" onclick="editPackageInPanel(${pkg.id})">
                         ✏️ Edit
                     </button>
                 </div>
-                
-                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.2);">
-                    <h4 style="margin: 0 0 0.75rem 0; color: white; font-size: 0.85rem; font-weight: 600; opacity: 0.95;">
+
+                <div style="background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                    <h4 style="margin: 0 0 1rem 0; color: #2c3e50; font-size: 0.95rem; font-weight: 600; padding-bottom: 0.75rem; border-bottom: 2px solid #e5e7eb;">
                         Active Discounts (${pkg.discounts.length})
                     </h4>
         `;
 
         pkg.discounts.forEach((discount, index) => {
             const discountedPrice = calculateDiscountedPrice(parseFloat(pkg.price), discount.type, parseFloat(discount.value));
-            const discountLabel = discount.type === 'percentage' ? `${discount.value}%` : `$${discount.value}`;
-            
-            // Always show who it applies to
-            let targetDisplay = '';
-            if (discount.target === 'all') {
-                targetDisplay = '<span style="color: #10b981; font-weight: 600;">All Clients</span>';
-            } else {
-                targetDisplay = `<span style="color: #3b82f6; font-weight: 600;">Client: ${discount.clients || 'N/A'}</span>`;
-            }
+            const discountLabel = discount.type === 'percentage' ? `${discount.value}%` : `${discount.value}`;
 
             content += `
-                <div style="background: rgba(255,255,255,0.95); border: 1px solid rgba(255,255,255,0.3); border-radius: 6px; padding: 0.4rem 0.6rem; margin-bottom: ${index < pkg.discounts.length - 1 ? '0.5rem' : '0'}; display: flex; align-items: center; gap: 0.5rem; font-size: 0.7rem;">
-                    
-                    <span style="background: #3b82f6; color: white; width: 20px; height: 20px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; flex-shrink: 0;">${index + 1}</span>
-                    
-                    <div style="display: flex; align-items: center; gap: 0.25rem; min-width: 55px;">
-                        <span style="font-size: 0.75rem;">${discount.type === 'percentage' ? '📊' : '💵'}</span>
-                        <span style="color: #64748b; font-size: 0.65rem; font-weight: 500;">${discount.type === 'percentage' ? '%' : 'Fix'}</span>
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 0.75rem 1rem; margin-bottom: ${index < pkg.discounts.length - 1 ? '0.75rem' : '0'}; display: flex; align-items: center; gap: 1rem;">
+                    <span style="background: #3b82f6; color: white; width: 28px; height: 28px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">${index + 1}</span>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; min-width: 140px;">
+                        <span style="font-size: 1rem;">${discount.type === 'percentage' ? '📊' : '💵'}</span>
+                        <span style="color: #64748b; font-size: 0.8rem; font-weight: 500;">${discount.type === 'percentage' ? 'Percentage' : 'Fixed'}</span>
                     </div>
-                    
-                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 0.2rem 0.45rem; border-radius: 4px; font-size: 0.65rem; font-weight: 700; flex-shrink: 0;">-${discountLabel}</div>
-                    
-                    <span style="color: #cbd5e1; font-size: 0.75rem; flex-shrink: 0;">→</span>
-                    
-                    <div style="display: flex; align-items: center; gap: 0.3rem; min-width: 65px;">
-                        <span style="color: #10b981; font-weight: 700; font-size: 0.75rem;">$${discountedPrice.toFixed(2)}</span>
-                        <span style="color: #94a3b8; font-size: 0.6rem; text-decoration: line-through;">$${pkg.price}</span>
+                    <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.85rem; font-weight: 700; flex-shrink: 0;">-${discountLabel}</div>
+                    <span style="color: #cbd5e1; font-size: 1.2rem; flex-shrink: 0;">→</span>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; min-width: 120px;">
+                        <span style="color: #10b981; font-weight: 700; font-size: 1.1rem;">${discountedPrice.toFixed(2)}</span>
+                        <span style="color: #94a3b8; font-size: 0.75rem; text-decoration: line-through;">${pkg.price}</span>
                     </div>
-                    
-                    <div style="width: 1px; height: 16px; background: rgba(0,0,0,0.1); flex-shrink: 0;"></div>
-                    
-                    <div style="flex: 1; font-size: 0.65rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                        ${targetDisplay}
+                    <div style="width: 1px; height: 24px; background: #e2e8f0; flex-shrink: 0;"></div>
+                    <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem; min-width: 0;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: ${discount.target === 'all' ? '#10b981' : '#3b82f6'};">${discount.target === 'all' ? '🌍 All' : '👤 Specific'}</span>
+                        ${discount.target === 'specific' && discount.clients ? `<span style="font-size: 0.75rem; color: #64748b; font-family: monospace; background: #f1f5f9; padding: 0.2rem 0.5rem; border-radius: 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${discount.clients}</span>` : ''}
                     </div>
-                    
-                    <button class="btn btn-small" style="background: #ef4444; color: white; padding: 0.25rem 0.4rem; font-size: 0.65rem; border-radius: 4px; border: none; cursor: pointer; flex-shrink: 0;" onclick="removeDiscountMultiple(` + pkg.id + `, ` + index + `)">🗑️</button>
+                    <button class="btn btn-small" style="background: #ef4444; color: white; padding: 0.35rem 0.65rem; font-size: 0.75rem; border-radius: 6px; border: none; cursor: pointer; flex-shrink: 0;" onclick="removeDiscountMultiple(${pkg.id}, ${index})">🗑️</button>
                 </div>
             `;
         });
