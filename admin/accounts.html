@@ -958,7 +958,12 @@
                         <td>General</td>
                         <td>Shared wallet</td>
                         <td>
-                            <div style="font-weight: 600;">Main: <span id="access-1">Main Profile</span></div>
+                            <div style="font-weight: 600;">
+                                Main: <span id="access-1">Main Profile</span>
+                                <div>
+                                    <a href="javascript:void(0)" onclick="showLoginDetails(1)" style="font-size: 0.75rem; color: #3498db; text-decoration: none; font-weight: 400;">log details</a>
+                                </div>
+                            </div>
                         </td>
                         <td style="font-weight: 600;">$134.96</td>
                         <td>
@@ -994,7 +999,12 @@
                         <td>Individual</td>
                         <td style="font-weight: 600;">$1,080.00</td>
                         <td>
-                            <div style="font-weight: 600;">Main: <span id="access-2">Gmail Main</span></div>
+                            <div style="font-weight: 600;">
+                                Main: <span id="access-2">Gmail Main</span>
+                                <div>
+                                    <a href="javascript:void(0)" onclick="showLoginDetails(2)" style="font-size: 0.75rem; color: #3498db; text-decoration: none; font-weight: 400;">log details</a>
+                                </div>
+                            </div>
                         </td>
                         <td style="font-weight: 600;">$892.00</td>
                         <td>
@@ -1030,7 +1040,12 @@
                         <td>General</td>
                         <td>Shared wallet</td>
                         <td>
-                            <div style="font-weight: 600;">Main: <span id="access-3">TikTok Pro</span></div>
+                            <div style="font-weight: 600;">
+                                Main: <span id="access-3">TikTok Pro</span>
+                                <div>
+                                    <a href="javascript:void(0)" onclick="showLoginDetails(3)" style="font-size: 0.75rem; color: #3498db; text-decoration: none; font-weight: 400;">log details</a>
+                                </div>
+                            </div>
                         </td>
                         <td style="font-weight: 600;">$3,200.00</td>
                         <td>
@@ -1066,7 +1081,12 @@
                         <td>Individual</td>
                         <td style="font-weight: 600;">$5,900.00</td>
                         <td>
-                            <div style="font-weight: 600;">Main: <span id="access-4">Taboola Master</span></div>
+                            <div style="font-weight: 600;">
+                                Main: <span id="access-4">Taboola Master</span>
+                                <div>
+                                    <a href="javascript:void(0)" onclick="showLoginDetails(4)" style="font-size: 0.75rem; color: #3498db; text-decoration: none; font-weight: 400;">log details</a>
+                                </div>
+                            </div>
                         </td>
                         <td style="font-weight: 600;">$2,100.00</td>
                         <td>
@@ -1102,7 +1122,12 @@
                         <td>General</td>
                         <td>Shared wallet</td>
                         <td>
-                            <div style="font-weight: 600;">Main: <span id="access-5">Snap Main</span></div>
+                            <div style="font-weight: 600;">
+                                Main: <span id="access-5">Snap Main</span>
+                                <div>
+                                    <a href="javascript:void(0)" onclick="showLoginDetails(5)" style="font-size: 0.75rem; color: #3498db; text-decoration: none; font-weight: 400;">log details</a>
+                                </div>
+                            </div>
                         </td>
                         <td style="font-weight: 600;">$1,450.00</td>
                         <td>
@@ -1138,7 +1163,12 @@
                         <td>General</td>
                         <td>Shared wallet</td>
                         <td>
-                            <div style="font-weight: 600;">Main: <span id="access-6">FB Premium</span></div>
+                            <div style="font-weight: 600;">
+                                Main: <span id="access-6">FB Premium</span>
+                                <div>
+                                    <a href="javascript:void(0)" onclick="showLoginDetails(6)" style="font-size: 0.75rem; color: #3498db; text-decoration: none; font-weight: 400;">log details</a>
+                                </div>
+                            </div>
                         </td>
                         <td style="font-weight: 600;">$0.00</td>
                         <td>
@@ -1174,7 +1204,12 @@
                         <td>Individual</td>
                         <td style="font-weight: 600;">$0.00</td>
                         <td>
-                            <div style="font-weight: 600;">Main: <span id="access-7">Google Fresh</span></div>
+                            <div style="font-weight: 600;">
+                                Main: <span id="access-7">Google Fresh</span>
+                                <div>
+                                    <a href="javascript:void(0)" onclick="showLoginDetails(7)" style="font-size: 0.75rem; color: #3498db; text-decoration: none; font-weight: 400;">log details</a>
+                                </div>
+                            </div>
                         </td>
                         <td style="font-weight: 600;">$0.00</td>
                         <td>
@@ -1210,7 +1245,12 @@
                         <td>General</td>
                         <td>Shared wallet</td>
                         <td>
-                            <div style="font-weight: 600;">Main: <span id="access-8">TikTok New</span></div>
+                            <div style="font-weight: 600;">
+                                Main: <span id="access-8">TikTok New</span>
+                                <div>
+                                    <a href="javascript:void(0)" onclick="showLoginDetails(8)" style="font-size: 0.75rem; color: #3498db; text-decoration: none; font-weight: 400;">log details</a>
+                                </div>
+                            </div>
                         </td>
                         <td style="font-weight: 600;">$0.00</td>
                         <td>
@@ -2299,29 +2339,29 @@
         // Profiles data for each account
         const accountProfiles = {
             1: [ // Facebook account - Dennis Robertson
-                { id: 1, name: 'Main Profile', email: 'main.fb@example.com', password: '********', twoFA: 'JBSWY3DPEHPK3PXP', recoveryEmail: 'recovery.fb.main@gmail.com', recoveryPassword: 'RecPass123!', tag: 'Primary', status: 'active' }
+                { id: 1, name: 'Main Profile', email: 'main.fb@example.com', password: 'FbPass2024!', twoFA: 'JBSWY3DPEHPK3PXP', recoveryEmail: 'recovery.fb.main@gmail.com', recoveryPassword: 'RecPass123!', tag: 'Primary', status: 'active' }
             ],
             2: [ // Google account - Ada Account Pro
-                { id: 2, name: 'Gmail Main', email: 'gmail.main@example.com', password: '********', twoFA: 'ABCDE12345', recoveryEmail: 'recovery.gmail.main@outlook.com', recoveryPassword: 'GmailRec456!', tag: 'Primary', status: 'active' },
-                { id: 6, name: 'Gmail Backup', email: 'gmail.backup@example.com', password: '********', twoFA: 'FGHIJ67890', recoveryEmail: 'recovery.gmail.backup@yahoo.com', recoveryPassword: 'BackupRec789!', tag: 'Backup', status: 'active' }
+                { id: 2, name: 'Gmail Main', email: 'gmail.main@example.com', password: 'GoogleMain456!', twoFA: 'ABCDE12345', recoveryEmail: 'recovery.gmail.main@outlook.com', recoveryPassword: 'GmailRec456!', tag: 'Primary', status: 'active' },
+                { id: 6, name: 'Gmail Backup', email: 'gmail.backup@example.com', password: 'GmailBackup789!', twoFA: 'FGHIJ67890', recoveryEmail: 'recovery.gmail.backup@yahoo.com', recoveryPassword: 'BackupRec789!', tag: 'Backup', status: 'active' }
             ],
             3: [ // TikTok account - TikTok Campaign
-                { id: 3, name: 'TikTok Pro', email: 'tiktok.pro@example.com', password: '********', twoFA: 'KLMNO11111', recoveryEmail: 'recovery.tiktok@gmail.com', recoveryPassword: 'TikTokRec321!', tag: 'Primary', status: 'active' }
+                { id: 3, name: 'TikTok Pro', email: 'tiktok.pro@example.com', password: 'TikTokPro321!', twoFA: 'KLMNO11111', recoveryEmail: 'recovery.tiktok@gmail.com', recoveryPassword: 'TikTokRec321!', tag: 'Primary', status: 'active' }
             ],
             4: [ // Taboola account - Native Ads Pro
-                { id: 4, name: 'Taboola Master', email: 'taboola.master@example.com', password: '********', twoFA: 'PQRST22222', recoveryEmail: 'recovery.taboola@protonmail.com', recoveryPassword: 'TaboolaRec654!', tag: 'Primary', status: 'active' }
+                { id: 4, name: 'Taboola Master', email: 'taboola.master@example.com', password: 'TaboolaMaster654!', twoFA: 'PQRST22222', recoveryEmail: 'recovery.taboola@protonmail.com', recoveryPassword: 'TaboolaRec654!', tag: 'Primary', status: 'active' }
             ],
             5: [ // Snapchat account - Snap Ads Elite
-                { id: 5, name: 'Snap Main', email: 'snap.main@example.com', password: '********', twoFA: 'UVWXY33333', recoveryEmail: 'recovery.snap@gmail.com', recoveryPassword: 'SnapRec987!', tag: 'Primary', status: 'suspended' }
+                { id: 5, name: 'Snap Main', email: 'snap.main@example.com', password: 'SnapMain987!', twoFA: 'UVWXY33333', recoveryEmail: 'recovery.snap@gmail.com', recoveryPassword: 'SnapRec987!', tag: 'Primary', status: 'suspended' }
             ],
             6: [ // Facebook unassigned - FB Premium Account
-                { id: 8, name: 'FB Premium', email: 'fb.premium@example.com', password: '********', twoFA: 'AAAAA44444', recoveryEmail: 'recovery.fb.premium@gmail.com', recoveryPassword: 'PremiumRec111!', tag: 'Primary', status: 'active' }
+                { id: 8, name: 'FB Premium', email: 'fb.premium@example.com', password: 'FbPremium111!', twoFA: 'AAAAA44444', recoveryEmail: 'recovery.fb.premium@gmail.com', recoveryPassword: 'PremiumRec111!', tag: 'Primary', status: 'active' }
             ],
             7: [ // Google unassigned - Google Ads Fresh
-                { id: 9, name: 'Google Fresh', email: 'google.fresh@example.com', password: '********', twoFA: 'BBBBB55555', recoveryEmail: 'recovery.google.fresh@outlook.com', recoveryPassword: 'FreshRec222!', tag: 'Primary', status: 'active' }
+                { id: 9, name: 'Google Fresh', email: 'google.fresh@example.com', password: 'GoogleFresh222!', twoFA: 'BBBBB55555', recoveryEmail: 'recovery.google.fresh@outlook.com', recoveryPassword: 'FreshRec222!', tag: 'Primary', status: 'active' }
             ],
             8: [ // TikTok unassigned - TikTok New Profile
-                { id: 10, name: 'TikTok New', email: 'tiktok.new@example.com', password: '********', twoFA: 'CCCCC66666', recoveryEmail: 'recovery.tiktok.new@yahoo.com', recoveryPassword: 'NewTikRec333!', tag: 'Primary', status: 'active' }
+                { id: 10, name: 'TikTok New', email: 'tiktok.new@example.com', password: 'TikTokNew333!', twoFA: 'CCCCC66666', recoveryEmail: 'recovery.tiktok.new@yahoo.com', recoveryPassword: 'NewTikRec333!', tag: 'Primary', status: 'active' }
             ]
         };
 
@@ -3000,6 +3040,60 @@
             document.getElementById('notesModal').classList.remove('active');
             document.getElementById('notesOverlay').classList.remove('active');
         }
+        
+        // ================= LOGIN DETAILS POPUP =================
+        
+        function showLoginDetails(accountId) {
+            const account = accountsData[accountId];
+            if (!account) return;
+            
+            // Get the active profile for this account
+            const profiles = accountProfiles[accountId];
+            if (!profiles || profiles.length === 0) return;
+            
+            // Find the active profile
+            const activeProfile = profiles.find(p => p.id === account.activeProfileId) || profiles[0];
+            
+            // Populate popup with profile data
+            document.getElementById('loginProfileName').textContent = activeProfile.name;
+            document.getElementById('loginEmail').value = activeProfile.email;
+            document.getElementById('loginPassword').value = activeProfile.password;
+            
+            // Show popup
+            document.getElementById('loginDetailsOverlay').style.display = 'flex';
+            document.getElementById('loginDetailsPopup').style.display = 'block';
+        }
+        
+        function closeLoginDetails() {
+            document.getElementById('loginDetailsOverlay').style.display = 'none';
+            document.getElementById('loginDetailsPopup').style.display = 'none';
+        }
+        
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('loginPassword');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+            } else {
+                passwordInput.type = 'password';
+            }
+        }
+        
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            element.select();
+            document.execCommand('copy');
+            
+            // Show feedback
+            const button = event.target;
+            const originalText = button.textContent;
+            button.textContent = '✓';
+            button.style.background = '#27ae60';
+            
+            setTimeout(() => {
+                button.textContent = originalText;
+                button.style.background = elementId === 'loginEmail' ? '#3498db' : '#3498db';
+            }, 1500);
+        }
 
         function openAddAccountModal() {
             document.getElementById('addAccountModal').classList.add('active');
@@ -3584,6 +3678,49 @@
 <!-- Undo Toast Notification -->
 <div id="undoToast" style="position: fixed; bottom: 2rem; right: 2rem; background: #34495e; color: white; padding: 1rem 1.5rem; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,0.4); display: none; align-items: center; gap: 1rem; z-index: 10001; min-width: 320px;">
     <span id="undoMessage" style="font-size: 0.95rem; flex: 1;">Deleted <strong id="undoCount">0</strong> account(s)</span>
+    <button onclick="undoDelete()" style="background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s;">
+        ↶ UNDO
+    </button>
+    <div id="undoProgress" style="position: absolute; bottom: 0; left: 0; height: 4px; background: #3498db; width: 100%; border-radius: 0 0 10px 10px;"></div>
+</div>
+
+<!-- Login Details Popup -->
+<div id="loginDetailsOverlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(3px); display: none; z-index: 10002; align-items: center; justify-content: center;" onclick="closeLoginDetails()"></div>
+<div id="loginDetailsPopup" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.3); padding: 1.5rem; min-width: 350px; max-width: 450px; display: none; z-index: 10003;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e5e5e5; padding-bottom: 1rem;">
+        <h3 style="margin: 0; color: #2c3e50; font-size: 1.2rem;">🔑 Login Details</h3>
+        <button onclick="closeLoginDetails()" style="background: none; border: none; font-size: 1.5rem; color: #999; cursor: pointer; padding: 0; width: 30px; height: 30px; line-height: 1;">&times;</button>
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-weight: 600; color: #555; margin-bottom: 0.5rem; font-size: 0.9rem;">Profile Name</label>
+        <div id="loginProfileName" style="padding: 0.75rem; background: #f8f9fa; border-radius: 6px; font-weight: 600; color: #2c3e50;">Main Profile</div>
+    </div>
+    
+    <div style="margin-bottom: 1rem;">
+        <label style="display: block; font-weight: 600; color: #555; margin-bottom: 0.5rem; font-size: 0.9rem;">Email</label>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" id="loginEmail" readonly value="email@example.com" style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f8f9fa; font-family: monospace;">
+            <button onclick="copyToClipboard('loginEmail')" style="background: #3498db; color: white; border: none; padding: 0.75rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem;" title="Copy email">
+                📋
+            </button>
+        </div>
+    </div>
+    
+    <div style="margin-bottom: 1.5rem;">
+        <label style="display: block; font-weight: 600; color: #555; margin-bottom: 0.5rem; font-size: 0.9rem;">Password</label>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <input type="text" id="loginPassword" readonly value="password123" style="flex: 1; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f8f9fa; font-family: monospace;">
+            <button onclick="copyToClipboard('loginPassword')" style="background: #3498db; color: white; border: none; padding: 0.75rem 1rem; border-radius: 6px; cursor: pointer; font-size: 0.9rem;" title="Copy password">
+                📋
+            </button>
+        </div>
+    </div>
+    
+    <button onclick="closeLoginDetails()" style="width: 100%; background: #2c3e50; color: white; border: none; padding: 0.875rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 1rem;">
+        Close
+    </button>
+</div>
     <button onclick="undoDelete()" style="background: #3498db; color: white; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: background 0.2s;">
         ↶ UNDO
     </button>
