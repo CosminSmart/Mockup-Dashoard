@@ -214,8 +214,8 @@
         .side-panel {
             position: fixed;
             top: 0;
-            right: -500px;
-            width: 500px;
+            right: -650px;
+            width: 650px;
             height: 100vh;
             background: white;
             box-shadow: -4px 0 20px rgba(0,0,0,0.15);
@@ -1099,24 +1099,19 @@
                 statusText = '● In Stock';
             }
 
-            // Calculate discounted price if discount exists
-            let priceHTML = '';
+            // For admin view, always show regular price (no discount display)
+            let priceHTML = `<div class="package-price">from $${pkg.price}</div>`;
+            
+            // Add discount indicator badge if discount exists
+            let discountIndicator = '';
             if (pkg.discountType && pkg.discountValue > 0) {
-                const discountedPrice = calculateDiscountedPrice(parseFloat(pkg.price), pkg.discountType, parseFloat(pkg.discountValue));
                 const discountLabel = pkg.discountType === 'percentage' ? `${pkg.discountValue}%` : `$${pkg.discountValue}`;
-                priceHTML = `
-                    <div class="package-price">
-                        <span class="price-original">from $${pkg.price}</span>
-                        <span class="price-discounted">$${discountedPrice.toFixed(2)}</span>
-                        <span class="discount-badge">-${discountLabel}</span>
-                    </div>
-                `;
-            } else {
-                priceHTML = `<div class="package-price">from $${pkg.price}</div>`;
+                discountIndicator = `<span class="discount-badge" style="position: absolute; top: 40px; right: 12px;">🏷️ -${discountLabel}</span>`;
             }
             
             card.innerHTML = `
                 <span class="status-badge ${statusBadge}">${statusText}</span>
+                ${discountIndicator}
                 <div class="package-icon">${pkg.icon}</div>
                 <div class="package-title">${pkg.name}</div>
                 <div class="package-subtitle">${pkg.subtitle}</div>
@@ -1523,6 +1518,13 @@
             localStorage.setItem('marketplacePackages', JSON.stringify(packages));
             
             renderAllPackages();
+            
+            // If discounts view is open, refresh it
+            const discountsView = document.getElementById('discountsView');
+            if (discountsView && discountsView.style.display !== 'none') {
+                renderDiscountsView();
+            }
+            
             closeSidePanel();
             alert('✅ Package added successfully!');
         }
@@ -1559,8 +1561,167 @@
             localStorage.setItem('marketplacePackages', JSON.stringify(packages));
 
             renderAllPackages();
+            
+            // If discounts view is open, refresh it
+            const discountsView = document.getElementById('discountsView');
+            if (discountsView && discountsView.style.display !== 'none') {
+                renderDiscountsView();
+            }
+            
             viewPackage(id);
             alert('✅ Package updated successfully!');
+        }
+
+        function openDiscountsView() {
+            // Hide packages list
+            document.querySelector('.packages-list').style.display = 'none';
+            
+            // Create or show discounts view
+            let discountsView = document.getElementById('discountsView');
+            if (!discountsView) {
+                discountsView = document.createElement('div');
+                discountsView.id = 'discountsView';
+                discountsView.className = 'packages-list';
+                document.querySelector('.main').appendChild(discountsView);
+            }
+            
+            discountsView.style.display = 'block';
+            renderDiscountsView();
+        }
+
+        function closeDiscountsView() {
+            document.getElementById('discountsView').style.display = 'none';
+            document.querySelector('.packages-list').style.display = 'block';
+        }
+
+        function renderDiscountsView() {
+            const discountsView = document.getElementById('discountsView');
+            
+            // Debug: log all packages
+            console.log('All packages:', packages);
+            
+            const packagesWithDiscounts = packages.filter(pkg => {
+                const hasDiscount = pkg.discountType && pkg.discountValue && parseFloat(pkg.discountValue) > 0;
+                console.log(`Package ${pkg.name}: discountType=${pkg.discountType}, discountValue=${pkg.discountValue}, hasDiscount=${hasDiscount}`);
+                return hasDiscount;
+            });
+            
+            console.log('Packages with discounts:', packagesWithDiscounts);
+            
+            let html = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h2>🏷️ Active Discounts</h2>
+                    <button class="btn-add-package" style="background: #95a5a6;" onclick="closeDiscountsView()">
+                        <span>←</span>
+                        <span>Back to Packages</span>
+                    </button>
+                </div>
+            `;
+            
+            if (packagesWithDiscounts.length === 0) {
+                html += `
+                    <div style="text-align: center; padding: 3rem; color: #999;">
+                        <div style="font-size: 3rem; margin-bottom: 1rem;">🏷️</div>
+                        <p style="font-size: 1.1rem;">No active discounts</p>
+                        <p style="font-size: 0.9rem;">Add discounts to packages to see them here</p>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <table style="width: 100%; border-collapse: collapse; background: white;">
+                        <thead>
+                            <tr style="background: #2c3e50; color: white;">
+                                <th style="padding: 1rem; text-align: left;">Package</th>
+                                <th style="padding: 1rem; text-align: left;">Original Price</th>
+                                <th style="padding: 1rem; text-align: left;">Discount</th>
+                                <th style="padding: 1rem; text-align: left;">Discounted Price</th>
+                                <th style="padding: 1rem; text-align: center;">Status</th>
+                                <th style="padding: 1rem; text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                packagesWithDiscounts.forEach(pkg => {
+                    const discountedPrice = calculateDiscountedPrice(parseFloat(pkg.price), pkg.discountType, parseFloat(pkg.discountValue));
+                    const discountLabel = pkg.discountType === 'percentage' ? `${pkg.discountValue}%` : `$${pkg.discountValue}`;
+                    const isActive = pkg.discountActive !== false; // Default to true if not set
+                    
+                    html += `
+                        <tr style="border-bottom: 1px solid #e5e5e5;">
+                            <td style="padding: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <span style="font-size: 1.5rem;">${pkg.icon}</span>
+                                    <div>
+                                        <div style="font-weight: 600;">${pkg.name}</div>
+                                        <div style="font-size: 0.85rem; color: #666;">${pkg.subtitle}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td style="padding: 1rem; font-weight: 500;">$${pkg.price}</td>
+                            <td style="padding: 1rem;">
+                                <span style="background: #e74c3c; color: white; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.85rem; font-weight: 500;">
+                                    -${discountLabel}
+                                </span>
+                            </td>
+                            <td style="padding: 1rem; font-weight: 600; color: #27ae60; font-size: 1.1rem;">$${discountedPrice.toFixed(2)}</td>
+                            <td style="padding: 1rem; text-align: center;">
+                                <select onchange="toggleDiscountStatus(${pkg.id}, this.value)" style="padding: 0.4rem 0.75rem; border: 1px solid #ddd; border-radius: 4px; background: ${isActive ? '#d4f4dd' : '#ffebee'}; color: ${isActive ? '#0d7a2c' : '#c62828'}; font-weight: 500; cursor: pointer;">
+                                    <option value="active" ${isActive ? 'selected' : ''}>● Active</option>
+                                    <option value="inactive" ${!isActive ? 'selected' : ''}>○ Inactive</option>
+                                </select>
+                            </td>
+                            <td style="padding: 1rem; text-align: center;">
+                                <button class="btn btn-small" style="background: #3498db; color: white; padding: 0.4rem 0.75rem; border: none; border-radius: 4px; cursor: pointer; margin-right: 0.5rem;" onclick="editPackageInPanel(${pkg.id})">Edit</button>
+                                <button class="btn btn-small" style="background: #e74c3c; color: white; padding: 0.4rem 0.75rem; border: none; border-radius: 4px; cursor: pointer;" onclick="removeDiscount(${pkg.id})">Remove Discount</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                html += `
+                        </tbody>
+                    </table>
+                `;
+            }
+            
+            discountsView.innerHTML = html;
+        }
+
+        function toggleDiscountStatus(packageId, status) {
+            const pkg = packages.find(p => p.id === packageId);
+            if (!pkg) return;
+            
+            pkg.discountActive = (status === 'active');
+            
+            // Save to localStorage
+            localStorage.setItem('marketplacePackages', JSON.stringify(packages));
+            
+            renderDiscountsView();
+            
+            // Update the dropdown style
+            event.target.style.background = pkg.discountActive ? '#d4f4dd' : '#ffebee';
+            event.target.style.color = pkg.discountActive ? '#0d7a2c' : '#c62828';
+            
+            alert(`Discount ${pkg.discountActive ? 'activated' : 'deactivated'} for "${pkg.name}"`);
+        }
+
+        function removeDiscount(packageId) {
+            const pkg = packages.find(p => p.id === packageId);
+            if (!pkg) return;
+            
+            if (confirm(`Remove discount from "${pkg.name}"?`)) {
+                pkg.discountType = null;
+                pkg.discountValue = null;
+                pkg.discountActive = null;
+                
+                // Save to localStorage
+                localStorage.setItem('marketplacePackages', JSON.stringify(packages));
+                
+                renderDiscountsView();
+                renderAllPackages();
+                alert('✅ Discount removed successfully!');
+            }
         }
 
         function openSidePanel() {

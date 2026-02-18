@@ -126,6 +126,70 @@ th {
     z-index: 1002;
 }
 
+#confirmOverlay {
+    z-index: 1003;
+}
+
+/* Confirmation Modal */
+.confirm-modal {
+    display: none;
+    position: absolute;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+    z-index: 1004;
+    width: 320px;
+}
+
+.confirm-modal.active {
+    display: block;
+}
+
+.confirm-modal-content {
+    padding: 0;
+}
+
+.confirm-modal-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #e5e5e5;
+    background: #f8f9fa;
+    border-radius: 8px 8px 0 0;
+}
+
+.confirm-modal-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.confirm-modal-body {
+    padding: 1rem 1.25rem;
+}
+
+.confirm-modal-body p {
+    margin: 0 0 0.75rem 0;
+    color: #555;
+    font-size: 0.875rem;
+}
+
+.confirm-modal-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid #e5e5e5;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    background: #fafafa;
+    border-radius: 0 0 8px 8px;
+}
+
+.confirm-modal-footer .btn {
+    padding: 0.4rem 1rem;
+    border-radius: 4px;
+    font-weight: 500;
+    font-size: 0.875rem;
+}
+
 .cards-section {
     border-top: 2px solid #eee;
     padding-top: 1rem;
@@ -544,4 +608,27 @@ th {
     .statistics {
         grid-template-columns: 1fr;
     }
+}
+
+/* Icon buttons for actions */
+.icon-btn {
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    padding: 0.4rem 0.6rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.icon-btn:hover {
+    background: #f0f0f0;
+    transform: translateY(-2px);
+}
+
+.icon-btn:active {
+    transform: translateY(0);
 }
