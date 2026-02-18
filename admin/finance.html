@@ -822,24 +822,131 @@
 }
 
 
+/* ===== Header Tabs (Finance / Transactions / Ledger) ===== */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding: 12px 18px;
+}
+
+.header-left{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width: 280px;
+}
+
+.page-tabs{
+  display:flex;
+  gap:8px;
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line2);
+  background: color-mix(in srgb, var(--glass) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: fit-content;
+}
+
+.page-tab{
+  border:1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 950;
+  cursor:pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+  letter-spacing: .2px;
+  user-select:none;
+}
+
+.page-tab:hover{ transform: translateY(-1px); }
+
+.page-tab.active{
+  background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+  border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+  color: var(--text);
+}
+
+.page-subtitle{
+  font-size: .92rem;
+  font-weight: 850;
+  opacity: .95;
+}
+
+/* Mobile */
+@media (max-width: 820px){
+  .header{ flex-wrap:wrap; align-items:flex-start; }
+  .header-left{ width:100%; }
+  .page-tabs{ width:100%; justify-content:space-between; }
+  .page-tab{ flex:1; text-align:center; }
+}
+
+
+.page-tabs{
+  display:flex;
+  gap:8px;
+  padding:6px;
+  border-radius:999px;
+  border:1px solid var(--line2);
+  background: color-mix(in srgb, var(--glass) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: fit-content;
+}
+
+.page-tab{
+  border:1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 950;
+  cursor:pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+  user-select:none;
+  letter-spacing:.2px;
+}
+.page-tab:hover{ transform: translateY(-1px); }
+
+.page-tab.active{
+  background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+  border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+  color: var(--text);
+}
+
+@media (max-width: 820px){
+  .page-tabs{ width:100%; justify-content:space-between; }
+  .page-tab{ flex:1; text-align:center; }
+}
+
+
+
+
   </style>
 </head>
 
 <body>
     <div class="layout">
-        <header class="header">
-            <h1>Finance</h1>
-            <div class="header-right">
-                <div class="theme-toggle">
-                    <button class="theme-btn active">Light</button>
-                    <button class="theme-btn">Dark</button>
-                </div>
-                <div class="user-info">
-                    <span>Admin User</span>
-                    <div class="user-avatar">AU</div>
-                </div>
-            </div>
-        </header>
+<header class="header">
+  <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+  <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">
+    Finance
+  </button>
+  <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">
+    Transactions
+  </button>
+  <button type="button" class="page-tab" data-page="ledger" role="tab" aria-selected="false">
+    Ledger
+  </button>
+</div>
+
+</header>
+
+
     <!-- Transfer Modal -->
     <div class="modal-simple" id="transferModal">
         <div class="modal-simple-content">
@@ -2639,6 +2746,201 @@ function populateGlobalClientFilter(){
     document.querySelector(`#ledgerTabs .pill[data-ledger="${state.ledgerTab}"]`)?.classList.add("active");
 
     refreshAll();
+
+    /* ===============================
+   PAGE TABS (Finance/Transactions/Ledger)
+================================ */
+state.activePage = state.activePage || "finance";
+
+function setActivePage(page){
+  state.activePage = page;
+  save();
+
+  // tabs UI
+  document.querySelectorAll("#pageTabs .page-tab").forEach(b=>{
+    const isOn = b.getAttribute("data-page") === page;
+    b.classList.toggle("active", isOn);
+    b.setAttribute("aria-selected", isOn ? "true" : "false");
+  });
+
+  // page sections
+  const pages = ["finance","transactions","ledger"];
+  pages.forEach(p=>{
+    const el = document.getElementById(`page_${p}`);
+    if(el) el.style.display = (p === page) ? "block" : "none";
+  });
+
+  // subtitle
+  const sub = document.getElementById("pageSubtitle");
+  if(sub){
+    sub.textContent =
+      page === "finance" ? "Overview • KPIs • Funding / Setup"
+      : page === "transactions" ? "Transactions • Filters • Export"
+      : "Ledger • Audit trail • Review";
+  }
+
+  // render page bodies
+  if(page === "transactions") renderTransactionsPage();
+  if(page === "ledger") renderLedgerPage();
+}
+
+document.getElementById("pageTabs").addEventListener("click", (e)=>{
+  const btn = e.target.closest(".page-tab");
+  if(!btn) return;
+  setActivePage(btn.getAttribute("data-page"));
+});
+
+/* Render Transactions Page */
+function renderTransactionsPage(){
+  const body = document.getElementById("txPageBody");
+  const hint = document.getElementById("txPageHint");
+  if(!body) return;
+
+  // Use global filters + show everything (or you can reuse matchesLedgerTab if you want)
+  const rows = state.ledger
+    .filter(passesGlobalFilters)
+    .slice()
+    .sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+  if(!rows.length){
+    body.innerHTML = `<tr><td colspan="8" class="td-muted">No transactions for current filters.</td></tr>`;
+    if(hint) hint.textContent = "";
+    return;
+  }
+
+  body.innerHTML = rows.map(tx=>{
+    const amountClass = (tx.from === "mainWallet" || tx.from === "individualBalance") ? "amount-neg" : "amount-pos";
+    return `
+      <tr>
+        <td style="white-space:nowrap;">${escapeHtml(tx.date)}</td>
+        <td>${escapeHtml(tx.type)}</td>
+        <td>${escapeHtml((tx.from||"—") + " → " + (tx.to||"—"))}</td>
+        <td>${escapeHtml(getClientLabelById(tx.clientId || "—"))}</td>
+        <td>${escapeHtml(tx.platform || "—")}</td>
+        <td>${escapeHtml(tx.category || "—")}</td>
+        <td>${escapeHtml(tx.note || tx.description || "")}</td>
+        <td style="text-align:right;" class="${amountClass}">${money(tx.amount)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  if(hint) hint.textContent = `Showing ${rows.length} entries • Filtered by global client/date.`;
+}
+
+/* Render Ledger Page (simple clone of preview) */
+function renderLedgerPage(){
+  const cloneBody = document.getElementById("ledgerPreviewBody_clone");
+  if(!cloneBody) return;
+
+  const preview = getFilteredLedger().slice(0, 12);
+
+  cloneBody.innerHTML = preview.map(tx=>{
+    const amountClass = (tx.from === "mainWallet" || tx.from === "individualBalance") ? "amount-neg" : "amount-pos";
+    const tags = [
+      `<span class="tag">${escapeHtml(tx.type.toUpperCase())}</span>`,
+      tx.platform ? `<span class="tag">${escapeHtml(tx.platform)}</span>` : ""
+    ].join(" ");
+    return `
+      <tr>
+        <td style="white-space:nowrap;">${escapeHtml(tx.date)}</td>
+        <td>${tags}</td>
+        <td>${buildShortDetails(tx)}</td>
+        <td style="text-align:right;" class="${amountClass}">${money(tx.amount)}</td>
+      </tr>
+    `;
+  }).join("");
+}
+
+/* Restore active page on load */
+(function initPageTabs(){
+  setActivePage(state.activePage || "finance");
+})();
+
+
+
+
   </script>
+
+
+
+<script>
+  // === CONFIG: map page keys -> filenames (adjust if needed) ===
+  const PAGE_ROUTES = {
+    finance: "finance.html",
+    transactions: "transactions.html",
+    ledger: "ledger.html" // dacă nu ai ledger.html, schimbă aici
+  };
+
+  function getCurrentFileName(){
+    // Works for file:// and http(s)
+    const p = window.location.pathname || "";
+    const parts = p.split("/");
+    return (parts[parts.length - 1] || "").toLowerCase();
+  }
+
+  function detectActivePage(){
+    const file = getCurrentFileName();
+    // match by file name
+    for (const [key, filename] of Object.entries(PAGE_ROUTES)){
+      if ((filename || "").toLowerCase() === file) return key;
+    }
+    // fallback: if open folder/index
+    return "finance";
+  }
+
+  function setActiveTabUI(activeKey){
+    document.querySelectorAll("#pageTabs .page-tab").forEach(btn=>{
+      const isOn = btn.dataset.page === activeKey;
+      btn.classList.toggle("active", isOn);
+      btn.setAttribute("aria-selected", isOn ? "true" : "false");
+    });
+  }
+
+  function navigateTo(key){
+    const target = PAGE_ROUTES[key];
+    if(!target) return;
+    // Keep same folder, works in file:// too
+    window.location.href = target;
+  }
+
+  // Init UI
+  const active = detectActivePage();
+  setActiveTabUI(active);
+
+  // Click behavior
+  document.getElementById("pageTabs")?.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".page-tab");
+    if(!btn) return;
+
+    const key = btn.dataset.page;
+    // instant UI feedback
+    setActiveTabUI(key);
+
+    // if already on same page, do nothing
+    if(key === detectActivePage()) return;
+
+    navigateTo(key);
+  });
+
+  // Optional: keyboard left/right like a true switcher
+  document.getElementById("pageTabs")?.addEventListener("keydown", (e)=>{
+    const tabs = [...document.querySelectorAll("#pageTabs .page-tab")];
+    const idx = tabs.findIndex(t => t.classList.contains("active"));
+    if(idx < 0) return;
+
+    if(e.key === "ArrowRight" || e.key === "ArrowLeft"){
+      e.preventDefault();
+      const next = e.key === "ArrowRight"
+        ? tabs[(idx + 1) % tabs.length]
+        : tabs[(idx - 1 + tabs.length) % tabs.length];
+      next.focus();
+      next.click();
+    }
+  });
+</script>
+
+
+
+
 </body>
 </html>
