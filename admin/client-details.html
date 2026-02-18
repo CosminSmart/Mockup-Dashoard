@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="ro">
 <head>
@@ -120,6 +119,94 @@
     .um-muted{
       opacity:.8;
     }
+
+    /* ===== General Balance toggle row ===== */
+    .um-setting-row{
+      margin-top:10px;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,.08);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .um-setting-row__left{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .um-setting-row__label{
+      font-weight:600;
+      opacity:.95;
+    }
+    .um-setting-row__hint{
+      font-size:12px;
+      opacity:.75;
+    }
+
+    .um-switch{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      user-select:none;
+    }
+    .um-switch input{
+      position:absolute;
+      opacity:0;
+      pointer-events:none;
+    }
+    .um-switch__track{
+      width:46px;
+      height:26px;
+      border-radius:999px;
+      background: rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.10);
+      position:relative;
+      box-shadow: inset 0 0 0 1px rgba(0,0,0,.08);
+      transition: transform .15s ease, background .15s ease;
+    }
+    .um-switch__knob{
+      width:20px;
+      height:20px;
+      border-radius:999px;
+      background:#fff;
+      position:absolute;
+      top:50%;
+      left:3px;
+      transform:translateY(-50%);
+      transition:left .15s ease;
+      box-shadow: 0 6px 16px rgba(0,0,0,.20);
+    }
+    .um-switch input:checked + .um-switch__track .um-switch__knob{
+      left:23px;
+    }
+    .um-switch input:checked + .um-switch__track{
+      background: rgba(16,185,129,.28);
+      border-color: rgba(16,185,129,.35);
+    }
+    .um-switch--disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+    .um-switch--disabled .um-switch__track{
+      filter:grayscale(1);
+    }
+
+    .um-lock{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      opacity:.75;
+      white-space:nowrap;
+    }
+    .um-dot{
+      width:8px; height:8px; border-radius:50%;
+      background: rgba(255,255,255,.35);
+      display:inline-block;
+    }
   </style>
 </head>
 
@@ -156,6 +243,29 @@
                 <div class="um-profile__company" id="companyText">—</div>
                 <div class="um-profile__status" id="statusText">—</div>
                 <div class="um-profile__company" style="margin-top:6px;" id="idText">#—</div>
+
+                <!-- ✅ General Balance setting row -->
+                <div class="um-setting-row" aria-label="General Balance setting">
+                  <div class="um-setting-row__left">
+                    <span class="um-setting-row__label">General Balance</span>
+                    <span id="gbStatusBadge">—</span>
+                    <span class="um-setting-row__hint">Default: Disabled</span>
+                  </div>
+
+                  <div class="um-setting-row__right" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                    <span class="um-lock" id="gbLock" hidden>
+                      <span class="um-dot"></span> Locked (Admin only)
+                    </span>
+
+                    <label class="um-switch" id="gbSwitchLabel" title="Admin only">
+                      <input type="checkbox" id="gbToggle" />
+                      <span class="um-switch__track" aria-hidden="true">
+                        <span class="um-switch__knob"></span>
+                      </span>
+                    </label>
+                  </div>
+                </div>
+                <!-- /General Balance -->
               </div>
             </div>
 
@@ -222,30 +332,29 @@
               </div>
             </div>
 
-            <!-- Employees (under Contact Information) -->
-<div class="um-card" id="employeesCard">
-  <div class="um-card__head" style="margin-bottom:10px;">
-    <div class="um-card__title">Employees</div>
-    <div class="um-card__head-actions">
-      <span class="um-badge um-badge--gray" id="employeesCount">0</span>
-    </div>
-  </div>
+            <!-- Employees -->
+            <div class="um-card" id="employeesCard">
+              <div class="um-card__head" style="margin-bottom:10px;">
+                <div class="um-card__title">Employees</div>
+                <div class="um-card__head-actions">
+                  <span class="um-badge um-badge--gray" id="employeesCount">0</span>
+                </div>
+              </div>
 
-  <div class="um-table-wrap" style="padding:0; background:transparent;">
-    <table class="um-table-mini" aria-label="Employees table">
-      <thead>
-        <tr>
-          <th>Full Name</th>
-          <th>Created</th>
-        </tr>
-      </thead>
-      <tbody id="employeesBody"></tbody>
-    </table>
-  </div>
+              <div class="um-table-wrap" style="padding:0; background:transparent;">
+                <table class="um-table-mini" aria-label="Employees table">
+                  <thead>
+                    <tr>
+                      <th>Full Name</th>
+                      <th>Created</th>
+                    </tr>
+                  </thead>
+                  <tbody id="employeesBody"></tbody>
+                </table>
+              </div>
 
-  <div class="um-muted" id="employeesHint" style="margin-top:8px;">—</div>
-</div>
-
+              <div class="um-muted" id="employeesHint" style="margin-top:8px;">—</div>
+            </div>
 
           </div>
 
@@ -279,7 +388,7 @@
                 </div>
               </div>
 
-              <!-- edit (inputs only; percent stays visible above) -->
+              <!-- edit -->
               <div id="netEdit" hidden class="um-two-col" style="margin-top:10px;">
                 <div class="um-field" style="margin-bottom:0;">
                   <input class="um-input um-inline-input" id="ercFeeInput" inputmode="decimal" placeholder="0" />
@@ -344,6 +453,11 @@
 
     const id = qs("id");
 
+    // ✅ Demo auth role (înlocuiești cu auth real)
+    // - ca să simulezi non-admin, pune "client" sau "employee"
+    const CURRENT_USER_ROLE = "admin";
+    const IS_ADMIN = CURRENT_USER_ROLE === "admin";
+
     const els = {
       avatar: document.getElementById("avatar"),
       idText: document.getElementById("idText"),
@@ -376,7 +490,6 @@
       employeesCount: document.getElementById("employeesCount"),
       employeesHint: document.getElementById("employeesHint"),
 
-
       // network fees
       ercFeeText: document.getElementById("ercFeeText"),
       trcFeeText: document.getElementById("trcFeeText"),
@@ -395,6 +508,12 @@
       feeCancelBtn: document.getElementById("feeCancelBtn"),
 
       notFound: document.getElementById("notFound"),
+
+      // ✅ General Balance UI
+      gbToggle: document.getElementById("gbToggle"),
+      gbStatusBadge: document.getElementById("gbStatusBadge"),
+      gbSwitchLabel: document.getElementById("gbSwitchLabel"),
+      gbLock: document.getElementById("gbLock"),
     };
 
     function initials(name){
@@ -406,6 +525,10 @@
     function badge(status){
       const isActive = (status || "").toLowerCase() === "active";
       return `<span class="um-badge ${isActive ? "um-badge--green" : "um-badge--gray"}">${status || "—"}</span>`;
+    }
+
+    function enabledBadge(isOn){
+      return `<span class="um-badge ${isOn ? "um-badge--green" : "um-badge--gray"}">${isOn ? "Enabled" : "Disabled"}</span>`;
     }
 
     function asPercent(v){
@@ -425,7 +548,6 @@
       return s;
     }
 
-    // Money parser: "$250" or "250$" or "250"
     function parseMoneyOrNumber(s){
       const raw = String(s ?? "").trim();
       if (!raw) return { value:null, prefix:"", suffix:"" };
@@ -462,13 +584,6 @@
 
     function clamp0(n){ return Math.max(0, n); }
 
-    // Apply discount rules:
-    // - If target is percent (fee "5%"):
-    //    mode "%" => new = old * (1 - disc/100)
-    //    mode "$" => treat as "percentage points off": new = old - disc
-    // - If target is money (setup "$250"):
-    //    mode "%" => new = old * (1 - disc/100)
-    //    mode "$" => new = old - disc
     function applyDiscountToValue(originalStr, discountValue, discountMode){
       const s = String(originalStr ?? "").trim();
       const disc = Number(discountValue);
@@ -503,14 +618,11 @@
     let client = null;
     let snapshot = null;
 
-    // snapshots
     let netSnap = null;
     let feeSnap = null;
 
     let feeEditing = false;
-
-    // keep track of inline discount editor (only one open at a time)
-    let openDiscount = { rowIdx: null, col: null }; // col: "setup" | "fee"
+    let openDiscount = { rowIdx: null, col: null };
 
     function loadClient(){
       if (!id) return null;
@@ -523,39 +635,19 @@
       if (client.ercFee === undefined || client.ercFee === null || client.ercFee === "") client.ercFee = 5;
       if (client.trcFee === undefined || client.trcFee === null || client.trcFee === "") client.trcFee = 3;
 
+      // ✅ default disabled
+      if (client.generalBalanceEnabled === undefined || client.generalBalanceEnabled === null){
+        client.generalBalanceEnabled = false;
+      }
+
       if (!Array.isArray(client.feeTable) || client.feeTable.length === 0){
         client.feeTable = [
-          {
-            type: "Google Ads",
-            setup: "$250",
-            initInterval: 21,
-            initAmount: "$30",
-            recInterval: 30,
-            recAmount: "$50",
-            fee: "5%"
-          },
-          {
-            type: "Facebook Ads",
-            setup: "$250",
-            initInterval: 21,
-            initAmount: "$30",
-            recInterval: 30,
-            recAmount: "$50",
-            fee: "6%"
-          },
-          {
-            type: "TikTok Ads",
-            setup: "$250",
-            initInterval: 21,
-            initAmount: "$30",
-            recInterval: 30,
-            recAmount: "$50",
-            fee: "3%"
-          },
+          { type: "Google Ads",   setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "5%" },
+          { type: "Facebook Ads", setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "6%" },
+          { type: "TikTok Ads",   setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "3%" },
         ];
       }
 
-      // ensure new fields exist on each row
       client.feeTable.forEach(r => {
         if (r.initInterval === undefined) r.initInterval = 21;
         if (r.initAmount === undefined) r.initAmount = "$30";
@@ -582,67 +674,84 @@
       els.createdText.textContent = client.created || "—";
     }
 
+    // ✅ General Balance render + permissions
+    function renderGeneralBalance(){
+      const enabled = !!client.generalBalanceEnabled;
+
+      els.gbStatusBadge.innerHTML = enabledBadge(enabled);
+      els.gbToggle.checked = enabled;
+
+      // permissions
+      if (!IS_ADMIN){
+        els.gbToggle.disabled = true;
+        els.gbSwitchLabel.classList.add("um-switch--disabled");
+        els.gbLock.hidden = false;
+        els.gbSwitchLabel.title = "Locked (Admin only)";
+      } else {
+        els.gbToggle.disabled = false;
+        els.gbSwitchLabel.classList.remove("um-switch--disabled");
+        els.gbLock.hidden = true;
+        els.gbSwitchLabel.title = "Admin: you can enable/disable";
+      }
+    }
+
     function escapeHtml(s){
-  return String(s ?? "")
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#039;");
-}
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
 
-// Demo employees DB (înlocuiești cu API mai târziu)
-function getEmployeesDb(){
-  return [
-    // C-2002 (Michael Chen) — 5 employees
-    { id:"E-2002-01", clientId:"C-2002", firstName:"Victor", lastName:"Ivanov", created:"2026-01-21" },
-    { id:"E-2002-02", clientId:"C-2002", firstName:"Elena",  lastName:"Popescu", created:"2026-01-22" },
-    { id:"E-2002-03", clientId:"C-2002", firstName:"Andrei", lastName:"Marin", created:"2026-01-25" },
-    { id:"E-2002-04", clientId:"C-2002", firstName:"Julia",  lastName:"Stone", created:"2026-02-01" },
-    { id:"E-2002-05", clientId:"C-2002", firstName:"Daniel", lastName:"Cooper", created:"2026-02-02" },
+    function getEmployeesDb(){
+      return [
+        { id:"E-2002-01", clientId:"C-2002", firstName:"Victor", lastName:"Ivanov", created:"2026-01-21" },
+        { id:"E-2002-02", clientId:"C-2002", firstName:"Elena",  lastName:"Popescu", created:"2026-01-22" },
+        { id:"E-2002-03", clientId:"C-2002", firstName:"Andrei", lastName:"Marin", created:"2026-01-25" },
+        { id:"E-2002-04", clientId:"C-2002", firstName:"Julia",  lastName:"Stone", created:"2026-02-01" },
+        { id:"E-2002-05", clientId:"C-2002", firstName:"Daniel", lastName:"Cooper", created:"2026-02-02" },
 
-    // C-2001 (Sarah) — 3 employees
-    { id:"E-2001-01", clientId:"C-2001", firstName:"Maria", lastName:"Lopez", created:"2026-01-13" },
-    { id:"E-2001-02", clientId:"C-2001", firstName:"Nate",  lastName:"Wilson", created:"2026-01-15" },
-    { id:"E-2001-03", clientId:"C-2001", firstName:"Iris",  lastName:"Chang", created:"2026-01-18" },
-  ];
-}
+        { id:"E-2001-01", clientId:"C-2001", firstName:"Maria", lastName:"Lopez", created:"2026-01-13" },
+        { id:"E-2001-02", clientId:"C-2001", firstName:"Nate",  lastName:"Wilson", created:"2026-01-15" },
+        { id:"E-2001-03", clientId:"C-2001", firstName:"Iris",  lastName:"Chang", created:"2026-01-18" },
+      ];
+    }
 
-function renderEmployees(){
-  if (!client){
-    if (els.employeesBody) els.employeesBody.innerHTML = "";
-    if (els.employeesCount) els.employeesCount.textContent = "0";
-    if (els.employeesHint) els.employeesHint.textContent = "—";
-    return;
-  }
+    function renderEmployees(){
+      if (!client){
+        if (els.employeesBody) els.employeesBody.innerHTML = "";
+        if (els.employeesCount) els.employeesCount.textContent = "0";
+        if (els.employeesHint) els.employeesHint.textContent = "—";
+        return;
+      }
 
-  const all = getEmployeesDb();
-  const list = all
-    .filter(e => String(e.clientId) === String(client.id))
-    .sort((a,b) => new Date(b.created).getTime() - new Date(a.created).getTime());
+      const all = getEmployeesDb();
+      const list = all
+        .filter(e => String(e.clientId) === String(client.id))
+        .sort((a,b) => new Date(b.created).getTime() - new Date(a.created).getTime());
 
-  els.employeesCount.textContent = String(list.length);
+      els.employeesCount.textContent = String(list.length);
 
-  if (!list.length){
-    els.employeesBody.innerHTML = `<tr><td colspan="2" class="um-muted">No employees found for this client.</td></tr>`;
-    els.employeesHint.textContent = "This section lists employees linked to the selected client.";
-    return;
-  }
+      if (!list.length){
+        els.employeesBody.innerHTML = `<tr><td colspan="2" class="um-muted">No employees found for this client.</td></tr>`;
+        els.employeesHint.textContent = "This section lists employees linked to the selected client.";
+        return;
+      }
 
-  els.employeesBody.innerHTML = list.map(emp => {
-    const fullName = `${emp.firstName || ""} ${emp.lastName || ""}`.trim() || "—";
-    const created = emp.created || "—";
-    return `
-      <tr>
-        <td>${escapeHtml(fullName)}</td>
-        <td>${escapeHtml(created)}</td>
-      </tr>
-    `;
-  }).join("");
+      els.employeesBody.innerHTML = list.map(emp => {
+        const fullName = `${emp.firstName || ""} ${emp.lastName || ""}`.trim() || "—";
+        const created = emp.created || "—";
+        return `
+          <tr>
+            <td>${escapeHtml(fullName)}</td>
+            <td>${escapeHtml(created)}</td>
+          </tr>
+        `;
+      }).join("");
 
-  els.employeesHint.textContent = `Showing ${list.length} employees for ${client.id}.`;
-}
-
+      els.employeesHint.textContent = `Showing ${list.length} employees for ${client.id}.`;
+    }
 
     function renderNetworkFees(){
       els.ercFeeText.textContent = asPercent(client.ercFee);
@@ -751,12 +860,13 @@ function renderEmployees(){
       }
 
       renderProfile();
+      renderGeneralBalance();
       renderEmployees();
       renderNetworkFees();
       renderFeeTable();
     }
 
-    // ===== Profile edit (left) =====
+    // ===== Profile edit =====
     function enterEdit(){
       snapshot = JSON.parse(JSON.stringify(client));
 
@@ -812,7 +922,6 @@ function renderEmployees(){
       els.ercFeeInput.value = (erc !== null && !Number.isNaN(erc)) ? String(erc) : String(client.ercFee ?? "");
       els.trcFeeInput.value = (trc !== null && !Number.isNaN(trc)) ? String(trc) : String(client.trcFee ?? "");
 
-      // show both view + edit (inputs under values)
       els.netView.hidden = false;
       els.netEdit.hidden = false;
 
@@ -848,12 +957,11 @@ function renderEmployees(){
       exitNetEdit(false);
     }
 
-    // ===== Fee table edit (manual edit mode) =====
+    // ===== Fee table edit =====
     function enterFeeEdit(){
       feeSnap = JSON.parse(JSON.stringify(client));
       feeEditing = true;
 
-      // close any discount inline editor
       openDiscount = { rowIdx: null, col: null };
 
       els.feeEditBtn.hidden = true;
@@ -910,7 +1018,6 @@ function renderEmployees(){
       exitFeeEdit(false);
     }
 
-    // ===== Discount inline (per row, per cell) =====
     function openDiscountEditor(idx, col){
       openDiscount = { rowIdx: idx, col };
       renderFeeTable();
@@ -935,7 +1042,6 @@ function renderEmployees(){
       closeDiscountEditor();
     }
 
-    // Event delegation inside fee table
     els.feeBody.addEventListener("click", (e) => {
       const openBtn = e.target.closest("[data-discount-open]");
       if (openBtn){
@@ -978,6 +1084,22 @@ function renderEmployees(){
       }
     });
 
+    // ✅ General Balance toggle (Admin only)
+    els.gbToggle.addEventListener("change", () => {
+      if (!client) return;
+
+      if (!IS_ADMIN){
+        // safety (even though disabled)
+        els.gbToggle.checked = !!client.generalBalanceEnabled;
+        alert("Only Admin can enable/disable General Balance.");
+        return;
+      }
+
+      client.generalBalanceEnabled = !!els.gbToggle.checked;
+      persist();
+      renderGeneralBalance();
+    });
+
     // ===== init =====
     client = loadClient();
     if (client){
@@ -1005,4 +1127,3 @@ function renderEmployees(){
   <script src="../js/sidebar.js"></script>
 </body>
 </html>
-```
