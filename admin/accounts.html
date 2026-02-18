@@ -793,15 +793,25 @@
                 <div class="stat-box">
                     <h4>ACCOUNTS</h4>
                     <div class="stat-value">8</div>
-                    <div style="display: flex; align-items: center; justify-content: center; gap: 20px; margin-top: 12px;">
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 12px;">
                         <div style="text-align: center;">
-                            <div style="font-size: 24px; font-weight: 600; color: #3498db;">5</div>
-                            <div style="font-size: 12px; color: #666; margin-top: 4px;">Assigned</div>
+                            <div style="font-size: 20px; font-weight: 600; color: #3498db;">5</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">Assigned</div>
                         </div>
-                        <div style="width: 2px; height: 40px; background: #e0e0e0;"></div>
+                        <div style="width: 1.5px; height: 35px; background: #e0e0e0;"></div>
                         <div style="text-align: center;">
-                            <div style="font-size: 24px; font-weight: 600; color: #e67700;">3</div>
-                            <div style="font-size: 12px; color: #666; margin-top: 4px;">Unassigned</div>
+                            <div style="font-size: 20px; font-weight: 600; color: #e67700;">3</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">Unassigned</div>
+                        </div>
+                        <div style="width: 1.5px; height: 35px; background: #e0e0e0;"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: #27ae60;">5</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">Active</div>
+                        </div>
+                        <div style="width: 1.5px; height: 35px; background: #e0e0e0;"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: #e74c3c;">1</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">Restricted</div>
                         </div>
                     </div>
                 </div>
@@ -809,14 +819,6 @@
                     <h4>SPEND (PERIOD)</h4>
                     <div class="stat-value">$4,776.96</div>
                     <div class="stat-description">Includes manual spend for CL</div>
-                </div>
-                <div class="stat-box">
-                    <h4>STATUS (ACTIVE/RESTRICTED)</h4>
-                    <div class="stat-value">5 / 1</div>
-                    <div class="stat-badges">
-                        <span class="badge badge-active">Active</span>
-                        <span class="badge badge-restricted">Restricted</span>
-                    </div>
                 </div>
             </div>
 
@@ -1238,17 +1240,20 @@
     <div class="modal" id="accountModal">
         <div class="modal-content" style="padding: 2.5rem;">
             <div class="modal-header" style="margin-bottom: 2rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 600;">Account Details</h2>
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 600; margin: 0;">Account Details</h2>
+                    <p id="modalHeaderAccountName" style="font-size: 1.1rem; color: #2c3e50; margin: 0.5rem 0 0 0; font-weight: 600;">Campaign Account 1</p>
+                </div>
                 <button class="close-btn" onclick="closeModal()" style="font-size: 1.5rem;">&times;</button>
             </div>
 
             <!-- Tabs Navigation -->
             <div style="display: flex; gap: 0; border-bottom: 2px solid #e5e5e5; margin-bottom: 2rem;">
-                <button class="account-tab active" onclick="switchAccountTab('details')" data-tab="details" style="flex: 1; padding: 1rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;">
-                    Details
-                </button>
-                <button class="account-tab" onclick="switchAccountTab('profiles')" data-tab="profiles" style="flex: 1; padding: 1rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;">
+                <button class="account-tab active" onclick="switchAccountTab('profiles')" data-tab="profiles" style="flex: 1; padding: 1rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;">
                     Profiles
+                </button>
+                <button class="account-tab" onclick="switchAccountTab('details')" data-tab="details" style="flex: 1; padding: 1rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;">
+                    Details
                 </button>
                 <button class="account-tab" onclick="switchAccountTab('cards')" data-tab="cards" style="flex: 1; padding: 1rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;">
                     Cards
@@ -1544,6 +1549,105 @@
     </div>
 </div>
 
+            <!-- Tab Content: Account Details -->
+            <div class="account-tab-content" id="tabDetails" style="display:none;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; row-gap: 2rem;">
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.75rem; font-weight: 500; color: #2c3e50; font-size: 0.95rem;">ID</label>
+                        <input type="text" id="modalTableId" value="1" readonly style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; font-size: 0.95rem;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.75rem; font-weight: 500; color: #2c3e50; font-size: 0.95rem;">Account ID</label>
+                        <input type="text" id="modalAccountId" value="FB-12345" readonly style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; font-size: 0.95rem;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.75rem; font-weight: 500; color: #2c3e50; font-size: 0.95rem;">Account Name</label>
+                        <input type="text" id="modalAccountName" value="Campaign Account 1" style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Platform</label>
+                        <input type="text" id="modalPlatform" value="Facebook" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Client</label>
+                        <input type="text" id="modalClient" value="Client A" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Client Tag</label>
+                        <input type="text" id="modalClientTag" value="Premium" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Asset Type</label>
+                        <select id="modalAssetType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="ad-account">Ad Account</option>
+                            <option value="profile">Profile</option>
+                            <option value="bm">BM</option>
+                            <option value="page">Page</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Status</label>
+                        <select id="modalStatus" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="active">Active</option>
+                            <option value="in-review">In Review</option>
+                            <option value="restricted">Restricted</option>
+                            <option value="disabled">Disabled</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Balance Type</label>
+                        <select id="modalBalanceType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="general">General</option>
+                            <option value="individual">Individual</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Balance</label>
+                        <input type="text" id="modalBalance" value="$2,580.00" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Primary Access</label>
+                        <input type="text" id="modalPrimaryAccess" value="Main Profile" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Account Type</label>
+                        <select id="modalAccountType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="cc">CC (Credit Card)</option>
+                            <option value="cl">CL (Credit Line)</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Billing</label>
+                        <select id="modalBilling" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                            <option value="one-time">One Time</option>
+                            <option value="recurring">Recurring</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Provider</label>
+                        <input type="text" id="modalProvider" value="Adi" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+
+                    <div class="field-group">
+                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Setup Account</label>
+                        <input type="text" id="modalSetupAccount" value="$500" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                    </div>
+                </div>
+            </div>
+
             <!-- Tab Content: Cards -->
             <div class="account-tab-content" id="tabCards" style="display: none;">
                 <div id="cardsList">
@@ -1593,6 +1697,11 @@
             <div class="modal-header">
                 <h2>Account Notes</h2>
                 <button class="close-btn" onclick="closeNotesModal()">&times;</button>
+            </div>
+
+            <div class="field-group">
+                <label>Account Name</label>
+                <input type="text" id="notesAccountName" value="Campaign Account 1" readonly style="background: #f5f5f5; font-weight: 600;">
             </div>
 
             <div class="field-group">
@@ -2582,6 +2691,9 @@
             // Store current account ID
             currentAccountId = accountId;
 
+            // Populate header with account name
+            document.getElementById('modalHeaderAccountName').textContent = account.name;
+
             // Populate Details tab with account data
             document.getElementById('modalTableId').value = accountId;
             document.getElementById('modalAccountId').value = account.id;
@@ -2867,6 +2979,19 @@
         }
 
         function openNotesModal(accountId) {
+            // Get account data
+            const account = accountsData[accountId];
+            if (account) {
+                document.getElementById('notesAccountName').value = account.name;
+                document.getElementById('notesAccountId').value = account.id;
+                // Load notes if they exist
+                if (account.notes) {
+                    document.getElementById('notesText').value = account.notes;
+                } else {
+                    document.getElementById('notesText').value = '';
+                }
+            }
+            
             document.getElementById('notesModal').classList.add('active');
             document.getElementById('notesOverlay').classList.add('active');
         }
