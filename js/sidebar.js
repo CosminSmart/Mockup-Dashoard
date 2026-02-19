@@ -45,6 +45,17 @@ const navigationItems = {
     ]
 };
 
+// Wallet data (hardcoded demo)
+const walletData = {
+    mainWallet: 2450.00,
+    platforms: [
+        { name: 'Facebook', balance: 1250.00, color: '#1877f2', icon: '📘' },
+        { name: 'Google', balance: 890.50, color: '#4285f4', icon: '🔍' },
+        { name: 'TikTok', balance: 650.00, color: '#000000', icon: '🎵' },
+        { name: 'Instagram', balance: 420.75, color: '#e4405f', icon: '📷' }
+    ]
+};
+
 // Generate sidebar HTML
 function generateSidebar() {
     const currentRole = getCurrentRole();
@@ -62,7 +73,42 @@ function generateSidebar() {
                     <option value="client" ${currentRole === 'client' ? 'selected' : ''}>💼 Client</option>
                 </select>
             </div>
+
+            <!-- Wallet Widget -->
+            <div class="wallet-widget">
+                <div class="wallet-widget-content">
+                    <div class="wallet-widget-icon">💰</div>
+                    <div class="wallet-widget-info">
+                        <div class="wallet-widget-label">Main Wallet</div>
+                        <div class="wallet-widget-amount">$${walletData.mainWallet.toFixed(2)}</div>
+                    </div>
+                </div>
+
+                <!-- Hover Modal -->
+                <div class="wallet-modal">
+                    <div class="wallet-modal-header">
+                        <span>💰 Wallet Overview</span>
+                    </div>
+                    <div class="wallet-modal-main">
+                        <div class="wallet-modal-label">Main Wallet</div>
+                        <div class="wallet-modal-amount">$${walletData.mainWallet.toFixed(2)}</div>
+                    </div>
+                    <div class="wallet-modal-divider"></div>
+                    <div class="wallet-modal-platforms">
+                        ${walletData.platforms.map(platform => `
+                            <div class="wallet-modal-platform">
+                                <div class="wallet-modal-platform-info">
+                                    <span class="wallet-modal-platform-icon">${platform.icon}</span>
+                                    <span class="wallet-modal-platform-name">${platform.name}</span>
+                                </div>
+                                <div class="wallet-modal-platform-balance">$${platform.balance.toFixed(2)}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
         </div>
+
         <nav>
             ${navItems.map(item => `
                 <a href="${item.page}.html" class="${currentPage === item.page ? 'active' : ''}">

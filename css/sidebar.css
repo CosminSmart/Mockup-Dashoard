@@ -99,3 +99,190 @@
     width: 20px;
     text-align: center;
 }
+
+/* ===== Wallet Widget (In Header, after Switch Role) ===== */
+.wallet-widget {
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.wallet-widget:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.wallet-widget-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.wallet-widget-icon {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.wallet-widget-info {
+    flex: 1;
+}
+
+.wallet-widget-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.wallet-widget-amount {
+    font-size: 16px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.3px;
+}
+
+/* Wallet Modal (Hover Popup) */
+.wallet-modal {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 8px;
+    background: #2a2a2a;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 16px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+}
+
+.wallet-widget:hover .wallet-modal {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.wallet-modal-header {
+    font-size: 13px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.wallet-modal-main {
+    background: rgba(102, 126, 234, 0.15);
+    border: 1px solid rgba(102, 126, 234, 0.3);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.wallet-modal-label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.6);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.wallet-modal-amount {
+    font-size: 22px;
+    font-weight: 900;
+    color: white;
+    letter-spacing: -0.5px;
+}
+
+.wallet-modal-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin: 12px 0;
+}
+
+.wallet-modal-platforms {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wallet-modal-platform {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+}
+
+.wallet-modal-platform:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(2px);
+}
+
+.wallet-modal-platform-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.wallet-modal-platform-icon {
+    font-size: 16px;
+}
+
+.wallet-modal-platform-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.wallet-modal-platform-balance {
+    font-size: 14px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -0.2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .wallet-widget-amount {
+        font-size: 15px;
+    }
+    
+    .wallet-modal {
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%) translateY(-10px);
+        width: 280px;
+    }
+    
+    .wallet-widget:hover .wallet-modal {
+        transform: translateX(-50%) translateY(0);
+    }
+}
