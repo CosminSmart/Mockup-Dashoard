@@ -248,7 +248,7 @@
       letter-spacing:.2px;
     }
 
-    /* Filters bar (match screenshot style) */
+    /* Filters bar */
     .filters{
       position: sticky;
       top: 10px;
@@ -305,7 +305,7 @@
     /* KPIs */
     .stats{
       display:grid;
-      grid-template-columns: repeat(4, minmax(0,1fr));
+      grid-template-columns: repeat(3, minmax(0,1fr));
       gap: 12px;
     }
     @media (max-width: 1200px){ .stats{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
@@ -355,6 +355,22 @@
       color: var(--muted);
       font-size: 12px;
       font-weight: 800;
+    }
+    /* ✅ count in top-right (small) */
+    .stat-count{
+      position:absolute;
+      top:12px;
+      right:14px;
+      font-size: 12px;
+      font-weight: 950;
+      color: var(--muted);
+      letter-spacing:.2px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 72%, transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
     /* Table */
@@ -432,12 +448,12 @@
     }
 
     /* =========================================================
-       ✅ RIGHT DRAWER MODAL (FIX: NEVER CENTER)
+       ✅ RIGHT DRAWER MODAL (GENERIC)
     ========================================================= */
     .drawer-modal{
-      position: fixed; /* <-- fixed, not absolute */
+      position: fixed;
       inset: 0;
-      z-index: 9999; /* high */
+      z-index: 9999;
       display: none;
     }
     .drawer-modal.active{ display:block; }
@@ -456,9 +472,9 @@
     .drawer-modal__panel{
       position: absolute;
       top: 0;
-      right: 0; /* <-- always right */
+      right: 0;
       height: 100%;
-      width: min(980px, 94vw);  /* wide like screenshot */
+      width: min(980px, 94vw);
       background: var(--bg1);
       border-left: 1px solid var(--line2);
       box-shadow: -22px 0 60px rgba(15,23,42,.22);
@@ -660,6 +676,65 @@
       flex-wrap:wrap;
       justify-content:flex-end;
     }
+
+    /* ✅ Create / Wallets form helpers */
+    .form-card{
+      border:1px solid var(--line2);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--glass) 65%, var(--bg1));
+      box-shadow: var(--shadow2);
+      padding: 14px;
+    }
+    .grid-4{
+      display:grid;
+      grid-template-columns: 1.1fr 1.2fr 1fr .9fr;
+      gap: 12px;
+      align-items:end;
+    }
+    @media (max-width: 1100px){
+      .grid-4{ grid-template-columns: 1fr 1fr; }
+    }
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    @media (max-width: 720px){
+      .grid-2{ grid-template-columns: 1fr; }
+    }
+    .chip-warn{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:.25rem .6rem;
+      border-radius: 999px;
+      border:1px solid color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
+      background: color-mix(in srgb, rgba(245,158,11,.18) 65%, var(--glass));
+      color: #8a4b00;
+      font-weight: 950;
+      font-size:.78rem;
+      white-space:nowrap;
+    }
+    .drawer-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .bill-summary{
+      border:1px solid var(--line2);
+      border-radius: 16px;
+      background: #fff;
+      overflow:hidden;
+    }
+    [data-theme="dark"] .bill-summary{ background: color-mix(in srgb, var(--glass) 25%, transparent); }
+    .bill-summary .row{
+      display:grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom:1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      align-items:center;
+    }
+    .bill-summary .row:last-child{ border-bottom:none; }
+    .bill-summary .k{ color: var(--muted); font-weight: 900; font-size:.85rem; }
+    .bill-summary .v{ font-weight: 950; }
   </style>
 </head>
 
@@ -763,26 +838,24 @@
           </div>
         </div>
 
-        <!-- KPIs -->
+        <!-- ✅ KPIs (3 cards only) -->
         <div class="stats">
-          <div class="stat-box">
-            <h4>TOTAL</h4>
-            <div class="stat-value" id="kTotal">0</div>
-            <div class="stat-sub">Matches filters</div>
-          </div>
           <div class="stat-box pending">
+            <div class="stat-count" id="cPending">0 </div>
             <h4>PENDING</h4>
-            <div class="stat-value" id="kPending">0</div>
+            <div class="stat-value" id="kPendingSum">USD 0.00</div>
             <div class="stat-sub">Awaiting steps</div>
           </div>
           <div class="stat-box approved">
+            <div class="stat-count" id="cApproved">0 </div>
             <h4>APPROVED</h4>
-            <div class="stat-value" id="kApproved">0</div>
+            <div class="stat-value" id="kApprovedSum">USD 0.00</div>
             <div class="stat-sub">Internal tx added</div>
           </div>
           <div class="stat-box declined">
+            <div class="stat-count" id="cDeclined">0 </div>
             <h4>DECLINED</h4>
-            <div class="stat-value" id="kDeclined">0</div>
+            <div class="stat-value" id="kDeclinedSum">USD 0.00</div>
             <div class="stat-sub">Has reason</div>
           </div>
         </div>
@@ -819,12 +892,12 @@
 
   <!-- ✅ RIGHT DRAWER: Top-up details -->
   <div class="drawer-modal" id="topupDrawerModal" aria-hidden="true">
-    <div class="drawer-modal__overlay" id="drawerOverlay"></div>
+    <div class="drawer-modal__overlay" data-close="topupDrawerModal"></div>
 
     <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Topup details">
       <div class="drawer-modal__header">
         <div class="drawer-modal__title" id="dTitle">Top-up • TU-00000</div>
-        <button class="drawer-modal__close" type="button" id="drawerClose">Close</button>
+        <button class="drawer-modal__close" type="button" data-close="topupDrawerModal">Close</button>
       </div>
 
       <div class="drawer-modal__body">
@@ -980,6 +1053,180 @@
     </div>
   </div>
 
+  <!-- ✅ RIGHT DRAWER: Wallets (Admin) -->
+  <div class="drawer-modal" id="walletsDrawer" aria-hidden="true">
+    <div class="drawer-modal__overlay" data-close="walletsDrawer"></div>
+
+    <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Wallets">
+      <div class="drawer-modal__header">
+        <div class="drawer-modal__title">Crypto wallets (Admin)</div>
+        <button class="drawer-modal__close" type="button" data-close="walletsDrawer">Close</button>
+      </div>
+
+      <div class="drawer-modal__body">
+        <div class="mini-hint" style="margin-bottom:12px;">
+          These are global platform wallets. Clients only see the wallet, cannot edit.
+        </div>
+
+        <div class="form-card">
+          <div class="fg" style="margin-bottom:12px;">
+            <label class="label">USDT ERC20 wallet</label>
+            <input id="wErc20" placeholder="0x..." />
+          </div>
+
+          <div class="fg">
+            <label class="label">USDT TRC20 wallet</label>
+            <input id="wTrc20" placeholder="T..." />
+          </div>
+
+          <div class="drawer-actions">
+            <button class="btn primary" type="button" id="btnSaveWallets">Save</button>
+            <button class="btn" type="button" data-close="walletsDrawer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ RIGHT DRAWER: Create Top-up -->
+  <div class="drawer-modal" id="createDrawer" aria-hidden="true">
+    <div class="drawer-modal__overlay" data-close="createDrawer"></div>
+
+    <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Create topup">
+      <div class="drawer-modal__header">
+        <div class="drawer-modal__title">Create Top-up (Client/Admin)</div>
+        <button class="drawer-modal__close" type="button" data-close="createDrawer">Close</button>
+      </div>
+
+      <div class="drawer-modal__body">
+        <div class="seg" id="createSeg">
+          <button type="button" data-mode="client" class="active">Client</button>
+          <button type="button" data-mode="admin">Admin</button>
+        </div>
+
+        <div class="form-card">
+          <div class="grid-4">
+            <div class="fg">
+              <label class="label">Type</label>
+              <select id="cType">
+                <option value="wire">Wire</option>
+                <option value="crypto">Crypto</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Client</label>
+              <select id="cClient"></select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Amount</label>
+              <input id="cAmount" type="number" step="0.01" value="1200" />
+            </div>
+
+            <div class="fg">
+              <label class="label">Currency</label>
+              <select id="cCurrency">
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+              </select>
+              <div class="mini-hint">Auto from billing company</div>
+            </div>
+          </div>
+
+          <div class="fg" style="margin-top:12px;">
+            <label class="label">Description (optional)</label>
+            <input id="cDesc" placeholder="Optional note…" />
+          </div>
+
+          <div class="mini-hint" style="margin:12px 0 10px;">
+            Client/Admin selects billing company (includes IBAN). Currency is auto from billing company.
+          </div>
+
+          <div class="grid-2" style="align-items:center;">
+            <div class="fg">
+              <label class="label">Billing company</label>
+              <select id="cBilling"></select>
+            </div>
+            <div style="display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;">
+              <button class="btn ghost" type="button" id="btnAddBilling">+ Add billing company</button>
+              <button class="btn" type="button" id="btnEditBillingCreate">Edit</button>
+            </div>
+          </div>
+
+          <div class="bill-summary" style="margin-top:12px;" id="billSummary">
+            <div class="row"><div class="k">Company</div><div class="v" id="bsCompany">—</div></div>
+            <div class="row"><div class="k">Address</div><div class="v" id="bsAddress">—</div></div>
+            <div class="row"><div class="k">VAT</div><div class="v" id="bsVat">—</div></div>
+            <div class="row"><div class="k">IBAN</div><div class="v" id="bsIban">—</div></div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px; margin-top:12px;">
+            <span class="chip-warn">Double-check</span>
+            <div class="mini-hint" style="margin:0;">
+              Confirm details above before creating. (Demo: we keep it simple; devs can add a strict confirm screen.)
+            </div>
+          </div>
+
+          <div class="drawer-actions" style="margin-top:12px;">
+            <button class="btn primary" type="button" id="btnCreatePending">Create (Pending)</button>
+            <button class="btn" type="button" data-close="createDrawer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ RIGHT DRAWER: Add / Edit Billing Company -->
+  <div class="drawer-modal" id="billingDrawer" aria-hidden="true">
+    <div class="drawer-modal__overlay" data-close="billingDrawer"></div>
+
+    <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Billing company">
+      <div class="drawer-modal__header">
+        <div class="drawer-modal__title" id="bTitle">Add billing company</div>
+        <button class="drawer-modal__close" type="button" data-close="billingDrawer">Close</button>
+      </div>
+
+      <div class="drawer-modal__body">
+        <div class="form-card">
+          <div class="grid-4" style="grid-template-columns: 1.2fr 1.3fr .9fr 1.1fr;">
+            <div class="fg">
+              <label class="label">Company</label>
+              <input id="bCompany" placeholder="Company name" />
+            </div>
+            <div class="fg">
+              <label class="label">Address</label>
+              <input id="bAddress" placeholder="Address" />
+            </div>
+            <div class="fg">
+              <label class="label">VAT</label>
+              <input id="bVat" placeholder="VAT" />
+            </div>
+            <div class="fg">
+              <label class="label">Default currency</label>
+              <select id="bCurrency">
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+                <option value="GBP">GBP</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fg" style="margin-top:12px;">
+            <label class="label">IBAN</label>
+            <input id="bIban" placeholder="IBAN" />
+          </div>
+
+          <div class="drawer-actions">
+            <button class="btn primary" type="button" id="btnSaveBilling">Save</button>
+            <button class="btn" type="button" data-close="billingDrawer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="../js/sidebar.js"></script>
   <script>
     /* ==============================
@@ -1029,6 +1276,22 @@
       { id:"102", name:"Mihai R." },
     ];
 
+    let wallets = {
+      erc20: "0x7b3c...a19f (ERC20 demo)",
+      trc20: "TQ8h...3kZp (TRC20 demo)"
+    };
+
+    let billingCompanies = [
+      {
+        id: "bc_1",
+        name: "Alpha Media SRL",
+        address: "Str. Exemplu 10, Iași, România",
+        vat: "RO12345678",
+        iban: "RO49AAAAA1B31007593840000",
+        currency: "EUR"
+      }
+    ];
+
     let mainWalletUsd = 580.00;
 
     let topups = [
@@ -1044,6 +1307,7 @@
         initialCurrency:"EUR",
         amountUsd:null,
         billingCompany:{
+          id:"bc_1",
           name:"Alpha Media SRL",
           iban:"RO49AAAAA1B31007593840000",
           currency:"EUR",
@@ -1076,6 +1340,7 @@
         initialCurrency:"EUR",
         amountUsd:null,
         billingCompany:{
+          id:"bc_1",
           name:"Alpha Media SRL",
           iban:"RO49AAAAA1B31007593840000",
           currency:"EUR",
@@ -1125,6 +1390,7 @@
         initialCurrency:"EUR",
         amountUsd:null,
         billingCompany:{
+          id:"bc_1",
           name:"Alpha Media SRL",
           iban:"RO49AAAAA1B31007593840000",
           currency:"EUR",
@@ -1219,18 +1485,33 @@
       </span>`;
     }
 
+    function usdValueForKpi(t){
+      // KPI sum uses amountUsd if known; else if USD initial => use it; else 0 (demo)
+      if(t.amountUsd != null) return Number(t.amountUsd || 0);
+      if((t.initialCurrency||"").toUpperCase() === "USD") return Number(t.initialAmount || 0);
+      return 0;
+    }
+
     function computeKpis(items){
-      let total=0,p=0,a=0,d=0;
+      let pSum=0,aSum=0,dSum=0;
+      let p=0,a=0,d=0;
+
       for(const t of items){
-        total++;
-        if(t.status==="pending") p++;
-        if(t.status==="approved") a++;
-        if(t.status==="declined") d++;
+        const s = (t.status||"pending").toLowerCase();
+        const val = usdValueForKpi(t);
+
+        if(s==="pending"){ p++; pSum += val; }
+        if(s==="approved"){ a++; aSum += val; }
+        if(s==="declined"){ d++; dSum += val; }
       }
-      $("kTotal").textContent = total;
-      $("kPending").textContent = p;
-      $("kApproved").textContent = a;
-      $("kDeclined").textContent = d;
+
+      $("kPendingSum").textContent = moneyUSD(pSum);
+      $("kApprovedSum").textContent = moneyUSD(aSum);
+      $("kDeclinedSum").textContent = moneyUSD(dSum);
+
+      $("cPending").textContent = `${p} `;
+      $("cApproved").textContent = `${a}`;
+      $("cDeclined").textContent = `${d} `;
     }
 
     function render(){
@@ -1265,15 +1546,14 @@
       }).join("");
 
       tbody.querySelectorAll("[data-open]").forEach(tr=>{
-        tr.addEventListener("click",(e)=>{
-          const id = tr.getAttribute("data-open");
-          openDrawer(id);
+        tr.addEventListener("click",()=>{
+          openTopupDrawer(tr.getAttribute("data-open"));
         });
       });
       tbody.querySelectorAll("[data-open-btn]").forEach(btn=>{
         btn.addEventListener("click",(e)=>{
           e.stopPropagation();
-          openDrawer(btn.getAttribute("data-open-btn"));
+          openTopupDrawer(btn.getAttribute("data-open-btn"));
         });
       });
     }
@@ -1298,41 +1578,232 @@
       alert("Demo: export (CSV/XLSX) next step.");
     });
 
-    $("btnWallets").addEventListener("click", ()=>{
-      alert("Demo: crypto wallets modal (admin) – next step.");
+    /* ==============================
+       ✅ Drawer helpers (generic)
+    ============================== */
+    function setBodyModal(open){
+      document.body.classList.toggle("modal-open", !!open);
+    }
+    function openDrawer(id){
+      $(id).classList.add("active");
+      $(id).setAttribute("aria-hidden","false");
+      setBodyModal(true);
+    }
+    function closeDrawerById(id){
+      $(id).classList.remove("active");
+      $(id).setAttribute("aria-hidden","true");
+      // close body lock only if no other drawer active
+      const anyOpen = document.querySelector(".drawer-modal.active");
+      if(!anyOpen) setBodyModal(false);
+    }
+
+    document.addEventListener("click",(e)=>{
+      const closer = e.target.closest("[data-close]");
+      if(!closer) return;
+      const id = closer.getAttribute("data-close");
+      closeDrawerById(id);
     });
 
-    $("btnCreate").addEventListener("click", ()=>{
-      alert("Demo: create top-up modal – next step (ai deja în alte screenshot-uri).");
+    document.addEventListener("keydown",(e)=>{
+      if(e.key !== "Escape") return;
+      const top = document.querySelector(".drawer-modal.active:last-of-type") || document.querySelector(".drawer-modal.active");
+      if(top?.id) closeDrawerById(top.id);
     });
 
     /* ==============================
-       Drawer details (FIXED right)
+       Drawer: Wallets
+    ============================== */
+    $("btnWallets").addEventListener("click", ()=>{
+      $("wErc20").value = wallets.erc20 || "";
+      $("wTrc20").value = wallets.trc20 || "";
+      openDrawer("walletsDrawer");
+    });
+
+    $("btnSaveWallets").addEventListener("click", ()=>{
+      wallets.erc20 = ($("wErc20").value || "").trim();
+      wallets.trc20 = ($("wTrc20").value || "").trim();
+      closeDrawerById("walletsDrawer");
+    });
+
+    /* ==============================
+       Drawer: Create Top-up
+    ============================== */
+    let createMode = "client";
+    let billingEditId = null;
+
+    function fillCreateClients(){
+      $("cClient").innerHTML = clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+    }
+    function fillBillingSelect(){
+      $("cBilling").innerHTML = billingCompanies.map(b=>`<option value="${b.id}">${b.name} • ${b.currency} • IBAN ✓</option>`).join("");
+      if(!billingCompanies.length){
+        $("cBilling").innerHTML = `<option value="">No billing companies</option>`;
+      }
+    }
+    function syncBillingSummary(){
+      const id = $("cBilling").value;
+      const b = billingCompanies.find(x=>x.id===id);
+      if(!b){
+        $("bsCompany").textContent = "—";
+        $("bsAddress").textContent = "—";
+        $("bsVat").textContent = "—";
+        $("bsIban").textContent = "—";
+        return;
+      }
+      $("bsCompany").textContent = b.name || "—";
+      $("bsAddress").textContent = b.address || "—";
+      $("bsVat").textContent = b.vat || "—";
+      $("bsIban").textContent = b.iban || "—";
+      // auto-currency like screenshot
+      $("cCurrency").value = b.currency || "EUR";
+    }
+
+    $("createSeg").addEventListener("click",(e)=>{
+      const btn = e.target.closest("button[data-mode]");
+      if(!btn) return;
+      createMode = btn.dataset.mode;
+      $("createSeg").querySelectorAll("button").forEach(b=> b.classList.toggle("active", b.dataset.mode===createMode));
+    });
+
+    $("btnCreate").addEventListener("click", ()=>{
+      fillCreateClients();
+      fillBillingSelect();
+      $("cType").value = "wire";
+      $("cClient").value = clients[0]?.id || "";
+      $("cAmount").value = "1200";
+      $("cDesc").value = "";
+      $("cBilling").value = billingCompanies[0]?.id || "";
+      syncBillingSummary();
+      openDrawer("createDrawer");
+    });
+
+    $("cBilling").addEventListener("change", syncBillingSummary);
+
+    $("btnAddBilling").addEventListener("click", ()=>{
+      billingEditId = null;
+      $("bTitle").textContent = "Add billing company";
+      $("bCompany").value = "";
+      $("bAddress").value = "";
+      $("bVat").value = "";
+      $("bIban").value = "";
+      $("bCurrency").value = "EUR";
+      openDrawer("billingDrawer");
+    });
+
+    $("btnEditBillingCreate").addEventListener("click", ()=>{
+      const id = $("cBilling").value;
+      const b = billingCompanies.find(x=>x.id===id);
+      if(!b) return;
+      billingEditId = id;
+      $("bTitle").textContent = "Edit billing company";
+      $("bCompany").value = b.name || "";
+      $("bAddress").value = b.address || "";
+      $("bVat").value = b.vat || "";
+      $("bIban").value = b.iban || "";
+      $("bCurrency").value = b.currency || "EUR";
+      openDrawer("billingDrawer");
+    });
+
+    $("btnSaveBilling").addEventListener("click", ()=>{
+      const payload = {
+        name: ($("bCompany").value || "").trim(),
+        address: ($("bAddress").value || "").trim(),
+        vat: ($("bVat").value || "").trim(),
+        iban: ($("bIban").value || "").trim(),
+        currency: $("bCurrency").value
+      };
+      if(!payload.name || !payload.iban){
+        alert("Company + IBAN required (demo).");
+        return;
+      }
+
+      if(billingEditId){
+        const idx = billingCompanies.findIndex(x=>x.id===billingEditId);
+        if(idx >= 0) billingCompanies[idx] = { ...billingCompanies[idx], ...payload };
+      }else{
+        billingCompanies.unshift({ id: "bc_" + Math.random().toString(16).slice(2,8), ...payload });
+      }
+
+      fillBillingSelect();
+      $("cBilling").value = billingCompanies[0]?.id || "";
+      syncBillingSummary();
+
+      closeDrawerById("billingDrawer");
+    });
+
+    $("btnCreatePending").addEventListener("click", ()=>{
+      const type = $("cType").value;
+      const clientId = $("cClient").value;
+      const amount = Number($("cAmount").value || 0);
+      const currency = $("cCurrency").value;
+      const desc = ($("cDesc").value || "").trim();
+
+      if(!clientId || !amount){
+        alert("Client + amount required.");
+        return;
+      }
+
+      const id = "TU-" + String(Math.floor(120000 + Math.random()*900)).padStart(6,"0");
+
+      let billingCompany = null;
+      let network = null;
+      let amountUsd = null;
+
+      if(type === "wire"){
+        const b = billingCompanies.find(x=>x.id===($("cBilling").value));
+        if(!b){
+          alert("Select billing company.");
+          return;
+        }
+        billingCompany = { id: b.id, name: b.name, iban: b.iban, currency: b.currency };
+        // demo: unknown USD until FX
+        amountUsd = (currency === "USD") ? amount : null;
+      }else{
+        // crypto demo: choose network based on currency
+        network = "USDT_ERC20";
+        amountUsd = amount; // in demo treat as USD
+      }
+
+      topups.unshift({
+        id,
+        created: new Date().toISOString().slice(0,10),
+        clientId,
+        type,
+        network,
+        status: "pending",
+        description: desc,
+        initialAmount: amount,
+        initialCurrency: currency,
+        amountUsd,
+        billingCompany,
+        steps: { invoiceProvided:false, proofUploaded:false, moneyOTW:false, invoiceFile:null, proofFile:null },
+        admin: { wireReceived:false, receivedAmount:null, receivedCurrency: currency, fxRate:null, feeUsd:0, declineReason:"" }
+      });
+
+      closeDrawerById("createDrawer");
+      render();
+    });
+
+    /* ==============================
+       Drawer details (Topup)
     ============================== */
     let activeId = null;
     let activeView = "client";
 
-    function setBodyModal(open){
-      document.body.classList.toggle("modal-open", !!open);
-    }
-
-    function openDrawer(id){
+    function openTopupDrawer(id){
       const t = topups.find(x=>x.id===id);
       if(!t) return;
       activeId = id;
 
       $("dTitle").textContent = `Top-up • ${t.id}`;
 
-      // view seg
-      activeView = "admin"; // default like screenshot (admin view)
+      activeView = "admin";
       syncViewButtons();
 
-      // status pill + main wallet
       $("dStatusPill").className = "pill " + (t.status||"pending");
       $("dStatusPill").textContent = (t.status||"pending").toUpperCase();
       $("dMainWallet").textContent = `Main Wallet: ${moneyUSD(mainWalletUsd)}`;
 
-      // timeline dots
       const s = t.steps || {};
       setDot("dotInvoice", !!s.invoiceProvided);
       setDot("dotProof", !!s.proofUploaded);
@@ -1342,7 +1813,6 @@
       $("txtProof").textContent = s.proofFile ? s.proofFile : "—";
       $("txtOTW").textContent = s.moneyOTW ? "In progress" : "—";
 
-      // details kv
       const amountUsd = (t.amountUsd != null) ? moneyUSD(t.amountUsd) : "—";
       const network = t.network ? t.network : "—";
       $("dKv").innerHTML = `
@@ -1356,7 +1826,6 @@
         <div class="kv-row"><div class="k">Description</div><div class="v">${t.description ? t.description : "—"}</div></div>
       `;
 
-      // billing
       if(t.billingCompany){
         $("billingBlock").style.display = "block";
         $("dCompany").textContent = t.billingCompany.name || "—";
@@ -1366,30 +1835,16 @@
         $("billingBlock").style.display = "none";
       }
 
-      // admin actions + FX lock
       const a = t.admin || {};
       $("fxCurrency").value = a.receivedCurrency || "EUR";
       $("fxReceivedAmount").value = a.receivedAmount ?? "";
       $("fxRate").value = a.fxRate ?? "";
       $("fxFee").value = a.feeUsd ?? 0;
 
-      // lock FX until wire received (only for WIRE)
       syncFxLock();
-
-      // totals
       recalcTotals();
 
-      // show modal
-      $("topupDrawerModal").classList.add("active");
-      $("topupDrawerModal").setAttribute("aria-hidden","false");
-      setBodyModal(true);
-    }
-
-    function closeDrawer(){
-      activeId = null;
-      $("topupDrawerModal").classList.remove("active");
-      $("topupDrawerModal").setAttribute("aria-hidden","true");
-      setBodyModal(false);
+      openDrawer("topupDrawerModal");
     }
 
     function setDot(id, done){
@@ -1397,23 +1852,11 @@
       el.classList.toggle("done", !!done);
     }
 
-    $("drawerOverlay").addEventListener("click", closeDrawer);
-    $("drawerClose").addEventListener("click", closeDrawer);
-
-    document.addEventListener("keydown",(e)=>{
-      if(e.key==="Escape" && $("topupDrawerModal").classList.contains("active")){
-        closeDrawer();
-      }
-    });
-
-    // Client/Admin toggle
     function syncViewButtons(){
       $("viewSeg").querySelectorAll("button").forEach(b=>{
         b.classList.toggle("active", b.dataset.view === activeView);
       });
-      // in client view hide admin actions
       $("adminActions").style.display = (activeView === "admin") ? "block" : "none";
-      // billing edit button only admin
       $("btnEditBilling").style.display = (activeView === "admin") ? "inline-flex" : "none";
     }
     $("viewSeg").addEventListener("click",(e)=>{
@@ -1427,15 +1870,14 @@
       return topups.find(x=>x.id===activeId);
     }
 
-    // Uploads (demo metadata)
     $("fileInvoice").addEventListener("change",(e)=>{
       const t = getActive(); if(!t) return;
       const f = e.target.files?.[0];
       if(f){
         t.steps.invoiceProvided = true;
         t.steps.invoiceFile = f.name;
-        render(); // updates chips
-        openDrawer(t.id); // refresh drawer UI quickly (simple)
+        render();
+        openTopupDrawer(t.id);
       }
     });
     $("fileProof").addEventListener("change",(e)=>{
@@ -1445,7 +1887,7 @@
         t.steps.proofUploaded = true;
         t.steps.proofFile = f.name;
         render();
-        openDrawer(t.id);
+        openTopupDrawer(t.id);
       }
     });
 
@@ -1465,7 +1907,6 @@
         $(id).disabled = !unlocked;
       });
       $("btnMarkWire").disabled = !isWire ? true : false;
-      // if crypto, keep approve enabled
       if(t.type === "crypto"){
         $("btnApprove").disabled = false;
         ["fxReceivedAmount","fxCurrency","fxRate","fxFee"].forEach(id=> $(id).disabled = true);
@@ -1484,7 +1925,6 @@
         return;
       }
 
-      // wire:
       const received = Number($("fxReceivedAmount").value || 0);
       const rate = Number($("fxRate").value || 0);
       const fee = Number($("fxFee").value || 0);
@@ -1515,7 +1955,6 @@
     $("btnApprove").addEventListener("click", ()=>{
       const t = getActive(); if(!t) return;
 
-      // compute net
       let netUsd = 0;
       if(t.type === "crypto"){
         const gross = Number(t.amountUsd ?? t.initialAmount ?? 0);
@@ -1537,7 +1976,7 @@
       mainWalletUsd = +(mainWalletUsd + netUsd).toFixed(2);
 
       render();
-      openDrawer(t.id);
+      openTopupDrawer(t.id);
     });
 
     $("declinePreset").addEventListener("change", ()=>{
@@ -1562,20 +2001,22 @@
       t.status = "declined";
       t.admin.declineReason = reason;
       render();
-      openDrawer(t.id);
+      openTopupDrawer(t.id);
     });
 
     $("btnDelete").addEventListener("click", ()=>{
       const t = getActive(); if(!t) return;
       if(!confirm(`Delete ${t.id}?`)) return;
       topups = topups.filter(x=>x.id !== t.id);
-      closeDrawer();
+      closeDrawerById("topupDrawerModal");
       render();
     });
 
     $("btnEditBilling").addEventListener("click", ()=>{
       const t = getActive(); if(!t) return;
-      alert("Demo: Edit billing company modal (next step).");
+      if(!t.billingCompany) return;
+      // quick demo: redirect to edit in create drawer style
+      alert("Demo: billing edit (you already have the Billing drawer in Create).");
     });
 
     /* ==============================
