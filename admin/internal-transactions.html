@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin Finance • Topups</title>
+  <title>Internal Transactions • Admin Finance</title>
 
   <link rel="stylesheet" href="../css/layout.css" />
   <link rel="stylesheet" href="../css/dashboard.css" />
@@ -669,10 +669,10 @@
     <header class="header">
       <div class="header-left">
         <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
-          <button type="button" class="page-tab active" data-page="topups" role="tab" aria-selected="true">Topups</button>
+          <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="false">Topups</button>
           <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
           <button type="button" class="page-tab" data-page="fees" role="tab" aria-selected="false">Fees</button>
-          <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">Internal Transactions</button>
+          <button type="button" class="page-tab active" data-page="internal-transactions" role="tab" aria-selected="true">Internal Transactions</button>
           <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
         </div>
       </div>
@@ -693,111 +693,131 @@
     <aside class="sidebar" id="sidebar"></aside>
 
     <main class="main">
-      <div style="display:flex; flex-direction:column; gap:14px;">
-
-        <div class="glass-panel top-head">
+      <div class="glass-panel" style="margin-top: 1.5rem; padding: 1.5rem;">
+        
+        <!-- Header -->
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
           <div>
-            <div class="top-head__title">Top-ups</div>
-            <div class="mini-hint">Wire + Crypto flows • Timeline shown in list • Admin-only wallets editor</div>
+            <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Internal Transactions</h2>
+            <div style="font-size: 0.875rem; color: var(--muted); margin-top: 0.25rem;">
+              Full audit log of money movements • <span id="internalTxCount">0</span> entries
+            </div>
           </div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn ghost" type="button" id="btnWallets">Wallets</button>
-            <button class="btn ghost" type="button" id="btnExport">Export</button>
-            <button class="btn primary" type="button" id="btnCreate">+ Create Top-up</button>
-          </div>
+          <button class="btn" onclick="exportInternalTransactionsExcel()" style="padding: 8px 16px;">Export Excel</button>
         </div>
 
-        <!-- Filters -->
-        <div class="filters">
-          <div class="filters__row">
-            <div class="fg">
-              <label class="label">Search</label>
-              <input id="fSearch" type="search" placeholder="ID / client / wire / crypto / hash" />
-            </div>
-
-            <div class="fg">
-              <label class="label">Client</label>
-              <select id="fClient"></select>
-            </div>
-
-            <div class="fg">
-              <label class="label">Date range</label>
-              <div class="date-range">
-                <input type="date" id="fFrom" />
-                <div class="sep">→</div>
-                <input type="date" id="fTo" />
-              </div>
-            </div>
-
-            <div class="fg">
-              <label class="label">Status</label>
-              <select id="fStatus">
-                <option value="all">All</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="declined">Declined</option>
-              </select>
-            </div>
-
-            <div class="fg">
-              <label class="label">Type</label>
-              <select id="fType">
-                <option value="all">All</option>
-                <option value="wire">WIRE</option>
-                <option value="crypto">CRYPTO</option>
-              </select>
-            </div>
-
-            <div class="fg">
-              <label class="label">Network</label>
-              <select id="fNetwork">
-                <option value="all">All</option>
-                <option value="USDT_ERC20">USDT ERC20</option>
-                <option value="USDT_TRC20">USDT TRC20</option>
-              </select>
-            </div>
-
-            <div class="fg">
-              <button class="btn ghost" type="button" id="btnClear">Clear</button>
-            </div>
+        <!-- Search and Filter Row -->
+        <div style="display: flex; gap: 0.75rem; align-items: flex-end; margin-top: 1.5rem; margin-bottom: 1.5rem;">
+          <div style="flex: 1; max-width: 500px;">
+            <label style="display: block; font-size: 0.875rem; color: var(--muted); margin-bottom: 0.35rem;">
+              Search (ID / Date / Description / Link)
+            </label>
+            <input 
+              type="text" 
+              id="internalTx_search" 
+              placeholder="Search..." 
+              oninput="filterInternalTransactions()"
+              style="width: 100%; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 8px; background: var(--bg0); color: var(--text); font-size: 0.9rem;"
+            >
           </div>
-        </div>
 
-        <!-- KPIs -->
-        <div class="stats">
-          <div class="stat-box">
-            <h4>TOTAL</h4>
-            <div class="stat-value" id="kTotal">0</div>
-            <div class="stat-sub">Matches filters</div>
+          <div style="min-width: 180px;">
+            <label style="display: block; font-size: 0.875rem; color: var(--muted); margin-bottom: 0.35rem;">
+              Category
+            </label>
+            <select 
+              id="internalTx_category" 
+              onchange="filterInternalTransactions()"
+              style="width: 100%; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 8px; background: var(--bg0); color: var(--text); font-size: 0.9rem;"
+            >
+              <option value="__all__">All</option>
+              <option value="topup_approval">TOPUP_APPROVAL</option>
+              <option value="topup_fee">TOPUP_FEE</option>
+              <option value="transfer">TRANSFER</option>
+              <option value="transfer_fee">TRANSFER_FEE</option>
+              <option value="service_charge">SERVICE_CHARGE</option>
+              <option value="setup_charge">SETUP_CHARGE</option>
+              <option value="refund">REFUND</option>
+              <option value="other">OTHER</option>
+            </select>
           </div>
-          <div class="stat-box pending">
-            <h4>PENDING</h4>
-            <div class="stat-value" id="kPending">0</div>
-            <div class="stat-sub">Awaiting steps</div>
-          </div>
-          <div class="stat-box approved">
-            <h4>APPROVED</h4>
-            <div class="stat-value" id="kApproved">0</div>
-            <div class="stat-sub">Internal tx added</div>
-          </div>
-          <div class="stat-box declined">
-            <h4>DECLINED</h4>
-            <div class="stat-value" id="kDeclined">0</div>
-            <div class="stat-sub">Has reason</div>
-          </div>
+
+          <button class="btn gray" onclick="clearInternalTxFilters()" style="padding: 8px 16px;">Clear</button>
         </div>
 
         <!-- Table -->
-        <div class="glass-panel" style="padding:16px;">
-          <div class="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Date</th>
-                  <th>Client</th>
-                  <th>Top-up ID</th>
-                  <th>Type</th>
-                  <th>Network</th>
+        <div style="overflow-x: auto; border: 1px solid var(--line2); border-radius: var(--r-lg);">
+          <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+            <thead>
+              <tr style="background: var(--bg0); border-bottom: 1px solid var(--line2);">
+                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text); white-space: nowrap;">Date</th>
+                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">Category</th>
+                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">Amount</th>
+                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">From</th>
+                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">To</th>
+                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">Link</th>
+                <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">Description</th>
+                <th style="padding: 12px 16px; text-align: center; font-weight: 600; color: var(--text);">Action</th>
+              </tr>
+            </thead>
+            <tbody id="internalTxPageBody">
+              <!-- Rows will be inserted here -->
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- Internal Transaction Details Modal -->
+  <div id="internalTxDetailsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(4px);" onclick="closeInternalTxDetails()">
+    <div id="internalTxDetailsPanel" style="position: absolute; top: 0; right: -500px; width: 500px; height: 100%; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.2); transition: right 0.3s ease; overflow-y: auto;" onclick="event.stopPropagation()">
+      
+      <!-- Header -->
+      <div style="padding: 2rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 10;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 id="internalTxModalTitle" style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #1f2937;">Internal Tx • [ID]</h3>
+          <button onclick="closeInternalTxDetails()" style="background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">×</button>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div style="padding: 2rem;">
+        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.25rem; font-size: 0.95rem;">
+          
+          <div style="color: #6b7280; font-weight: 500;">Created</div>
+          <div id="txDetail_created" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Category</div>
+          <div id="txDetail_category" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Amount</div>
+          <div id="txDetail_amount" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">From</div>
+          <div id="txDetail_from" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">To</div>
+          <div id="txDetail_to" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Link</div>
+          <div id="txDetail_link" style="color: #1f2937; font-weight: 600; text-align: right; font-family: monospace; font-size: 0.9rem;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Client</div>
+          <div id="txDetail_client" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Fee code</div>
+          <div id="txDetail_feeCode" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Description</div>
+          <div id="txDetail_description" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
                   <th class="td-right">Amount (USD)</th>
                   <th>Status</th>
                   <th>Timeline</th>
@@ -997,7 +1017,6 @@
       if(!btn) return;
       const key = btn.dataset.page;
       if(!PAGE_ROUTES[key]) return;
-      if(key === "topups") return;
       window.location.href = PAGE_ROUTES[key];
     });
 
@@ -1021,17 +1040,447 @@
     })();
 
     /* ==============================
-       Demo data
+       Demo data and state
     ============================== */
-    const clients = [
-      { id:"100", name:"Alex M." },
-      { id:"101", name:"Dana P." },
-      { id:"102", name:"Mihai R." },
-    ];
+    const LS_KEY = "admin_finance_demo_v7";
 
-    let mainWalletUsd = 580.00;
+    const state = {
+      ledger: [],
+      platformFilter: "__all__",
+      globalClient: "__all__",
+      globalFrom: "",
+      globalTo: "",
+      ledgerTab: "all"
+    };
 
-    let topups = [
+    function money(n){
+      const v = Number(n || 0);
+      return v.toLocaleString(undefined, { style:"currency", currency:"USD" });
+    }
+    function nowISO(){ return new Date().toLocaleString(); }
+    function uid(){ return Math.random().toString(16).slice(2) + "_" + Date.now(); }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function getClientLabelById(id){
+      const map = { "100":"100 - Alex", "101":"101 - Maria", "102":"102 - John" };
+      return map[String(id)] || String(id);
+    }
+
+    function getClientNameById(id){
+      const label = getClientLabelById(id);
+      const parts = String(label).split(" - ");
+      return parts[1] ? parts.slice(1).join(" - ").trim() : label;
+    }
+
+    function load(){
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw){ seedDemo(); return; }
+      try{
+        const parsed = JSON.parse(raw);
+        
+        if(!parsed.dataVersion || parsed.dataVersion < 2){
+          seedDemo();
+          return;
+        }
+        
+        state.ledger = Array.isArray(parsed.ledger) ? parsed.ledger : [];
+        state.platformFilter = parsed.platformFilter || "__all__";
+        state.globalClient = parsed.globalClient || "__all__";
+        state.globalFrom = parsed.globalFrom || "";
+        state.globalTo = parsed.globalTo || "";
+        state.ledgerTab = parsed.ledgerTab || "all";
+      }catch(e){ seedDemo(); }
+    }
+
+    function save(){
+      localStorage.setItem(LS_KEY, JSON.stringify({
+        dataVersion: 2,
+        ledger: state.ledger,
+        platformFilter: state.platformFilter,
+        globalClient: state.globalClient,
+        globalFrom: state.globalFrom,
+        globalTo: state.globalTo,
+        ledgerTab: state.ledgerTab
+      }));
+    }
+
+    function seedDemo(){
+      state.ledger = [
+        {
+          id: uid(),
+          topupId: "100147",
+          date: "19 februarie 2026",
+          type:"topup",
+          clientId:"100",
+          from:"external",
+          to:"mainWallet",
+          platform:"",
+          category:"topup_approval",
+          status:"approved",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Top-up approved (net USD) to Main Wallet",
+          grossAmount: 980.00,
+          feeAmount: 0,
+          netAmount: 980.00,
+          note:"Demo • Top-up approved (net USD) to Main Wallet",
+          amount: 980.00
+        },
+        {
+          id: uid(),
+          topupId: "100148",
+          date: "19 februarie 2026",
+          type:"fee",
+          clientId:"100",
+          from:"topup",
+          to:"feesCollected",
+          platform:"",
+          category:"topup_fee",
+          status:"approved",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Top-up fee",
+          grossAmount: 20.00,
+          feeAmount: 20.00,
+          netAmount: 20.00,
+          note:"Demo • Top-up fee",
+          amount: 20.00
+        },
+        {
+          id: uid(),
+          topupId: "100149",
+          date: "19 februarie 2026",
+          type:"transfer",
+          clientId:"100",
+          from:"mainWallet",
+          to:"platformVault",
+          platform:"FACEBOOK",
+          category:"transfer",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Main → FB Vault",
+          grossAmount: 400.00,
+          feeAmount: 0,
+          netAmount: 400.00,
+          note:"Demo • Main → FB Vault",
+          amount: 400.00
+        },
+        {
+          id: uid(),
+          date: "19 februarie 2026",
+          type:"fee",
+          clientId:"100",
+          from:"mainWallet",
+          to:"feesCollected",
+          platform:"",
+          category:"transfer_fee",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Transfer fee",
+          grossAmount: 5.00,
+          feeAmount: 5.00,
+          netAmount: 5.00,
+          note:"Demo • Transfer fee",
+          amount: 5.00
+        }
+      ];
+      save();
+    }
+
+    function passesGlobalFilters(tx){
+      return true;
+    }
+
+    /* ==============================
+       Internal Transactions Page Functions
+    ============================== */
+    function renderInternalTransactionsPage(){
+      const body = document.getElementById("internalTxPageBody");
+      if(!body) return;
+
+      let rows = state.ledger
+        .filter(passesGlobalFilters)
+        .slice()
+        .sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+      const searchTerm = (document.getElementById("internalTx_search")?.value || "").toLowerCase();
+      if(searchTerm){
+        rows = rows.filter(tx => {
+          const searchableText = [
+            tx.id || "",
+            tx.date || "",
+            tx.note || "",
+            tx.description || "",
+            tx.from || "",
+            tx.to || "",
+            generateLinkId(tx)
+          ].join(" ").toLowerCase();
+          return searchableText.includes(searchTerm);
+        });
+      }
+
+      const categoryFilter = document.getElementById("internalTx_category")?.value || "__all__";
+      if(categoryFilter !== "__all__"){
+        rows = rows.filter(tx => {
+          const cat = String(tx.category || tx.type || "").toLowerCase();
+          
+          if(categoryFilter === "topup_approval") return cat.includes("topup") && !cat.includes("fee");
+          if(categoryFilter === "topup_fee") return cat.includes("topup") && cat.includes("fee");
+          if(categoryFilter === "transfer") return cat.includes("transfer") && !cat.includes("fee");
+          if(categoryFilter === "transfer_fee") return cat.includes("transfer") && cat.includes("fee");
+          if(categoryFilter === "service_charge") return cat.includes("service");
+          if(categoryFilter === "setup_charge") return cat.includes("setup");
+          if(categoryFilter === "refund") return cat.includes("refund");
+          if(categoryFilter === "other") return !cat.includes("topup") && !cat.includes("transfer") && !cat.includes("service") && !cat.includes("setup") && !cat.includes("refund");
+          
+          return cat.includes(categoryFilter);
+        });
+      }
+
+      const countEl = document.getElementById("internalTxCount");
+      if(countEl) countEl.textContent = rows.length;
+
+      if(!rows.length){
+        body.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 3rem; color: var(--muted);">No internal transactions found for current filters.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = rows.map(tx=>{
+        const categoryBadge = getCategoryBadgeStyled(tx);
+        const linkId = generateLinkId(tx);
+        
+        let fromText = formatAccountName(tx.from || "—");
+        let toText = formatAccountName(tx.to || "—");
+        
+        if(tx.platform && fromText === "Platform Vault"){
+          fromText = `Platform Vault:${tx.platform.toUpperCase()}`;
+        }
+        if(tx.platform && toText === "Platform Vault"){
+          toText = `Platform Vault:${tx.platform.toUpperCase()}`;
+        }
+        
+        if(tx.platform && toText === "General Balance"){
+          toText = `General Balance:${tx.platform.toUpperCase()}`;
+        }
+        if(tx.platform && toText === "Individual Balance"){
+          toText = `Individual Balance:${tx.platform.toUpperCase()}`;
+        }
+        
+        const amountFormatted = `USD ${Number(tx.amount || 0).toFixed(2)}`;
+        
+        return `
+          <tr style="border-bottom: 1px solid var(--line2);">
+            <td style="padding: 12px 16px; white-space: nowrap; color: var(--text);">${escapeHtml(tx.date)}</td>
+            <td style="padding: 12px 16px;">${categoryBadge}</td>
+            <td style="padding: 12px 16px; color: var(--text);">${amountFormatted}</td>
+            <td style="padding: 12px 16px; color: var(--text);">${escapeHtml(fromText)}</td>
+            <td style="padding: 12px 16px; color: var(--text);">${escapeHtml(toText)}</td>
+            <td style="padding: 12px 16px; font-family: monospace; font-size: 0.85rem; color: var(--muted);">${escapeHtml(linkId)}</td>
+            <td style="padding: 12px 16px; color: var(--text); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(tx.note || tx.description || "—")}</td>
+            <td style="padding: 12px 16px; text-align: center;">
+              <button 
+                onclick="viewInternalTxDetails('${escapeHtml(tx.id)}')" 
+                style="padding: 6px 14px; background: var(--bg0); border: 1px solid var(--line2); border-radius: 6px; color: var(--text); cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.15s ease;"
+                onmouseover="this.style.background='var(--glass)'; this.style.transform='translateY(-1px)'"
+                onmouseout="this.style.background='var(--bg0)'; this.style.transform='translateY(0)'"
+              >Details</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function getCategoryBadgeStyled(tx){
+      const cat = String(tx.category || tx.type || "").toLowerCase();
+      let bgColor = "#e5e7eb";
+      let textColor = "#374151";
+      let displayText = (tx.category || tx.type || "—").toUpperCase().replace(/_/g, " ");
+      
+      if(cat.includes("topup") && !cat.includes("fee")){
+        bgColor = "#dcfce7";
+        textColor = "#166534";
+        displayText = "TOPUP APPROVAL";
+      } else if(cat.includes("topup") && cat.includes("fee")){
+        bgColor = "#fef3c7";
+        textColor = "#92400e";
+        displayText = "TOPUP FEE";
+      } else if(cat.includes("transfer") && cat.includes("fee")){
+        bgColor = "#fef3c7";
+        textColor = "#92400e";
+        displayText = "TRANSFER FEE";
+      } else if(cat.includes("transfer") || cat.includes("allocation")){
+        bgColor = "#dbeafe";
+        textColor = "#1e40af";
+        displayText = "TRANSFER";
+      } else if(cat.includes("service")){
+        bgColor = "#e0e7ff";
+        textColor = "#4338ca";
+        displayText = "SERVICE CHARGE";
+      } else if(cat.includes("setup")){
+        bgColor = "#e0e7ff";
+        textColor = "#4338ca";
+        displayText = "SETUP CHARGE";
+      } else if(cat.includes("refund")){
+        bgColor = "#fee2e2";
+        textColor = "#991b1b";
+        displayText = "REFUND";
+      } else {
+        bgColor = "#f3f4f6";
+        textColor = "#4b5563";
+        displayText = "OTHER";
+      }
+      
+      return `<span style="display: inline-block; padding: 4px 10px; border-radius: 6px; background: ${bgColor}; color: ${textColor}; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.3px;">${displayText}</span>`;
+    }
+
+    function formatAccountName(account){
+      if(!account || account === "—") return "—";
+      
+      let formatted = String(account);
+      
+      if(formatted === "external") return "Wire (EUR)";
+      if(formatted === "mainWallet") return "Main Wallet";
+      if(formatted === "platformVault") return "Platform Vault";
+      if(formatted === "generalBalance") return "General Balance";
+      if(formatted === "individualBalance") return "Individual Balance";
+      if(formatted === "feesCollected") return "Fees";
+      if(formatted === "topups") return "Topups";
+      if(formatted === "topup") return "Top-up";
+      
+      return formatted;
+    }
+
+    function generateLinkId(tx){
+      const type = (tx.type || "").toUpperCase();
+      const id = String(tx.id || "").substring(0, 6).toUpperCase();
+      
+      if(type === "TOPUP") return `TOPUP-TN-DEMO-${id}`;
+      if(type === "TRANSFER") return `TRANSFER-TE-DEMO-${id}`;
+      if(type === "ALLOCATION") return `TRANSFER-TN-DEMO-${id}`;
+      if(type === "FEE") return `TRANSFER-TE-DEMO-${id}`;
+      
+      return `TX-${id}`;
+    }
+
+    function filterInternalTransactions(){
+      renderInternalTransactionsPage();
+    }
+
+    function clearInternalTxFilters(){
+      const searchEl = document.getElementById("internalTx_search");
+      const categoryEl = document.getElementById("internalTx_category");
+      
+      if(searchEl) searchEl.value = "";
+      if(categoryEl) categoryEl.value = "__all__";
+      
+      renderInternalTransactionsPage();
+    }
+
+    function viewInternalTxDetails(txId){
+      const tx = state.ledger.find(t => String(t.id) === String(txId));
+      if(!tx){
+        alert("Transaction not found.");
+        return;
+      }
+      
+      document.getElementById("internalTxModalTitle").textContent = `Internal Tx • ${tx.id}`;
+      document.getElementById("txDetail_created").textContent = tx.date || "—";
+      document.getElementById("txDetail_category").textContent = (tx.category || tx.type || "—").toUpperCase().replace(/_/g, " ");
+      document.getElementById("txDetail_amount").textContent = `USD ${Number(tx.amount || 0).toFixed(2)}`;
+      
+      let fromText = formatAccountName(tx.from || "—");
+      let toText = formatAccountName(tx.to || "—");
+      
+      if(tx.platform && fromText === "Platform Vault"){
+        fromText = `Platform Vault:${tx.platform.toUpperCase()}`;
+      }
+      if(tx.platform && toText === "Platform Vault"){
+        toText = `Platform Vault:${tx.platform.toUpperCase()}`;
+      }
+      if(tx.platform && toText === "General Balance"){
+        toText = `General Balance:${tx.platform.toUpperCase()}`;
+      }
+      if(tx.platform && toText === "Individual Balance"){
+        toText = `Individual Balance:${tx.platform.toUpperCase()}`;
+      }
+      
+      document.getElementById("txDetail_from").textContent = fromText;
+      document.getElementById("txDetail_to").textContent = toText;
+      document.getElementById("txDetail_link").textContent = generateLinkId(tx);
+      document.getElementById("txDetail_client").textContent = `c${tx.clientId || "1"}`;
+      document.getElementById("txDetail_feeCode").textContent = tx.feeCode || "—";
+      document.getElementById("txDetail_description").textContent = tx.note || tx.description || "—";
+      
+      const modal = document.getElementById("internalTxDetailsModal");
+      const panel = document.getElementById("internalTxDetailsPanel");
+      modal.style.display = "block";
+      
+      setTimeout(() => {
+        panel.style.right = "0";
+      }, 10);
+    }
+
+    function closeInternalTxDetails(){
+      const modal = document.getElementById("internalTxDetailsModal");
+      const panel = document.getElementById("internalTxDetailsPanel");
+      
+      panel.style.right = "-500px";
+      
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 300);
+    }
+
+    function exportInternalTransactionsExcel(){
+      const rows = state.ledger
+        .filter(passesGlobalFilters)
+        .sort((a,b)=> new Date(b.date) - new Date(a.date));
+      
+      let csv = "Date,Category,Amount,From,To,Link,Description\n";
+      
+      rows.forEach(tx => {
+        const linkId = generateLinkId(tx);
+        const cat = tx.category || tx.type || "—";
+        const row = [
+          tx.date,
+          cat,
+          tx.amount,
+          formatAccountName(tx.from || "—"),
+          formatAccountName(tx.to || "—"),
+          linkId,
+          (tx.note || tx.description || "—").replace(/,/g, ";")
+        ].join(",");
+        csv += row + "\n";
+      });
+      
+      const blob = new Blob([csv], { type: "text/csv" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `internal-transactions-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    }
+
+    /* ==============================
+       Boot
+    ============================== */
+    load();
+    renderInternalTransactionsPage();
+  </script>
+</body>
+</html>
+
       {
         id:"TU-120401",
         created:"2026-02-19",

@@ -933,22 +933,22 @@
     <div class="layout">
 <header class="header">
   <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
-      <button class="page-tab" data-page="topups" type="button">
-    Topups
-  </button>
-  <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">
-    Finance
-  </button>
-  <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">
-    Transactions
-  </button>
-  <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">
-    Internal Transactions
-  </button>
-  <button type="button" class="page-tab" data-page="ledger" role="tab" aria-selected="false">
-    Ledger
-  </button>
-</div>
+    <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="false">
+      Topups
+    </button>
+    <button type="button" class="page-tab active" data-page="finance" role="tab" aria-selected="true">
+      Finance
+    </button>
+    <button type="button" class="page-tab" data-page="fees" role="tab" aria-selected="false">
+      Fees
+    </button>
+    <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">
+      Internal Transactions
+    </button>
+    <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">
+      Transactions
+    </button>
+  </div>
 
 </header>
 
@@ -1114,8 +1114,9 @@
 
               <!-- MAIN WORKSPACE TABS -->
               <div class="pillbar" id="workspaceTabs">
-                <div class="pill active" data-tab="funding" style="display: none;">Funding</div>
-                <div class="pill" data-tab="setup" style="display: none;">Setup & Services</div>
+                <div class="pill active" data-tab="funding">Funding</div>
+                <div class="pill" data-tab="setup">Setup & Services</div>
+                <div class="pill" data-tab="fees">Fees</div>
               </div>
             </div>
 
@@ -1339,6 +1340,94 @@
                 <button class="transfer-btn gray" onclick="seedDemo()">Reset Demo Data</button>
               </div>
             </div>
+
+            <!-- TAB: Fees -->
+            <div id="tab_fees" style="display:none;">
+              <div class="mini-hint" style="margin-bottom:1rem;">
+                Derived from internal transactions - everything links back to audit log
+              </div>
+
+              <!-- Fee Summary Cards -->
+              <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 1.5rem;">
+                <div class="stat-box">
+                  <h4>TOTAL FEES</h4>
+                  <div class="stat-value" style="color: var(--info);">USD 25.00</div>
+                  <div class="stat-description">All fee categories</div>
+                </div>
+
+                <div class="stat-box">
+                  <h4>TOP-UP FEES</h4>
+                  <div class="stat-value" style="color: var(--warn);">USD 20.00</div>
+                  <div class="stat-description">Withdrawal fees</div>
+                </div>
+
+                <div class="stat-box">
+                  <h4>TRANSFER FEES</h4>
+                  <div class="stat-value" style="color: var(--good);">USD 5.00</div>
+                  <div class="stat-description">Main → Platform/transfer</div>
+                </div>
+
+                <div class="stat-box">
+                  <h4>SETUP + SERVICES</h4>
+                  <div class="stat-value" style="color: var(--muted);">USD 0.00</div>
+                  <div class="stat-description">Charges from Main Wallet</div>
+                </div>
+              </div>
+
+              <!-- Add Service Fee Button -->
+              <div style="margin-bottom: 1rem; text-align: right;">
+                <button class="btn success" onclick="openAddServiceFeeModal()">+ Add Service Fee</button>
+              </div>
+
+              <!-- Fees Table -->
+              <div style="border: 1px solid var(--line2); border-radius: var(--r-xl); overflow: hidden; background: var(--glass); backdrop-filter: blur(14px);">
+                <table style="width: 100%; border-collapse: collapse;">
+                  <thead>
+                    <tr style="background: color-mix(in srgb, var(--glass) 88%, var(--bg1)); backdrop-filter: blur(14px);">
+                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Date</th>
+                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Type</th>
+                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Amount</th>
+                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Fee code</th>
+                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Link</th>
+                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Description</th>
+                      <th style="padding: 14px 16px; text-align: center; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="feesTableBody">
+                    <tr style="border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);">
+                      <td style="padding: 14px 16px;">19 februarie 2026</td>
+                      <td style="padding: 14px 16px;">
+                        <span style="display: inline-block; padding: 4px 10px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-radius: 999px; font-size: 12px; font-weight: 700;">TOPUP</span>
+                      </td>
+                      <td style="padding: 14px 16px; font-weight: 700;">USD 20.00</td>
+                      <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--muted);">TOPUP_WIRE</td>
+                      <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--info); font-size: 13px;">TOPUPTU-DEMO-1</td>
+                      <td style="padding: 14px 16px; color: var(--muted);">Demo > Top-up fee</td>
+                      <td style="padding: 14px 16px; text-align: center;">
+                        <button class="btn ghost" style="padding: 6px 12px; font-size: 13px;">Details</button>
+                      </td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);">
+                      <td style="padding: 14px 16px;">19 februarie 2026</td>
+                      <td style="padding: 14px 16px;">
+                        <span style="display: inline-block; padding: 4px 10px; background: rgba(22, 163, 74, 0.15); color: #16a34a; border-radius: 999px; font-size: 12px; font-weight: 700;">TRANSFER</span>
+                      </td>
+                      <td style="padding: 14px 16px; font-weight: 700;">USD 5.00</td>
+                      <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--muted);">TRANSFER_MAIN_TO_VAULT</td>
+                      <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--info); font-size: 13px;">TRANSFERTR-DEMO-1</td>
+                      <td style="padding: 14px 16px; color: var(--muted);">Demo > Transfer fee</td>
+                      <td style="padding: 14px 16px; text-align: center;">
+                        <button class="btn ghost" style="padding: 6px 12px; font-size: 13px;">Details</button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mini-hint" style="margin-top: 1rem;">
+                To be clear: internal transactions are the main audit log. These additions and data lookups are derived from them. If there's a discrepancy, the internal transactions are the source of truth. These additions and data lookups are derived from them.
+              </div>
+            </div>
           </div>
 
           <!-- LEDGER -->
@@ -1548,6 +1637,94 @@
           </div>
         </div>
         <!-- END PAGE: Ledger -->
+        <!-- Fees Section -->
+        <div id="page_fees" style="display: none;">
+          <div style="margin-bottom: 1.5rem;">
+            <h2 style="margin: 0 0 0.5rem 0; font-size: 1.5rem; font-weight: 700;">Fees</h2>
+            <p style="color: var(--muted); font-size: 0.95rem;">Derived from internal transactions - everything links back to audit log</p>
+          </div>
+
+          <!-- Fee Statistics -->
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 1.5rem;">
+            <div class="stat-box">
+              <h4>TOTAL FEES</h4>
+              <div class="stat-value" style="color: var(--info);">USD 25.00</div>
+              <div class="stat-description">All fee categories</div>
+            </div>
+
+            <div class="stat-box">
+              <h4>TOP-UP FEES</h4>
+              <div class="stat-value" style="color: var(--warn);">USD 20.00</div>
+              <div class="stat-description">Withdrawal fees</div>
+            </div>
+
+            <div class="stat-box">
+              <h4>TRANSFER FEES</h4>
+              <div class="stat-value" style="color: var(--good);">USD 5.00</div>
+              <div class="stat-description">Main → Platform/transfer</div>
+            </div>
+
+            <div class="stat-box">
+              <h4>SETUP + SERVICES</h4>
+              <div class="stat-value" style="color: var(--muted);">USD 0.00</div>
+              <div class="stat-description">Charges from Main Wallet</div>
+            </div>
+          </div>
+
+          <!-- Add Service Fee Button -->
+          <div style="margin-bottom: 1rem; text-align: right;">
+            <button class="btn success" onclick="openAddServiceFeeModal()">+ Add Service Fee</button>
+          </div>
+
+          <!-- Fees Table -->
+          <div style="border: 1px solid var(--line2); border-radius: var(--r-xl); overflow: hidden; background: var(--glass); backdrop-filter: blur(14px); box-shadow: var(--shadow2);">
+            <table style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr style="background: color-mix(in srgb, var(--glass) 88%, var(--bg1)); backdrop-filter: blur(14px);">
+                  <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Date</th>
+                  <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Type</th>
+                  <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Amount</th>
+                  <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Fee code</th>
+                  <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Link</th>
+                  <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Description</th>
+                  <th style="padding: 14px 16px; text-align: center; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="feesTableBody">
+                <tr style="border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);">
+                  <td style="padding: 14px 16px;">19 februarie 2026</td>
+                  <td style="padding: 14px 16px;">
+                    <span style="display: inline-block; padding: 4px 10px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-radius: 999px; font-size: 12px; font-weight: 700;">TOPUP</span>
+                  </td>
+                  <td style="padding: 14px 16px; font-weight: 700;">USD 20.00</td>
+                  <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--muted);">TOPUP_WIRE</td>
+                  <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--info); font-size: 13px;">TOPUPTU-DEMO-1</td>
+                  <td style="padding: 14px 16px; color: var(--muted);">Demo > Top-up fee</td>
+                  <td style="padding: 14px 16px; text-align: center;">
+                    <button class="btn ghost" style="padding: 6px 12px; font-size: 13px;">Details</button>
+                  </td>
+                </tr>
+                <tr style="border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);">
+                  <td style="padding: 14px 16px;">19 februarie 2026</td>
+                  <td style="padding: 14px 16px;">
+                    <span style="display: inline-block; padding: 4px 10px; background: rgba(22, 163, 74, 0.15); color: #16a34a; border-radius: 999px; font-size: 12px; font-weight: 700;">TRANSFER</span>
+                  </td>
+                  <td style="padding: 14px 16px; font-weight: 700;">USD 5.00</td>
+                  <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--muted);">TRANSFER_MAIN_TO_VAULT</td>
+                  <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--info); font-size: 13px;">TRANSFERTR-DEMO-1</td>
+                  <td style="padding: 14px 16px; color: var(--muted);">Demo > Transfer fee</td>
+                  <td style="padding: 14px 16px; text-align: center;">
+                    <button class="btn ghost" style="padding: 6px 12px; font-size: 13px;">Details</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mini-hint" style="margin-top: 1rem;">
+            To be clear: internal transactions are the main audit log. These additions and data lookups are derived from them. If there's a discrepancy, the internal transactions are the source of truth.
+          </div>
+        </div>
 
       </div>
     </main>
@@ -2392,6 +2569,7 @@ function populateGlobalClientFilter(){
       const tab = pill.getAttribute("data-tab");
       document.getElementById("tab_funding").style.display = tab === "funding" ? "block" : "none";
       document.getElementById("tab_setup").style.display = tab === "setup" ? "block" : "none";
+      document.getElementById("tab_fees").style.display = tab === "fees" ? "block" : "none";
     });
 
     /* FUNDING SUBTABS */
@@ -2630,6 +2808,19 @@ function populateGlobalClientFilter(){
 
       document.getElementById("charge_amount").value = "";
       document.getElementById("charge_details").value = "";
+    }
+
+    function openAddServiceFeeModal(){
+      alert("Add Service Fee modal - to be implemented");
+      // This would open a modal similar to Add Topup
+      // For now, just showing an alert
+    }
+
+    /* Render Fees Page */
+    function renderFeesPage(){
+      // For now, just show the static content
+      // In the future, this could dynamically populate fees from state.ledger
+      console.log("Fees page rendered");
     }
 
     /* Add Topup Drawer logic */
@@ -3013,15 +3204,24 @@ function setActivePage(page){
     b.setAttribute("aria-selected", isOn ? "true" : "false");
   });
 
-  // Show/hide global filters based on page
+  // Handle default content (topups/finance view) vs page-specific sections
+  const defaultPages = ["topups", "finance"];
+  const isDefaultPage = defaultPages.includes(page);
+  
+  // Show/hide default content (global filters, KPIs, Finance Workspace, Ledger, Topups)
   const globalFilters = document.querySelector(".global-filters");
-  if(globalFilters){
-    globalFilters.style.display = (page === "internal-transactions") ? "none" : "block";
-  }
+  const statistics = document.querySelector(".statistics");
+  const widgetsGrid = document.querySelector(".widgets-grid");
+  const topupsSection = document.querySelector(".topups-section");
+  
+  if(globalFilters) globalFilters.style.display = isDefaultPage ? "block" : "none";
+  if(statistics) statistics.style.display = isDefaultPage ? "grid" : "none";
+  if(widgetsGrid) widgetsGrid.style.display = isDefaultPage ? "grid" : "none";
+  if(topupsSection) topupsSection.style.display = isDefaultPage ? "block" : "none";
 
-  // page sections
-  const pages = ["finance","transactions","internal-transactions","ledger"];
-  pages.forEach(p=>{
+  // Show/hide page-specific sections
+  const pageSpecificSections = ["fees","transactions","ledger"];
+  pageSpecificSections.forEach(p=>{
     const el = document.getElementById(`page_${p}`);
     if(el) el.style.display = (p === page) ? "block" : "none";
   });
@@ -3030,15 +3230,16 @@ function setActivePage(page){
   const sub = document.getElementById("pageSubtitle");
   if(sub){
     sub.textContent =
-      page === "finance" ? "Overview • KPIs • Funding / Setup"
+      page === "topups" ? "Top-ups • Client Funding • Status Management"
+      : page === "finance" ? "Overview • KPIs • Funding / Setup"
+      : page === "fees" ? "Fee Management • Audit • Service Fees"
       : page === "transactions" ? "Transactions • Filters • Export"
-      : page === "internal-transactions" ? "Internal Transactions • Between Accounts • Transfers"
       : "Ledger • Audit trail • Review";
   }
 
   // render page bodies
+  if(page === "fees") renderFeesPage();
   if(page === "transactions") renderTransactionsPage();
-  if(page === "internal-transactions") renderInternalTransactionsPage();
   if(page === "ledger") renderLedgerPage();
 }
 
@@ -3411,9 +3612,11 @@ function renderLedgerPage(){
 <script>
   // === CONFIG: map page keys -> filenames (adjust if needed) ===
   const PAGE_ROUTES = {
+    topups: "topups.html",
     finance: "finance.html",
-    transactions: "transactions.html",
-    ledger: "ledger.html" // dacă nu ai ledger.html, schimbă aici
+    fees: "fees.html",
+    "internal-transactions": "internal-transactions.html",
+    transactions: "transactions.html"
   };
 
   function getCurrentFileName(){
@@ -3447,6 +3650,7 @@ function renderLedgerPage(){
     // Keep same folder, works in file:// too
     window.location.href = target;
   }
+
 
   // Init UI
   const active = detectActivePage();

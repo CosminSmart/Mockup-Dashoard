@@ -1772,26 +1772,69 @@
             </div>
 
             <div class="field-group">
+                <label>ID (Auto-generated)</label>
+                <input type="text" id="addAccountId" readonly style="background: #f5f5f5; cursor: not-allowed;" placeholder="Will be set automatically">
+            </div>
+
+            <div class="field-group">
+                <label>Platform</label>
+                <select id="addAccountPlatform" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select platform...</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="google">Google</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="taboola">Taboola</option>
+                    <option value="outbrain">Outbrain</option>
+                    <option value="microsoft">Microsoft</option>
+                    <option value="snapchat">Snapchat</option>
+                </select>
+            </div>
+
+            <div class="field-group">
                 <label>Account Name</label>
                 <input type="text" id="addAccountName" placeholder="Enter account name">
             </div>
 
             <div class="field-group">
-                <label>Email</label>
-                <input type="email" id="addAccountEmail" placeholder="Enter email">
+                <label>Assets</label>
+                <select id="addAccountAssets" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select asset type...</option>
+                    <option value="ad-account">Ad Account</option>
+                    <option value="profile">Profile</option>
+                    <option value="bm">BM (Business Manager)</option>
+                    <option value="page">Page</option>
+                </select>
+            </div>
+
+            <div class="field-group">
+                <label>Account ID</label>
+                <input type="text" id="addAccountAccountId" placeholder="Enter account ID">
+            </div>
+
+            <div class="field-group">
+                <label>Pay</label>
+                <input type="text" id="addAccountPay" value="CC" readonly style="background: #f5f5f5; cursor: not-allowed;">
             </div>
 
             <div class="field-group">
                 <label>Client</label>
-                <input type="text" id="addAccountClient" placeholder="Enter client name">
+                <select id="addAccountClient" onchange="toggleContractField()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select client...</option>
+                    <option value="client-a">Client A</option>
+                    <option value="client-b">Client B</option>
+                    <option value="client-c">Client C</option>
+                </select>
             </div>
 
-            <div class="field-group">
-                <label>Options (Optional)</label>
-                <textarea id="addAccountOptions" rows="4" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; resize: vertical;" placeholder="Enter any additional options..."></textarea>
+            <div class="field-group" id="contractField" style="display: none;">
+                <label>Contract</label>
+                <select id="addAccountContract" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="one-time">One Time</option>
+                    <option value="recurring">Recurring</option>
+                </select>
             </div>
 
-            <button class="btn" style="width: 100%;">Create Account</button>
+            <button class="btn" style="width: 100%;" onclick="submitAddAccount()">Create Account</button>
         </div>
     </div>
 
@@ -3114,6 +3157,21 @@
         }
 
         function openAddAccountModal() {
+            // Generate next ID
+            const maxId = Math.max(...Object.keys(accountsData).map(id => parseInt(id)), 0);
+            const nextId = maxId + 1;
+            document.getElementById('addAccountId').value = `ACC-${String(nextId).padStart(4, '0')}`;
+            
+            // Reset form
+            document.getElementById('addAccountPlatform').value = '';
+            document.getElementById('addAccountName').value = '';
+            document.getElementById('addAccountAssets').value = '';
+            document.getElementById('addAccountAccountId').value = '';
+            document.getElementById('addAccountPay').value = 'CC';
+            document.getElementById('addAccountClient').value = '';
+            document.getElementById('addAccountContract').value = 'one-time';
+            document.getElementById('contractField').style.display = 'none';
+            
             document.getElementById('addAccountModal').classList.add('active');
             document.getElementById('addAccountOverlay').classList.add('active');
         }
@@ -3121,6 +3179,113 @@
         function closeAddAccountModal() {
             document.getElementById('addAccountModal').classList.remove('active');
             document.getElementById('addAccountOverlay').classList.remove('active');
+        }
+
+        function toggleContractField() {
+            const clientSelect = document.getElementById('addAccountClient');
+            const contractField = document.getElementById('contractField');
+            
+            if (clientSelect.value && clientSelect.value !== '') {
+                contractField.style.display = 'block';
+            } else {
+                contractField.style.display = 'none';
+            }
+        }
+
+        function submitAddAccount() {
+            // Get form values
+            const platform = document.getElementById('addAccountPlatform').value;
+            const accountName = document.getElementById('addAccountName').value.trim();
+            const assets = document.getElementById('addAccountAssets').value;
+            const accountId = document.getElementById('addAccountAccountId').value.trim();
+            const pay = document.getElementById('addAccountPay').value;
+            const client = document.getElementById('addAccountClient').value;
+            const contract = document.getElementById('addAccountContract').value;
+
+            // Validate required fields
+            if (!platform) {
+                alert('Please select a platform');
+                return;
+            }
+            if (!accountName) {
+                alert('Please enter an account name');
+                return;
+            }
+            if (!assets) {
+                alert('Please select an asset type');
+                return;
+            }
+            if (!accountId) {
+                alert('Please enter an account ID');
+                return;
+            }
+
+            // Generate new account ID
+            const maxId = Math.max(...Object.keys(accountsData).map(id => parseInt(id)), 0);
+            const newId = maxId + 1;
+
+            // Create new account object
+            const newAccount = {
+                id: `ACC-${String(newId).padStart(4, '0')}`,
+                name: accountName,
+                platform: platform,
+                assetType: assets,
+                accountId: accountId,
+                accountType: pay,
+                client: client || 'Unassigned',
+                clientTag: client ? 'assigned' : 'unassigned',
+                billing: client ? contract : 'one-time',
+                status: 'active',
+                balanceType: 'general',
+                balance: '$0.00',
+                spend: '$0.00',
+                primaryAccess: 'Main Profile',
+                provider: 'N/A'
+            };
+
+            // Add to accountsData
+            accountsData[newId] = newAccount;
+
+            // Save to localStorage
+            localStorage.setItem('accountsData', JSON.stringify(accountsData));
+
+            // Add to table
+            addAccountToTable(newAccount, newId);
+
+            // Close modal
+            closeAddAccountModal();
+
+            // Show success message
+            alert('Account created successfully!');
+        }
+
+        function addAccountToTable(account, accountId) {
+            const tbody = document.getElementById('accountsTable');
+            const row = document.createElement('tr');
+            row.setAttribute('data-account-id', accountId);
+            
+            row.innerHTML = `
+                <td><input type="checkbox" class="account-checkbox" value="${accountId}"></td>
+                <td>${account.id}</td>
+                <td>${account.name}</td>
+                <td>${account.platform}</td>
+                <td>${account.client}</td>
+                <td><span class="badge badge-${account.clientTag}">${account.clientTag}</span></td>
+                <td>${account.assetType}</td>
+                <td><span class="badge badge-${account.status}">${account.status}</span></td>
+                <td>${account.balanceType}</td>
+                <td>${account.balance}</td>
+                <td>${account.spend}</td>
+                <td>${account.primaryAccess}</td>
+                <td>${account.accountType}</td>
+                <td>${account.billing}</td>
+                <td>${account.provider}</td>
+                <td>
+                    <button class="btn btn-sm" onclick="openModal(${accountId})">View More</button>
+                </td>
+            `;
+            
+            tbody.appendChild(row);
         }
 
         function toggleMoreFilters(event) {

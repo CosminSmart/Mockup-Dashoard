@@ -303,12 +303,11 @@
     <header class="header">
       <div class="header-left">
         <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
-            <button class="page-tab" data-page="topups" type="button">
-    Topups
-  </button>
+          <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="false">Topups</button>
           <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
-          <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
-          <button type="button" class="page-tab" data-page="ledger" role="tab" aria-selected="false">Ledger</button>
+          <button type="button" class="page-tab" data-page="fees" role="tab" aria-selected="false">Fees</button>
+          <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">Internal Transactions</button>
+          <button type="button" class="page-tab active" data-page="transactions" role="tab" aria-selected="true">Transactions</button>
         </div>
       </div>
 
@@ -716,9 +715,11 @@
        SWITCHER (Finance/Transactions/Ledger) – like finance
     ============================== */
     const PAGE_ROUTES = {
+      topups: "topups.html",
       finance: "finance.html",
-      transactions: "transactions.html",
-      ledger: "ledger.html"
+      fees: "fees.html",
+      "internal-transactions": "internal-transactions.html",
+      transactions: "transactions.html"
     };
 
     function getCurrentFileName(){

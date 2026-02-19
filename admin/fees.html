@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Fees</title>
+
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+
+  <style>
+    .fees-container { 
+      width: 100%; 
+      padding: 1.5rem;
+    }
+
+    .page-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-subtitle {
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .fee-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 1200px) {
+      .fee-stats { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 768px) {
+      .fee-stats { grid-template-columns: 1fr; }
+    }
+
+    .fee-stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      border-left: 4px solid #3498db;
+    }
+
+    .fee-stat-card.topup { border-left-color: #f59e0b; }
+    .fee-stat-card.transfer { border-left-color: #10b981; }
+    .fee-stat-card.setup { border-left-color: #6b7280; }
+
+    .fee-stat-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #666;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .fee-stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 0.25rem;
+    }
+
+    .fee-stat-desc {
+      font-size: 0.85rem;
+      color: #999;
+    }
+
+    .fees-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-add-fee {
+      background: #3498db;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-add-fee:hover {
+      background: #2980b9;
+    }
+
+    .fees-table-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
+    }
+
+    .fees-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .fees-table thead {
+      background: #f8f9fa;
+    }
+
+    .fees-table th {
+      padding: 1rem;
+      text-align: left;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #666;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .fees-table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+
+    .fees-table tbody tr:hover {
+      background: #f8f9fa;
+    }
+
+    .fee-type-badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .fee-type-badge.topup {
+      background: rgba(245, 158, 11, 0.15);
+      color: #f59e0b;
+    }
+
+    .fee-type-badge.transfer {
+      background: rgba(16, 185, 129, 0.15);
+      color: #10b981;
+    }
+
+    .fee-type-badge.setup {
+      background: rgba(107, 114, 128, 0.15);
+      color: #6b7280;
+    }
+
+    .fee-code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #666;
+    }
+
+    .fee-link {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .fee-link:hover {
+      text-decoration: underline;
+    }
+
+    .btn-details {
+      background: #f0f0f0;
+      color: #333;
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-details:hover {
+      background: #e0e0e0;
+    }
+
+    .fee-note {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-left: 4px solid #3498db;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.6;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+        <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="false">Topups</button>
+        <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
+        <button type="button" class="page-tab active" data-page="fees" role="tab" aria-selected="true">Fees</button>
+        <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">Internal Transactions</button>
+        <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
+      </div>
+
+      <div class="header-right">
+        <div class="theme-toggle">
+          <button class="theme-btn active">Light</button>
+          <button class="theme-btn">Dark</button>
+        </div>
+        <div class="user-info">
+          <span>Admin User</span>
+          <div class="user-avatar">AU</div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div class="fees-container">
+        <div class="page-header">
+          <h1>Fees</h1>
+          <p class="page-subtitle">Derived from internal transactions - everything links back to audit log</p>
+        </div>
+
+        <!-- Fee Statistics -->
+        <div class="fee-stats">
+          <div class="fee-stat-card">
+            <div class="fee-stat-label">Total Fees</div>
+            <div class="fee-stat-value">USD 25.00</div>
+            <div class="fee-stat-desc">All fee categories</div>
+          </div>
+
+          <div class="fee-stat-card topup">
+            <div class="fee-stat-label">Top-Up Fees</div>
+            <div class="fee-stat-value">USD 20.00</div>
+            <div class="fee-stat-desc">Withdrawal fees</div>
+          </div>
+
+          <div class="fee-stat-card transfer">
+            <div class="fee-stat-label">Transfer Fees</div>
+            <div class="fee-stat-value">USD 5.00</div>
+            <div class="fee-stat-desc">Main → Platform/transfer</div>
+          </div>
+
+          <div class="fee-stat-card setup">
+            <div class="fee-stat-label">Setup + Services</div>
+            <div class="fee-stat-value">USD 0.00</div>
+            <div class="fee-stat-desc">Charges from Main Wallet</div>
+          </div>
+        </div>
+
+        <!-- Add Fee Button -->
+        <div class="fees-actions">
+          <button class="btn-add-fee" onclick="alert('Add Service Fee - to be implemented')">+ Add Service Fee</button>
+        </div>
+
+        <!-- Fees Table -->
+        <div class="fees-table-container">
+          <table class="fees-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Fee Code</th>
+                <th>Link</th>
+                <th>Description</th>
+                <th style="text-align: center;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>19 februarie 2026</td>
+                <td>
+                  <span class="fee-type-badge topup">TOPUP</span>
+                </td>
+                <td style="font-weight: 700;">USD 20.00</td>
+                <td class="fee-code">TOPUP_WIRE</td>
+                <td>
+                  <a href="#" class="fee-link">TOPUPTU-DEMO-1</a>
+                </td>
+                <td>Demo > Top-up fee</td>
+                <td style="text-align: center;">
+                  <button class="btn-details" onclick="alert('Details modal - to be implemented')">Details</button>
+                </td>
+              </tr>
+
+              <tr>
+                <td>19 februarie 2026</td>
+                <td>
+                  <span class="fee-type-badge transfer">TRANSFER</span>
+                </td>
+                <td style="font-weight: 700;">USD 5.00</td>
+                <td class="fee-code">TRANSFER_MAIN_TO_VAULT</td>
+                <td>
+                  <a href="#" class="fee-link">TRANSFERTR-DEMO-1</a>
+                </td>
+                <td>Demo > Transfer fee</td>
+                <td style="text-align: center;">
+                  <button class="btn-details" onclick="alert('Details modal - to be implemented')">Details</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Note -->
+        <div class="fee-note">
+          <strong>Note:</strong> To be clear: internal transactions are the main audit log. These additions and data lookups are derived from them. If there's a discrepancy, the internal transactions are the source of truth.
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    /* ==============================
+       Page tabs navigation
+    ============================== */
+    const PAGE_ROUTES = {
+      topups: "topups.html",
+      finance: "finance.html",
+      fees: "fees.html",
+      "internal-transactions": "internal-transactions.html",
+      transactions: "transactions.html"
+    };
+
+    function getCurrentFileName(){
+      const p = window.location.pathname || "";
+      const parts = p.split("/");
+      return (parts[parts.length - 1] || "").toLowerCase();
+    }
+    function detectActivePage(){
+      const file = getCurrentFileName();
+      for (const [key, filename] of Object.entries(PAGE_ROUTES)){
+        if ((filename || "").toLowerCase() === file) return key;
+      }
+      return "fees";
+    }
+    function setActiveTabUI(activeKey){
+      document.querySelectorAll("#pageTabs .page-tab").forEach(btn=>{
+        const isOn = btn.dataset.page === activeKey;
+        btn.classList.toggle("active", isOn);
+        btn.setAttribute("aria-selected", isOn ? "true" : "false");
+      });
+    }
+    function navigateTo(key){
+      const target = PAGE_ROUTES[key];
+      if(!target) return;
+      window.location.href = target;
+    }
+    
+    setActiveTabUI(detectActivePage());
+
+    document.getElementById("pageTabs")?.addEventListener("click", (e)=>{
+      const btn = e.target.closest(".page-tab");
+      if(!btn) return;
+      const key = btn.dataset.page;
+      setActiveTabUI(key);
+      if(key === detectActivePage()) return;
+      navigateTo(key);
+    });
+  </script>
+</body>
+</html>
