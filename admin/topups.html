@@ -12,7 +12,7 @@
 
   <style>
     /* =========================================================
-       LIQUID GLASS (WHITE) – MATCH FINANCE STYLE (TOPUPS PAGE)
+       LIQUID GLASS (WHITE) – TOPUPS PAGE
     ========================================================= */
     :root{
       --bg0:#f7f8fb;
@@ -79,6 +79,8 @@
         url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
     }
 
+    body.modal-open{ overflow:hidden; }
+
     .muted{ color: var(--muted); }
     .mini-hint{ font-size:.9rem; color: var(--muted); line-height:1.35; margin-top:.2rem; }
 
@@ -117,7 +119,6 @@
       gap:6px;
       min-width: 280px;
     }
-
     .page-tabs{
       display:flex;
       gap:8px;
@@ -198,51 +199,8 @@
       padding: 16px;
     }
 
-    /* Filters bar */
-    .filters{
-      position: sticky;
-      top: 10px;
-      z-index: 50;
-      padding: 12px;
-      border-radius: var(--r-xl);
-      background: var(--glass);
-      border: 1px solid var(--line2);
-      box-shadow: var(--shadow2);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-    }
-    /* ONE LINE FILTER BAR */
-.filters__row{
-  display:grid;
-  grid-template-columns:
-    220px   /* Client */
-    160px   /* Date from */
-    160px   /* Date to */
-    180px   /* Status */
-    1fr     /* Search */
-    auto    /* Buttons */
-    360px;  /* Hint */
-  gap: 12px;
-  align-items:end;
-}
-
-.filters__left{ display: contents; }
-.filters__right{ display:flex; gap:10px; align-items:center; justify-content:flex-end; }
-
-/* remove old min-width so grid can work */
-.fg, .fg.small{ min-width: 0; }
-
-    .label{
-      display:block;
-      margin: 0 0 .45rem 0;
-      font-weight: 900;
-      font-size: .88rem;
-      color: color-mix(in srgb, var(--text) 85%, var(--muted));
-      letter-spacing:.2px;
-    }
-
-    /* Buttons (reuse your transfer-btn names) */
-    .transfer-btn{
+    /* Buttons */
+    .btn{
       border: 1px solid var(--line2);
       background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
       color: var(--text);
@@ -258,18 +216,93 @@
       gap:.55rem;
       white-space:nowrap;
     }
-    .transfer-btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
-    .transfer-btn:active{ transform: translateY(0px); }
-    .transfer-btn.secondary{
-      background: color-mix(in srgb, rgba(37,99,235,.18) 65%, var(--glass));
-      border-color: color-mix(in srgb, rgba(37,99,235,.32) 55%, var(--line2));
+    .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.primary{
+      background: color-mix(in srgb, rgba(37,99,235,.20) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.35) 55%, var(--line2));
     }
-    .transfer-btn.gray{
+    .btn.ghost{
       background: color-mix(in srgb, rgba(148,163,184,.18) 70%, var(--glass));
     }
-    .btn-disabled{ opacity:.55; pointer-events:none; }
+    .btn.danger{
+      background: color-mix(in srgb, rgba(239,68,68,.16) 70%, var(--glass));
+      border-color: color-mix(in srgb, rgba(239,68,68,.32) 60%, var(--line2));
+      color: #991b1b;
+    }
+    .btn[disabled], .btn.disabled{
+      opacity:.55;
+      pointer-events:none;
+    }
 
-    /* Stats */
+    .top-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .top-head__title{
+      font-weight:950;
+      font-size:1.15rem;
+      letter-spacing:.2px;
+    }
+
+    /* Filters bar (match screenshot style) */
+    .filters{
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      padding: 12px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .filters__row{
+      display:grid;
+      grid-template-columns:
+        1.25fr
+        220px
+        340px
+        180px
+        170px
+        170px
+        auto;
+      gap: 12px;
+      align-items:end;
+    }
+    @media (max-width: 1200px){
+      .filters__row{ grid-template-columns: 1fr 1fr; }
+    }
+    .fg .label{
+      display:block;
+      margin: 0 0 .45rem 0;
+      font-weight: 900;
+      font-size: .88rem;
+      color: color-mix(in srgb, var(--text) 85%, var(--muted));
+      letter-spacing:.2px;
+    }
+    .date-range{
+      display:grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 10px;
+      align-items:end;
+    }
+    .date-range .sep{
+      height: 44px;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+    }
+
+    /* KPIs */
     .stats{
       display:grid;
       grid-template-columns: repeat(4, minmax(0,1fr));
@@ -279,15 +312,29 @@
     @media (max-width: 620px){ .stats{ grid-template-columns: 1fr; } }
 
     .stat-box{
-      padding: 14px;
+      padding: 14px 14px 12px 14px;
       border-radius: var(--r-xl);
       background: var(--glass);
       border: 1px solid var(--line2);
       box-shadow: var(--shadow2);
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
-      min-height: 108px;
+      min-height: 112px;
+      position: relative;
+      overflow:hidden;
     }
+    .stat-box:before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:4px;
+      background: color-mix(in srgb, rgba(37,99,235,.55) 70%, transparent);
+      opacity:.9;
+    }
+    .stat-box.pending:before{ background: color-mix(in srgb, rgba(245,158,11,.65) 70%, transparent); }
+    .stat-box.approved:before{ background: color-mix(in srgb, rgba(22,163,74,.65) 70%, transparent); }
+    .stat-box.declined:before{ background: color-mix(in srgb, rgba(239,68,68,.65) 70%, transparent); }
+
     .stat-box h4{
       margin:0;
       font-size: 11px;
@@ -297,22 +344,20 @@
       font-weight: 950;
     }
     .stat-value{
-      font-size: 28px;
+      font-size: 30px;
       font-weight: 950;
       margin-top: 6px;
       letter-spacing: .2px;
+      line-height:1.05;
     }
-    .stat-desc{
-      margin-top: 10px;
+    .stat-sub{
+      margin-top: 6px;
       color: var(--muted);
       font-size: 12px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
+      font-weight: 800;
     }
 
-    /* Topups table */
+    /* Table */
     .table-wrap{
       border:1px solid var(--line2);
       border-radius: var(--r-xl);
@@ -327,7 +372,7 @@
       border-collapse: separate;
       border-spacing: 0;
       font-size: .92rem;
-      min-width: 980px;
+      min-width: 1180px;
     }
     th, td{
       padding: .85rem .75rem;
@@ -355,10 +400,10 @@
     tr.row:hover{
       background: color-mix(in srgb, rgba(37,99,235,.10) 60%, transparent);
     }
-    .td-muted{ color: var(--muted); }
     .td-right{ text-align:right; }
+    .td-muted{ color: var(--muted); }
 
-    .status-badge{
+    .pill{
       display:inline-flex;
       align-items:center;
       justify-content:center;
@@ -370,271 +415,251 @@
       background: color-mix(in srgb, var(--glass) 72%, transparent);
       color: color-mix(in srgb, var(--text) 92%, var(--muted));
     }
-    .status-badge.approved{
-      background: color-mix(in srgb, rgba(22,163,74,.18) 65%, var(--glass));
-      border-color: color-mix(in srgb, rgba(22,163,74,.35) 55%, var(--line2));
-      color: color-mix(in srgb, var(--good) 85%, var(--text));
-    }
-    .status-badge.pending{
+    .pill.pending{
       background: color-mix(in srgb, rgba(245,158,11,.18) 65%, var(--glass));
       border-color: color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
       color: color-mix(in srgb, var(--warn) 82%, var(--text));
     }
-    .status-badge.declined{
+    .pill.approved{
+      background: color-mix(in srgb, rgba(22,163,74,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(22,163,74,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--good) 85%, var(--text));
+    }
+    .pill.declined{
       background: color-mix(in srgb, rgba(239,68,68,.16) 65%, var(--glass));
       border-color: color-mix(in srgb, rgba(239,68,68,.32) 55%, var(--line2));
       color: color-mix(in srgb, var(--bad) 82%, var(--text));
     }
-    .status-badge.past_due{
-      background: color-mix(in srgb, rgba(148,163,184,.16) 70%, var(--glass));
-      border-color: color-mix(in srgb, rgba(148,163,184,.28) 60%, var(--line2));
-      color: color-mix(in srgb, var(--muted) 88%, var(--text));
-    }
 
-    /* Right modal (details) */
-    .tx-modal{
-      position:fixed; inset:0; z-index:3000;
-      display:none;
+    /* =========================================================
+       ✅ RIGHT DRAWER MODAL (FIX: NEVER CENTER)
+    ========================================================= */
+    .drawer-modal{
+      position: fixed; /* <-- fixed, not absolute */
+      inset: 0;
+      z-index: 9999; /* high */
+      display: none;
     }
-    .tx-modal.active{ display:block; }
-    .tx-modal__overlay{
-      position:absolute; inset:0;
+    .drawer-modal.active{ display:block; }
+
+    .drawer-modal__overlay{
+      position: absolute;
+      inset: 0;
       background: rgba(0,0,0,.38);
       backdrop-filter: blur(6px);
       -webkit-backdrop-filter: blur(6px);
-      opacity:0;
-      transition:opacity .22s ease;
+      opacity: 0;
+      transition: opacity .18s ease;
     }
-    .tx-modal.active .tx-modal__overlay{ opacity:1; }
+    .drawer-modal.active .drawer-modal__overlay{ opacity:1; }
 
-    .tx-modal__panel{
-      position:absolute; top:0; right:0;
-      height:100%;
-      width:min(520px, 95vw);
-      background: var(--glass);
+    .drawer-modal__panel{
+      position: absolute;
+      top: 0;
+      right: 0; /* <-- always right */
+      height: 100%;
+      width: min(980px, 94vw);  /* wide like screenshot */
+      background: var(--bg1);
       border-left: 1px solid var(--line2);
-      box-shadow:-22px 0 60px rgba(15,23,42,.22);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      transform:translateX(100%);
-      transition:transform .22s ease;
+      box-shadow: -22px 0 60px rgba(15,23,42,.22);
+      transform: translateX(100%);
+      transition: transform .18s ease;
       display:flex;
       flex-direction:column;
+      overflow:hidden;
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
     }
-    .tx-modal.active .tx-modal__panel{ transform:translateX(0); }
+    [data-theme="dark"] .drawer-modal__panel{
+      background: color-mix(in srgb, var(--glass) 30%, var(--bg1));
+    }
+    .drawer-modal.active .drawer-modal__panel{ transform: translateX(0); }
 
-    .tx-modal__header{
-      padding: 14px 14px 10px 14px;
+    .drawer-modal__header{
+      padding: 14px 16px;
       border-bottom:1px solid var(--line2);
       display:flex;
-      justify-content:space-between;
       align-items:center;
+      justify-content:space-between;
       gap:12px;
+      background: color-mix(in srgb, var(--glass) 55%, var(--bg1));
     }
-    .tx-modal__header h3{ margin:0; font-size: 1.2rem; font-weight: 950; }
-    .tx-close{
-      width: 38px; height: 38px;
-      border:1px solid var(--line2);
-      border-radius: 14px;
-      background: color-mix(in srgb, var(--glass) 75%, transparent);
-      cursor:pointer;
-      font-size: 18px;
+    .drawer-modal__title{
+      font-weight: 950;
+      font-size: 1.05rem;
+    }
+    .drawer-modal__close{
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+    .drawer-modal__close:hover{
+      background: color-mix(in srgb, rgba(148,163,184,.18) 70%, transparent);
       color: var(--text);
     }
-    .tx-modal__body{ padding: 14px; overflow:auto; flex:1; }
-    .modal-footer{
-      padding: 14px;
-      border-top:1px solid var(--line2);
-      background: color-mix(in srgb, var(--glass) 85%, transparent);
-      display:flex;
-      gap:10px;
-      justify-content:flex-start;
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      flex-wrap:wrap;
+
+    .drawer-modal__body{
+      padding: 16px;
+      overflow:auto;
+      flex:1;
     }
 
-    .kv-card{
+    /* inside drawer layout: left timeline + right details */
+    .topup-layout{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap: 16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .drawer-modal__panel{ width: min(980px, 98vw); }
+      .topup-layout{ grid-template-columns: 1fr; }
+    }
+
+    .seg{
+      display:flex;
+      gap:10px;
+      margin: 8px 0 14px 0;
+    }
+    .seg button{
       border:1px solid var(--line2);
-      border-radius: var(--r-xl);
-      background: color-mix(in srgb, var(--glass) 72%, transparent);
-      overflow:hidden;
-      box-shadow: var(--shadow2);
+      background: transparent;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor:pointer;
+      color: var(--muted);
+    }
+    .seg button.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .step-card{
+      border:1px dashed color-mix(in srgb, var(--line2) 90%, transparent);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fbfcff;
+    }
+    [data-theme="dark"] .step-card{
+      background: color-mix(in srgb, var(--glass) 25%, transparent);
+    }
+    .step{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding: 10px 8px;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+    }
+    .step:last-child{ border-bottom:none; }
+    .dot{
+      width: 14px; height: 14px;
+      border-radius: 999px;
+      border: 2px solid color-mix(in srgb, var(--muted) 70%, transparent);
+      margin-top: 4px;
+      flex: 0 0 auto;
+      background: transparent;
+    }
+    .dot.done{
+      border-color: color-mix(in srgb, var(--good) 70%, transparent);
+      background: color-mix(in srgb, rgba(22,163,74,.18) 70%, transparent);
+    }
+    .step h4{
+      margin:0;
+      font-size: .95rem;
+      font-weight: 950;
+    }
+    .step .sub{
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: .86rem;
+    }
+
+    .right-box{
+      border-left: 1px solid var(--line2);
+      padding-left: 16px;
+    }
+    @media (max-width: 980px){
+      .right-box{ border-left:none; padding-left:0; }
+    }
+
+    .kv{
+      border-top: 1px solid var(--line2);
+      margin-top: 10px;
     }
     .kv-row{
       display:grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr auto;
       gap: 12px;
-      padding: 10px 12px;
-      border-bottom:1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      padding: 10px 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
       align-items:center;
     }
-    .kv-row:last-child{ border-bottom:none; }
-    .kv-key{
+    .kv-row .k{
+      color: color-mix(in srgb, var(--muted) 95%, var(--text));
+      font-weight: 850;
+      font-size: .84rem;
+    }
+    .kv-row .v{
       font-weight: 950;
-      font-size: .9rem;
-      color: color-mix(in srgb, var(--text) 92%, var(--muted));
-    }
-    .kv-val{
-      text-align:right;
-      color: var(--muted);
-      font-weight: 900;
-      font-size: .9rem;
-    }
-
-    .segmented-status{
-      display:flex; gap:8px; flex-wrap: wrap;
-      margin: 8px 0 12px 0;
-    }
-    .seg-pill{
-      border:1px solid var(--line2);
-      background: color-mix(in srgb, var(--glass) 70%, transparent);
-      padding:.55rem .85rem;
-      border-radius: 999px;
-      cursor:pointer;
-      font-weight: 950;
-      font-size: .9rem;
-      color: var(--muted);
-      user-select:none;
-      transition: transform .12s ease, box-shadow .12s ease;
-    }
-    .seg-pill:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
-    .seg-pill.active{
-      color: var(--text);
-      background: color-mix(in srgb, rgba(37,99,235,.20) 60%, var(--glass));
-      border-color: color-mix(in srgb, rgba(37,99,235,.35) 55%, var(--line2));
-    }
-    .seg-pill.active.pending{
-      background: color-mix(in srgb, rgba(245,158,11,.18) 60%, var(--glass));
-      border-color: color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
-    }
-    .seg-pill.active.approved{
-      background: color-mix(in srgb, rgba(22,163,74,.18) 60%, var(--glass));
-      border-color: color-mix(in srgb, rgba(22,163,74,.35) 55%, var(--line2));
-    }
-    .seg-pill.active.declined{
-      background: color-mix(in srgb, rgba(239,68,68,.16) 60%, var(--glass));
-      border-color: color-mix(in srgb, rgba(239,68,68,.32) 55%, var(--line2));
-    }
-    .seg-pill.active.past_due{
-      background: color-mix(in srgb, rgba(148,163,184,.16) 70%, var(--glass));
-      border-color: color-mix(in srgb, rgba(148,163,184,.28) 60%, var(--line2));
-    }
-
-    /* Drawer (Add Topup) */
-    .drawer{ position: fixed; inset: 0; z-index: 2600; display: none; }
-    .drawer.active{ display:block; }
-    .drawer__overlay{
-      position:absolute; inset:0;
-      background: rgba(0,0,0,.38);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
-    }
-    .drawer__panel{
-      position:absolute; top:0; right:0;
-      height: 100%;
-      width: min(520px, 95vw);
-      background: var(--glass);
-      border-left: 1px solid var(--line2);
-      box-shadow: -22px 0 60px rgba(15,23,42,.22);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      display:flex;
-      flex-direction: column;
-      transform: translateX(100%);
-      transition: transform .22s ease;
-    }
-    .drawer.active .drawer__panel{ transform: translateX(0); }
-    .drawer__header{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 14px 14px 10px 14px;
-      border-bottom:1px solid var(--line2);
-      gap:12px;
-    }
-    .drawer__title{ font-size: 1.25rem; font-weight: 950; margin: 0; color: var(--text); }
-    .drawer__close{
-      width: 38px; height: 38px;
-      border:1px solid var(--line2);
-      background: color-mix(in srgb, var(--glass) 75%, transparent);
-      border-radius: 14px; cursor:pointer;
-      font-size: 18px; line-height: 36px;
-      color: var(--text);
-    }
-    .drawer__body{ padding: 14px; overflow:auto; }
-    .drawer__footer{
-      padding: 14px; border-top:1px solid var(--line2);
-      display:flex; gap:10px; justify-content:flex-start; flex-wrap:wrap;
-      background: color-mix(in srgb, var(--glass) 85%, transparent);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-
-    .segmented{ display:flex; gap:8px; flex-wrap: wrap; margin: 10px 0 12px 0; }
-    .seg-btn{
-      border:1px solid var(--line2);
-      background: color-mix(in srgb, var(--glass) 70%, transparent);
-      padding:.58rem .88rem;
-      border-radius: 999px;
-      cursor:pointer;
-      font-weight: 950;
-      font-size: .9rem;
-      color: color-mix(in srgb, var(--text) 88%, var(--muted));
-      transition: transform .12s ease, box-shadow .12s ease;
-    }
-    .seg-btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
-    .seg-btn.active{
-      background: color-mix(in srgb, rgba(37,99,235,.22) 60%, var(--glass));
-      border-color: color-mix(in srgb, rgba(37,99,235,.35) 55%, var(--line2));
       color: var(--text);
     }
 
-    .notice-box{
-      margin-top: 10px;
-      background: color-mix(in srgb, rgba(245,158,11,.18) 65%, var(--glass));
-      border: 1px solid color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
-      color: color-mix(in srgb, var(--text) 85%, var(--muted));
-      padding: 12px;
+    .admin-actions{
+      margin-top: 14px;
+    }
+    .card-lite{
+      border: 1px solid var(--line2);
       border-radius: 14px;
-      font-size: .88rem;
-      line-height: 1.35;
+      padding: 12px;
+      background: #fff;
+      margin-top: 10px;
+    }
+    [data-theme="dark"] .card-lite{
+      background: color-mix(in srgb, var(--glass) 35%, transparent);
+    }
+    .card-lite h5{
+      margin:0;
+      font-size: .95rem;
+      font-weight: 950;
+    }
+    .card-lite .muted{
+      font-size: .82rem;
+      font-weight: 800;
     }
 
-    /* Small top area */
-    .top-head{
-      display:flex;
+    .fx-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .fx-grid .full{ grid-column: 1 / -1; }
+    .hr{ height:1px; background: var(--line2); margin: 12px 0; }
+
+    .totals{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
       align-items:center;
-      justify-content:space-between;
-      gap:12px;
+      margin-top: 10px;
+    }
+    .totals .label{ color: var(--muted); font-weight: 900; font-size:.85rem; }
+    .totals .val{ font-weight: 950; }
+
+    .danger-zone{
+      margin-top: 10px;
+      display:flex;
+      gap:10px;
       flex-wrap:wrap;
+      justify-content:flex-end;
     }
-    .top-head__title{
-      font-weight:950;
-      font-size:1.15rem;
-      letter-spacing:.2px;
-    }
-
-
-
-    .filters__row{
-  display:grid;
-  grid-template-columns:
-    230px   /* Search (first, bigger) */
-    220px   /* Client */
-    160px   /* Date from */
-    160px   /* Date to */
-    180px   /* Status */
-    auto    /* Buttons */
-    360px;  /* Hint */
-  gap: 12px;
-  align-items:end;
-}
-
-.filters__left{ display: contents; }
-.filters__right{ display:flex; gap:10px; align-items:center; justify-content:flex-end; }
-
-/* ensure search can grow nicely */
-.fg-search input{ width:100%; }
-
   </style>
 </head>
 
@@ -644,7 +669,7 @@
     <header class="header">
       <div class="header-left">
         <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
-            <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="true">Topups</button>
+          <button type="button" class="page-tab active" data-page="topups" role="tab" aria-selected="true">Topups</button>
           <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
           <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
           <button type="button" class="page-tab" data-page="ledger" role="tab" aria-selected="false">Ledger</button>
@@ -671,315 +696,285 @@
 
         <div class="glass-panel top-head">
           <div>
-            <div class="top-head__title">Topups</div>
-            <div class="mini-hint">Filtrele sunt sticky și se aplică pe tabel + statistici.</div>
+            <div class="top-head__title">Top-ups</div>
+            <div class="mini-hint">Wire + Crypto flows • Timeline shown in list • Admin-only wallets editor</div>
           </div>
           <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="transfer-btn secondary" type="button" onclick="openTopupDrawer()">+ Add Topup</button>
-            <button class="transfer-btn gray" type="button" onclick="seedDemo()">Reset Demo Data</button>
+            <button class="btn ghost" type="button" id="btnWallets">Wallets</button>
+            <button class="btn ghost" type="button" id="btnExport">Export</button>
+            <button class="btn primary" type="button" id="btnCreate">+ Create Top-up</button>
           </div>
         </div>
 
         <!-- Filters -->
         <div class="filters">
           <div class="filters__row">
-            <div class="filters__left">
+            <div class="fg">
+              <label class="label">Search</label>
+              <input id="fSearch" type="search" placeholder="ID / client / wire / crypto / hash" />
+            </div>
 
             <div class="fg">
-                <label class="label">Search</label>
-                <input id="topups_search" type="search" placeholder="Search (proof, desc, client id, topup id)..." oninput="renderAll()" />
-              </div>
-              <div class="fg">
-                <label class="label">Client</label>
-                <select id="global_client" onchange="onFiltersChanged()">
-                  <option value="__all__">All clients</option>
-                </select>
-              </div>
+              <label class="label">Client</label>
+              <select id="fClient"></select>
+            </div>
 
-              <div class="fg small">
-                <label class="label">Date from</label>
-                <input type="date" id="global_from" onchange="onFiltersChanged()" />
-              </div>
-
-              <div class="fg small">
-                <label class="label">Date to</label>
-                <input type="date" id="global_to" onchange="onFiltersChanged()" />
-              </div>
-
-              <div class="fg small">
-                <label class="label">Status</label>
-                <select id="topups_status" onchange="onFiltersChanged()">
-                  <option value="__all__">All</option>
-                  <option value="pending">Pending</option>
-                  <option value="approved">Approved</option>
-                  <option value="declined">Declined</option>
-                  <option value="past_due">Past Due</option>
-                </select>
+            <div class="fg">
+              <label class="label">Date range</label>
+              <div class="date-range">
+                <input type="date" id="fFrom" />
+                <div class="sep">→</div>
+                <input type="date" id="fTo" />
               </div>
             </div>
 
-            <div class="filters__right">
-              <button class="transfer-btn gray" type="button" onclick="clearFilters()">Clear</button>
-              <button class="transfer-btn" type="button" onclick="exportTopupsCSV()">Export CSV</button>
+            <div class="fg">
+              <label class="label">Status</label>
+              <select id="fStatus">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="declined">Declined</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Type</label>
+              <select id="fType">
+                <option value="all">All</option>
+                <option value="wire">WIRE</option>
+                <option value="crypto">CRYPTO</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Network</label>
+              <select id="fNetwork">
+                <option value="all">All</option>
+                <option value="USDT_ERC20">USDT ERC20</option>
+                <option value="USDT_TRC20">USDT TRC20</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <button class="btn ghost" type="button" id="btnClear">Clear</button>
             </div>
           </div>
-
-          <div class="mini-hint" id="filtersHint"></div>
         </div>
 
-        <!-- Stats -->
+        <!-- KPIs -->
         <div class="stats">
           <div class="stat-box">
-            <h4>TOTAL TOPUPS</h4>
-            <div class="stat-value" id="kpi_total">$0.00</div>
-            <div class="stat-desc"><span>Filtered</span><span class="muted" id="kpi_total_cnt">0</span></div>
+            <h4>TOTAL</h4>
+            <div class="stat-value" id="kTotal">0</div>
+            <div class="stat-sub">Matches filters</div>
           </div>
-
-          <div class="stat-box">
+          <div class="stat-box pending">
             <h4>PENDING</h4>
-            <div class="stat-value" id="kpi_pending">$0.00</div>
-            <div class="stat-desc"><span>Needs action</span><span class="muted" id="kpi_pending_cnt">0</span></div>
+            <div class="stat-value" id="kPending">0</div>
+            <div class="stat-sub">Awaiting steps</div>
           </div>
-
-          <div class="stat-box">
+          <div class="stat-box approved">
             <h4>APPROVED</h4>
-            <div class="stat-value" id="kpi_approved">$0.00</div>
-            <div class="stat-desc"><span>Processed</span><span class="muted" id="kpi_approved_cnt">0</span></div>
+            <div class="stat-value" id="kApproved">0</div>
+            <div class="stat-sub">Internal tx added</div>
           </div>
-
-          <div class="stat-box">
+          <div class="stat-box declined">
             <h4>DECLINED</h4>
-            <div class="stat-value" id="kpi_declined">$0.00</div>
-            <div class="stat-desc"><span>Rejected</span><span class="muted" id="kpi_declined_cnt">0</span></div>
+            <div class="stat-value" id="kDeclined">0</div>
+            <div class="stat-sub">Has reason</div>
           </div>
         </div>
 
         <!-- Table -->
         <div class="glass-panel" style="padding:16px;">
-          <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:10px;">
-            <div>
-              <div style="font-size:1.18rem; font-weight:950;">Total Topups</div>
-              <div class="mini-hint">Click pe un rând → modal dreapta (status + descriere + dată).</div>
-            </div>
-            <div class="mini-hint" id="tableHint"></div>
-          </div>
-
           <div class="table-wrap">
             <table>
               <thead>
                 <tr>
                   <th>Date</th>
                   <th>Client</th>
-                  <th>Topup ID</th>
+                  <th>Top-up ID</th>
                   <th>Type</th>
-                  <th>Account</th>
-                  <th>Proof</th>
-                  <th class="td-right">Amount</th>
+                  <th>Network</th>
+                  <th class="td-right">Amount (USD)</th>
                   <th>Status</th>
-                  <th>Description</th>
+                  <th>Timeline</th>
+                  <th class="td-right">Action</th>
                 </tr>
               </thead>
-              <tbody id="topupsBody"></tbody>
+              <tbody id="tbody"></tbody>
             </table>
           </div>
+        </div>
+
+        <div class="mini-hint" style="padding:0 2px;">
+          Tip for devs: Internal Transactions are the single source of truth. Fees and balances are derived from them. Backend is intentionally omitted.
         </div>
 
       </div>
     </main>
   </div>
 
-  <!-- Details Modal (right) -->
-  <div class="tx-modal" id="topupDetailsModal" aria-hidden="true">
-    <div class="tx-modal__overlay" onclick="closeTopupDetails()"></div>
+  <!-- ✅ RIGHT DRAWER: Top-up details -->
+  <div class="drawer-modal" id="topupDrawerModal" aria-hidden="true">
+    <div class="drawer-modal__overlay" id="drawerOverlay"></div>
 
-    <div class="tx-modal__panel" role="dialog" aria-modal="true" aria-label="Topup Details">
-      <div class="tx-modal__header">
-        <div>
-          <h3 style="margin:0;">Top-Up Details</h3>
-          <div class="mini-hint" id="d_sub">—</div>
-        </div>
-        <button class="tx-close" onclick="closeTopupDetails()" aria-label="Close">×</button>
+    <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Topup details">
+      <div class="drawer-modal__header">
+        <div class="drawer-modal__title" id="dTitle">Top-up • TU-00000</div>
+        <button class="drawer-modal__close" type="button" id="drawerClose">Close</button>
       </div>
 
-      <div class="tx-modal__body">
-        <div class="kv-card" id="topupKvCard"></div>
+      <div class="drawer-modal__body">
+        <div class="seg" id="viewSeg">
+          <button type="button" data-view="client" class="active">Client view</button>
+          <button type="button" data-view="admin">Admin view</button>
+        </div>
 
-        <div style="margin-top:.35rem;">
-          <div class="kv-key" style="margin-bottom:.35rem;">Status</div>
-          <div class="segmented-status" id="topupStatusSeg">
-            <div class="seg-pill" data-status="pending" onclick="setTopupModalStatus('pending')">Pending</div>
-            <div class="seg-pill" data-status="approved" onclick="setTopupModalStatus('approved')">Approved</div>
-            <div class="seg-pill" data-status="declined" onclick="setTopupModalStatus('declined')">Declined</div>
-            <div class="seg-pill" data-status="past_due" onclick="setTopupModalStatus('past_due')">Past Due</div>
+        <div class="topup-layout">
+          <!-- LEFT -->
+          <div>
+            <div class="step-card">
+              <div class="step">
+                <div class="dot" id="dotInvoice"></div>
+                <div>
+                  <h4>Invoice provided</h4>
+                  <div class="sub" id="txtInvoice">—</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="dot" id="dotProof"></div>
+                <div>
+                  <h4>Proof uploaded</h4>
+                  <div class="sub" id="txtProof">—</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="dot" id="dotOTW"></div>
+                <div>
+                  <h4>Money OTW</h4>
+                  <div class="sub" id="txtOTW">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT -->
+          <div class="right-box">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <span class="pill pending" id="dStatusPill">PENDING</span>
+              <span class="muted" id="dMainWallet">Main Wallet: USD 0.00</span>
+            </div>
+
+            <div class="kv" id="dKv"></div>
+
+            <div style="margin-top:10px;" id="billingBlock">
+              <div class="kv-row">
+                <div class="k">Billing company</div>
+                <div class="v" id="dCompany">—</div>
+              </div>
+              <div class="kv-row">
+                <div class="k">IBAN</div>
+                <div class="v" id="dIban">—</div>
+              </div>
+              <div class="kv-row">
+                <div class="k">Currency</div>
+                <div class="v" id="dCurrency">—</div>
+              </div>
+
+              <div class="mini-hint" style="margin-top:8px;">Admin can edit billing company while pending.</div>
+              <button class="btn" type="button" id="btnEditBilling">Edit billing company</button>
+            </div>
+
+            <div class="admin-actions" id="adminActions">
+              <div class="hr"></div>
+              <div style="font-weight:950; margin-bottom:6px;">Admin actions</div>
+
+              <div class="card-lite">
+                <h5>Invoice upload</h5>
+                <div class="muted">Demo stores metadata only.</div>
+                <div style="margin-top:8px;">
+                  <input type="file" id="fileInvoice" />
+                </div>
+              </div>
+
+              <div class="card-lite">
+                <h5>Payment proof upload</h5>
+                <div class="muted">Admin can upload if client asks.</div>
+                <div style="margin-top:8px;">
+                  <input type="file" id="fileProof" />
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <button class="btn" type="button" id="btnMarkWire">Mark wire received</button>
+                <div class="mini-hint">FX shows only here (admin). Locked until “wire received”.</div>
+              </div>
+
+              <div class="fx-grid">
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Received amount</label>
+                  <input id="fxReceivedAmount" type="number" step="0.01" placeholder="0" />
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Received currency</label>
+                  <select id="fxCurrency">
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">FX rate to USD</label>
+                  <input id="fxRate" type="number" step="0.0001" placeholder="1" />
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Fee (USD)</label>
+                  <input id="fxFee" type="number" step="0.01" placeholder="0" />
+                </div>
+              </div>
+
+              <div class="totals">
+                <div class="label">Approved USD amount</div>
+                <div class="val" id="dApprovedUsd">USD 0.00</div>
+              </div>
+              <div class="totals">
+                <div class="label">Net to Main Wallet</div>
+                <div class="val" id="dNetUsd">USD 0.00</div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <button class="btn" type="button" id="btnApprove">Approve</button>
+              </div>
+
+              <div class="hr"></div>
+
+              <div>
+                <label class="label" style="margin:0 0 6px;">Decline preset</label>
+                <select id="declinePreset">
+                  <option value="">Select…</option>
+                  <option value="missing_docs">Missing documents</option>
+                  <option value="iban_mismatch">IBAN mismatch</option>
+                  <option value="wrong_amount">Wrong amount</option>
+                  <option value="compliance">Compliance issue</option>
+                </select>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label class="label" style="margin:0 0 6px;">Decline reason (required)</label>
+                <input id="declineReason" placeholder="Write details…" />
+              </div>
+
+              <div class="danger-zone">
+                <button class="btn danger" type="button" id="btnDecline">Decline</button>
+                <button class="btn" type="button" id="btnDelete">Delete</button>
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <div style="margin-top:8px;">
-          <label class="label">Description</label>
-          <textarea id="topupModalDesc" rows="3" placeholder="--"></textarea>
-        </div>
-
-        <div style="margin-top:10px;">
-          <label class="label">Date</label>
-          <input type="datetime-local" id="topupModalDate">
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="transfer-btn secondary" onclick="saveTopupDetails()">Save Changes</button>
-        <button class="transfer-btn gray" onclick="closeTopupDetails()">Cancel</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Add Topup Drawer (right) -->
-  <div class="drawer" id="topupDrawer" aria-hidden="true">
-    <div class="drawer__overlay" onclick="closeTopupDrawer()"></div>
-
-    <div class="drawer__panel" role="dialog" aria-modal="true" aria-label="Add Topup">
-      <div class="drawer__header">
-        <h3 class="drawer__title">Add Top-Up</h3>
-        <button class="drawer__close" onclick="closeTopupDrawer()" aria-label="Close">×</button>
-      </div>
-
-      <div class="drawer__body">
-        <div style="margin-bottom:10px;">
-          <label class="label">Client</label>
-          <select id="topup_client"></select>
-          <div class="mini-hint">Dacă ai selectat un client în filtre, îl preselectăm aici.</div>
-        </div>
-
-        <div class="segmented" id="topupTabs">
-          <button class="seg-btn active" data-tab="wire" type="button" onclick="switchTopupTab('wire')">Wire</button>
-          <button class="seg-btn" data-tab="crypto" type="button" onclick="switchTopupTab('crypto')">Crypto</button>
-          <button class="seg-btn" data-tab="refund" type="button" onclick="switchTopupTab('refund')">Refund</button>
-        </div>
-
-        <!-- WIRE -->
-        <div id="tab_wire">
-          <label class="label">Company</label>
-          <input id="wire_company" type="text" placeholder="e.g. Wise / Revolut / Bank" />
-
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:10px;">
-            <div>
-              <label class="label">Account</label>
-              <select id="wire_account">
-                <option value="">Select</option>
-                <option value="acc_1">acc_1</option>
-                <option value="acc_2">acc_2</option>
-                <option value="acc_3">acc_3</option>
-              </select>
-            </div>
-            <div>
-              <label class="label">Invoice (PDF)</label>
-              <input id="wire_invoice" type="file" accept="application/pdf" />
-            </div>
-          </div>
-
-          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-top:10px;">
-            <div>
-              <label class="label">Gross</label>
-              <input id="wire_gross" type="number" min="0" step="0.01" placeholder="e.g. 1000" oninput="recalcWireNet()" />
-            </div>
-            <div>
-              <label class="label">Fee</label>
-              <input id="wire_fee" type="number" min="0" step="0.01" placeholder="e.g. 10" oninput="recalcWireNet()" />
-            </div>
-            <div>
-              <label class="label">Net</label>
-              <input id="wire_net" type="number" min="0" step="0.01" placeholder="auto" readonly />
-            </div>
-          </div>
-
-          <div style="margin-top:10px;">
-            <label class="label">Description</label>
-            <input id="wire_desc" type="text" placeholder="Optional note" />
-          </div>
-
-          <div class="notice-box">
-            Minimum deposit: $500<br />
-            Make sure the full amount arrives without fee deductions.
-          </div>
-        </div>
-
-        <!-- CRYPTO -->
-        <div id="tab_crypto" style="display:none;">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
-            <div>
-              <label class="label">Method</label>
-              <select id="crypto_method">
-                <option value="">Select</option>
-                <option value="USDT">USDT</option>
-                <option value="USDC">USDC</option>
-                <option value="BTC">BTC</option>
-                <option value="ETH">ETH</option>
-              </select>
-            </div>
-            <div>
-              <label class="label">Wallet / Network</label>
-              <select id="crypto_network">
-                <option value="">Select</option>
-                <option value="ERC20">ERC20</option>
-                <option value="TRC20">TRC20</option>
-                <option value="BEP20">BEP20</option>
-              </select>
-            </div>
-          </div>
-
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:10px;">
-            <div>
-              <label class="label">Net Amount</label>
-              <input id="crypto_net" type="number" min="0" step="0.01" placeholder="e.g. 500" />
-            </div>
-            <div>
-              <label class="label">Gross Amount (optional)</label>
-              <input id="crypto_gross" type="number" min="0" step="0.01" placeholder="optional" />
-            </div>
-          </div>
-
-          <div style="margin-top:10px;">
-            <label class="label">Hash</label>
-            <input id="crypto_hash" type="text" placeholder="Transaction hash" />
-          </div>
-
-          <div style="margin-top:10px;">
-            <label class="label">Description</label>
-            <input id="crypto_desc" type="text" placeholder="Optional note" />
-          </div>
-
-          <div class="mini-hint" id="crypto_fee_hint">Fee: 0.00</div>
-        </div>
-
-        <!-- REFUND -->
-        <div id="tab_refund" style="display:none;">
-          <label class="label">Account</label>
-          <select id="refund_account">
-            <option value="">Select</option>
-            <option value="acc_1">acc_1</option>
-            <option value="acc_2">acc_2</option>
-            <option value="acc_3">acc_3</option>
-          </select>
-
-          <div style="margin-top:10px;">
-            <label class="label">Net Amount (refund)</label>
-            <input id="refund_net" type="number" min="0" step="0.01" placeholder="e.g. 120" />
-          </div>
-
-          <div style="margin-top:10px;">
-            <label class="label">Description</label>
-            <input id="refund_desc" type="text" placeholder="Refund reason / note" />
-          </div>
-
-          <div class="notice-box" style="background:#e7f5ff;border-color:#74c0fc;color:#0b4a6f;">
-            Refund scade din Main Wallet (în finance). Aici logăm tranzacția ca “refund”.
-          </div>
-        </div>
-
-      </div>
-
-      <div class="drawer__footer">
-        <button class="transfer-btn secondary" id="topupSubmitBtn" type="button" onclick="submitTopup()">Submit</button>
-        <button class="transfer-btn gray" type="button" onclick="closeTopupDrawer()">Cancel</button>
       </div>
     </div>
   </div>
@@ -987,7 +982,7 @@
   <script src="../js/sidebar.js"></script>
   <script>
     /* ==============================
-       ROUTES (tabs navigate to pages)
+       Tabs routes
     ============================== */
     const PAGE_ROUTES = {
       finance: "finance.html",
@@ -995,43 +990,17 @@
       transactions: "transactions.html",
       ledger: "ledger.html",
     };
-    function getCurrentFileName(){
-      const p = window.location.pathname || "";
-      const parts = p.split("/");
-      return (parts[parts.length - 1] || "").toLowerCase();
-    }
-    function detectActivePage(){
-      const file = getCurrentFileName();
-      for(const [key, filename] of Object.entries(PAGE_ROUTES)){
-        if(String(filename).toLowerCase() === file) return key;
-      }
-      // fallback
-      return "topups";
-    }
-    function setActiveTabUI(activeKey){
-      document.querySelectorAll("#pageTabs .page-tab").forEach(btn=>{
-        const isOn = btn.dataset.page === activeKey;
-        btn.classList.toggle("active", isOn);
-        btn.setAttribute("aria-selected", isOn ? "true" : "false");
-      });
-    }
-    function navigateTo(key){
-      const target = PAGE_ROUTES[key];
-      if(!target) return;
-      window.location.href = target;
-    }
-    setActiveTabUI(detectActivePage());
     document.getElementById("pageTabs")?.addEventListener("click",(e)=>{
       const btn = e.target.closest(".page-tab");
       if(!btn) return;
       const key = btn.dataset.page;
-      setActiveTabUI(key);
-      if(key === detectActivePage()) return;
-      navigateTo(key);
+      if(!PAGE_ROUTES[key]) return;
+      if(key === "topups") return;
+      window.location.href = PAGE_ROUTES[key];
     });
 
     /* ==============================
-       THEME TOGGLE (same behavior)
+       Theme
     ============================== */
     (function initTheme(){
       const root = document.documentElement;
@@ -1050,708 +1019,567 @@
     })();
 
     /* ==============================
-       DATA (shared with finance pages)
+       Demo data
     ============================== */
-    const LS_KEY = "admin_finance_demo_v7";
+    const clients = [
+      { id:"100", name:"Alex M." },
+      { id:"101", name:"Dana P." },
+      { id:"102", name:"Mihai R." },
+    ];
 
-    const state = {
-      ledger: [],
-      globalClient: "__all__",
-      globalFrom: "",
-      globalTo: "",
-      topupsStatus: "__all__",
-      activeTopupModalId: null
-    };
+    let mainWalletUsd = 580.00;
 
-    function money(n){
-      const v = Number(n || 0);
-      return v.toLocaleString(undefined, { style:"currency", currency:"USD" });
-    }
-    function nowISO(){ return new Date().toLocaleString(); }
-    function uid(){ return Math.random().toString(16).slice(2) + "_" + Date.now(); }
-
-    function escapeHtml(s){
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-
-    function getClientLabelById(id){
-      const map = { "100":"100 - Alex", "101":"101 - Maria", "102":"102 - John" };
-      return map[String(id)] || String(id);
-    }
-    function getClientNameById(id){
-      const label = getClientLabelById(id);
-      const parts = String(label).split(" - ");
-      return parts[1] ? parts.slice(1).join(" - ").trim() : label;
-    }
-
-    function load(){
-      const raw = localStorage.getItem(LS_KEY);
-      if(!raw){ seedDemo(); return; }
-      try{
-        const parsed = JSON.parse(raw);
-        state.ledger = Array.isArray(parsed.ledger) ? parsed.ledger : [];
-        state.globalClient = parsed.globalClient || "__all__";
-        state.globalFrom = parsed.globalFrom || "";
-        state.globalTo = parsed.globalTo || "";
-        state.topupsStatus = parsed.topupsStatus || "__all__";
-      }catch(e){
-        seedDemo();
+    let topups = [
+      {
+        id:"TU-120401",
+        created:"2026-02-19",
+        clientId:"100",
+        type:"wire",
+        network:null,
+        status:"pending",
+        description:"Monthly spend funding",
+        initialAmount:1500,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{
+          invoiceProvided:false,
+          proofUploaded:false,
+          moneyOTW:false,
+          invoiceFile:null,
+          proofFile:null,
+        },
+        admin:{
+          wireReceived:false,
+          receivedAmount:null,
+          receivedCurrency:"EUR",
+          fxRate:null,
+          feeUsd:0,
+          declineReason:"",
+        }
+      },
+      {
+        id:"TU-120402",
+        created:"2026-02-19",
+        clientId:"101",
+        type:"wire",
+        network:null,
+        status:"pending",
+        description:"",
+        initialAmount:1200,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:false, moneyOTW:false, invoiceFile:"INV_TU-120402.pdf", proofFile:null },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:"EUR", fxRate:null, feeUsd:0, declineReason:"" }
+      },
+      {
+        id:"TU-120403",
+        created:"2026-02-19",
+        clientId:"102",
+        type:"crypto",
+        network:"USDT_TRC20",
+        status:"pending",
+        description:"USDT top-up",
+        initialAmount:1000,
+        initialCurrency:"USD",
+        amountUsd:1000,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:false, invoiceFile:null, proofFile:"0xabc...def (hash)" },
+        admin:{ wireReceived:true, receivedAmount:1000, receivedCurrency:"USD", fxRate:1, feeUsd:0, declineReason:"" }
+      },
+      {
+        id:"TU-120350",
+        created:"2026-02-10",
+        clientId:"100",
+        type:"crypto",
+        network:"USDT_ERC20",
+        status:"approved",
+        description:"Funding",
+        initialAmount:2000,
+        initialCurrency:"USD",
+        amountUsd:2000,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:true, invoiceFile:null, proofFile:"0x7b3c...a19f" },
+        admin:{ wireReceived:true, receivedAmount:2000, receivedCurrency:"USD", fxRate:1, feeUsd:10, declineReason:"" }
+      },
+      {
+        id:"TU-120120",
+        created:"2026-01-28",
+        clientId:"101",
+        type:"wire",
+        network:null,
+        status:"declined",
+        description:"Top-up attempt",
+        initialAmount:500,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:true, moneyOTW:true, invoiceFile:"INV_TU-120120.pdf", proofFile:"Proof_TU-120120.png" },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:"EUR", fxRate:null, feeUsd:0, declineReason:"Missing documents" }
       }
+    ];
+
+    function $(id){ return document.getElementById(id); }
+    function clientName(id){ return clients.find(c=>c.id===id)?.name || ("Client " + id); }
+    function fmtDate(iso){
+      const d = new Date(iso + "T00:00:00");
+      try{ return new Intl.DateTimeFormat("ro-RO",{ day:"2-digit", month:"long", year:"numeric" }).format(d); }
+      catch(e){ return d.toLocaleDateString(); }
+    }
+    function moneyUSD(n){
+      const v = Number(n||0);
+      return "USD " + v.toFixed(2);
     }
 
-    function save(){
-      // preserve extra keys used by other pages if they exist
-      const raw = localStorage.getItem(LS_KEY);
-      let prev = {};
-      try{ prev = raw ? JSON.parse(raw) : {}; }catch(e){ prev = {}; }
-
-      localStorage.setItem(LS_KEY, JSON.stringify({
-        ...prev,
-        ledger: state.ledger,
-        globalClient: state.globalClient,
-        globalFrom: state.globalFrom,
-        globalTo: state.globalTo,
-        topupsStatus: state.topupsStatus
-      }));
+    function pillHtml(status){
+      const s = (status||"pending").toLowerCase();
+      return `<span class="pill ${s}">${s.toUpperCase()}</span>`;
     }
-
-function fmtLocal(d){
-  return d.toLocaleString();
-}
-function daysAgo(n){
-  const d = new Date();
-  d.setDate(d.getDate() - n);
-  return fmtLocal(d);
-}
-
-function seedDemo(){
-  state.ledger = [
-    {
-      id: uid(),
-      topupId: "100147",
-      date: daysAgo(7),
-      type:"topup",
-      clientId:"100",
-      from:"external",
-      to:"topups",
-      category:"wire",
-      status:"approved",
-      account:"USD",
-      proof:"INV_100147.pdf",
-      description:"--",
-      grossAmount: 1000,
-      feeAmount: 0,
-      netAmount: 1000,
-      note:"Topup #1 (Wire)",
-      amount: 1000
-    },
-    {
-      id: uid(),
-      topupId: "100148",
-      date: daysAgo(4),
-      type:"topup",
-      clientId:"100",
-      from:"external",
-      to:"topups",
-      category:"wire",
-      status:"pending",
-      account:"USD",
-      proof:"INV_100148.pdf",
-      description:"Bank wire topup",
-      grossAmount: 2000,
-      feeAmount: 0,
-      netAmount: 2000,
-      note:"Topup #2 (Wire)",
-      amount: 2000
-    },
-    {
-      id: uid(),
-      topupId: "100149",
-      date: daysAgo(2),
-      type:"topup",
-      clientId:"101",
-      from:"external",
-      to:"topups",
-      category:"crypto",
-      status:"approved",
-      account:"USDT",
-      proof:"0x7a1b...9c2f",
-      description:"USDT TRC20",
-      grossAmount: 2000,
-      feeAmount: 0,
-      netAmount: 2000,
-      note:"Topup #3 (Crypto)",
-      amount: 2000
-    },
-
-    // optional finance entries
-    { id: uid(), date: daysAgo(1), type:"deposit", clientId:"100", from:"external", to:"mainWallet", category:"deposit", note:"Initial funding into Main Wallet", amount: 5000 },
-    { id: uid(), date: daysAgo(1), type:"fee", clientId:"100", from:"", to:"feesCollected", category:"wire_fee", note:"Wire processing fee", amount: 200 },
-  ];
-
-  // IMPORTANT: reset filters so you SEE demo instantly
-  state.globalClient = "__all__";
-  state.globalFrom = "";
-  state.globalTo = "";
-  state.topupsStatus = "__all__";
-
-  save();
-  renderAll();
-}
 
     /* ==============================
-       FILTERS
+       Filters init
     ============================== */
-    function txDateToISO(txDateString){
-      const d = new Date(txDateString);
-      if(isNaN(d.getTime())) return null;
-      const yyyy = d.getFullYear();
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const dd = String(d.getDate()).padStart(2,"0");
-      return `${yyyy}-${mm}-${dd}`;
+    function initFilters(){
+      $("fClient").innerHTML = `<option value="all">All Clients</option>` +
+        clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+    }
+    initFilters();
+
+    function readFilters(){
+      return {
+        q: ($("fSearch").value || "").trim().toLowerCase(),
+        client: $("fClient").value,
+        from: $("fFrom").value,
+        to: $("fTo").value,
+        status: $("fStatus").value,
+        type: $("fType").value,
+        network: $("fNetwork").value
+      };
     }
 
-    function passesGlobalFilters(tx){
-      if(state.globalClient !== "__all__"){
-        if(String(tx.clientId || "") !== String(state.globalClient)) return false;
+    function passFilters(t, f){
+      if(f.client !== "all" && t.clientId !== f.client) return false;
+
+      const iso = t.created;
+      if(f.from && iso < f.from) return false;
+      if(f.to && iso > f.to) return false;
+
+      if(f.status !== "all" && (t.status||"").toLowerCase() !== f.status) return false;
+      if(f.type !== "all" && (t.type||"").toLowerCase() !== f.type) return false;
+
+      if(f.network !== "all"){
+        const n = (t.network||"").toUpperCase();
+        if(n !== f.network.toUpperCase()) return false;
       }
-      const iso = txDateToISO(tx.date);
-      if(iso){
-        if(state.globalFrom && iso < state.globalFrom) return false;
-        if(state.globalTo && iso > state.globalTo) return false;
+
+      if(f.q){
+        const blob = [
+          t.id, clientName(t.clientId), t.type, t.network, t.description,
+          t.steps?.invoiceFile, t.steps?.proofFile, t.billingCompany?.name, t.billingCompany?.iban
+        ].filter(Boolean).join(" ").toLowerCase();
+        if(!blob.includes(f.q)) return false;
       }
+
       return true;
     }
 
-    function populateClientSelect(){
-      const clientIds = new Set(["100","101","102"]);
-      for(const tx of state.ledger){
-        if(tx.clientId) clientIds.add(String(tx.clientId));
-      }
-
-      const sel = document.getElementById("global_client");
-      const current = state.globalClient || "__all__";
-      sel.innerHTML =
-        `<option value="__all__">All clients</option>` +
-        [...clientIds].sort().map(cid =>
-          `<option value="${cid}">${escapeHtml(getClientLabelById(cid))}</option>`
-        ).join("");
-      sel.value = current;
-
-      document.getElementById("global_from").value = state.globalFrom || "";
-      document.getElementById("global_to").value = state.globalTo || "";
-      document.getElementById("topups_status").value = state.topupsStatus || "__all__";
-
-      // drawer client select
-      const drawerSel = document.getElementById("topup_client");
-      drawerSel.innerHTML = [...clientIds].sort().map(cid =>
-        `<option value="${cid}">${escapeHtml(getClientLabelById(cid))}</option>`
-      ).join("");
-    }
-
-    function onFiltersChanged(){
-      state.globalClient = document.getElementById("global_client").value;
-      state.globalFrom = document.getElementById("global_from").value;
-      state.globalTo = document.getElementById("global_to").value;
-      state.topupsStatus = document.getElementById("topups_status").value;
-      save();
-      renderAll();
-    }
-
-    function clearFilters(){
-      state.globalClient = "__all__";
-      state.globalFrom = "";
-      state.globalTo = "";
-      state.topupsStatus = "__all__";
-
-      document.getElementById("global_client").value = "__all__";
-      document.getElementById("global_from").value = "";
-      document.getElementById("global_to").value = "";
-      document.getElementById("topups_status").value = "__all__";
-      document.getElementById("topups_search").value = "";
-      save();
-      renderAll();
-    }
-
     /* ==============================
-       TOPUPS LIST + KPIs
+       Render list + KPIs
     ============================== */
-    function getFilteredTopups(){
-      const q = (document.getElementById("topups_search").value || "").trim().toLowerCase();
-      const status = state.topupsStatus;
-
-      return state.ledger
-        .filter(tx => tx.type === "topup")
-        .filter(passesGlobalFilters)
-        .filter(tx => status === "__all__" ? true : String(tx.status || "").toLowerCase() === String(status).toLowerCase())
-        .filter(tx => {
-          if(!q) return true;
-          const blob = [
-            tx.clientId, tx.topupId, tx.id, tx.proof, tx.description, tx.note, tx.category, tx.account
-          ].join(" ").toLowerCase();
-          return blob.includes(q);
-        })
-        .slice()
-        .sort((a,b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    function timelineChips(t){
+      const chips = [];
+      const s = t.steps || {};
+      chips.push(chip("Invoice provided", !!s.invoiceProvided));
+      chips.push(chip("Proof uploaded", !!s.proofUploaded));
+      chips.push(chip("Money OTW", !!s.moneyOTW));
+      return chips.join(" ");
+    }
+    function chip(label, on){
+      const bg = on ? "color-mix(in srgb, rgba(22,163,74,.14) 70%, #fff)" : "color-mix(in srgb, rgba(148,163,184,.18) 70%, #fff)";
+      const bd = on ? "color-mix(in srgb, rgba(22,163,74,.30) 70%, rgba(15,23,42,.10))" : "rgba(15,23,42,.10)";
+      const col = on ? "#166534" : "#64748b";
+      return `<span style="display:inline-flex;align-items:center;gap:6px;padding:.26rem .55rem;border:1px solid ${bd};border-radius:999px;background:${bg};color:${col};font-weight:900;font-size:.78rem;">
+        <span style="width:8px;height:8px;border-radius:999px;border:2px solid ${on? "rgba(22,163,74,.55)" : "rgba(100,116,139,.55)"};background:${on? "rgba(22,163,74,.12)" : "transparent"};"></span>
+        ${label}
+      </span>`;
     }
 
-    function calcTopupKPIs(topups){
-      const out = {
-        total: 0, totalCnt: 0,
-        pending: 0, pendingCnt: 0,
-        approved: 0, approvedCnt: 0,
-        declined: 0, declinedCnt: 0
-      };
-      for(const t of topups){
-        const amt = Number(t.amount || 0);
-        out.total += amt; out.totalCnt++;
-
-        const st = String(t.status || "pending").toLowerCase();
-        if(st === "pending"){ out.pending += amt; out.pendingCnt++; }
-        if(st === "approved"){ out.approved += amt; out.approvedCnt++; }
-        if(st === "declined"){ out.declined += amt; out.declinedCnt++; }
+    function computeKpis(items){
+      let total=0,p=0,a=0,d=0;
+      for(const t of items){
+        total++;
+        if(t.status==="pending") p++;
+        if(t.status==="approved") a++;
+        if(t.status==="declined") d++;
       }
-      return out;
+      $("kTotal").textContent = total;
+      $("kPending").textContent = p;
+      $("kApproved").textContent = a;
+      $("kDeclined").textContent = d;
     }
 
-    function renderKPIs(topups){
-      const k = calcTopupKPIs(topups);
-      document.getElementById("kpi_total").textContent = money(k.total);
-      document.getElementById("kpi_total_cnt").textContent = `${k.totalCnt} items`;
+    function render(){
+      const f = readFilters();
+      const items = topups.filter(t => passFilters(t,f)).sort((x,y)=> (y.created||"").localeCompare(x.created||""));
+      computeKpis(items);
 
-      document.getElementById("kpi_pending").textContent = money(k.pending);
-      document.getElementById("kpi_pending_cnt").textContent = `${k.pendingCnt} items`;
-
-      document.getElementById("kpi_approved").textContent = money(k.approved);
-      document.getElementById("kpi_approved_cnt").textContent = `${k.approvedCnt} items`;
-
-      document.getElementById("kpi_declined").textContent = money(k.declined);
-      document.getElementById("kpi_declined_cnt").textContent = `${k.declinedCnt} items`;
-    }
-
-    function renderTable(topups){
-      const body = document.getElementById("topupsBody");
-      const hint = document.getElementById("tableHint");
-
-      if(!topups.length){
-        body.innerHTML = `<tr><td colspan="9" class="td-muted">No topups found for current filters.</td></tr>`;
-        hint.textContent = "";
+      const tbody = $("tbody");
+      if(!items.length){
+        tbody.innerHTML = `<tr><td colspan="9" class="td-muted">No results.</td></tr>`;
         return;
       }
 
-      body.innerHTML = topups.map(t => {
-        const st = String(t.status || "pending").toLowerCase();
-        const stLabel = st === "past_due" ? "Past Due" : (st.charAt(0).toUpperCase() + st.slice(1));
-        const proof = t.proof ? escapeHtml(t.proof) : "-";
-        const desc = (t.description && String(t.description).trim()) ? escapeHtml(t.description) : (t.note ? escapeHtml(t.note) : "--");
-
+      tbody.innerHTML = items.map(t=>{
+        const amountUsd = (t.amountUsd != null) ? moneyUSD(t.amountUsd) : "—";
+        const net = t.network ? t.network : "—";
         return `
-          <tr class="row" onclick="openTopupDetails('${escapeHtml(t.id)}')">
-            <td>${escapeHtml(t.date)}</td>
-            <td>${escapeHtml(getClientLabelById(t.clientId || ""))}</td>
-            <td>${escapeHtml(t.topupId || t.id)}</td>
-            <td>${escapeHtml((t.category || "—").toUpperCase())}</td>
-            <td>${escapeHtml(t.account || "USD")}</td>
-            <td class="td-muted">${proof}</td>
-            <td class="td-right"><strong>${money(t.amount)}</strong></td>
-            <td><span class="status-badge ${st}">${stLabel}</span></td>
-            <td class="td-muted" style="max-width: 360px; overflow:hidden; text-overflow:ellipsis;">${desc}</td>
+          <tr class="row" data-open="${t.id}">
+            <td>${fmtDate(t.created)}</td>
+            <td>${clientName(t.clientId)}</td>
+            <td><strong>${t.id}</strong></td>
+            <td>${String(t.type||"").toUpperCase()}</td>
+            <td>${net}</td>
+            <td class="td-right">${amountUsd}</td>
+            <td>${pillHtml(t.status)}</td>
+            <td>${timelineChips(t)}</td>
+            <td class="td-right">
+              <button class="btn" type="button" data-open-btn="${t.id}">Open</button>
+            </td>
           </tr>
         `;
       }).join("");
 
-      hint.textContent = `${topups.length} items`;
+      tbody.querySelectorAll("[data-open]").forEach(tr=>{
+        tr.addEventListener("click",(e)=>{
+          const id = tr.getAttribute("data-open");
+          openDrawer(id);
+        });
+      });
+      tbody.querySelectorAll("[data-open-btn]").forEach(btn=>{
+        btn.addEventListener("click",(e)=>{
+          e.stopPropagation();
+          openDrawer(btn.getAttribute("data-open-btn"));
+        });
+      });
     }
 
-    function renderHints(topups){
-      const clientText = state.globalClient === "__all__" ? "All clients" : getClientLabelById(state.globalClient);
-      const rangeText = (state.globalFrom || state.globalTo)
-        ? `${state.globalFrom || "…"} → ${state.globalTo || "…"}`
-        : "All dates";
-      const stText = state.topupsStatus === "__all__" ? "All statuses" : state.topupsStatus.toUpperCase();
-    }
+    ["fSearch","fClient","fFrom","fTo","fStatus","fType","fNetwork"].forEach(id=>{
+      $(id).addEventListener("input", render);
+      $(id).addEventListener("change", render);
+    });
 
-    function renderAll(){
-      populateClientSelect();
-      const topups = getFilteredTopups();
-      renderKPIs(topups);
-      renderTable(topups);
-      renderHints(topups);
-    }
+    $("btnClear").addEventListener("click", ()=>{
+      $("fSearch").value="";
+      $("fClient").value="all";
+      $("fFrom").value="";
+      $("fTo").value="";
+      $("fStatus").value="all";
+      $("fType").value="all";
+      $("fNetwork").value="all";
+      render();
+    });
+
+    $("btnExport").addEventListener("click", ()=>{
+      alert("Demo: export (CSV/XLSX) next step.");
+    });
+
+    $("btnWallets").addEventListener("click", ()=>{
+      alert("Demo: crypto wallets modal (admin) – next step.");
+    });
+
+    $("btnCreate").addEventListener("click", ()=>{
+      alert("Demo: create top-up modal – next step (ai deja în alte screenshot-uri).");
+    });
 
     /* ==============================
-       DETAILS MODAL
+       Drawer details (FIXED right)
     ============================== */
-    function findTopupById(id){
-      return state.ledger.find(tx => String(tx.id) === String(id));
+    let activeId = null;
+    let activeView = "client";
+
+    function setBodyModal(open){
+      document.body.classList.toggle("modal-open", !!open);
     }
 
-    function formatDatetimeLocalFromTx(tx){
-      const d = new Date(tx.date);
-      if(isNaN(d.getTime())) return "";
-      const pad = (n)=>String(n).padStart(2,"0");
-      const yyyy = d.getFullYear();
-      const mm = pad(d.getMonth()+1);
-      const dd = pad(d.getDate());
-      const hh = pad(d.getHours());
-      const mi = pad(d.getMinutes());
-      return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
-    }
+    function openDrawer(id){
+      const t = topups.find(x=>x.id===id);
+      if(!t) return;
+      activeId = id;
 
-    function openTopupDetails(id){
-      const tx = findTopupById(id);
-      if(!tx || tx.type !== "topup") return;
+      $("dTitle").textContent = `Top-up • ${t.id}`;
 
-      state.activeTopupModalId = id;
+      // view seg
+      activeView = "admin"; // default like screenshot (admin view)
+      syncViewButtons();
 
-      document.getElementById("d_sub").textContent =
-        `${getClientLabelById(tx.clientId || "—")} • #${tx.topupId || tx.id}`;
+      // status pill + main wallet
+      $("dStatusPill").className = "pill " + (t.status||"pending");
+      $("dStatusPill").textContent = (t.status||"pending").toUpperCase();
+      $("dMainWallet").textContent = `Main Wallet: ${moneyUSD(mainWalletUsd)}`;
 
-      const kv = document.getElementById("topupKvCard");
-      kv.innerHTML = `
-        <div class="kv-row"><div class="kv-key">User ID</div><div class="kv-val">${escapeHtml(tx.clientId || "")}</div></div>
-        <div class="kv-row"><div class="kv-key">Top-Up ID</div><div class="kv-val">${escapeHtml(tx.topupId || tx.id)}</div></div>
-        <div class="kv-row"><div class="kv-key">Full Name</div><div class="kv-val">${escapeHtml(getClientNameById(tx.clientId || ""))}</div></div>
-        <div class="kv-row"><div class="kv-key">Gross Amount</div><div class="kv-val">${escapeHtml(String(Number(tx.grossAmount ?? tx.amount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
-        <div class="kv-row"><div class="kv-key">Fee Amount</div><div class="kv-val">${escapeHtml(String(Number(tx.feeAmount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
-        <div class="kv-row"><div class="kv-key">Net Amount</div><div class="kv-val">${escapeHtml(String(Number(tx.netAmount ?? tx.amount ?? 0).toFixed(2)))} ${escapeHtml(tx.account || "USD")}</div></div>
-        <div class="kv-row"><div class="kv-key">Account</div><div class="kv-val">${escapeHtml(tx.account || "USD")}</div></div>
-        <div class="kv-row"><div class="kv-key">Type</div><div class="kv-val">${escapeHtml((tx.category || "—").toUpperCase())}</div></div>
-        <div class="kv-row"><div class="kv-key">Proof</div><div class="kv-val">${escapeHtml(tx.proof || "-")}</div></div>
+      // timeline dots
+      const s = t.steps || {};
+      setDot("dotInvoice", !!s.invoiceProvided);
+      setDot("dotProof", !!s.proofUploaded);
+      setDot("dotOTW", !!s.moneyOTW);
+
+      $("txtInvoice").textContent = s.invoiceFile ? s.invoiceFile : "—";
+      $("txtProof").textContent = s.proofFile ? s.proofFile : "—";
+      $("txtOTW").textContent = s.moneyOTW ? "In progress" : "—";
+
+      // details kv
+      const amountUsd = (t.amountUsd != null) ? moneyUSD(t.amountUsd) : "—";
+      const network = t.network ? t.network : "—";
+      $("dKv").innerHTML = `
+        <div class="kv-row"><div class="k">Client</div><div class="v">${clientName(t.clientId)}</div></div>
+        <div class="kv-row"><div class="k">Type</div><div class="v">${String(t.type||"").toUpperCase()}</div></div>
+        <div class="kv-row"><div class="k">Network</div><div class="v">${network}</div></div>
+        <div class="kv-row"><div class="k">Created</div><div class="v">${fmtDate(t.created)}</div></div>
+        <div class="kv-row"><div class="k">Initial</div><div class="v">${Number(t.initialAmount||0).toFixed(0)} ${t.initialCurrency||"—"}</div></div>
+        <div class="kv-row"><div class="k">Amount (USD)</div><div class="v">${amountUsd}</div></div>
+        <div class="kv-row"><div class="k">Status</div><div class="v">${pillHtml(t.status)}</div></div>
+        <div class="kv-row"><div class="k">Description</div><div class="v">${t.description ? t.description : "—"}</div></div>
       `;
 
-      document.getElementById("topupModalDesc").value =
-        (tx.description && String(tx.description).trim()) ? tx.description : (tx.note || "--");
-      document.getElementById("topupModalDate").value = formatDatetimeLocalFromTx(tx);
-
-      setTopupModalStatus(String(tx.status || "pending").toLowerCase(), true);
-
-      document.getElementById("topupDetailsModal").classList.add("active");
-      document.getElementById("topupDetailsModal").setAttribute("aria-hidden", "false");
-    }
-
-    function closeTopupDetails(){
-      state.activeTopupModalId = null;
-      document.getElementById("topupDetailsModal").classList.remove("active");
-      document.getElementById("topupDetailsModal").setAttribute("aria-hidden", "true");
-    }
-
-    function setTopupModalStatus(status, silent){
-      const st = String(status || "pending").toLowerCase();
-      const seg = document.getElementById("topupStatusSeg");
-      seg.querySelectorAll(".seg-pill").forEach(p => p.classList.remove("active","pending","approved","declined","past_due"));
-      const el = seg.querySelector(`.seg-pill[data-status="${st}"]`);
-      if(el) el.classList.add("active", st);
-
-      if(!silent){
-        const tx = findTopupById(state.activeTopupModalId);
-        if(tx) tx.status = st;
-      }
-    }
-
-    function saveTopupDetails(){
-      const tx = findTopupById(state.activeTopupModalId);
-      if(!tx) return;
-
-      tx.description = (document.getElementById("topupModalDesc").value || "").trim() || "--";
-
-      const dt = document.getElementById("topupModalDate").value;
-      if(dt){
-        const d = new Date(dt);
-        if(!isNaN(d.getTime())) tx.date = d.toLocaleString();
+      // billing
+      if(t.billingCompany){
+        $("billingBlock").style.display = "block";
+        $("dCompany").textContent = t.billingCompany.name || "—";
+        $("dIban").textContent = t.billingCompany.iban || "—";
+        $("dCurrency").textContent = t.billingCompany.currency || "—";
+      }else{
+        $("billingBlock").style.display = "none";
       }
 
-      save();
-      renderAll();
-      closeTopupDetails();
+      // admin actions + FX lock
+      const a = t.admin || {};
+      $("fxCurrency").value = a.receivedCurrency || "EUR";
+      $("fxReceivedAmount").value = a.receivedAmount ?? "";
+      $("fxRate").value = a.fxRate ?? "";
+      $("fxFee").value = a.feeUsd ?? 0;
+
+      // lock FX until wire received (only for WIRE)
+      syncFxLock();
+
+      // totals
+      recalcTotals();
+
+      // show modal
+      $("topupDrawerModal").classList.add("active");
+      $("topupDrawerModal").setAttribute("aria-hidden","false");
+      setBodyModal(true);
     }
 
-    /* ==============================
-       ADD TOPUP DRAWER
-    ============================== */
-    let activeTopupTab = "wire";
-
-    function openTopupDrawer(){
-      document.getElementById("topupDrawer").classList.add("active");
-      document.getElementById("topupDrawer").setAttribute("aria-hidden", "false");
-
-      // preselect client if filter has one
-      if(state.globalClient !== "__all__"){
-        document.getElementById("topup_client").value = String(state.globalClient);
-      }
-      recalcWireNet();
-      validateTopupForm();
+    function closeDrawer(){
+      activeId = null;
+      $("topupDrawerModal").classList.remove("active");
+      $("topupDrawerModal").setAttribute("aria-hidden","true");
+      setBodyModal(false);
     }
 
-    function closeTopupDrawer(){
-      document.getElementById("topupDrawer").classList.remove("active");
-      document.getElementById("topupDrawer").setAttribute("aria-hidden", "true");
+    function setDot(id, done){
+      const el = $(id);
+      el.classList.toggle("done", !!done);
     }
 
-    function switchTopupTab(tab){
-      activeTopupTab = tab;
+    $("drawerOverlay").addEventListener("click", closeDrawer);
+    $("drawerClose").addEventListener("click", closeDrawer);
 
-      document.querySelectorAll("#topupTabs .seg-btn").forEach(b => b.classList.remove("active"));
-      document.querySelector(`#topupTabs .seg-btn[data-tab="${tab}"]`)?.classList.add("active");
-
-      document.getElementById("tab_wire").style.display = tab === "wire" ? "block" : "none";
-      document.getElementById("tab_crypto").style.display = tab === "crypto" ? "block" : "none";
-      document.getElementById("tab_refund").style.display = tab === "refund" ? "block" : "none";
-
-      validateTopupForm();
-    }
-
-    function recalcWireNet(){
-      const gross = Number(document.getElementById("wire_gross").value || 0);
-      const fee = Number(document.getElementById("wire_fee").value || 0);
-      const net = Math.max(0, +(gross - fee).toFixed(2));
-      document.getElementById("wire_net").value = net ? net : "";
-      validateTopupForm();
-    }
-
-    function validateTopupForm(){
-      const btn = document.getElementById("topupSubmitBtn");
-      let ok = true;
-
-      if(activeTopupTab === "wire"){
-        const account = document.getElementById("wire_account").value;
-        const net = Number(document.getElementById("wire_net").value || 0);
-        ok = !!account && net > 0;
-      }
-      if(activeTopupTab === "crypto"){
-        const method = document.getElementById("crypto_method").value;
-        const net = Number(document.getElementById("crypto_net").value || 0);
-        const network = document.getElementById("crypto_network").value;
-        const hash = (document.getElementById("crypto_hash").value || "").trim();
-        ok = !!method && net > 0 && !!network && !!hash;
-      }
-      if(activeTopupTab === "refund"){
-        const net = Number(document.getElementById("refund_net").value || 0);
-        ok = net > 0;
-      }
-
-      btn.classList.toggle("btn-disabled", !ok);
-    }
-
-    ["crypto_method","crypto_net","crypto_network","crypto_hash","refund_net","wire_account","wire_gross","wire_fee"].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el){
-        el.addEventListener("input", validateTopupForm);
-        el.addEventListener("change", validateTopupForm);
+    document.addEventListener("keydown",(e)=>{
+      if(e.key==="Escape" && $("topupDrawerModal").classList.contains("active")){
+        closeDrawer();
       }
     });
 
-    function nextTopupId(){
-      const base = 100100;
-      const count = state.ledger.filter(x => x.type === "topup").length;
-      return String(base + count + 1);
-    }
-
-    function addTopupDepositAndFee({ clientId, topupAmount, netAmount, feeAmount, category, note, proof, account, description, grossAmount }){
-      const topupId = nextTopupId();
-
-      addLedger({
-        id: uid(),
-        topupId,
-        date: nowISO(),
-        type: "topup",
-        clientId,
-        from: "external",
-        to: "topups",
-        category,
-        status: "pending",
-        account: account || "USD",
-        proof: proof || "-",
-        description: description || "--",
-        grossAmount: Number(grossAmount || topupAmount || 0),
-        feeAmount: Number(feeAmount || 0),
-        netAmount: Number(netAmount || topupAmount || 0),
-        note: note || "Topup",
-        amount: Number(topupAmount)
+    // Client/Admin toggle
+    function syncViewButtons(){
+      $("viewSeg").querySelectorAll("button").forEach(b=>{
+        b.classList.toggle("active", b.dataset.view === activeView);
       });
+      // in client view hide admin actions
+      $("adminActions").style.display = (activeView === "admin") ? "block" : "none";
+      // billing edit button only admin
+      $("btnEditBilling").style.display = (activeView === "admin") ? "inline-flex" : "none";
+    }
+    $("viewSeg").addEventListener("click",(e)=>{
+      const btn = e.target.closest("button[data-view]");
+      if(!btn) return;
+      activeView = btn.dataset.view;
+      syncViewButtons();
+    });
 
-      // finance uses these
-      addLedger({
-        id: uid(),
-        date: nowISO(),
-        type: "deposit",
-        clientId,
-        from: "external",
-        to: "mainWallet",
-        category: "deposit",
-        note: `Topup credited to Main Wallet (${category})`,
-        amount: Number(netAmount)
-      });
-
-      const f = Number(feeAmount || 0);
-      if(f > 0){
-        addLedger({
-          id: uid(),
-          date: nowISO(),
-          type: "fee",
-          clientId,
-          from: "",
-          to: "feesCollected",
-          category: category + "_fee",
-          note: `Fee collected (${category})`,
-          amount: f
-        });
-      }
+    function getActive(){
+      return topups.find(x=>x.id===activeId);
     }
 
-    function submitTopup(){
-      validateTopupForm();
-      const btn = document.getElementById("topupSubmitBtn");
-      if(btn.classList.contains("btn-disabled")) return;
-
-      const clientId = document.getElementById("topup_client").value;
-
-      if(activeTopupTab === "wire"){
-        const company = (document.getElementById("wire_company").value || "").trim();
-        const accountSel = document.getElementById("wire_account").value;
-        const gross = Number(document.getElementById("wire_gross").value || 0);
-        const fee = Number(document.getElementById("wire_fee").value || 0);
-        const net = Number(document.getElementById("wire_net").value || 0);
-        const desc = (document.getElementById("wire_desc").value || "").trim();
-        const invoice = document.getElementById("wire_invoice").files?.[0]?.name || "";
-
-        addTopupDepositAndFee({
-          clientId,
-          topupAmount: net,
-          netAmount: net,
-          feeAmount: fee,
-          grossAmount: gross || net,
-          category: "wire",
-          account: "USD",
-          proof: invoice || "-",
-          description: desc || "--",
-          note: `Client ${getClientLabelById(clientId)} | Wire${company ? " | " + company : ""} | Account: ${accountSel} | Gross: ${gross || net}`
-        });
-
-        document.getElementById("wire_company").value = "";
-        document.getElementById("wire_account").value = "";
-        document.getElementById("wire_gross").value = "";
-        document.getElementById("wire_fee").value = "";
-        document.getElementById("wire_net").value = "";
-        document.getElementById("wire_desc").value = "";
-        document.getElementById("wire_invoice").value = "";
-      }
-
-      if(activeTopupTab === "crypto"){
-        const method = document.getElementById("crypto_method").value;
-        const net = Number(document.getElementById("crypto_net").value || 0);
-        const gross = Number(document.getElementById("crypto_gross").value || 0);
-        const desc = (document.getElementById("crypto_desc").value || "").trim();
-        const network = document.getElementById("crypto_network").value;
-        const hash = (document.getElementById("crypto_hash").value || "").trim();
-
-        const fee = gross > 0 ? Math.max(0, +(gross - net).toFixed(2)) : 0;
-        document.getElementById("crypto_fee_hint").textContent = "Fee: " + fee.toFixed(2);
-
-        addTopupDepositAndFee({
-          clientId,
-          topupAmount: net,
-          netAmount: net,
-          feeAmount: fee,
-          grossAmount: gross || net,
-          category: "crypto",
-          account: method || "USDT",
-          proof: hash,
-          description: desc || `${method || "Crypto"} ${network}`,
-          note: `Client ${getClientLabelById(clientId)} | Crypto ${method} | ${network} | Hash: ${hash}`
-        });
-
-        document.getElementById("crypto_method").value = "";
-        document.getElementById("crypto_net").value = "";
-        document.getElementById("crypto_gross").value = "";
-        document.getElementById("crypto_desc").value = "";
-        document.getElementById("crypto_network").value = "";
-        document.getElementById("crypto_hash").value = "";
-        document.getElementById("crypto_fee_hint").textContent = "Fee: 0.00";
-      }
-
-      if(activeTopupTab === "refund"){
-        const net = Number(document.getElementById("refund_net").value || 0);
-        const account = document.getElementById("refund_account").value;
-        const desc = (document.getElementById("refund_desc").value || "").trim();
-
-        addLedger({
-          id: uid(),
-          date: nowISO(),
-          type: "refund",
-          clientId,
-          from: "mainWallet",
-          to: "external",
-          category: "refund",
-          note: `Client ${getClientLabelById(clientId)} | Refund${account ? " | Account: " + account : ""}${desc ? " | " + desc : ""}`,
-          amount: net
-        });
-
-        document.getElementById("refund_account").value = "";
-        document.getElementById("refund_net").value = "";
-        document.getElementById("refund_desc").value = "";
-      }
-
-      closeTopupDrawer();
-      renderAll();
-    }
-
-    /* ==============================
-       EXPORT CSV
-    ============================== */
-    function exportTopupsCSV(){
-      const topups = getFilteredTopups();
-      const rows = [
-        ["date","client","topupId","type","account","proof","amount","status","description"].join(",")
-      ];
-
-      for(const t of topups){
-        const cols = [
-          t.date,
-          getClientLabelById(t.clientId || ""),
-          t.topupId || t.id,
-          (t.category || ""),
-          (t.account || ""),
-          (t.proof || ""),
-          String(Number(t.amount || 0)),
-          (t.status || ""),
-          (t.description || t.note || "")
-        ].map(v => {
-          const s = String(v ?? "");
-          const esc = s.replaceAll('"','""');
-          return `"${esc}"`;
-        });
-        rows.push(cols.join(","));
-      }
-
-      const csv = rows.join("\n");
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = "topups.csv";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    }
-
-    /* ==============================
-       BOOT
-    ============================== */
-    load();
-    renderAll();
-
-    // keyboard: ESC closes modal/drawer
-    document.addEventListener("keydown", (e)=>{
-      if(e.key === "Escape"){
-        if(document.getElementById("topupDetailsModal").classList.contains("active")) closeTopupDetails();
-        if(document.getElementById("topupDrawer").classList.contains("active")) closeTopupDrawer();
+    // Uploads (demo metadata)
+    $("fileInvoice").addEventListener("change",(e)=>{
+      const t = getActive(); if(!t) return;
+      const f = e.target.files?.[0];
+      if(f){
+        t.steps.invoiceProvided = true;
+        t.steps.invoiceFile = f.name;
+        render(); // updates chips
+        openDrawer(t.id); // refresh drawer UI quickly (simple)
       }
     });
+    $("fileProof").addEventListener("change",(e)=>{
+      const t = getActive(); if(!t) return;
+      const f = e.target.files?.[0];
+      if(f){
+        t.steps.proofUploaded = true;
+        t.steps.proofFile = f.name;
+        render();
+        openDrawer(t.id);
+      }
+    });
+
+    $("btnMarkWire").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      if(t.type !== "wire") return alert("Mark wire received is only for WIRE.");
+      t.admin.wireReceived = true;
+      syncFxLock();
+      recalcTotals();
+    });
+
+    function syncFxLock(){
+      const t = getActive(); if(!t) return;
+      const isWire = t.type === "wire";
+      const unlocked = !isWire || !!t.admin.wireReceived;
+      ["fxReceivedAmount","fxCurrency","fxRate","fxFee","btnApprove"].forEach(id=>{
+        $(id).disabled = !unlocked;
+      });
+      $("btnMarkWire").disabled = !isWire ? true : false;
+      // if crypto, keep approve enabled
+      if(t.type === "crypto"){
+        $("btnApprove").disabled = false;
+        ["fxReceivedAmount","fxCurrency","fxRate","fxFee"].forEach(id=> $(id).disabled = true);
+      }
+    }
+
+    function recalcTotals(){
+      const t = getActive(); if(!t) return;
+
+      if(t.type === "crypto"){
+        const gross = Number(t.amountUsd ?? t.initialAmount ?? 0);
+        const fee = Number(t.admin.feeUsd ?? 0);
+        const net = Math.max(0, gross - fee);
+        $("dApprovedUsd").textContent = moneyUSD(gross);
+        $("dNetUsd").textContent = moneyUSD(net);
+        return;
+      }
+
+      // wire:
+      const received = Number($("fxReceivedAmount").value || 0);
+      const rate = Number($("fxRate").value || 0);
+      const fee = Number($("fxFee").value || 0);
+
+      const approvedUsd = rate > 0 ? (received * rate) : 0;
+      const netUsd = Math.max(0, approvedUsd - fee);
+
+      $("dApprovedUsd").textContent = moneyUSD(approvedUsd);
+      $("dNetUsd").textContent = moneyUSD(netUsd);
+    }
+
+    ["fxReceivedAmount","fxRate","fxFee","fxCurrency"].forEach(id=>{
+      $(id).addEventListener("input", ()=>{
+        const t = getActive(); if(!t) return;
+        t.admin.receivedAmount = Number($("fxReceivedAmount").value || 0) || null;
+        t.admin.receivedCurrency = $("fxCurrency").value;
+        t.admin.fxRate = Number($("fxRate").value || 0) || null;
+        t.admin.feeUsd = Number($("fxFee").value || 0) || 0;
+        recalcTotals();
+      });
+      $(id).addEventListener("change", ()=> {
+        const t = getActive(); if(!t) return;
+        t.admin.receivedCurrency = $("fxCurrency").value;
+        recalcTotals();
+      });
+    });
+
+    $("btnApprove").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+
+      // compute net
+      let netUsd = 0;
+      if(t.type === "crypto"){
+        const gross = Number(t.amountUsd ?? t.initialAmount ?? 0);
+        netUsd = Math.max(0, gross - Number(t.admin.feeUsd ?? 0));
+        t.amountUsd = gross;
+      }else{
+        const received = Number($("fxReceivedAmount").value || 0);
+        const rate = Number($("fxRate").value || 0);
+        const fee = Number($("fxFee").value || 0);
+        const approvedUsd = (rate > 0) ? (received * rate) : 0;
+        netUsd = Math.max(0, approvedUsd - fee);
+        t.amountUsd = approvedUsd || null;
+        t.admin.receivedAmount = received || null;
+        t.admin.fxRate = rate || null;
+        t.admin.feeUsd = fee || 0;
+      }
+
+      t.status = "approved";
+      mainWalletUsd = +(mainWalletUsd + netUsd).toFixed(2);
+
+      render();
+      openDrawer(t.id);
+    });
+
+    $("declinePreset").addEventListener("change", ()=>{
+      const v = $("declinePreset").value;
+      if(!v) return;
+      const map = {
+        missing_docs: "Missing documents",
+        iban_mismatch: "IBAN mismatch",
+        wrong_amount: "Wrong amount",
+        compliance: "Compliance issue"
+      };
+      $("declineReason").value = map[v] || "";
+    });
+
+    $("btnDecline").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      const reason = ($("declineReason").value || "").trim();
+      if(!reason){
+        alert("Decline reason is required.");
+        return;
+      }
+      t.status = "declined";
+      t.admin.declineReason = reason;
+      render();
+      openDrawer(t.id);
+    });
+
+    $("btnDelete").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      if(!confirm(`Delete ${t.id}?`)) return;
+      topups = topups.filter(x=>x.id !== t.id);
+      closeDrawer();
+      render();
+    });
+
+    $("btnEditBilling").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      alert("Demo: Edit billing company modal (next step).");
+    });
+
+    /* ==============================
+       Boot
+    ============================== */
+    render();
   </script>
 </body>
 </html>
