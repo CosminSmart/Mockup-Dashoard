@@ -942,6 +942,9 @@
   <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">
     Transactions
   </button>
+  <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">
+    Internal Transactions
+  </button>
   <button type="button" class="page-tab" data-page="ledger" role="tab" aria-selected="false">
     Ledger
   </button>
@@ -1034,6 +1037,9 @@
 
           <div class="mini-hint" id="global_hint"></div>
         </div>
+
+        <!-- PAGE: Finance (default view with KPIs, workspace, etc.) -->
+        <div id="page_finance">
 
         <!-- KPI Statistics -->
         <div class="statistics">
@@ -1407,8 +1413,193 @@
           <div class="mini-hint" id="topupsTableHint" style="margin-top:.6rem;"></div>
         </div>
 
+        </div>
+        <!-- END PAGE: Finance -->
+
+        <!-- PAGE: Transactions -->
+        <div id="page_transactions" style="display:none;">
+          <div class="wallet-section" style="margin-top: 1.5rem;">
+            <div class="widget-title">
+              <h2>All Transactions</h2>
+              <div class="mini-hint" id="txPageHint"></div>
+            </div>
+
+            <div style="max-height: 70vh; overflow:auto; border:1px solid var(--line2); border-radius: var(--r-lg); padding: .25rem;">
+              <table class="ledger-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>From → To</th>
+                    <th>Client</th>
+                    <th>Platform</th>
+                    <th>Category</th>
+                    <th>Note</th>
+                    <th style="text-align:right;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="txPageBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- END PAGE: Transactions -->
+
+        <!-- PAGE: Internal Transactions -->
+        <div id="page_internal-transactions" style="display:none;">
+          <div style="margin-top: 1.5rem; padding: 1.5rem; background: var(--bg1); border-radius: var(--r-xl); border: 1px solid var(--line2);">
+            
+            <!-- Header -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+              <div>
+                <h2 style="margin: 0; font-size: 1.5rem; font-weight: 700;">Internal Transactions</h2>
+                <div style="font-size: 0.875rem; color: var(--muted); margin-top: 0.25rem;">
+                  Full audit log of money movements • <span id="internalTxCount">0</span> entries
+                </div>
+              </div>
+              <button class="transfer-btn" onclick="exportInternalTransactionsExcel()" style="padding: 8px 16px;">Export Excel</button>
+            </div>
+
+            <!-- Search and Filter Row -->
+            <div style="display: flex; gap: 0.75rem; align-items: flex-end; margin-top: 1.5rem; margin-bottom: 1.5rem;">
+              <div style="flex: 1; max-width: 500px;">
+                <label style="display: block; font-size: 0.875rem; color: var(--muted); margin-bottom: 0.35rem;">
+                  Search (ID / Date / Description / Link)
+                </label>
+                <input 
+                  type="text" 
+                  id="internalTx_search" 
+                  placeholder="Search..." 
+                  oninput="filterInternalTransactions()"
+                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 8px; background: var(--bg0); color: var(--text); font-size: 0.9rem;"
+                >
+              </div>
+
+              <div style="min-width: 180px;">
+                <label style="display: block; font-size: 0.875rem; color: var(--muted); margin-bottom: 0.35rem;">
+                  Category
+                </label>
+                <select 
+                  id="internalTx_category" 
+                  onchange="filterInternalTransactions()"
+                  style="width: 100%; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 8px; background: var(--bg0); color: var(--text); font-size: 0.9rem;"
+                >
+                  <option value="__all__">All</option>
+                  <option value="topup_approval">TOPUP_APPROVAL</option>
+                  <option value="topup_fee">TOPUP_FEE</option>
+                  <option value="transfer">TRANSFER</option>
+                  <option value="transfer_fee">TRANSFER_FEE</option>
+                  <option value="service_charge">SERVICE_CHARGE</option>
+                  <option value="setup_charge">SETUP_CHARGE</option>
+                  <option value="refund">REFUND</option>
+                  <option value="other">OTHER</option>
+                </select>
+              </div>
+
+              <button class="transfer-btn gray" onclick="clearInternalTxFilters()" style="padding: 8px 16px;">Clear</button>
+            </div>
+
+            <!-- Table -->
+            <div style="overflow-x: auto; border: 1px solid var(--line2); border-radius: var(--r-lg);">
+              <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
+                <thead>
+                  <tr style="background: var(--bg0); border-bottom: 1px solid var(--line2);">
+                    <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text); white-space: nowrap;">Date</th>
+                    <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">Category</th>
+                    <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">Amount</th>
+                    <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">From</th>
+                    <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">To</th>
+                    <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">Link</th>
+                    <th style="padding: 12px 16px; text-align: left; font-weight: 600; color: var(--text);">Description</th>
+                    <th style="padding: 12px 16px; text-align: center; font-weight: 600; color: var(--text);">Action</th>
+                  </tr>
+                </thead>
+                <tbody id="internalTxPageBody">
+                  <!-- Rows will be inserted here -->
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+        <!-- END PAGE: Internal Transactions -->
+
+        <!-- PAGE: Ledger -->
+        <div id="page_ledger" style="display:none;">
+          <div class="wallet-section" style="margin-top: 1.5rem;">
+            <div class="widget-title">
+              <h2>Ledger (Full View)</h2>
+              <div class="mini-hint" id="ledgerPageHint"></div>
+            </div>
+
+            <div style="max-height: 70vh; overflow:auto; border:1px solid var(--line2); border-radius: var(--r-lg); padding: .25rem;">
+              <table class="ledger-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Type</th>
+                    <th>Details</th>
+                    <th style="text-align:right;">Amount</th>
+                  </tr>
+                </thead>
+                <tbody id="ledgerPreviewBody_clone"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <!-- END PAGE: Ledger -->
+
       </div>
     </main>
+  </div>
+
+  <!-- Internal Transaction Details Modal -->
+  <div id="internalTxDetailsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(4px);" onclick="closeInternalTxDetails()">
+    <div id="internalTxDetailsPanel" style="position: absolute; top: 0; right: -500px; width: 500px; height: 100%; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.2); transition: right 0.3s ease; overflow-y: auto;" onclick="event.stopPropagation()">
+      
+      <!-- Header -->
+      <div style="padding: 2rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 10;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 id="internalTxModalTitle" style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #1f2937;">Internal Tx • [ID]</h3>
+          <button onclick="closeInternalTxDetails()" style="background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">×</button>
+        </div>
+      </div>
+
+      <!-- Details Grid -->
+      <div style="padding: 2rem;">
+        <div style="display: grid; grid-template-columns: 140px 1fr; gap: 1.25rem; font-size: 0.95rem;">
+          
+          <div style="color: #6b7280; font-weight: 500;">Created</div>
+          <div id="txDetail_created" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Category</div>
+          <div id="txDetail_category" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Amount</div>
+          <div id="txDetail_amount" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">From</div>
+          <div id="txDetail_from" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">To</div>
+          <div id="txDetail_to" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Link</div>
+          <div id="txDetail_link" style="color: #1f2937; font-weight: 600; text-align: right; font-family: monospace; font-size: 0.9rem;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Client</div>
+          <div id="txDetail_client" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Fee code</div>
+          <div id="txDetail_feeCode" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+          <div style="color: #6b7280; font-weight: 500;">Description</div>
+          <div id="txDetail_description" style="color: #1f2937; font-weight: 600; text-align: right;">—</div>
+
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- Ledger Modal -->
@@ -1727,6 +1918,13 @@
       if(!raw){ seedDemo(); return; }
       try{
         const parsed = JSON.parse(raw);
+        
+        // Force refresh if old data
+        if(!parsed.dataVersion || parsed.dataVersion < 2){
+          seedDemo();
+          return;
+        }
+        
         state.ledger = Array.isArray(parsed.ledger) ? parsed.ledger : [];
         state.platformFilter = parsed.platformFilter || "__all__";
         state.globalClient = parsed.globalClient || "__all__";
@@ -1738,6 +1936,7 @@
     }
     function save(){
       localStorage.setItem(LS_KEY, JSON.stringify({
+        dataVersion: 2,
         ledger: state.ledger,
         platformFilter: state.platformFilter,
         globalClient: state.globalClient,
@@ -1750,81 +1949,129 @@
 
     function seedDemo(){
       state.ledger = [
-        // ✅ topups now contain fields required by table + modal
+        // ✅ Topups for Topups table
         {
           id: uid(),
           topupId: "100147",
-          date: "1/15/2024, 10:00:00 AM",
+          date: "19 februarie 2026",
           type:"topup",
           clientId:"100",
           from:"external",
-          to:"topups",
+          to:"mainWallet",
           platform:"",
-          category:"wire",
+          category:"topup",
           status:"approved",
           account:"USD",
-          proof:"INV_100147.pdf",
-          description:"--",
-          grossAmount: 1000,
+          proof:"—",
+          description:"Demo • Top-up approved (net USD) to Main Wallet",
+          grossAmount: 980.00,
           feeAmount: 0,
-          netAmount: 1000,
-          note:"Topup #1 (Wire)",
-          amount: 1000
+          netAmount: 980.00,
+          note:"Demo • Top-up approved (net USD) to Main Wallet",
+          amount: 980.00
         },
         {
           id: uid(),
           topupId: "100148",
-          date: "1/20/2024, 10:00:00 AM",
-          type:"topup",
+          date: "19 februarie 2026",
+          type:"fee",
           clientId:"100",
-          from:"external",
-          to:"topups",
+          from:"topup",
+          to:"feesCollected",
           platform:"",
-          category:"wire",
-          status:"pending",
+          category:"topup_fee",
+          status:"approved",
           account:"USD",
-          proof:"INV_100148.pdf",
-          description:"Bank wire topup",
-          grossAmount: 2000,
-          feeAmount: 0,
-          netAmount: 2000,
-          note:"Topup #2 (Wire)",
-          amount: 2000
+          proof:"—",
+          description:"Demo • Top-up fee",
+          grossAmount: 20.00,
+          feeAmount: 20.00,
+          netAmount: 20.00,
+          note:"Demo • Top-up fee",
+          amount: 20.00
         },
         {
           id: uid(),
           topupId: "100149",
-          date: "1/25/2024, 10:00:00 AM",
-          type:"topup",
-          clientId:"101",
-          from:"external",
-          to:"topups",
-          platform:"",
-          category:"crypto",
-          status:"approved",
-          account:"USDT",
-          proof:"0x7a1b...9c2f",
-          description:"USDT TRC20",
-          grossAmount: 2000,
+          date: "19 februarie 2026",
+          type:"transfer",
+          clientId:"100",
+          from:"mainWallet",
+          to:"platformVault",
+          platform:"FACEBOOK",
+          category:"transfer",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Main → FB Vault",
+          grossAmount: 400.00,
           feeAmount: 0,
-          netAmount: 2000,
-          note:"Topup #3 (Crypto)",
-          amount: 2000
+          netAmount: 400.00,
+          note:"Demo • Main → FB Vault",
+          amount: 400.00
+        },
+        {
+          id: uid(),
+          date: "19 februarie 2026",
+          type:"fee",
+          clientId:"100",
+          from:"mainWallet",
+          to:"feesCollected",
+          platform:"",
+          category:"transfer_fee",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Transfer fee",
+          grossAmount: 5.00,
+          feeAmount: 5.00,
+          netAmount: 5.00,
+          note:"Demo • Transfer fee",
+          amount: 5.00
+        },
+        {
+          id: uid(),
+          date: "19 februarie 2026",
+          type:"allocation",
+          clientId:"100",
+          from:"platformVault",
+          to:"generalBalance",
+          platform:"FACEBOOK",
+          category:"allocation",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • FB Vault → FB General",
+          grossAmount: 250.00,
+          feeAmount: 0,
+          netAmount: 250.00,
+          note:"Demo • FB Vault → FB General",
+          amount: 250.00
+        },
+        {
+          id: uid(),
+          date: "19 februarie 2026",
+          type:"allocation",
+          clientId:"100",
+          from:"platformVault",
+          to:"individualBalance",
+          platform:"GOOGLE",
+          category:"allocation",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Google Vault → Google Individual (c1)",
+          grossAmount: 120.00,
+          feeAmount: 0,
+          netAmount: 120.00,
+          note:"Demo • Google Vault → Google Individual (c1)",
+          amount: 120.00
         },
 
+        // Additional transactions for other pages
         { id: uid(), date: "1/26/2024, 09:00:00 AM", type:"deposit", clientId:"100", from:"external", to:"mainWallet", platform:"", category:"deposit", note:"Initial funding into Main Wallet", amount: 5000 },
-        { id: uid(), date: "1/26/2024, 09:01:00 AM", type:"fee", clientId:"100", from:"", to:"feesCollected", platform:"", category:"wire_fee", note:"Wire processing fee", amount: 200 },
-
         { id: uid(), date: "2/01/2024, 09:16:05 AM", type:"transfer", clientId:"100", from:"mainWallet", to:"platformVault", platform:"facebook", category:"spend", note:"Funding Facebook vault", amount: 700 },
-        { id: uid(), date: "2/02/2024, 10:10:00 AM", type:"transfer", clientId:"100", from:"mainWallet", to:"platformVault", platform:"google", category:"spend", note:"Funding Google vault", amount: 300 },
-
-        { id: uid(), date: "2/03/2024, 11:00:00 AM", type:"allocation", clientId:"100", from:"platformVault", to:"generalBalance", platform:"facebook", category:"budget_general", note:"Allocate to General", amount: 200 },
-        { id: uid(), date: "2/03/2024, 11:05:00 AM", type:"allocation", clientId:"100", from:"platformVault", to:"individualBalance", platform:"google", category:"budget_individual", note:"Allocate to Individual", amount: 150 },
-
-        { id: uid(), date: "2/04/2024, 12:00:00 PM", type:"ind_to_account", clientId:"100", from:"individualBalance", to:"account:acc_2", platform:"", category:"ind_to_account", note:"Assign to acc_2", amount: 50 },
-
-        { id: uid(), date: "2/16/2026, 10:12:55 AM", type:"setup_service", clientId:"100", from:"mainWallet", to:"setupServices", platform:"", category:"service", note:"Account: acc_1 | Service | BOV {...}", amount: 50 },
-        { id: uid(), date: "2/16/2026, 10:12:55 AM", type:"setup_service", clientId:"100", from:"mainWallet", to:"setupServices", platform:"", category:"setup", note:"Account: acc_1 | one-time - Setup account #1", amount: 80 }
+        { id: uid(), date: "2/02/2024, 10:10:00 AM", type:"transfer", clientId:"100", from:"mainWallet", to:"platformVault", platform:"google", category:"spend", note:"Funding Google vault", amount: 300 }
       ];
       state.platformFilter = "__all__";
       state.globalClient = "__all__";
@@ -2766,8 +3013,14 @@ function setActivePage(page){
     b.setAttribute("aria-selected", isOn ? "true" : "false");
   });
 
+  // Show/hide global filters based on page
+  const globalFilters = document.querySelector(".global-filters");
+  if(globalFilters){
+    globalFilters.style.display = (page === "internal-transactions") ? "none" : "block";
+  }
+
   // page sections
-  const pages = ["finance","transactions","ledger"];
+  const pages = ["finance","transactions","internal-transactions","ledger"];
   pages.forEach(p=>{
     const el = document.getElementById(`page_${p}`);
     if(el) el.style.display = (p === page) ? "block" : "none";
@@ -2779,11 +3032,13 @@ function setActivePage(page){
     sub.textContent =
       page === "finance" ? "Overview • KPIs • Funding / Setup"
       : page === "transactions" ? "Transactions • Filters • Export"
+      : page === "internal-transactions" ? "Internal Transactions • Between Accounts • Transfers"
       : "Ledger • Audit trail • Review";
   }
 
   // render page bodies
   if(page === "transactions") renderTransactionsPage();
+  if(page === "internal-transactions") renderInternalTransactionsPage();
   if(page === "ledger") renderLedgerPage();
 }
 
@@ -2830,6 +3085,296 @@ function renderTransactionsPage(){
   if(hint) hint.textContent = `Showing ${rows.length} entries • Filtered by global client/date.`;
 }
 
+/* Render Internal Transactions Page */
+function renderInternalTransactionsPage(){
+  const body = document.getElementById("internalTxPageBody");
+  if(!body) return;
+
+  // Get all transactions and apply filters
+  let rows = state.ledger
+    .filter(passesGlobalFilters)
+    .slice()
+    .sort((a,b)=> new Date(b.date) - new Date(a.date));
+
+  // Apply search filter
+  const searchTerm = (document.getElementById("internalTx_search")?.value || "").toLowerCase();
+  if(searchTerm){
+    rows = rows.filter(tx => {
+      const searchableText = [
+        tx.id || "",
+        tx.date || "",
+        tx.note || "",
+        tx.description || "",
+        tx.from || "",
+        tx.to || "",
+        generateLinkId(tx)
+      ].join(" ").toLowerCase();
+      return searchableText.includes(searchTerm);
+    });
+  }
+
+  // Apply category filter
+  const categoryFilter = document.getElementById("internalTx_category")?.value || "__all__";
+  if(categoryFilter !== "__all__"){
+    rows = rows.filter(tx => {
+      const cat = String(tx.category || tx.type || "").toLowerCase();
+      
+      if(categoryFilter === "topup_approval") return cat.includes("topup") && !cat.includes("fee");
+      if(categoryFilter === "topup_fee") return cat.includes("topup") && cat.includes("fee");
+      if(categoryFilter === "transfer") return cat.includes("transfer") && !cat.includes("fee");
+      if(categoryFilter === "transfer_fee") return cat.includes("transfer") && cat.includes("fee");
+      if(categoryFilter === "service_charge") return cat.includes("service");
+      if(categoryFilter === "setup_charge") return cat.includes("setup");
+      if(categoryFilter === "refund") return cat.includes("refund");
+      if(categoryFilter === "other") return !cat.includes("topup") && !cat.includes("transfer") && !cat.includes("service") && !cat.includes("setup") && !cat.includes("refund");
+      
+      return cat.includes(categoryFilter);
+    });
+  }
+
+  // Update count
+  const countEl = document.getElementById("internalTxCount");
+  if(countEl) countEl.textContent = rows.length;
+
+  if(!rows.length){
+    body.innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 3rem; color: var(--muted);">No internal transactions found for current filters.</td></tr>`;
+    return;
+  }
+
+  body.innerHTML = rows.map(tx=>{
+    // Format category as badge (matching screenshot colors)
+    const categoryBadge = getCategoryBadgeStyled(tx);
+    
+    // Generate link ID
+    const linkId = generateLinkId(tx);
+    
+    // Format from/to with platform info
+    let fromText = formatAccountName(tx.from || "—");
+    let toText = formatAccountName(tx.to || "—");
+    
+    // Add platform info to vault names
+    if(tx.platform && fromText === "Platform Vault"){
+      fromText = `Platform Vault:${tx.platform.toUpperCase()}`;
+    }
+    if(tx.platform && toText === "Platform Vault"){
+      toText = `Platform Vault:${tx.platform.toUpperCase()}`;
+    }
+    
+    // Add platform info to balance names
+    if(tx.platform && toText === "General Balance"){
+      toText = `General Balance:${tx.platform.toUpperCase()}`;
+    }
+    if(tx.platform && toText === "Individual Balance"){
+      toText = `Individual Balance:${tx.platform.toUpperCase()}`;
+    }
+    
+    // Format amount with currency
+    const amountFormatted = `USD ${Number(tx.amount || 0).toFixed(2)}`;
+    
+    return `
+      <tr style="border-bottom: 1px solid var(--line2);">
+        <td style="padding: 12px 16px; white-space: nowrap; color: var(--text);">${escapeHtml(tx.date)}</td>
+        <td style="padding: 12px 16px;">${categoryBadge}</td>
+        <td style="padding: 12px 16px; color: var(--text);">${amountFormatted}</td>
+        <td style="padding: 12px 16px; color: var(--text);">${escapeHtml(fromText)}</td>
+        <td style="padding: 12px 16px; color: var(--text);">${escapeHtml(toText)}</td>
+        <td style="padding: 12px 16px; font-family: monospace; font-size: 0.85rem; color: var(--muted);">${escapeHtml(linkId)}</td>
+        <td style="padding: 12px 16px; color: var(--text); max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${escapeHtml(tx.note || tx.description || "—")}</td>
+        <td style="padding: 12px 16px; text-align: center;">
+          <button 
+            onclick="viewInternalTxDetails('${escapeHtml(tx.id)}')" 
+            style="padding: 6px 14px; background: var(--bg0); border: 1px solid var(--line2); border-radius: 6px; color: var(--text); cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: all 0.15s ease;"
+            onmouseover="this.style.background='var(--glass)'; this.style.transform='translateY(-1px)'"
+            onmouseout="this.style.background='var(--bg0)'; this.style.transform='translateY(0)'"
+          >Details</button>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function getCategoryBadgeStyled(tx){
+  const cat = String(tx.category || tx.type || "").toLowerCase();
+  let bgColor = "#e5e7eb"; // default gray
+  let textColor = "#374151";
+  let displayText = (tx.category || tx.type || "—").toUpperCase().replace(/_/g, " ");
+  
+  // Match screenshot colors exactly
+  if(cat.includes("topup") && !cat.includes("fee")){
+    bgColor = "#dcfce7"; // green background
+    textColor = "#166534"; // dark green text
+    displayText = "TOPUP APPROVAL";
+  } else if(cat.includes("topup") && cat.includes("fee")){
+    bgColor = "#fef3c7"; // yellow/orange background
+    textColor = "#92400e"; // dark orange text
+    displayText = "TOPUP FEE";
+  } else if(cat.includes("transfer") && cat.includes("fee")){
+    bgColor = "#fef3c7"; // yellow/orange background
+    textColor = "#92400e"; // dark orange text
+    displayText = "TRANSFER FEE";
+  } else if(cat.includes("transfer") || cat.includes("allocation")){
+    bgColor = "#dbeafe"; // light blue background
+    textColor = "#1e40af"; // dark blue text
+    displayText = "TRANSFER";
+  } else if(cat.includes("service")){
+    bgColor = "#e0e7ff"; // light purple background
+    textColor = "#4338ca"; // dark purple text
+    displayText = "SERVICE CHARGE";
+  } else if(cat.includes("setup")){
+    bgColor = "#e0e7ff"; // light purple background
+    textColor = "#4338ca"; // dark purple text
+    displayText = "SETUP CHARGE";
+  } else if(cat.includes("refund")){
+    bgColor = "#fee2e2"; // light red background
+    textColor = "#991b1b"; // dark red text
+    displayText = "REFUND";
+  } else {
+    bgColor = "#f3f4f6"; // light gray background
+    textColor = "#4b5563"; // dark gray text
+    displayText = "OTHER";
+  }
+  
+  return `<span style="display: inline-block; padding: 4px 10px; border-radius: 6px; background: ${bgColor}; color: ${textColor}; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.3px;">${displayText}</span>`;
+}
+
+function formatAccountName(account){
+  if(!account || account === "—") return "—";
+  
+  // Format exact ca în screenshot
+  let formatted = String(account);
+  
+  if(formatted === "external") return "Wire (EUR)";
+  if(formatted === "mainWallet") return "Main Wallet";
+  if(formatted === "platformVault") return "Platform Vault";
+  if(formatted === "generalBalance") return "General Balance";
+  if(formatted === "individualBalance") return "Individual Balance";
+  if(formatted === "feesCollected") return "Fees";
+  if(formatted === "topups") return "Topups";
+  if(formatted === "topup") return "Top-up";
+  
+  return formatted;
+}
+
+function generateLinkId(tx){
+  // Generate a link ID based on transaction type and details
+  const type = (tx.type || "").toUpperCase();
+  const id = String(tx.id || "").substring(0, 6).toUpperCase();
+  
+  if(type === "TOPUP") return `TOPUP-TN-DEMO-${id}`;
+  if(type === "TRANSFER") return `TRANSFER-TE-DEMO-${id}`;
+  if(type === "ALLOCATION") return `TRANSFER-TN-DEMO-${id}`;
+  if(type === "FEE") return `TRANSFER-TE-DEMO-${id}`;
+  
+  return `TX-${id}`;
+}
+
+function filterInternalTransactions(){
+  renderInternalTransactionsPage();
+}
+
+function clearInternalTxFilters(){
+  const searchEl = document.getElementById("internalTx_search");
+  const categoryEl = document.getElementById("internalTx_category");
+  
+  if(searchEl) searchEl.value = "";
+  if(categoryEl) categoryEl.value = "__all__";
+  
+  renderInternalTransactionsPage();
+}
+
+function viewInternalTxDetails(txId){
+  const tx = state.ledger.find(t => String(t.id) === String(txId));
+  if(!tx){
+    alert("Transaction not found.");
+    return;
+  }
+  
+  // Populate modal
+  document.getElementById("internalTxModalTitle").textContent = `Internal Tx • ${tx.id}`;
+  document.getElementById("txDetail_created").textContent = tx.date || "—";
+  document.getElementById("txDetail_category").textContent = (tx.category || tx.type || "—").toUpperCase().replace(/_/g, " ");
+  document.getElementById("txDetail_amount").textContent = `USD ${Number(tx.amount || 0).toFixed(2)}`;
+  
+  // Format from/to with platform
+  let fromText = formatAccountName(tx.from || "—");
+  let toText = formatAccountName(tx.to || "—");
+  
+  if(tx.platform && fromText === "Platform Vault"){
+    fromText = `Platform Vault:${tx.platform.toUpperCase()}`;
+  }
+  if(tx.platform && toText === "Platform Vault"){
+    toText = `Platform Vault:${tx.platform.toUpperCase()}`;
+  }
+  if(tx.platform && toText === "General Balance"){
+    toText = `General Balance:${tx.platform.toUpperCase()}`;
+  }
+  if(tx.platform && toText === "Individual Balance"){
+    toText = `Individual Balance:${tx.platform.toUpperCase()}`;
+  }
+  
+  document.getElementById("txDetail_from").textContent = fromText;
+  document.getElementById("txDetail_to").textContent = toText;
+  document.getElementById("txDetail_link").textContent = generateLinkId(tx);
+  document.getElementById("txDetail_client").textContent = `c${tx.clientId || "1"}`;
+  document.getElementById("txDetail_feeCode").textContent = tx.feeCode || "—";
+  document.getElementById("txDetail_description").textContent = tx.note || tx.description || "—";
+  
+  // Show modal with animation
+  const modal = document.getElementById("internalTxDetailsModal");
+  const panel = document.getElementById("internalTxDetailsPanel");
+  modal.style.display = "block";
+  
+  // Trigger animation after display
+  setTimeout(() => {
+    panel.style.right = "0";
+  }, 10);
+}
+
+function closeInternalTxDetails(){
+  const modal = document.getElementById("internalTxDetailsModal");
+  const panel = document.getElementById("internalTxDetailsPanel");
+  
+  // Animate out
+  panel.style.right = "-500px";
+  
+  // Hide after animation
+  setTimeout(() => {
+    modal.style.display = "none";
+  }, 300);
+}
+
+function exportInternalTransactionsExcel(){
+  // Simple CSV export
+  const rows = state.ledger
+    .filter(passesGlobalFilters)
+    .sort((a,b)=> new Date(b.date) - new Date(a.date));
+  
+  let csv = "Date,Category,Amount,From,To,Link,Description\n";
+  
+  rows.forEach(tx => {
+    const linkId = generateLinkId(tx);
+    const cat = tx.category || tx.type || "—";
+    const row = [
+      tx.date,
+      cat,
+      tx.amount,
+      formatAccountName(tx.from || "—"),
+      formatAccountName(tx.to || "—"),
+      linkId,
+      (tx.note || tx.description || "—").replace(/,/g, ";")
+    ].join(",");
+    csv += row + "\n";
+  });
+  
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `internal-transactions-${new Date().toISOString().split('T')[0]}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
 /* Render Ledger Page (simple clone of preview) */
 function renderLedgerPage(){
   const cloneBody = document.getElementById("ledgerPreviewBody_clone");
@@ -2858,9 +3403,6 @@ function renderLedgerPage(){
 (function initPageTabs(){
   setActivePage(state.activePage || "finance");
 })();
-
-
-
 
   </script>
 
