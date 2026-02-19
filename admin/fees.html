@@ -271,7 +271,6 @@
       <div class="fees-container">
         <div class="page-header">
           <h1>Fees</h1>
-          <p class="page-subtitle">Derived from internal transactions - everything links back to audit log</p>
         </div>
 
         <!-- Fee Statistics -->
@@ -279,25 +278,21 @@
           <div class="fee-stat-card">
             <div class="fee-stat-label">Total Fees</div>
             <div class="fee-stat-value">USD 25.00</div>
-            <div class="fee-stat-desc">All fee categories</div>
           </div>
 
           <div class="fee-stat-card topup">
             <div class="fee-stat-label">Top-Up Fees</div>
             <div class="fee-stat-value">USD 20.00</div>
-            <div class="fee-stat-desc">Withdrawal fees</div>
           </div>
 
           <div class="fee-stat-card transfer">
             <div class="fee-stat-label">Transfer Fees</div>
             <div class="fee-stat-value">USD 5.00</div>
-            <div class="fee-stat-desc">Main → Platform/transfer</div>
           </div>
 
           <div class="fee-stat-card setup">
             <div class="fee-stat-label">Setup + Services</div>
             <div class="fee-stat-value">USD 0.00</div>
-            <div class="fee-stat-desc">Charges from Main Wallet</div>
           </div>
         </div>
 
@@ -333,7 +328,7 @@
                 </td>
                 <td>Demo > Top-up fee</td>
                 <td style="text-align: center;">
-                  <button class="btn-details" onclick="alert('Details modal - to be implemented')">Details</button>
+                  <button class="btn-details" onclick="openFeeDetailsModal('TOPUP', 'USD 20.00', 'TOPUP_WIRE', 'TOPUPTU-DEMO-1', 'Demo > Top-up fee', '19 februarie 2026')">Details</button>
                 </td>
               </tr>
 
@@ -349,19 +344,82 @@
                 </td>
                 <td>Demo > Transfer fee</td>
                 <td style="text-align: center;">
-                  <button class="btn-details" onclick="alert('Details modal - to be implemented')">Details</button>
+                  <button class="btn-details" onclick="openFeeDetailsModal('TRANSFER', 'USD 5.00', 'TRANSFER_MAIN_TO_VAULT', 'TRANSFERTR-DEMO-1', 'Demo > Transfer fee', '19 februarie 2026')">Details</button>
                 </td>
               </tr>
             </tbody>
           </table>
         </div>
-
-        <!-- Note -->
-        <div class="fee-note">
-          <strong>Note:</strong> To be clear: internal transactions are the main audit log. These additions and data lookups are derived from them. If there's a discrepancy, the internal transactions are the source of truth.
-        </div>
       </div>
     </main>
+  </div>
+
+  <!-- Fee Details Modal (Right Side Panel) -->
+  <div id="feeDetailsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(4px);" onclick="closeFeeDetailsModal()">
+    <div id="feeDetailsPanel" style="position: absolute; top: 0; right: -600px; width: 600px; height: 100%; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.2); transition: right 0.3s ease; overflow-y: auto;" onclick="event.stopPropagation()">
+      
+      <!-- Header -->
+      <div style="padding: 2rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 10;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 id="detailTitle" style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #1f2937;">Fee entry • 25d6e69b-c1e1-4fad-8bab-77d23436199e</h3>
+          <button onclick="closeFeeDetailsModal()" style="background: none; border: none; font-size: 1rem; color: #6b7280; cursor: pointer; padding: 0.5rem 1rem; font-weight: 500; transition: all 0.15s;" onmouseover="this.style.color='#1f2937'" onmouseout="this.style.color='#6b7280'">Close</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div style="padding: 2rem;">
+        
+        <!-- Field: Created -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Created</span>
+          <span id="detailCreated" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">19 februarie 2026</span>
+        </div>
+
+        <!-- Field: Category -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Category</span>
+          <span id="detailCategory" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">TOPUP_FEE</span>
+        </div>
+
+        <!-- Field: Amount -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Amount</span>
+          <span id="detailAmount" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">USD 20.00</span>
+        </div>
+
+        <!-- Field: From -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">From</span>
+          <span id="detailFrom" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">Top-up</span>
+        </div>
+
+        <!-- Field: To -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">To</span>
+          <span id="detailTo" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">Fees</span>
+        </div>
+
+        <!-- Field: Fee code -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Fee code</span>
+          <span id="detailFeeCode" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">TOPUP_WIRE</span>
+        </div>
+
+        <!-- Field: Link -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Link</span>
+          <span id="detailLink" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">TOPUP:TU-DEMO-1</span>
+        </div>
+
+        <!-- Field: Description -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Description</span>
+          <span id="detailDescription" style="color: #1f2937; font-weight: 600; font-size: 0.95rem; text-align: right;">Demo • Top-up fee</span>
+        </div>
+
+      </div>
+
+    </div>
   </div>
 
   <!-- Add Service Fee Modal (Right Side Panel) -->
@@ -491,6 +549,48 @@
       if(key === detectActivePage()) return;
       navigateTo(key);
     });
+
+    /* ==============================
+       Fee Details Modal Functions
+    ============================== */
+    function openFeeDetailsModal(type, amount, feeCode, link, description, date){
+      const modal = document.getElementById("feeDetailsModal");
+      const panel = document.getElementById("feeDetailsPanel");
+      
+      // Generate a random ID for the title
+      const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      // Populate data
+      document.getElementById("detailTitle").textContent = `Fee entry • ${randomId}`;
+      document.getElementById("detailCreated").textContent = date;
+      document.getElementById("detailCategory").textContent = type + "_FEE";
+      document.getElementById("detailAmount").textContent = amount;
+      document.getElementById("detailFrom").textContent = type === "TOPUP" ? "Top-up" : "Transfer";
+      document.getElementById("detailTo").textContent = "Fees";
+      document.getElementById("detailFeeCode").textContent = feeCode;
+      document.getElementById("detailLink").textContent = link;
+      document.getElementById("detailDescription").textContent = description;
+      
+      modal.style.display = "block";
+      
+      // Trigger animation after display
+      setTimeout(() => {
+        panel.style.right = "0";
+      }, 10);
+    }
+
+    function closeFeeDetailsModal(){
+      const modal = document.getElementById("feeDetailsModal");
+      const panel = document.getElementById("feeDetailsPanel");
+      
+      // Animate out
+      panel.style.right = "-600px";
+      
+      // Hide after animation
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 300);
+    }
 
     /* ==============================
        Add Service Fee Modal Functions
