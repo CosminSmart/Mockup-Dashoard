@@ -933,6 +933,9 @@
     <div class="layout">
 <header class="header">
   <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+      <button class="page-tab" data-page="topups" type="button">
+    Topups
+  </button>
   <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">
     Finance
   </button>
@@ -1100,7 +1103,7 @@
         <!-- Workspace + Ledger -->
         <div class="widgets-grid">
           <!-- FINANCE WORKSPACE -->
-          <div class="wallet-section">
+          <div class="wallet-section" style="width: 168%;">
             <div class="widget-title">
               <div>
                 <h2>Finance Workspace</h2>
@@ -1339,7 +1342,7 @@
           </div>
 
           <!-- LEDGER -->
-          <div class="wallet-section">
+          <div class="wallet-section" style="display: none;">
             <div class="widget-title">
               <div>
                 <h2>Ledger</h2>
@@ -1377,7 +1380,7 @@
         </div>
 
         <!-- Total Topups -->
-        <div class="topups-section">
+        <div class="topups-section" style="display: none;">
           <div class="topups-header">
             <div>
               <h2>Total Topups</h2>
@@ -3402,6 +3405,152 @@ function renderLedgerPage(){
 })();
 
   </script>
+
+
+
+<script>
+  // === CONFIG: map page keys -> filenames (adjust if needed) ===
+  const PAGE_ROUTES = {
+    finance: "finance.html",
+    transactions: "transactions.html",
+    ledger: "ledger.html" // dacă nu ai ledger.html, schimbă aici
+  };
+
+  function getCurrentFileName(){
+    // Works for file:// and http(s)
+    const p = window.location.pathname || "";
+    const parts = p.split("/");
+    return (parts[parts.length - 1] || "").toLowerCase();
+  }
+
+  function detectActivePage(){
+    const file = getCurrentFileName();
+    // match by file name
+    for (const [key, filename] of Object.entries(PAGE_ROUTES)){
+      if ((filename || "").toLowerCase() === file) return key;
+    }
+    // fallback: if open folder/index
+    return "finance";
+  }
+
+  function setActiveTabUI(activeKey){
+    document.querySelectorAll("#pageTabs .page-tab").forEach(btn=>{
+      const isOn = btn.dataset.page === activeKey;
+      btn.classList.toggle("active", isOn);
+      btn.setAttribute("aria-selected", isOn ? "true" : "false");
+    });
+  }
+
+  function navigateTo(key){
+    const target = PAGE_ROUTES[key];
+    if(!target) return;
+    // Keep same folder, works in file:// too
+    window.location.href = target;
+  }
+
+  // Init UI
+  const active = detectActivePage();
+  setActiveTabUI(active);
+
+  // Click behavior
+  document.getElementById("pageTabs")?.addEventListener("click", (e)=>{
+    const btn = e.target.closest(".page-tab");
+    if(!btn) return;
+
+    const key = btn.dataset.page;
+    // instant UI feedback
+    setActiveTabUI(key);
+
+    // if already on same page, do nothing
+    if(key === detectActivePage()) return;
+
+    navigateTo(key);
+  });
+
+  // Optional: keyboard left/right like a true switcher
+  document.getElementById("pageTabs")?.addEventListener("keydown", (e)=>{
+    const tabs = [...document.querySelectorAll("#pageTabs .page-tab")];
+    const idx = tabs.findIndex(t => t.classList.contains("active"));
+    if(idx < 0) return;
+
+    if(e.key === "ArrowRight" || e.key === "ArrowLeft"){
+      e.preventDefault();
+      const next = e.key === "ArrowRight"
+        ? tabs[(idx + 1) % tabs.length]
+        : tabs[(idx - 1 + tabs.length) % tabs.length];
+      next.focus();
+      next.click();
+    }
+  });
+</script>
+
+<script>
+/* ==============================
+   GLOBAL TAB SWITCHER
+============================== */
+
+const TAB_ROUTES = {
+  finance: "finance.html",
+  topups: "topups.html",
+  transactions: "transactions.html",
+  ledger: "ledger.html"
+};
+
+function getCurrentPageKey(){
+
+  const file = window.location.pathname
+    .split("/")
+    .pop()
+    .toLowerCase();
+
+  if(file.includes("finance")) return "finance";
+  if(file.includes("topup")) return "topups";
+  if(file.includes("transaction")) return "transactions";
+  if(file.includes("ledger")) return "ledger";
+
+  return "finance";
+}
+
+function setActiveTab(){
+
+  const active = getCurrentPageKey();
+
+  document.querySelectorAll(".page-tab").forEach(tab => {
+
+    const isActive = tab.dataset.page === active;
+
+    tab.classList.toggle("active", isActive);
+
+  });
+
+}
+
+function initTabSwitcher(){
+
+  setActiveTab();
+
+  document.querySelectorAll(".page-tab").forEach(tab => {
+
+    tab.addEventListener("click", () => {
+
+      const page = tab.dataset.page;
+
+      if(page === getCurrentPageKey())
+        return;
+
+      window.location.href = TAB_ROUTES[page];
+
+    });
+
+  });
+
+}
+
+initTabSwitcher();
+</script>
+
+
+
 
 </body>
 </html>

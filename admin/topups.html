@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Finance • Topups</title>
+
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/accounts.css" />
+
+  <style>
+    /* =========================================================
+       LIQUID GLASS (WHITE) – TOPUPS PAGE
+    ========================================================= */
+    :root{
+      --bg0:#f7f8fb;
+      --bg1:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+
+      --line: rgba(15,23,42,.10);
+      --line2: rgba(15,23,42,.07);
+
+      --glass: rgba(255,255,255,.72);
+      --glass2: rgba(255,255,255,.58);
+
+      --shadow: 0 18px 50px rgba(15,23,42,.12);
+      --shadow2: 0 12px 28px rgba(15,23,42,.10);
+
+      --r-xl: 18px;
+      --r-lg: 14px;
+      --r-md: 12px;
+
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --info:#2563eb;
+
+      --focus: rgba(37,99,235,.25);
+    }
+    [data-theme="dark"]{
+      --bg0:#0b1220;
+      --bg1:#0f172a;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.08);
+
+      --glass: rgba(17,24,39,.58);
+      --glass2: rgba(17,24,39,.45);
+
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --shadow2: 0 12px 28px rgba(0,0,0,.35);
+
+      --focus: rgba(96,165,250,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+
+    body{
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(37,99,235,.14), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(99,102,241,.14), transparent 55%),
+        radial-gradient(900px 600px at 35% 95%, rgba(16,185,129,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0) 0%, color-mix(in srgb, var(--bg0) 55%, var(--bg1)) 100%);
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    }
+
+    body.modal-open{ overflow:hidden; }
+
+    .muted{ color: var(--muted); }
+    .mini-hint{ font-size:.9rem; color: var(--muted); line-height:1.35; margin-top:.2rem; }
+
+    input, select, textarea{
+      width:100%;
+      padding:.7rem .8rem;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      outline:none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: color-mix(in srgb, var(--info) 45%, var(--line2));
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    /* Header (tabs + theme + user) */
+    .header{
+      background: rgba(255,255,255,.55);
+      border-bottom: 1px solid var(--line2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 12px 18px;
+    }
+    [data-theme="dark"] .header{ background: rgba(15,23,42,.55); }
+
+    .header-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 280px;
+    }
+    .page-tabs{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius:999px;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      width: fit-content;
+    }
+    .page-tab{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 950;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+      user-select:none;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    .page-tab:hover{ transform: translateY(-1px); }
+    .page-tab.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .header-right{ display:flex; align-items:center; gap:14px; }
+
+    .theme-toggle{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius: 999px;
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .theme-btn{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease;
+    }
+    .theme-btn.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .main{ padding: 18px; }
+    @media (max-width: 720px){ .main{ padding: 14px; } }
+
+    @media (max-width: 980px){
+      .header{ flex-wrap:wrap; align-items:flex-start; }
+      .header-left{ width:100%; }
+      .page-tabs{ width:100%; justify-content:space-between; }
+      .page-tab{ flex:1; text-align:center; }
+    }
+
+    /* Panels */
+    .glass-panel{
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--r-xl);
+      padding: 16px;
+    }
+
+    /* Buttons */
+    .btn{
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      padding: .7rem .95rem;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.55rem;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.primary{
+      background: color-mix(in srgb, rgba(37,99,235,.20) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.35) 55%, var(--line2));
+    }
+    .btn.ghost{
+      background: color-mix(in srgb, rgba(148,163,184,.18) 70%, var(--glass));
+    }
+    .btn.danger{
+      background: color-mix(in srgb, rgba(239,68,68,.16) 70%, var(--glass));
+      border-color: color-mix(in srgb, rgba(239,68,68,.32) 60%, var(--line2));
+      color: #991b1b;
+    }
+    .btn[disabled], .btn.disabled{
+      opacity:.55;
+      pointer-events:none;
+    }
+
+    .top-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .top-head__title{
+      font-weight:950;
+      font-size:1.15rem;
+      letter-spacing:.2px;
+    }
+
+    /* Filters bar (match screenshot style) */
+    .filters{
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      padding: 12px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .filters__row{
+      display:grid;
+      grid-template-columns:
+        1.25fr
+        220px
+        340px
+        180px
+        170px
+        170px
+        auto;
+      gap: 12px;
+      align-items:end;
+    }
+    @media (max-width: 1200px){
+      .filters__row{ grid-template-columns: 1fr 1fr; }
+    }
+    .fg .label{
+      display:block;
+      margin: 0 0 .45rem 0;
+      font-weight: 900;
+      font-size: .88rem;
+      color: color-mix(in srgb, var(--text) 85%, var(--muted));
+      letter-spacing:.2px;
+    }
+    .date-range{
+      display:grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 10px;
+      align-items:end;
+    }
+    .date-range .sep{
+      height: 44px;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+    }
+
+    /* KPIs */
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+    }
+    @media (max-width: 1200px){ .stats{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 620px){ .stats{ grid-template-columns: 1fr; } }
+
+    .stat-box{
+      padding: 14px 14px 12px 14px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      min-height: 112px;
+      position: relative;
+      overflow:hidden;
+    }
+    .stat-box:before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:4px;
+      background: color-mix(in srgb, rgba(37,99,235,.55) 70%, transparent);
+      opacity:.9;
+    }
+    .stat-box.pending:before{ background: color-mix(in srgb, rgba(245,158,11,.65) 70%, transparent); }
+    .stat-box.approved:before{ background: color-mix(in srgb, rgba(22,163,74,.65) 70%, transparent); }
+    .stat-box.declined:before{ background: color-mix(in srgb, rgba(239,68,68,.65) 70%, transparent); }
+
+    .stat-box h4{
+      margin:0;
+      font-size: 11px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 950;
+    }
+    .stat-value{
+      font-size: 30px;
+      font-weight: 950;
+      margin-top: 6px;
+      letter-spacing: .2px;
+      line-height:1.05;
+    }
+    .stat-sub{
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* Table */
+    .table-wrap{
+      border:1px solid var(--line2);
+      border-radius: var(--r-xl);
+      overflow:auto;
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow2);
+    }
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .92rem;
+      min-width: 1180px;
+    }
+    th, td{
+      padding: .85rem .75rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      text-align:left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    th{
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 88%, var(--bg1));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    tr.row{
+      cursor:pointer;
+      transition: background .12s ease;
+    }
+    tr.row:hover{
+      background: color-mix(in srgb, rgba(37,99,235,.10) 60%, transparent);
+    }
+    .td-right{ text-align:right; }
+    .td-muted{ color: var(--muted); }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.28rem .65rem;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size:.82rem;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 72%, transparent);
+      color: color-mix(in srgb, var(--text) 92%, var(--muted));
+    }
+    .pill.pending{
+      background: color-mix(in srgb, rgba(245,158,11,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--warn) 82%, var(--text));
+    }
+    .pill.approved{
+      background: color-mix(in srgb, rgba(22,163,74,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(22,163,74,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--good) 85%, var(--text));
+    }
+    .pill.declined{
+      background: color-mix(in srgb, rgba(239,68,68,.16) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(239,68,68,.32) 55%, var(--line2));
+      color: color-mix(in srgb, var(--bad) 82%, var(--text));
+    }
+
+    /* =========================================================
+       ✅ RIGHT DRAWER MODAL (FIX: NEVER CENTER)
+    ========================================================= */
+    .drawer-modal{
+      position: fixed; /* <-- fixed, not absolute */
+      inset: 0;
+      z-index: 9999; /* high */
+      display: none;
+    }
+    .drawer-modal.active{ display:block; }
+
+    .drawer-modal__overlay{
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.38);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      transition: opacity .18s ease;
+    }
+    .drawer-modal.active .drawer-modal__overlay{ opacity:1; }
+
+    .drawer-modal__panel{
+      position: absolute;
+      top: 0;
+      right: 0; /* <-- always right */
+      height: 100%;
+      width: min(980px, 94vw);  /* wide like screenshot */
+      background: var(--bg1);
+      border-left: 1px solid var(--line2);
+      box-shadow: -22px 0 60px rgba(15,23,42,.22);
+      transform: translateX(100%);
+      transition: transform .18s ease;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
+    }
+    [data-theme="dark"] .drawer-modal__panel{
+      background: color-mix(in srgb, var(--glass) 30%, var(--bg1));
+    }
+    .drawer-modal.active .drawer-modal__panel{ transform: translateX(0); }
+
+    .drawer-modal__header{
+      padding: 14px 16px;
+      border-bottom:1px solid var(--line2);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background: color-mix(in srgb, var(--glass) 55%, var(--bg1));
+    }
+    .drawer-modal__title{
+      font-weight: 950;
+      font-size: 1.05rem;
+    }
+    .drawer-modal__close{
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+    .drawer-modal__close:hover{
+      background: color-mix(in srgb, rgba(148,163,184,.18) 70%, transparent);
+      color: var(--text);
+    }
+
+    .drawer-modal__body{
+      padding: 16px;
+      overflow:auto;
+      flex:1;
+    }
+
+    /* inside drawer layout: left timeline + right details */
+    .topup-layout{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap: 16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .drawer-modal__panel{ width: min(980px, 98vw); }
+      .topup-layout{ grid-template-columns: 1fr; }
+    }
+
+    .seg{
+      display:flex;
+      gap:10px;
+      margin: 8px 0 14px 0;
+    }
+    .seg button{
+      border:1px solid var(--line2);
+      background: transparent;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor:pointer;
+      color: var(--muted);
+    }
+    .seg button.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .step-card{
+      border:1px dashed color-mix(in srgb, var(--line2) 90%, transparent);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fbfcff;
+    }
+    [data-theme="dark"] .step-card{
+      background: color-mix(in srgb, var(--glass) 25%, transparent);
+    }
+    .step{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding: 10px 8px;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+    }
+    .step:last-child{ border-bottom:none; }
+    .dot{
+      width: 14px; height: 14px;
+      border-radius: 999px;
+      border: 2px solid color-mix(in srgb, var(--muted) 70%, transparent);
+      margin-top: 4px;
+      flex: 0 0 auto;
+      background: transparent;
+    }
+    .dot.done{
+      border-color: color-mix(in srgb, var(--good) 70%, transparent);
+      background: color-mix(in srgb, rgba(22,163,74,.18) 70%, transparent);
+    }
+    .step h4{
+      margin:0;
+      font-size: .95rem;
+      font-weight: 950;
+    }
+    .step .sub{
+      margin-top: 4px;
+      color: var(--muted);
+      font-weight: 800;
+      font-size: .86rem;
+    }
+
+    .right-box{
+      border-left: 1px solid var(--line2);
+      padding-left: 16px;
+    }
+    @media (max-width: 980px){
+      .right-box{ border-left:none; padding-left:0; }
+    }
+
+    .kv{
+      border-top: 1px solid var(--line2);
+      margin-top: 10px;
+    }
+    .kv-row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      align-items:center;
+    }
+    .kv-row .k{
+      color: color-mix(in srgb, var(--muted) 95%, var(--text));
+      font-weight: 850;
+      font-size: .84rem;
+    }
+    .kv-row .v{
+      font-weight: 950;
+      color: var(--text);
+    }
+
+    .admin-actions{
+      margin-top: 14px;
+    }
+    .card-lite{
+      border: 1px solid var(--line2);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      margin-top: 10px;
+    }
+    [data-theme="dark"] .card-lite{
+      background: color-mix(in srgb, var(--glass) 35%, transparent);
+    }
+    .card-lite h5{
+      margin:0;
+      font-size: .95rem;
+      font-weight: 950;
+    }
+    .card-lite .muted{
+      font-size: .82rem;
+      font-weight: 800;
+    }
+
+    .fx-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .fx-grid .full{ grid-column: 1 / -1; }
+    .hr{ height:1px; background: var(--line2); margin: 12px 0; }
+
+    .totals{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+      margin-top: 10px;
+    }
+    .totals .label{ color: var(--muted); font-weight: 900; font-size:.85rem; }
+    .totals .val{ font-weight: 950; }
+
+    .danger-zone{
+      margin-top: 10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <header class="header">
+      <div class="header-left">
+        <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+          <button type="button" class="page-tab active" data-page="topups" role="tab" aria-selected="true">Topups</button>
+          <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
+          <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
+          <button type="button" class="page-tab" data-page="ledger" role="tab" aria-selected="false">Ledger</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="theme-toggle" id="themeToggle">
+          <button class="theme-btn active" data-theme="light" type="button">Light</button>
+          <button class="theme-btn" data-theme="dark" type="button">Dark</button>
+        </div>
+
+        <div class="user-info">
+          <span>Admin User</span>
+          <div class="user-avatar">AU</div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+
+        <div class="glass-panel top-head">
+          <div>
+            <div class="top-head__title">Top-ups</div>
+            <div class="mini-hint">Wire + Crypto flows • Timeline shown in list • Admin-only wallets editor</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn ghost" type="button" id="btnWallets">Wallets</button>
+            <button class="btn ghost" type="button" id="btnExport">Export</button>
+            <button class="btn primary" type="button" id="btnCreate">+ Create Top-up</button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+          <div class="filters__row">
+            <div class="fg">
+              <label class="label">Search</label>
+              <input id="fSearch" type="search" placeholder="ID / client / wire / crypto / hash" />
+            </div>
+
+            <div class="fg">
+              <label class="label">Client</label>
+              <select id="fClient"></select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Date range</label>
+              <div class="date-range">
+                <input type="date" id="fFrom" />
+                <div class="sep">→</div>
+                <input type="date" id="fTo" />
+              </div>
+            </div>
+
+            <div class="fg">
+              <label class="label">Status</label>
+              <select id="fStatus">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="declined">Declined</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Type</label>
+              <select id="fType">
+                <option value="all">All</option>
+                <option value="wire">WIRE</option>
+                <option value="crypto">CRYPTO</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Network</label>
+              <select id="fNetwork">
+                <option value="all">All</option>
+                <option value="USDT_ERC20">USDT ERC20</option>
+                <option value="USDT_TRC20">USDT TRC20</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <button class="btn ghost" type="button" id="btnClear">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- KPIs -->
+        <div class="stats">
+          <div class="stat-box">
+            <h4>TOTAL</h4>
+            <div class="stat-value" id="kTotal">0</div>
+            <div class="stat-sub">Matches filters</div>
+          </div>
+          <div class="stat-box pending">
+            <h4>PENDING</h4>
+            <div class="stat-value" id="kPending">0</div>
+            <div class="stat-sub">Awaiting steps</div>
+          </div>
+          <div class="stat-box approved">
+            <h4>APPROVED</h4>
+            <div class="stat-value" id="kApproved">0</div>
+            <div class="stat-sub">Internal tx added</div>
+          </div>
+          <div class="stat-box declined">
+            <h4>DECLINED</h4>
+            <div class="stat-value" id="kDeclined">0</div>
+            <div class="stat-sub">Has reason</div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="glass-panel" style="padding:16px;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Client</th>
+                  <th>Top-up ID</th>
+                  <th>Type</th>
+                  <th>Network</th>
+                  <th class="td-right">Amount (USD)</th>
+                  <th>Status</th>
+                  <th>Timeline</th>
+                  <th class="td-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="mini-hint" style="padding:0 2px;">
+          Tip for devs: Internal Transactions are the single source of truth. Fees and balances are derived from them. Backend is intentionally omitted.
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ✅ RIGHT DRAWER: Top-up details -->
+  <div class="drawer-modal" id="topupDrawerModal" aria-hidden="true">
+    <div class="drawer-modal__overlay" id="drawerOverlay"></div>
+
+    <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Topup details">
+      <div class="drawer-modal__header">
+        <div class="drawer-modal__title" id="dTitle">Top-up • TU-00000</div>
+        <button class="drawer-modal__close" type="button" id="drawerClose">Close</button>
+      </div>
+
+      <div class="drawer-modal__body">
+        <div class="seg" id="viewSeg">
+          <button type="button" data-view="client" class="active">Client view</button>
+          <button type="button" data-view="admin">Admin view</button>
+        </div>
+
+        <div class="topup-layout">
+          <!-- LEFT -->
+          <div>
+            <div class="step-card">
+              <div class="step">
+                <div class="dot" id="dotInvoice"></div>
+                <div>
+                  <h4>Invoice provided</h4>
+                  <div class="sub" id="txtInvoice">—</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="dot" id="dotProof"></div>
+                <div>
+                  <h4>Proof uploaded</h4>
+                  <div class="sub" id="txtProof">—</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="dot" id="dotOTW"></div>
+                <div>
+                  <h4>Money OTW</h4>
+                  <div class="sub" id="txtOTW">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT -->
+          <div class="right-box">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <span class="pill pending" id="dStatusPill">PENDING</span>
+              <span class="muted" id="dMainWallet">Main Wallet: USD 0.00</span>
+            </div>
+
+            <div class="kv" id="dKv"></div>
+
+            <div style="margin-top:10px;" id="billingBlock">
+              <div class="kv-row">
+                <div class="k">Billing company</div>
+                <div class="v" id="dCompany">—</div>
+              </div>
+              <div class="kv-row">
+                <div class="k">IBAN</div>
+                <div class="v" id="dIban">—</div>
+              </div>
+              <div class="kv-row">
+                <div class="k">Currency</div>
+                <div class="v" id="dCurrency">—</div>
+              </div>
+
+              <div class="mini-hint" style="margin-top:8px;">Admin can edit billing company while pending.</div>
+              <button class="btn" type="button" id="btnEditBilling">Edit billing company</button>
+            </div>
+
+            <div class="admin-actions" id="adminActions">
+              <div class="hr"></div>
+              <div style="font-weight:950; margin-bottom:6px;">Admin actions</div>
+
+              <div class="card-lite">
+                <h5>Invoice upload</h5>
+                <div class="muted">Demo stores metadata only.</div>
+                <div style="margin-top:8px;">
+                  <input type="file" id="fileInvoice" />
+                </div>
+              </div>
+
+              <div class="card-lite">
+                <h5>Payment proof upload</h5>
+                <div class="muted">Admin can upload if client asks.</div>
+                <div style="margin-top:8px;">
+                  <input type="file" id="fileProof" />
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <button class="btn" type="button" id="btnMarkWire">Mark wire received</button>
+                <div class="mini-hint">FX shows only here (admin). Locked until “wire received”.</div>
+              </div>
+
+              <div class="fx-grid">
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Received amount</label>
+                  <input id="fxReceivedAmount" type="number" step="0.01" placeholder="0" />
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Received currency</label>
+                  <select id="fxCurrency">
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">FX rate to USD</label>
+                  <input id="fxRate" type="number" step="0.0001" placeholder="1" />
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Fee (USD)</label>
+                  <input id="fxFee" type="number" step="0.01" placeholder="0" />
+                </div>
+              </div>
+
+              <div class="totals">
+                <div class="label">Approved USD amount</div>
+                <div class="val" id="dApprovedUsd">USD 0.00</div>
+              </div>
+              <div class="totals">
+                <div class="label">Net to Main Wallet</div>
+                <div class="val" id="dNetUsd">USD 0.00</div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <button class="btn" type="button" id="btnApprove">Approve</button>
+              </div>
+
+              <div class="hr"></div>
+
+              <div>
+                <label class="label" style="margin:0 0 6px;">Decline preset</label>
+                <select id="declinePreset">
+                  <option value="">Select…</option>
+                  <option value="missing_docs">Missing documents</option>
+                  <option value="iban_mismatch">IBAN mismatch</option>
+                  <option value="wrong_amount">Wrong amount</option>
+                  <option value="compliance">Compliance issue</option>
+                </select>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label class="label" style="margin:0 0 6px;">Decline reason (required)</label>
+                <input id="declineReason" placeholder="Write details…" />
+              </div>
+
+              <div class="danger-zone">
+                <button class="btn danger" type="button" id="btnDecline">Decline</button>
+                <button class="btn" type="button" id="btnDelete">Delete</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    /* ==============================
+       Tabs routes
+    ============================== */
+    const PAGE_ROUTES = {
+      finance: "finance.html",
+      topups: "topups.html",
+      transactions: "transactions.html",
+      ledger: "ledger.html",
+    };
+    document.getElementById("pageTabs")?.addEventListener("click",(e)=>{
+      const btn = e.target.closest(".page-tab");
+      if(!btn) return;
+      const key = btn.dataset.page;
+      if(!PAGE_ROUTES[key]) return;
+      if(key === "topups") return;
+      window.location.href = PAGE_ROUTES[key];
+    });
+
+    /* ==============================
+       Theme
+    ============================== */
+    (function initTheme(){
+      const root = document.documentElement;
+      const saved = localStorage.getItem("ui_theme") || "light";
+      if(saved === "dark") root.setAttribute("data-theme","dark");
+
+      const buttons = document.querySelectorAll("#themeToggle .theme-btn");
+      function setTheme(t){
+        if(t === "dark") root.setAttribute("data-theme","dark");
+        else root.removeAttribute("data-theme");
+        localStorage.setItem("ui_theme", t);
+        buttons.forEach(b=> b.classList.toggle("active", b.dataset.theme === t));
+      }
+      buttons.forEach(b=> b.addEventListener("click", ()=> setTheme(b.dataset.theme)));
+      setTheme(saved);
+    })();
+
+    /* ==============================
+       Demo data
+    ============================== */
+    const clients = [
+      { id:"100", name:"Alex M." },
+      { id:"101", name:"Dana P." },
+      { id:"102", name:"Mihai R." },
+    ];
+
+    let mainWalletUsd = 580.00;
+
+    let topups = [
+      {
+        id:"TU-120401",
+        created:"2026-02-19",
+        clientId:"100",
+        type:"wire",
+        network:null,
+        status:"pending",
+        description:"Monthly spend funding",
+        initialAmount:1500,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{
+          invoiceProvided:false,
+          proofUploaded:false,
+          moneyOTW:false,
+          invoiceFile:null,
+          proofFile:null,
+        },
+        admin:{
+          wireReceived:false,
+          receivedAmount:null,
+          receivedCurrency:"EUR",
+          fxRate:null,
+          feeUsd:0,
+          declineReason:"",
+        }
+      },
+      {
+        id:"TU-120402",
+        created:"2026-02-19",
+        clientId:"101",
+        type:"wire",
+        network:null,
+        status:"pending",
+        description:"",
+        initialAmount:1200,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:false, moneyOTW:false, invoiceFile:"INV_TU-120402.pdf", proofFile:null },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:"EUR", fxRate:null, feeUsd:0, declineReason:"" }
+      },
+      {
+        id:"TU-120403",
+        created:"2026-02-19",
+        clientId:"102",
+        type:"crypto",
+        network:"USDT_TRC20",
+        status:"pending",
+        description:"USDT top-up",
+        initialAmount:1000,
+        initialCurrency:"USD",
+        amountUsd:1000,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:false, invoiceFile:null, proofFile:"0xabc...def (hash)" },
+        admin:{ wireReceived:true, receivedAmount:1000, receivedCurrency:"USD", fxRate:1, feeUsd:0, declineReason:"" }
+      },
+      {
+        id:"TU-120350",
+        created:"2026-02-10",
+        clientId:"100",
+        type:"crypto",
+        network:"USDT_ERC20",
+        status:"approved",
+        description:"Funding",
+        initialAmount:2000,
+        initialCurrency:"USD",
+        amountUsd:2000,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:true, invoiceFile:null, proofFile:"0x7b3c...a19f" },
+        admin:{ wireReceived:true, receivedAmount:2000, receivedCurrency:"USD", fxRate:1, feeUsd:10, declineReason:"" }
+      },
+      {
+        id:"TU-120120",
+        created:"2026-01-28",
+        clientId:"101",
+        type:"wire",
+        network:null,
+        status:"declined",
+        description:"Top-up attempt",
+        initialAmount:500,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:true, moneyOTW:true, invoiceFile:"INV_TU-120120.pdf", proofFile:"Proof_TU-120120.png" },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:"EUR", fxRate:null, feeUsd:0, declineReason:"Missing documents" }
+      }
+    ];
+
+    function $(id){ return document.getElementById(id); }
+    function clientName(id){ return clients.find(c=>c.id===id)?.name || ("Client " + id); }
+    function fmtDate(iso){
+      const d = new Date(iso + "T00:00:00");
+      try{ return new Intl.DateTimeFormat("ro-RO",{ day:"2-digit", month:"long", year:"numeric" }).format(d); }
+      catch(e){ return d.toLocaleDateString(); }
+    }
+    function moneyUSD(n){
+      const v = Number(n||0);
+      return "USD " + v.toFixed(2);
+    }
+
+    function pillHtml(status){
+      const s = (status||"pending").toLowerCase();
+      return `<span class="pill ${s}">${s.toUpperCase()}</span>`;
+    }
+
+    /* ==============================
+       Filters init
+    ============================== */
+    function initFilters(){
+      $("fClient").innerHTML = `<option value="all">All Clients</option>` +
+        clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+    }
+    initFilters();
+
+    function readFilters(){
+      return {
+        q: ($("fSearch").value || "").trim().toLowerCase(),
+        client: $("fClient").value,
+        from: $("fFrom").value,
+        to: $("fTo").value,
+        status: $("fStatus").value,
+        type: $("fType").value,
+        network: $("fNetwork").value
+      };
+    }
+
+    function passFilters(t, f){
+      if(f.client !== "all" && t.clientId !== f.client) return false;
+
+      const iso = t.created;
+      if(f.from && iso < f.from) return false;
+      if(f.to && iso > f.to) return false;
+
+      if(f.status !== "all" && (t.status||"").toLowerCase() !== f.status) return false;
+      if(f.type !== "all" && (t.type||"").toLowerCase() !== f.type) return false;
+
+      if(f.network !== "all"){
+        const n = (t.network||"").toUpperCase();
+        if(n !== f.network.toUpperCase()) return false;
+      }
+
+      if(f.q){
+        const blob = [
+          t.id, clientName(t.clientId), t.type, t.network, t.description,
+          t.steps?.invoiceFile, t.steps?.proofFile, t.billingCompany?.name, t.billingCompany?.iban
+        ].filter(Boolean).join(" ").toLowerCase();
+        if(!blob.includes(f.q)) return false;
+      }
+
+      return true;
+    }
+
+    /* ==============================
+       Render list + KPIs
+    ============================== */
+    function timelineChips(t){
+      const chips = [];
+      const s = t.steps || {};
+      chips.push(chip("Invoice provided", !!s.invoiceProvided));
+      chips.push(chip("Proof uploaded", !!s.proofUploaded));
+      chips.push(chip("Money OTW", !!s.moneyOTW));
+      return chips.join(" ");
+    }
+    function chip(label, on){
+      const bg = on ? "color-mix(in srgb, rgba(22,163,74,.14) 70%, #fff)" : "color-mix(in srgb, rgba(148,163,184,.18) 70%, #fff)";
+      const bd = on ? "color-mix(in srgb, rgba(22,163,74,.30) 70%, rgba(15,23,42,.10))" : "rgba(15,23,42,.10)";
+      const col = on ? "#166534" : "#64748b";
+      return `<span style="display:inline-flex;align-items:center;gap:6px;padding:.26rem .55rem;border:1px solid ${bd};border-radius:999px;background:${bg};color:${col};font-weight:900;font-size:.78rem;">
+        <span style="width:8px;height:8px;border-radius:999px;border:2px solid ${on? "rgba(22,163,74,.55)" : "rgba(100,116,139,.55)"};background:${on? "rgba(22,163,74,.12)" : "transparent"};"></span>
+        ${label}
+      </span>`;
+    }
+
+    function computeKpis(items){
+      let total=0,p=0,a=0,d=0;
+      for(const t of items){
+        total++;
+        if(t.status==="pending") p++;
+        if(t.status==="approved") a++;
+        if(t.status==="declined") d++;
+      }
+      $("kTotal").textContent = total;
+      $("kPending").textContent = p;
+      $("kApproved").textContent = a;
+      $("kDeclined").textContent = d;
+    }
+
+    function render(){
+      const f = readFilters();
+      const items = topups.filter(t => passFilters(t,f)).sort((x,y)=> (y.created||"").localeCompare(x.created||""));
+      computeKpis(items);
+
+      const tbody = $("tbody");
+      if(!items.length){
+        tbody.innerHTML = `<tr><td colspan="9" class="td-muted">No results.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map(t=>{
+        const amountUsd = (t.amountUsd != null) ? moneyUSD(t.amountUsd) : "—";
+        const net = t.network ? t.network : "—";
+        return `
+          <tr class="row" data-open="${t.id}">
+            <td>${fmtDate(t.created)}</td>
+            <td>${clientName(t.clientId)}</td>
+            <td><strong>${t.id}</strong></td>
+            <td>${String(t.type||"").toUpperCase()}</td>
+            <td>${net}</td>
+            <td class="td-right">${amountUsd}</td>
+            <td>${pillHtml(t.status)}</td>
+            <td>${timelineChips(t)}</td>
+            <td class="td-right">
+              <button class="btn" type="button" data-open-btn="${t.id}">Open</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      tbody.querySelectorAll("[data-open]").forEach(tr=>{
+        tr.addEventListener("click",(e)=>{
+          const id = tr.getAttribute("data-open");
+          openDrawer(id);
+        });
+      });
+      tbody.querySelectorAll("[data-open-btn]").forEach(btn=>{
+        btn.addEventListener("click",(e)=>{
+          e.stopPropagation();
+          openDrawer(btn.getAttribute("data-open-btn"));
+        });
+      });
+    }
+
+    ["fSearch","fClient","fFrom","fTo","fStatus","fType","fNetwork"].forEach(id=>{
+      $(id).addEventListener("input", render);
+      $(id).addEventListener("change", render);
+    });
+
+    $("btnClear").addEventListener("click", ()=>{
+      $("fSearch").value="";
+      $("fClient").value="all";
+      $("fFrom").value="";
+      $("fTo").value="";
+      $("fStatus").value="all";
+      $("fType").value="all";
+      $("fNetwork").value="all";
+      render();
+    });
+
+    $("btnExport").addEventListener("click", ()=>{
+      alert("Demo: export (CSV/XLSX) next step.");
+    });
+
+    $("btnWallets").addEventListener("click", ()=>{
+      alert("Demo: crypto wallets modal (admin) – next step.");
+    });
+
+    $("btnCreate").addEventListener("click", ()=>{
+      alert("Demo: create top-up modal – next step (ai deja în alte screenshot-uri).");
+    });
+
+    /* ==============================
+       Drawer details (FIXED right)
+    ============================== */
+    let activeId = null;
+    let activeView = "client";
+
+    function setBodyModal(open){
+      document.body.classList.toggle("modal-open", !!open);
+    }
+
+    function openDrawer(id){
+      const t = topups.find(x=>x.id===id);
+      if(!t) return;
+      activeId = id;
+
+      $("dTitle").textContent = `Top-up • ${t.id}`;
+
+      // view seg
+      activeView = "admin"; // default like screenshot (admin view)
+      syncViewButtons();
+
+      // status pill + main wallet
+      $("dStatusPill").className = "pill " + (t.status||"pending");
+      $("dStatusPill").textContent = (t.status||"pending").toUpperCase();
+      $("dMainWallet").textContent = `Main Wallet: ${moneyUSD(mainWalletUsd)}`;
+
+      // timeline dots
+      const s = t.steps || {};
+      setDot("dotInvoice", !!s.invoiceProvided);
+      setDot("dotProof", !!s.proofUploaded);
+      setDot("dotOTW", !!s.moneyOTW);
+
+      $("txtInvoice").textContent = s.invoiceFile ? s.invoiceFile : "—";
+      $("txtProof").textContent = s.proofFile ? s.proofFile : "—";
+      $("txtOTW").textContent = s.moneyOTW ? "In progress" : "—";
+
+      // details kv
+      const amountUsd = (t.amountUsd != null) ? moneyUSD(t.amountUsd) : "—";
+      const network = t.network ? t.network : "—";
+      $("dKv").innerHTML = `
+        <div class="kv-row"><div class="k">Client</div><div class="v">${clientName(t.clientId)}</div></div>
+        <div class="kv-row"><div class="k">Type</div><div class="v">${String(t.type||"").toUpperCase()}</div></div>
+        <div class="kv-row"><div class="k">Network</div><div class="v">${network}</div></div>
+        <div class="kv-row"><div class="k">Created</div><div class="v">${fmtDate(t.created)}</div></div>
+        <div class="kv-row"><div class="k">Initial</div><div class="v">${Number(t.initialAmount||0).toFixed(0)} ${t.initialCurrency||"—"}</div></div>
+        <div class="kv-row"><div class="k">Amount (USD)</div><div class="v">${amountUsd}</div></div>
+        <div class="kv-row"><div class="k">Status</div><div class="v">${pillHtml(t.status)}</div></div>
+        <div class="kv-row"><div class="k">Description</div><div class="v">${t.description ? t.description : "—"}</div></div>
+      `;
+
+      // billing
+      if(t.billingCompany){
+        $("billingBlock").style.display = "block";
+        $("dCompany").textContent = t.billingCompany.name || "—";
+        $("dIban").textContent = t.billingCompany.iban || "—";
+        $("dCurrency").textContent = t.billingCompany.currency || "—";
+      }else{
+        $("billingBlock").style.display = "none";
+      }
+
+      // admin actions + FX lock
+      const a = t.admin || {};
+      $("fxCurrency").value = a.receivedCurrency || "EUR";
+      $("fxReceivedAmount").value = a.receivedAmount ?? "";
+      $("fxRate").value = a.fxRate ?? "";
+      $("fxFee").value = a.feeUsd ?? 0;
+
+      // lock FX until wire received (only for WIRE)
+      syncFxLock();
+
+      // totals
+      recalcTotals();
+
+      // show modal
+      $("topupDrawerModal").classList.add("active");
+      $("topupDrawerModal").setAttribute("aria-hidden","false");
+      setBodyModal(true);
+    }
+
+    function closeDrawer(){
+      activeId = null;
+      $("topupDrawerModal").classList.remove("active");
+      $("topupDrawerModal").setAttribute("aria-hidden","true");
+      setBodyModal(false);
+    }
+
+    function setDot(id, done){
+      const el = $(id);
+      el.classList.toggle("done", !!done);
+    }
+
+    $("drawerOverlay").addEventListener("click", closeDrawer);
+    $("drawerClose").addEventListener("click", closeDrawer);
+
+    document.addEventListener("keydown",(e)=>{
+      if(e.key==="Escape" && $("topupDrawerModal").classList.contains("active")){
+        closeDrawer();
+      }
+    });
+
+    // Client/Admin toggle
+    function syncViewButtons(){
+      $("viewSeg").querySelectorAll("button").forEach(b=>{
+        b.classList.toggle("active", b.dataset.view === activeView);
+      });
+      // in client view hide admin actions
+      $("adminActions").style.display = (activeView === "admin") ? "block" : "none";
+      // billing edit button only admin
+      $("btnEditBilling").style.display = (activeView === "admin") ? "inline-flex" : "none";
+    }
+    $("viewSeg").addEventListener("click",(e)=>{
+      const btn = e.target.closest("button[data-view]");
+      if(!btn) return;
+      activeView = btn.dataset.view;
+      syncViewButtons();
+    });
+
+    function getActive(){
+      return topups.find(x=>x.id===activeId);
+    }
+
+    // Uploads (demo metadata)
+    $("fileInvoice").addEventListener("change",(e)=>{
+      const t = getActive(); if(!t) return;
+      const f = e.target.files?.[0];
+      if(f){
+        t.steps.invoiceProvided = true;
+        t.steps.invoiceFile = f.name;
+        render(); // updates chips
+        openDrawer(t.id); // refresh drawer UI quickly (simple)
+      }
+    });
+    $("fileProof").addEventListener("change",(e)=>{
+      const t = getActive(); if(!t) return;
+      const f = e.target.files?.[0];
+      if(f){
+        t.steps.proofUploaded = true;
+        t.steps.proofFile = f.name;
+        render();
+        openDrawer(t.id);
+      }
+    });
+
+    $("btnMarkWire").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      if(t.type !== "wire") return alert("Mark wire received is only for WIRE.");
+      t.admin.wireReceived = true;
+      syncFxLock();
+      recalcTotals();
+    });
+
+    function syncFxLock(){
+      const t = getActive(); if(!t) return;
+      const isWire = t.type === "wire";
+      const unlocked = !isWire || !!t.admin.wireReceived;
+      ["fxReceivedAmount","fxCurrency","fxRate","fxFee","btnApprove"].forEach(id=>{
+        $(id).disabled = !unlocked;
+      });
+      $("btnMarkWire").disabled = !isWire ? true : false;
+      // if crypto, keep approve enabled
+      if(t.type === "crypto"){
+        $("btnApprove").disabled = false;
+        ["fxReceivedAmount","fxCurrency","fxRate","fxFee"].forEach(id=> $(id).disabled = true);
+      }
+    }
+
+    function recalcTotals(){
+      const t = getActive(); if(!t) return;
+
+      if(t.type === "crypto"){
+        const gross = Number(t.amountUsd ?? t.initialAmount ?? 0);
+        const fee = Number(t.admin.feeUsd ?? 0);
+        const net = Math.max(0, gross - fee);
+        $("dApprovedUsd").textContent = moneyUSD(gross);
+        $("dNetUsd").textContent = moneyUSD(net);
+        return;
+      }
+
+      // wire:
+      const received = Number($("fxReceivedAmount").value || 0);
+      const rate = Number($("fxRate").value || 0);
+      const fee = Number($("fxFee").value || 0);
+
+      const approvedUsd = rate > 0 ? (received * rate) : 0;
+      const netUsd = Math.max(0, approvedUsd - fee);
+
+      $("dApprovedUsd").textContent = moneyUSD(approvedUsd);
+      $("dNetUsd").textContent = moneyUSD(netUsd);
+    }
+
+    ["fxReceivedAmount","fxRate","fxFee","fxCurrency"].forEach(id=>{
+      $(id).addEventListener("input", ()=>{
+        const t = getActive(); if(!t) return;
+        t.admin.receivedAmount = Number($("fxReceivedAmount").value || 0) || null;
+        t.admin.receivedCurrency = $("fxCurrency").value;
+        t.admin.fxRate = Number($("fxRate").value || 0) || null;
+        t.admin.feeUsd = Number($("fxFee").value || 0) || 0;
+        recalcTotals();
+      });
+      $(id).addEventListener("change", ()=> {
+        const t = getActive(); if(!t) return;
+        t.admin.receivedCurrency = $("fxCurrency").value;
+        recalcTotals();
+      });
+    });
+
+    $("btnApprove").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+
+      // compute net
+      let netUsd = 0;
+      if(t.type === "crypto"){
+        const gross = Number(t.amountUsd ?? t.initialAmount ?? 0);
+        netUsd = Math.max(0, gross - Number(t.admin.feeUsd ?? 0));
+        t.amountUsd = gross;
+      }else{
+        const received = Number($("fxReceivedAmount").value || 0);
+        const rate = Number($("fxRate").value || 0);
+        const fee = Number($("fxFee").value || 0);
+        const approvedUsd = (rate > 0) ? (received * rate) : 0;
+        netUsd = Math.max(0, approvedUsd - fee);
+        t.amountUsd = approvedUsd || null;
+        t.admin.receivedAmount = received || null;
+        t.admin.fxRate = rate || null;
+        t.admin.feeUsd = fee || 0;
+      }
+
+      t.status = "approved";
+      mainWalletUsd = +(mainWalletUsd + netUsd).toFixed(2);
+
+      render();
+      openDrawer(t.id);
+    });
+
+    $("declinePreset").addEventListener("change", ()=>{
+      const v = $("declinePreset").value;
+      if(!v) return;
+      const map = {
+        missing_docs: "Missing documents",
+        iban_mismatch: "IBAN mismatch",
+        wrong_amount: "Wrong amount",
+        compliance: "Compliance issue"
+      };
+      $("declineReason").value = map[v] || "";
+    });
+
+    $("btnDecline").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      const reason = ($("declineReason").value || "").trim();
+      if(!reason){
+        alert("Decline reason is required.");
+        return;
+      }
+      t.status = "declined";
+      t.admin.declineReason = reason;
+      render();
+      openDrawer(t.id);
+    });
+
+    $("btnDelete").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      if(!confirm(`Delete ${t.id}?`)) return;
+      topups = topups.filter(x=>x.id !== t.id);
+      closeDrawer();
+      render();
+    });
+
+    $("btnEditBilling").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      alert("Demo: Edit billing company modal (next step).");
+    });
+
+    /* ==============================
+       Boot
+    ============================== */
+    render();
+  </script>
+</body>
+</html>
