@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Payments • Admin</title>
+
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+
+  <style>
+    :root{
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: rgba(15,23,42,.10);
+      --shadow: 0 12px 30px rgba(15,23,42,.08);
+    }
+
+    body{ background: var(--bg) !important; color: var(--text); }
+
+    .header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 8px 20px rgba(15,23,42,.06);
+      padding: 16px 24px;
+    }
+    .header h1{
+      margin: 0;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .main{ 
+      padding: 24px !important; 
+      max-width: 1400px; 
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+    }
+
+    .empty-state{
+      text-align: center;
+      color: var(--muted);
+    }
+    .empty-state h2{
+      font-size: 48px;
+      margin: 0 0 16px 0;
+    }
+    .empty-state p{
+      font-size: 18px;
+      margin: 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>💳 Platform Payments</h1>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div class="empty-state">
+        <h2>🚧</h2>
+        <p>Platform Payments - Coming Soon</p>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+</body>
+</html>
