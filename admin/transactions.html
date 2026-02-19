@@ -655,9 +655,8 @@
       const btn = e.target.closest(".page-tab");
       if(!btn) return;
       const key = btn.dataset.page;
-      if(key === "transactions") return;
-      const url = TAB_ROUTES[key];
-      if(url) window.location.href = url;
+      if(!PAGE_ROUTES[key]) return;
+      window.location.href = PAGE_ROUTES[key];
     });
 
     /* =========================
