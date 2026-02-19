@@ -203,6 +203,42 @@
       color: #666;
       line-height: 1.6;
     }
+
+    /* Tab Styles - matching other pages */
+    .page-tabs{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.07);
+      background: rgba(255,255,255,.72);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      width: fit-content;
+    }
+
+    .page-tab{
+      border:1px solid transparent;
+      background: transparent;
+      color: #64748b;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 950;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+      letter-spacing: .2px;
+      user-select:none;
+    }
+
+    .page-tab:hover{ 
+      transform: translateY(-1px); 
+    }
+
+    .page-tab.active{
+      background: rgba(37,99,235,.18);
+      border-color: rgba(37,99,235,.25);
+      color: #0f172a;
+    }
   </style>
 </head>
 
@@ -267,7 +303,7 @@
 
         <!-- Add Fee Button -->
         <div class="fees-actions">
-          <button class="btn-add-fee" onclick="alert('Add Service Fee - to be implemented')">+ Add Service Fee</button>
+          <button class="btn-add-fee" onclick="openAddServiceFeeModal()">+ Add Service Fee</button>
         </div>
 
         <!-- Fees Table -->
@@ -328,6 +364,85 @@
     </main>
   </div>
 
+  <!-- Add Service Fee Modal (Right Side Panel) -->
+  <div id="addServiceFeeModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(4px);" onclick="closeAddServiceFeeModal()">
+    <div id="addServiceFeePanel" style="position: absolute; top: 0; right: -600px; width: 600px; height: 100%; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.2); transition: right 0.3s ease; overflow-y: auto;" onclick="event.stopPropagation()">
+      
+      <!-- Header -->
+      <div style="padding: 2rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 10;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; font-size: 1.3rem; font-weight: 700; color: #1f2937;">Add service fee</h3>
+          <button onclick="closeAddServiceFeeModal()" style="background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">×</button>
+        </div>
+      </div>
+
+      <!-- Form Content -->
+      <div style="padding: 2rem;">
+        
+        <!-- Row 1: Client, Service name, Amount, Fee code -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Client</label>
+            <select id="feeClient" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
+              <option value="100">Alex M.</option>
+              <option value="101">Maria S.</option>
+              <option value="102">John D.</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Service name</label>
+            <input type="text" id="feeServiceName" placeholder="Service" value="Service" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Amount (USD)</label>
+            <input type="number" id="feeAmount" placeholder="50" value="50" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Fee code</label>
+            <input type="text" id="feeFeeCode" placeholder="SERVICE" value="SERVICE" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
+          </div>
+        </div>
+
+        <!-- Note (optional) -->
+        <div style="margin-bottom: 2rem;">
+          <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Note (optional)</label>
+          <textarea id="feeNote" placeholder="Optional..." rows="3" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem; resize: vertical;"></textarea>
+        </div>
+
+        <!-- Summary Section -->
+        <div style="background: #f9fafb; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span style="color: #6b7280; font-size: 0.95rem;">From</span>
+            <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">Main Wallet</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span style="color: #6b7280; font-size: 0.95rem;">To</span>
+            <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">Fees</span>
+          </div>
+
+          <div style="height: 1px; background: #e5e7eb; margin: 1rem 0;"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #6b7280; font-size: 0.95rem;">Total</span>
+            <span style="color: #1f2937; font-weight: 700; font-size: 1.25rem;">USD <span id="feeTotalAmount">50.00</span></span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 1rem;">
+          <button onclick="submitAddServiceFee()" style="flex: 1; background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">Add fee</button>
+          <button onclick="closeAddServiceFeeModal()" style="flex: 0.5; background: #f3f4f6; color: #6b7280; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">Cancel</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
   <script src="../js/sidebar.js"></script>
   <script>
     /* ==============================
@@ -375,6 +490,54 @@
       setActiveTabUI(key);
       if(key === detectActivePage()) return;
       navigateTo(key);
+    });
+
+    /* ==============================
+       Add Service Fee Modal Functions
+    ============================== */
+    function openAddServiceFeeModal(){
+      const modal = document.getElementById("addServiceFeeModal");
+      const panel = document.getElementById("addServiceFeePanel");
+      modal.style.display = "block";
+      
+      // Trigger animation after display
+      setTimeout(() => {
+        panel.style.right = "0";
+      }, 10);
+    }
+
+    function closeAddServiceFeeModal(){
+      const modal = document.getElementById("addServiceFeeModal");
+      const panel = document.getElementById("addServiceFeePanel");
+      
+      // Animate out
+      panel.style.right = "-600px";
+      
+      // Hide after animation
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 300);
+    }
+
+    function submitAddServiceFee(){
+      const client = document.getElementById("feeClient").value;
+      const serviceName = document.getElementById("feeServiceName").value;
+      const amount = document.getElementById("feeAmount").value;
+      const feeCode = document.getElementById("feeFeeCode").value;
+      const note = document.getElementById("feeNote").value;
+
+      // Here you would normally send this data to your backend
+      console.log("Adding service fee:", { client, serviceName, amount, feeCode, note });
+      
+      alert(`Service fee added successfully!\nClient: ${client}\nAmount: USD ${amount}\nFee Code: ${feeCode}`);
+      
+      closeAddServiceFeeModal();
+    }
+
+    // Update total amount when amount field changes
+    document.getElementById("feeAmount")?.addEventListener("input", (e) => {
+      const amount = parseFloat(e.target.value) || 0;
+      document.getElementById("feeTotalAmount").textContent = amount.toFixed(2);
     });
   </script>
 </body>
