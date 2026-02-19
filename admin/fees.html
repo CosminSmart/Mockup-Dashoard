@@ -276,23 +276,23 @@
         <!-- Fee Statistics -->
         <div class="fee-stats">
           <div class="fee-stat-card">
-            <div class="fee-stat-label">Total Charges</div>
-            <div class="fee-stat-value">USD 25.00</div>
+            <div class="fee-stat-label">Total Fees</div>
+            <div class="fee-stat-value">$ 25.00</div>
           </div>
 
           <div class="fee-stat-card topup">
-            <div class="fee-stat-label">Top-Up Charges</div>
-            <div class="fee-stat-value">USD 20.00</div>
+            <div class="fee-stat-label">Top-Up Fees</div>
+            <div class="fee-stat-value">$ 20.00</div>
           </div>
 
           <div class="fee-stat-card transfer">
-            <div class="fee-stat-label">Transfer Charges</div>
-            <div class="fee-stat-value">USD 5.00</div>
+            <div class="fee-stat-label">Transfer Fees</div>
+            <div class="fee-stat-value">$ 5.00</div>
           </div>
 
           <div class="fee-stat-card setup">
             <div class="fee-stat-label">Setup + Services</div>
-            <div class="fee-stat-value">USD 0.00</div>
+            <div class="fee-stat-value">$ 0.00</div>
           </div>
         </div>
 
@@ -321,14 +321,14 @@
                 <td>
                   <span class="fee-type-badge topup">TOPUP</span>
                 </td>
-                <td style="font-weight: 700;">USD 20.00</td>
+                <td style="font-weight: 700;">$ 20.00</td>
                 <td class="fee-code">TOPUP_WIRE</td>
                 <td>
                   <a href="#" class="fee-link">TOPUPTU-DEMO-1</a>
                 </td>
                 <td>Demo > Top-up fee</td>
                 <td style="text-align: center;">
-                  <button class="btn-details" onclick="openFeeDetailsModal('TOPUP', 'USD 20.00', 'TOPUP_WIRE', 'TOPUPTU-DEMO-1', 'Demo > Top-up fee', '19 februarie 2026')">Details</button>
+                  <button class="btn-details" onclick="openFeeDetailsModal('TOPUP', '$ 20.00', 'TOPUP_WIRE', 'TOPUPTU-DEMO-1', 'Demo > Top-up fee', '19 februarie 2026')">Details</button>
                 </td>
               </tr>
 
@@ -337,14 +337,14 @@
                 <td>
                   <span class="fee-type-badge transfer">TRANSFER</span>
                 </td>
-                <td style="font-weight: 700;">USD 5.00</td>
+                <td style="font-weight: 700;">$ 5.00</td>
                 <td class="fee-code">TRANSFER_MAIN_TO_VAULT</td>
                 <td>
                   <a href="#" class="fee-link">TRANSFERTR-DEMO-1</a>
                 </td>
                 <td>Demo > Transfer fee</td>
                 <td style="text-align: center;">
-                  <button class="btn-details" onclick="openFeeDetailsModal('TRANSFER', 'USD 5.00', 'TRANSFER_MAIN_TO_VAULT', 'TRANSFERTR-DEMO-1', 'Demo > Transfer fee', '19 februarie 2026')">Details</button>
+                  <button class="btn-details" onclick="openFeeDetailsModal('TRANSFER', '$ 5.00', 'TRANSFER_MAIN_TO_VAULT', 'TRANSFERTR-DEMO-1', 'Demo > Transfer fee', '19 februarie 2026')">Details</button>
                 </td>
               </tr>
             </tbody>
@@ -384,7 +384,7 @@
         <!-- Field: Amount -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
           <span style="color: #9ca3af; font-size: 0.95rem;">Amount</span>
-          <span id="detailAmount" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">USD 20.00</span>
+          <span id="detailAmount" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">$ 20.00</span>
         </div>
 
         <!-- Field: From -->
@@ -454,7 +454,7 @@
           </div>
 
           <div>
-            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Amount (USD)</label>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Amount ($)</label>
             <input type="number" id="feeAmount" placeholder="50" value="50" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
           </div>
 
@@ -486,7 +486,7 @@
 
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <span style="color: #6b7280; font-size: 0.95rem;">Total</span>
-            <span style="color: #1f2937; font-weight: 700; font-size: 1.25rem;">USD <span id="feeTotalAmount">50.00</span></span>
+            <span style="color: #1f2937; font-weight: 700; font-size: 1.25rem;">$ <span id="feeTotalAmount">50.00</span></span>
           </div>
         </div>
 
@@ -629,7 +629,7 @@
       // Here you would normally send this data to your backend
       console.log("Adding service fee:", { client, serviceName, amount, feeCode, note });
       
-      alert(`Service fee added successfully!\nClient: ${client}\nAmount: USD ${amount}\nFee Code: ${feeCode}`);
+      alert(`Service fee added successfully!\nClient: ${client}\nAmount: $ ${amount}\nFee Code: ${feeCode}`);
       
       closeAddServiceFeeModal();
     }

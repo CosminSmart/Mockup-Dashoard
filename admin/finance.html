@@ -1103,22 +1103,7 @@
         <!-- Workspace + Ledger -->
         <div class="widgets-grid">
           <!-- FINANCE WORKSPACE -->
-          <div class="wallet-section" style="width: 168%;">
-            <div class="widget-title">
-              <div>
-                <h2>Finance Workspace</h2>
-                <div class="mini-hint">
-                  Acțiunile se aplică pe <strong>clientul selectat</strong>. Dacă e "All clients", acțiunile sunt blocate.
-                </div>
-              </div>
-
-              <!-- MAIN WORKSPACE TABS -->
-              <div class="pillbar" id="workspaceTabs">
-                <div class="pill active" data-tab="funding">Funding</div>
-                <div class="pill" data-tab="setup">Setup & Services</div>
-                <div class="pill" data-tab="fees">Fees</div>
-              </div>
-            </div>
+          
 
             <!-- TAB: Funding -->
             <div id="tab_funding">
@@ -1374,59 +1359,11 @@
                 </div>
               </div>
 
-              <!-- Add Service Fee Button -->
-              <div style="margin-bottom: 1rem; text-align: right;">
-                <button class="btn success" onclick="openAddServiceFeeModal()">+ Add Service Fee</button>
-              </div>
+           
 
-              <!-- Fees Table -->
-              <div style="border: 1px solid var(--line2); border-radius: var(--r-xl); overflow: hidden; background: var(--glass); backdrop-filter: blur(14px);">
-                <table style="width: 100%; border-collapse: collapse;">
-                  <thead>
-                    <tr style="background: color-mix(in srgb, var(--glass) 88%, var(--bg1)); backdrop-filter: blur(14px);">
-                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Date</th>
-                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Type</th>
-                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Amount</th>
-                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Fee code</th>
-                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Link</th>
-                      <th style="padding: 14px 16px; text-align: left; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Description</th>
-                      <th style="padding: 14px 16px; text-align: center; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); font-weight: 950;">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody id="feesTableBody">
-                    <tr style="border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);">
-                      <td style="padding: 14px 16px;">19 februarie 2026</td>
-                      <td style="padding: 14px 16px;">
-                        <span style="display: inline-block; padding: 4px 10px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; border-radius: 999px; font-size: 12px; font-weight: 700;">TOPUP</span>
-                      </td>
-                      <td style="padding: 14px 16px; font-weight: 700;">USD 20.00</td>
-                      <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--muted);">TOPUP_WIRE</td>
-                      <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--info); font-size: 13px;">TOPUPTU-DEMO-1</td>
-                      <td style="padding: 14px 16px; color: var(--muted);">Demo > Top-up fee</td>
-                      <td style="padding: 14px 16px; text-align: center;">
-                        <button class="btn ghost" style="padding: 6px 12px; font-size: 13px;">Details</button>
-                      </td>
-                    </tr>
-                    <tr style="border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);">
-                      <td style="padding: 14px 16px;">19 februarie 2026</td>
-                      <td style="padding: 14px 16px;">
-                        <span style="display: inline-block; padding: 4px 10px; background: rgba(22, 163, 74, 0.15); color: #16a34a; border-radius: 999px; font-size: 12px; font-weight: 700;">TRANSFER</span>
-                      </td>
-                      <td style="padding: 14px 16px; font-weight: 700;">USD 5.00</td>
-                      <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--muted);">TRANSFER_MAIN_TO_VAULT</td>
-                      <td style="padding: 14px 16px; font-family: 'Courier New', monospace; color: var(--info); font-size: 13px;">TRANSFERTR-DEMO-1</td>
-                      <td style="padding: 14px 16px; color: var(--muted);">Demo > Transfer fee</td>
-                      <td style="padding: 14px 16px; text-align: center;">
-                        <button class="btn ghost" style="padding: 6px 12px; font-size: 13px;">Details</button>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+           
 
-              <div class="mini-hint" style="margin-top: 1rem;">
-                To be clear: internal transactions are the main audit log. These additions and data lookups are derived from them. If there's a discrepancy, the internal transactions are the source of truth. These additions and data lookups are derived from them.
-              </div>
+           
             </div>
           </div>
 
@@ -1614,31 +1551,7 @@
           </div>
 
           <!-- Fee Statistics -->
-          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 1.5rem;">
-            <div class="stat-box">
-              <h4>TOTAL FEES</h4>
-              <div class="stat-value" style="color: var(--info);">USD 25.00</div>
-              <div class="stat-description">All fee categories</div>
-            </div>
-
-            <div class="stat-box">
-              <h4>TOP-UP FEES</h4>
-              <div class="stat-value" style="color: var(--warn);">USD 20.00</div>
-              <div class="stat-description">Withdrawal fees</div>
-            </div>
-
-            <div class="stat-box">
-              <h4>TRANSFER FEES</h4>
-              <div class="stat-value" style="color: var(--good);">USD 5.00</div>
-              <div class="stat-description">Main → Platform/transfer</div>
-            </div>
-
-            <div class="stat-box">
-              <h4>SETUP + SERVICES</h4>
-              <div class="stat-value" style="color: var(--muted);">USD 0.00</div>
-              <div class="stat-description">Charges from Main Wallet</div>
-            </div>
-          </div>
+     
 
           <!-- Add Service Fee Button -->
           <div style="margin-bottom: 1rem; text-align: right;">

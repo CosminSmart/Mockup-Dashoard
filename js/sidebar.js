@@ -24,6 +24,8 @@ const navigationItems = {
         { name: 'Accounts', page: 'accounts', icon: '💳' },
         { name: 'Finance', page: 'finance', icon: '💰' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
+        { name: 'Transactions', page: 'transactions', icon: '💸' },
+        { name: 'Platform Payments', page: 'platform-payments', icon: '💳' },
         { name: 'Settings', page: 'settings', icon: '⚙️' }
         
     ],
