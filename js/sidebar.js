@@ -61,25 +61,6 @@ function generateSidebar() {
     const currentRole = getCurrentRole();
     const currentPage = getCurrentPage();
     const navItems = navigationItems[currentRole] || navigationItems.client;
-    
-    // Calculate total and percentages for donut chart
-    const total = walletData.mainWallet + walletData.platforms.reduce((sum, p) => sum + p.balance, 0);
-    const circumference = 2 * Math.PI * 40; // radius = 40
-    
-    // Calculate segments
-    const mainWalletPercent = (walletData.mainWallet / total) * circumference;
-    let offset = 0;
-    
-    const platformSegments = walletData.platforms.map(platform => {
-        const percent = (platform.balance / total) * circumference;
-        const segment = {
-            ...platform,
-            dasharray: `${percent} ${circumference}`,
-            dashoffset: -offset
-        };
-        offset += percent;
-        return segment;
-    });
 
     const sidebarHTML = `
         <div class="sidebar-header">
@@ -94,7 +75,7 @@ function generateSidebar() {
             </div>
 
             <!-- Wallet Widget -->
-            <div class="wallet-widget" onclick="openWalletCardsModal()">
+            <div class="wallet-widget">
                 <div class="wallet-widget-content">
                     <div class="wallet-widget-icon">💰</div>
                     <div class="wallet-widget-info">
@@ -105,40 +86,84 @@ function generateSidebar() {
 
                 <!-- Hover Modal -->
                 <div class="wallet-modal">
-                    <div class="wallet-modal-header">
-                        <span>💰 Wallet Overview</span>
+                    <!-- Toggle Button -->
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 8px;">
+                        <button onclick="toggleWalletView()" style="background: rgba(255,255,255,0.1); border: none; color: rgba(255,255,255,0.8); padding: 6px 12px; border-radius: 6px; font-size: 11px; cursor: pointer; transition: all 0.2s; font-weight: 600;" onmouseover="this.style.background='rgba(255,255,255,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+                            <span id="walletViewToggleText">Switch to List</span>
+                        </button>
                     </div>
                     
-                    <!-- Donut Chart -->
-                    <div class="wallet-chart-container">
-                        <svg class="wallet-donut-chart" viewBox="0 0 100 100">
-                            <circle class="wallet-donut-hole" cx="50" cy="50" r="30" fill="#2a2a2a"></circle>
-                            <circle class="wallet-donut-ring" cx="50" cy="50" r="40" fill="transparent" stroke="#667eea" stroke-width="20" stroke-dasharray="${mainWalletPercent} ${circumference}" stroke-dashoffset="0" transform="rotate(-90 50 50)"></circle>
-                            ${platformSegments.map(segment => `
-                                <circle cx="50" cy="50" r="40" fill="transparent" stroke="${segment.color}" stroke-width="20" stroke-dasharray="${segment.dasharray}" stroke-dashoffset="${segment.dashoffset}" transform="rotate(-90 50 50)"></circle>
-                            `).join('')}
-                        </svg>
-                        <div class="wallet-chart-center">
-                            <div class="wallet-chart-total">${total.toFixed(0)}</div>
-                            <div class="wallet-chart-label">Total</div>
+                    <!-- Icon Carousel View -->
+                    <div id="walletCarouselView" style="display: block;">
+                        <div id="walletIconCarousel" style="position: relative; width: 100%; height: 300px; display: flex; align-items: center; justify-content: center;">
+                            ${(() => {
+                                const allCards = [
+                                    { name: 'Main Wallet', balance: walletData.mainWallet, color: '#667eea', icon: '💰', iconPath: '../assets/icons/wallet.svg', type: 'main' },
+                                    ...walletData.platforms.map(p => ({ ...p, type: 'platform' }))
+                                ];
+                                const totalCards = allCards.length;
+                                const centerIndex = Math.floor(totalCards / 2);
+                                
+                                return allCards.map((card, index) => {
+                                    const position = index - centerIndex;
+                                    const offset = position * 50;
+                                    const scale = 1 - (Math.abs(position) * 0.15);
+                                    const opacity = 1 - (Math.abs(position) * 0.3);
+                                    const blur = Math.abs(position) * 0.8;
+                                    const zIndex = totalCards - Math.abs(position);
+                                    
+                                    return `
+                                        <div class="wallet-icon-item" data-index="${index}" data-original-index="${index}" style="
+                                            position: absolute;
+                                            width: 100%;
+                                            height: 50px;
+                                            transform: translateY(${offset}px) scale(${scale});
+                                            transform-origin: center center;
+                                            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+                                            cursor: pointer;
+                                            z-index: ${zIndex};
+                                            top: 50%;
+                                            margin-top: -25px;
+                                            opacity: ${opacity};
+                                            filter: blur(${blur}px);
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 12px;
+                                            padding: 0 12px;
+                                        " onclick="bringWalletItemToCenter(${index})">
+                                            <div style="width: 40px; height: 40px; flex-shrink: 0; display: flex; align-items: center; justify-content: center;">
+                                                <img src="${card.iconPath}" alt="${card.name}" style="width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                <div style="display: none; font-size: 32px; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.15));">${card.icon}</div>
+                                            </div>
+                                            <div style="display: flex; flex-direction: column; gap: 1px; flex: 1;">
+                                                <div style="font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.3px;">${card.name}</div>
+                                                <div style="font-size: 18px; font-weight: 900; color: white; letter-spacing: -0.5px;">$${card.balance.toFixed(2)}</div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('');
+                            })()}
                         </div>
                     </div>
                     
-                    <div class="wallet-modal-main">
-                        <div class="wallet-modal-label">Main Wallet</div>
-                        <div class="wallet-modal-amount">${walletData.mainWallet.toFixed(2)}</div>
-                    </div>
-                    <div class="wallet-modal-divider"></div>
-                    <div class="wallet-modal-platforms">
-                        ${walletData.platforms.map(platform => `
-                            <div class="wallet-modal-platform">
-                                <div class="wallet-modal-platform-info">
-                                    <span class="wallet-modal-platform-icon">${platform.icon}</span>
-                                    <span class="wallet-modal-platform-name">${platform.name}</span>
+                    <!-- List View -->
+                    <div id="walletListView" style="display: none;">
+                        <div class="wallet-modal-main">
+                            <div class="wallet-modal-label">Main Wallet</div>
+                            <div class="wallet-modal-amount">${walletData.mainWallet.toFixed(2)}</div>
+                        </div>
+                        <div class="wallet-modal-divider"></div>
+                        <div class="wallet-modal-platforms">
+                            ${walletData.platforms.map(platform => `
+                                <div class="wallet-modal-platform">
+                                    <div class="wallet-modal-platform-info">
+                                        <span class="wallet-modal-platform-icon">${platform.icon}</span>
+                                        <span class="wallet-modal-platform-name">${platform.name}</span>
+                                    </div>
+                                    <div class="wallet-modal-platform-balance">${platform.balance.toFixed(2)}</div>
                                 </div>
-                                <div class="wallet-modal-platform-balance">${platform.balance.toFixed(2)}</div>
-                            </div>
-                        `).join('')}
+                            `).join('')}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -179,21 +204,164 @@ document.addEventListener('DOMContentLoaded', function() {
     if (sidebarElement) {
         sidebarElement.innerHTML = generateSidebar();
         
-        // Position wallet modal dynamically
+        // Position wallet modal dynamically and add hover handlers
         const walletWidget = document.querySelector('.wallet-widget');
         const walletModal = document.querySelector('.wallet-modal');
         
         if (walletWidget && walletModal) {
+            let hideTimer = null;
+            
+            // Position modal
             walletWidget.addEventListener('mouseenter', function() {
                 const rect = walletWidget.getBoundingClientRect();
                 walletModal.style.top = rect.top + 'px';
+                
+                // Show modal
+                clearTimeout(hideTimer);
+                walletModal.classList.add('show');
+            });
+            
+            walletWidget.addEventListener('mouseleave', function() {
+                // Delay hiding
+                hideTimer = setTimeout(() => {
+                    walletModal.classList.remove('show');
+                }, 300);
+            });
+            
+            walletModal.addEventListener('mouseenter', function() {
+                // Keep modal open
+                clearTimeout(hideTimer);
+                walletModal.classList.add('show');
+            });
+            
+            walletModal.addEventListener('mouseleave', function() {
+                // Hide modal
+                hideTimer = setTimeout(() => {
+                    walletModal.classList.remove('show');
+                }, 300);
             });
         }
+        
+        // Add scroll functionality to wallet icon carousel
+        const carousel = document.getElementById('walletIconCarousel');
+        if (carousel) {
+            let isScrolling = false;
+            carousel.addEventListener('wheel', (e) => {
+                if (isScrolling) return;
+                
+                e.preventDefault();
+                e.stopPropagation();
+                isScrolling = true;
+                
+                if (e.deltaY > 0) {
+                    rotateWalletItemsDown();
+                } else {
+                    rotateWalletItemsUp();
+                }
+                
+                setTimeout(() => {
+                    isScrolling = false;
+                }, 600);
+            }, { passive: false });
+        }
     }
-    
-    // Create wallet cards modal
-    createWalletCardsModal();
 });
+
+// Rotate wallet items down
+function rotateWalletItemsDown() {
+    const items = Array.from(document.querySelectorAll('.wallet-icon-item'));
+    const totalItems = items.length;
+    const centerIndex = Math.floor(totalItems / 2);
+    
+    items.forEach((item) => {
+        let currentIndex = parseInt(item.dataset.index);
+        let newIndex = (currentIndex + 1) % totalItems;
+        
+        const position = newIndex - centerIndex;
+        const offset = position * 50;
+        const scale = 1 - (Math.abs(position) * 0.15);
+        const opacity = 1 - (Math.abs(position) * 0.3);
+        const blur = Math.abs(position) * 0.8;
+        const zIndex = totalItems - Math.abs(position);
+        
+        item.style.transform = `translateY(${offset}px) scale(${scale})`;
+        item.style.zIndex = zIndex;
+        item.style.opacity = opacity;
+        item.style.filter = `blur(${blur}px)`;
+        item.dataset.index = newIndex;
+    });
+}
+
+// Rotate wallet items up
+function rotateWalletItemsUp() {
+    const items = Array.from(document.querySelectorAll('.wallet-icon-item'));
+    const totalItems = items.length;
+    const centerIndex = Math.floor(totalItems / 2);
+    
+    items.forEach((item) => {
+        let currentIndex = parseInt(item.dataset.index);
+        let newIndex = (currentIndex - 1 + totalItems) % totalItems;
+        
+        const position = newIndex - centerIndex;
+        const offset = position * 50;
+        const scale = 1 - (Math.abs(position) * 0.15);
+        const opacity = 1 - (Math.abs(position) * 0.3);
+        const blur = Math.abs(position) * 0.8;
+        const zIndex = totalItems - Math.abs(position);
+        
+        item.style.transform = `translateY(${offset}px) scale(${scale})`;
+        item.style.zIndex = zIndex;
+        item.style.opacity = opacity;
+        item.style.filter = `blur(${blur}px)`;
+        item.dataset.index = newIndex;
+    });
+}
+
+// Bring wallet item to center
+function bringWalletItemToCenter(originalIndex) {
+    const items = Array.from(document.querySelectorAll('.wallet-icon-item'));
+    const totalItems = items.length;
+    const centerIndex = Math.floor(totalItems / 2);
+    
+    const clickedItem = items.find(item => parseInt(item.dataset.originalIndex) === originalIndex);
+    if (!clickedItem) return;
+    
+    const currentIndex = parseInt(clickedItem.dataset.index);
+    const currentPosition = currentIndex - centerIndex;
+    
+    const rotations = Math.abs(currentPosition);
+    const direction = currentPosition > 0 ? 'up' : 'down';
+    
+    for (let i = 0; i < rotations; i++) {
+        setTimeout(() => {
+            if (direction === 'up') {
+                rotateWalletItemsUp();
+            } else {
+                rotateWalletItemsDown();
+            }
+        }, i * 150);
+    }
+}
+
+// Toggle between carousel and list view
+let walletViewMode = 'carousel'; // 'carousel' or 'list'
+function toggleWalletView() {
+    const carouselView = document.getElementById('walletCarouselView');
+    const listView = document.getElementById('walletListView');
+    const toggleText = document.getElementById('walletViewToggleText');
+    
+    if (walletViewMode === 'carousel') {
+        carouselView.style.display = 'none';
+        listView.style.display = 'block';
+        toggleText.textContent = 'Switch to Carousel';
+        walletViewMode = 'list';
+    } else {
+        carouselView.style.display = 'block';
+        listView.style.display = 'none';
+        toggleText.textContent = 'Switch to List';
+        walletViewMode = 'carousel';
+    }
+}
 
 // Create wallet cards modal
 function createWalletCardsModal() {
@@ -206,7 +374,7 @@ function createWalletCardsModal() {
     const centerIndex = Math.floor(totalCards / 2);
     
     const modalHTML = `
-        <div id="walletCardsModal" style="display: none; position: fixed; inset: 0; background: #f5f5f5; z-index: 99999; overflow: hidden;">
+        <div id="walletCardsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99999; overflow: hidden; backdrop-filter: blur(4px);" onmouseenter="clearTimeout(window.walletModalCloseTimer)" onmouseleave="scheduleCloseWalletCardsModal()">
             <button onclick="closeWalletCardsModal()" style="position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.1); border: none; color: #333; width: 40px; height: 40px; border-radius: 50%; font-size: 24px; cursor: pointer; z-index: 100000; backdrop-filter: blur(10px); transition: all 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.2)'" onmouseout="this.style.background='rgba(0,0,0,0.1)'">×</button>
             
             <div id="cardStackContainer" style="height: 100vh; display: flex; align-items: center; justify-content: center; perspective: 1000px;">
@@ -368,11 +536,20 @@ function bringCardToCenter(originalIndex) {
 
 // Open wallet cards modal
 function openWalletCardsModal() {
+    clearTimeout(window.walletModalCloseTimer);
     const modal = document.getElementById('walletCardsModal');
     if (modal) {
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
     }
+}
+
+// Schedule close wallet cards modal
+let walletModalCloseTimer;
+function scheduleCloseWalletCardsModal() {
+    walletModalCloseTimer = setTimeout(() => {
+        closeWalletCardsModal();
+    }, 300);
 }
 
 // Close wallet cards modal
