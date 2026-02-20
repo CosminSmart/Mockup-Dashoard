@@ -1213,9 +1213,47 @@
 
           <div class="form-group">
             <label>To</label>
-            <select id="transfer_to" onchange="updateTransferPreview()" disabled>
+            <select id="transfer_to" onchange="updateMainToPlatformInfo(); updateTransferPreview()" disabled>
               <option value="">Select destination...</option>
             </select>
+          </div>
+        </div>
+
+        <!-- Platform Balance Info (shown when platform is selected) -->
+        <div id="platform_balance_info" style="display: none; padding: 12px; background: rgba(102, 126, 234, 0.05); border: 1px solid rgba(102, 126, 234, 0.15); border-radius: 8px; margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px;">
+            Platform Balances
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+            <div>
+              <div style="font-size: 11px; color: var(--muted);">Vault</div>
+              <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="platform_vault_balance">$0.00</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--muted);">General</div>
+              <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="platform_general_balance">$0.00</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--muted);">Individual</div>
+              <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="platform_individual_balance">$0.00</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Main to Platform Balance Info (shown when transferring from Main to Platform) -->
+        <div id="main_to_platform_info" style="display: none; padding: 12px; background: rgba(102, 126, 234, 0.05); border: 1px solid rgba(102, 126, 234, 0.15); border-radius: 8px; margin-bottom: 16px;">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px;">
+            Current Balances
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+            <div>
+              <div style="font-size: 11px; color: var(--muted);">Main Wallet</div>
+              <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="main_wallet_balance_display">$0.00</div>
+            </div>
+            <div>
+              <div style="font-size: 11px; color: var(--muted);" id="target_platform_label">Platform Vault</div>
+              <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="target_platform_balance">$0.00</div>
+            </div>
           </div>
         </div>
 
@@ -1619,12 +1657,16 @@
       const toSelect = document.getElementById('transfer_to');
       const fromInfo = document.getElementById('from_info');
       const feeDisplayGroup = document.getElementById('fee_display_group');
+      const platformBalanceInfo = document.getElementById('platform_balance_info');
+      const mainToPlatformInfo = document.getElementById('main_to_platform_info');
 
       toSelect.innerHTML = '<option value="">Select destination...</option>';
 
       if (!from) {
         fromInfo.style.display = 'none';
         feeDisplayGroup.style.display = 'none';
+        platformBalanceInfo.style.display = 'none';
+        mainToPlatformInfo.style.display = 'none';
         updateTransferPreview();
         return;
       }
@@ -1639,6 +1681,8 @@
         `;
         fromInfo.style.display = 'inline-flex';
         feeDisplayGroup.style.display = 'block';
+        platformBalanceInfo.style.display = 'none';
+        mainToPlatformInfo.style.display = 'block';
       } else {
         const [platform, type] = from.split('_');
         const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
@@ -1661,6 +1705,11 @@
         
         fromInfo.style.display = 'none';
         feeDisplayGroup.style.display = 'none';
+        
+        // Show platform balance info
+        platformBalanceInfo.style.display = 'block';
+        mainToPlatformInfo.style.display = 'none';
+        updatePlatformBalanceInfo(platform);
       }
 
       updateTransferPreview();
@@ -2041,6 +2090,31 @@
       document.getElementById('instagram_individual_display').textContent = `$${platformIndividualBalances.instagram.toFixed(2)}`;
     }
 
+    function updatePlatformBalanceInfo(platform) {
+      const vaultBalance = platformBalances[platform] || 0;
+      const generalBalance = platformGeneralBalances[platform] || 0;
+      const individualBalance = platformIndividualBalances[platform] || 0;
+      
+      document.getElementById('platform_vault_balance').textContent = `$${vaultBalance.toFixed(2)}`;
+      document.getElementById('platform_general_balance').textContent = `$${generalBalance.toFixed(2)}`;
+      document.getElementById('platform_individual_balance').textContent = `$${individualBalance.toFixed(2)}`;
+    }
+
+
+    function updateMainToPlatformInfo() {
+      const to = document.getElementById('transfer_to').value;
+      
+      if (!to) {
+        return;
+      }
+      
+      const [platform, type] = to.split('_');
+      const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+      
+      document.getElementById('main_wallet_balance_display').textContent = `$${mainWalletBalance.toFixed(2)}`;
+      document.getElementById('target_platform_label').textContent = `${platformName} Vault`;
+      document.getElementById('target_platform_balance').textContent = `$${(platformBalances[platform] || 0).toFixed(2)}`;
+    }
     function resetTransferForm() {
       document.getElementById('transfer_from').value = '';
       document.getElementById('from_trigger_text').textContent = 'Select source';
@@ -2057,6 +2131,8 @@
       document.getElementById('confirm_transfer_btn').disabled = true;
       document.getElementById('from_info').style.display = 'none';
       document.getElementById('fee_display_group').style.display = 'none';
+      document.getElementById('platform_balance_info').style.display = 'none';
+      document.getElementById('main_to_platform_info').style.display = 'none';
     }
 
     // Modal functions

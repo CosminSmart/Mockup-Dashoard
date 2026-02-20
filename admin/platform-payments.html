@@ -784,6 +784,184 @@
       border: 6px solid transparent;
       border-top-color: var(--text);
     }
+
+    /* Platform History Modal */
+    .history-modal{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .history-modal.show{ display: flex; }
+
+    .history-modal-content{
+      background: var(--panel);
+      border-radius: 12px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .history-modal-header{
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .history-modal-title{
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0;
+    }
+
+    .history-modal-icon{
+      width: 32px;
+      height: 32px;
+    }
+
+    .history-modal-close{
+      background: #e2e8f0;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+    }
+
+    .history-modal-close:hover{
+      background: #cbd5e0;
+    }
+
+    .history-modal-body{
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .history-stats{
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .history-stat{
+      background: rgba(102, 126, 234, 0.05);
+      border: 1px solid rgba(102, 126, 234, 0.15);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .history-stat-label{
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .history-stat-value{
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .history-table{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .history-table thead th{
+      background: #fafafa;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .history-table tbody td{
+      padding: 1rem 0.75rem;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+
+    .history-table tbody tr:hover{
+      background: rgba(102, 126, 234, 0.03);
+    }
+
+    .history-badge{
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .history-badge.in{
+      background: rgba(72, 187, 120, 0.1);
+      color: #2f855a;
+    }
+
+    .history-badge.out{
+      background: rgba(245, 101, 101, 0.1);
+      color: #c53030;
+    }
+
+    .history-amount{
+      font-weight: 900;
+      font-size: 1rem;
+    }
+
+    .history-amount.positive{
+      color: #2f855a;
+    }
+
+    .history-amount.negative{
+      color: #c53030;
+    }
+
+    .empty-history{
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-history-icon{
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .platform-card{
+      cursor: pointer;
+    }
+
+    .platform-card:active{
+      transform: translateY(0) scale(0.98);
+    }
   </style>
 </head>
 
@@ -999,7 +1177,7 @@
         
         <div class="platforms-grid">
           <!-- Facebook -->
-          <div class="platform-card">
+          <div class="platform-card" onclick="openPlatformHistory('facebook')">
             <div class="platform-card-header">
               <img src="../assets/icons/facebook.svg" alt="Facebook" class="platform-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
               <div class="platform-icon-fallback" style="display: none;">📘</div>
@@ -1022,7 +1200,7 @@
           </div>
 
           <!-- Google -->
-          <div class="platform-card">
+          <div class="platform-card" onclick="openPlatformHistory('google')">
             <div class="platform-card-header">
               <img src="../assets/icons/google.svg" alt="Google" class="platform-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
               <div class="platform-icon-fallback" style="display: none;">🔍</div>
@@ -1045,7 +1223,7 @@
           </div>
 
           <!-- TikTok -->
-          <div class="platform-card">
+          <div class="platform-card" onclick="openPlatformHistory('tiktok')">
             <div class="platform-card-header">
               <img src="../assets/icons/tiktok.svg" alt="TikTok" class="platform-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
               <div class="platform-icon-fallback" style="display: none;">🎵</div>
@@ -1068,7 +1246,7 @@
           </div>
 
           <!-- Instagram -->
-          <div class="platform-card">
+          <div class="platform-card" onclick="openPlatformHistory('instagram')">
             <div class="platform-card-header">
               <img src="../assets/icons/instagram.svg" alt="Instagram" class="platform-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
               <div class="platform-icon-fallback" style="display: none;">📷</div>
@@ -1129,36 +1307,120 @@
 
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Platform History Modal -->
+    <div class="history-modal" id="historyModal">
+      <div class="history-modal-content">
+        <div class="history-modal-header">
+          <div class="history-modal-title">
+            <img src="" alt="" class="history-modal-icon" id="historyModalIcon">
+            <div>
+              <h2 style="margin: 0; font-size: 1.5rem;" id="historyModalTitle">Platform History</h2>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: var(--muted);">All transactions for this platform</p>
+            </div>
+          </div>
+          <button class="history-modal-close" onclick="closeHistoryModal()">×</button>
+        </div>
+
+        <div class="history-modal-body">
+          <!-- Stats -->
+          <div class="history-stats">
+            <div class="history-stat">
+              <div class="history-stat-label">Total In</div>
+              <div class="history-stat-value" id="historyTotalIn">$0.00</div>
+            </div>
+            <div class="history-stat">
+              <div class="history-stat-label">Total Out</div>
+              <div class="history-stat-value" id="historyTotalOut">$0.00</div>
+            </div>
+            <div class="history-stat">
+              <div class="history-stat-label">Net Flow</div>
+              <div class="history-stat-value" id="historyNetFlow">$0.00</div>
+            </div>
+            <div class="history-stat">
+              <div class="history-stat-label">Transactions</div>
+              <div class="history-stat-value" id="historyTxCount">0</div>
+            </div>
+          </div>
+
+          <!-- Transaction History Table -->
+          <div id="historyTableContainer"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="../js/sidebar.js"></script>
   <script>
-    // Platform balances (demo data)
-    const platformBalances = {
+    // Load data from localStorage or use defaults
+    function loadFromStorage(key, defaultValue) {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : defaultValue;
+    }
+
+    function saveToStorage(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    // Platform balances (load from localStorage or use defaults)
+    const platformBalances = loadFromStorage('admin_platformBalances', {
       facebook: 10.00,
       google: 15.00,
       tiktok: 5.00,
       instagram: 0.00
-    };
+    });
 
     // Platform-specific General and Individual balances
-    const platformGeneralBalances = {
+    const platformGeneralBalances = loadFromStorage('admin_platformGeneralBalances', {
       facebook: 50.00,
       google: 80.00,
       tiktok: 30.00,
       instagram: 90.00
-    };
+    });
 
-    const platformIndividualBalances = {
+    const platformIndividualBalances = loadFromStorage('admin_platformIndividualBalances', {
       facebook: 25.00,
       google: 40.00,
       tiktok: 15.00,
       instagram: 40.00
+    });
+
+    let mainWalletBalance = loadFromStorage('admin_mainWalletBalance', 580.00);
+    let generalBalance = loadFromStorage('admin_generalBalance', 250.00);
+    let individualBalance = loadFromStorage('admin_individualBalance', 120.00);
+
+    // Transaction history storage (load from localStorage)
+    let transactionHistory = loadFromStorage('admin_transactionHistory', []);
+
+    // Platform info
+    const platformInfo = {
+      facebook: { name: 'Facebook', icon: '../assets/icons/facebook.svg', fallback: '📘' },
+      google: { name: 'Google', icon: '../assets/icons/google.svg', fallback: '🔍' },
+      tiktok: { name: 'TikTok', icon: '../assets/icons/tiktok.svg', fallback: '🎵' },
+      instagram: { name: 'Instagram', icon: '../assets/icons/instagram.svg', fallback: '📷' }
     };
 
-    let mainWalletBalance = 580.00;
-    let generalBalance = 250.00;
-    let individualBalance = 120.00;
+    // Save all data to localStorage
+    function saveAllData() {
+      saveToStorage('admin_platformBalances', platformBalances);
+      saveToStorage('admin_platformGeneralBalances', platformGeneralBalances);
+      saveToStorage('admin_platformIndividualBalances', platformIndividualBalances);
+      saveToStorage('admin_mainWalletBalance', mainWalletBalance);
+      saveToStorage('admin_generalBalance', generalBalance);
+      saveToStorage('admin_individualBalance', individualBalance);
+      saveToStorage('admin_transactionHistory', transactionHistory);
+    }
+
+    // Add transaction to history
+    function addTransactionToHistory(transaction) {
+      transactionHistory.unshift({
+        ...transaction,
+        id: Date.now() + Math.random(),
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleString()
+      });
+      saveAllData(); // Save after adding transaction
+    }
 
     // Client fees per platform (percentage)
     const clientFees = {
@@ -1740,6 +2002,17 @@
           const totalPlatformVault = Object.values(platformBalances).reduce((sum, val) => sum + val, 0);
           document.querySelector('.wallet-card.platform .wallet-card-amount').textContent = `USD ${totalPlatformVault.toFixed(2)}`;
 
+          // Add to transaction history
+          addTransactionToHistory({
+            platform: platform,
+            type: 'Main → Vault',
+            from: 'Main Wallet',
+            to: `${platformName} Vault`,
+            amount: amount,
+            fee: fee,
+            direction: 'in'
+          });
+
           const successMessage = `
             <strong>$${amount.toFixed(2)}</strong> transferred to ${platformName} Vault
             <br><br>
@@ -1753,7 +2026,8 @@
             to: platform,
             amount: amount,
             fee: fee,
-            totalAmount: totalAmount
+            totalAmount: totalAmount,
+            historyId: transactionHistory[0].id
           };
           
           // Show toast with cancel option
@@ -1763,6 +2037,12 @@
               // Reverse the transaction
               mainWalletBalance += transactionDetails.totalAmount;
               platformBalances[transactionDetails.to] -= transactionDetails.amount;
+              
+              // Remove from history
+              transactionHistory = transactionHistory.filter(tx => tx.id !== transactionDetails.historyId);
+              
+              // Save changes
+              saveAllData();
               
               // Update UI - Main Wallet card
               document.querySelector('.wallet-card.main .wallet-card-amount').textContent = `USD ${mainWalletBalance.toFixed(2)}`;
@@ -1862,6 +2142,29 @@
           updatePlatformBalanceInfo(fromPlatform);
           updatePlatformOverview();
 
+
+          // Determine direction for history (from platform perspective)
+          let direction = 'out'; // Default: money leaving platform
+          let historyPlatform = fromPlatform;
+          
+          if (to !== 'main') {
+            const [toPlatform, toType] = to.split('_');
+            if (toPlatform === fromPlatform) {
+              // Internal transfer within same platform (e.g., Vault → General)
+              direction = 'in'; // Money staying in platform ecosystem
+            }
+          }
+          
+          // Add to transaction history
+          addTransactionToHistory({
+            platform: historyPlatform,
+            type: `${fromName} → ${toName}`,
+            from: fromName,
+            to: toName,
+            amount: amount,
+            fee: 0,
+            direction: direction
+          });
           const successMessage = `<strong>$${amount.toFixed(2)}</strong> transferred from ${fromName} to ${toName}`;
           
           // Store transaction details for reversal
@@ -1870,7 +2173,8 @@
             fromPlatform: fromPlatform,
             fromType: fromType,
             to: to,
-            amount: amount
+            amount: amount,
+            historyId: transactionHistory[0].id
           };
           
           // Show toast with cancel option
@@ -1912,6 +2216,12 @@
               const totalPlatformVault = Object.values(platformBalances).reduce((sum, val) => sum + val, 0);
               document.querySelector('.wallet-card.platform .wallet-card-amount').textContent = `USD ${totalPlatformVault.toFixed(2)}`;
               
+              // Remove from history
+              transactionHistory = transactionHistory.filter(tx => tx.id !== transactionDetails.historyId);
+              
+              // Save changes
+              saveAllData();
+              
               updatePlatformOverview();
             }
           });
@@ -1951,7 +2261,116 @@
     }
 
     // Initialize on load
-    document.getElementById('confirm_transfer_btn').disabled = true;
+    function initializePage() {
+      // Disable confirm button initially
+      document.getElementById('confirm_transfer_btn').disabled = true;
+      
+      // Load and display saved balances
+      document.querySelector('.wallet-card.main .wallet-card-amount').textContent = `USD ${mainWalletBalance.toFixed(2)}`;
+      
+      const totalPlatformVault = Object.values(platformBalances).reduce((sum, val) => sum + val, 0);
+      document.querySelector('.wallet-card.platform .wallet-card-amount').textContent = `USD ${totalPlatformVault.toFixed(2)}`;
+      
+      document.querySelector('.wallet-card.individual .wallet-card-amount').textContent = `USD ${individualBalance.toFixed(2)}`;
+      document.querySelector('.wallet-card.general .wallet-card-amount').textContent = `USD ${generalBalance.toFixed(2)}`;
+
+      // Update platform overview
+      updatePlatformOverview();
+    }
+
+    // Call initialization when page loads
+    document.addEventListener('DOMContentLoaded', initializePage);
+    // Also call immediately in case DOMContentLoaded already fired
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializePage);
+    } else {
+      initializePage();
+    }
+
+    // Open platform history modal
+    function openPlatformHistory(platform) {
+      const modal = document.getElementById('historyModal');
+      const info = platformInfo[platform];
+      
+      // Set modal title and icon
+      document.getElementById('historyModalTitle').textContent = `${info.name} History`;
+      document.getElementById('historyModalIcon').src = info.icon;
+      
+      // Filter transactions for this platform
+      const platformTransactions = transactionHistory.filter(tx => tx.platform === platform);
+      
+      // Calculate stats
+      let totalIn = 0;
+      let totalOut = 0;
+      
+      platformTransactions.forEach(tx => {
+        if (tx.direction === 'in') {
+          totalIn += tx.amount;
+        } else {
+          totalOut += tx.amount;
+        }
+      });
+      
+      const netFlow = totalIn - totalOut;
+      
+      // Update stats
+      document.getElementById('historyTotalIn').textContent = `$${totalIn.toFixed(2)}`;
+      document.getElementById('historyTotalOut').textContent = `$${totalOut.toFixed(2)}`;
+      document.getElementById('historyNetFlow').textContent = `$${netFlow.toFixed(2)}`;
+      document.getElementById('historyTxCount').textContent = platformTransactions.length;
+      
+      // Render transaction table
+      const tableContainer = document.getElementById('historyTableContainer');
+      
+      if (platformTransactions.length === 0) {
+        tableContainer.innerHTML = `
+          <div class="empty-history">
+            <div class="empty-history-icon">📭</div>
+            <p style="margin: 0; font-size: 1.1rem; font-weight: 700;">No transactions yet</p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Start by transferring funds to this platform</p>
+          </div>
+        `;
+      } else {
+        tableContainer.innerHTML = `
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>From → To</th>
+                <th>Direction</th>
+                <th style="text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${platformTransactions.map(tx => `
+                <tr>
+                  <td>${tx.date}</td>
+                  <td>${tx.from} → ${tx.to}</td>
+                  <td>
+                    <span class="history-badge ${tx.direction}">${tx.direction === 'in' ? 'IN' : 'OUT'}</span>
+                  </td>
+                  <td style="text-align: right;">
+                    <span class="history-amount ${tx.direction === 'in' ? 'positive' : 'negative'}">
+                      ${tx.direction === 'in' ? '+' : '-'}$${tx.amount.toFixed(2)}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+      
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close platform history modal
+    function closeHistoryModal() {
+      const modal = document.getElementById('historyModal');
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
   </script>
 </body>
 </html>
