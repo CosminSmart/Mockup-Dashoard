@@ -1,0 +1,2293 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Platform Payments - Client</title>
+
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+
+  <style>
+    :root{
+      --primary: #667eea;
+      --primary-dark: #5568d3;
+      --success: #48bb78;
+      --danger: #f56565;
+      --warning: #ed8936;
+      --text: #2d3748;
+      --muted: #718096;
+      --border: #e2e8f0;
+      --bg: #f7fafc;
+    }
+
+    body{ background: var(--bg); }
+
+    .wallet-overview{
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 1100px){
+      .wallet-overview{ grid-template-columns: 1fr; }
+    }
+
+    .wallet-overview-left, .wallet-overview-right{
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .wallet-overview-right{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .wallet-card{
+      background: #fff;
+      padding: 1.25rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.2s ease;
+    }
+
+    .wallet-card:hover{ transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+
+    .wallet-card-label{
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .wallet-card-amount{
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+
+    .wallet-card-description{
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .wallet-card.main{ border-left: 4px solid #667eea; }
+    .wallet-card.platform{ border-left: 4px solid #48bb78; }
+    .wallet-card.individual{ border-left: 4px solid #ed8936; }
+    .wallet-card.general{ border-left: 4px solid #9f7aea; }
+
+    .transfer-section{
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+    }
+
+    .transfer-section h2{
+      margin: 0 0 1.25rem 0;
+      font-size: 1.5rem;
+      color: var(--text);
+    }
+
+    .form-row{
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    @media (max-width: 780px){
+      .form-row{ grid-template-columns: 1fr; }
+    }
+
+    .form-group{
+      margin-bottom: 1rem;
+    }
+
+    .form-group label{
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 700;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .form-group select, .form-group input{
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #fff;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-group select:focus, .form-group input:focus{
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    .form-group select:disabled, .form-group input:disabled{
+      background: #f7fafc;
+      cursor: not-allowed;
+    }
+
+    .custom-dropdown{
+      position: relative;
+    }
+
+    .dropdown-trigger{
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .dropdown-trigger:hover:not(:disabled){ border-color: var(--primary); }
+    .dropdown-trigger:disabled{ background: #f7fafc; cursor: not-allowed; }
+
+    .dropdown-trigger-icon{
+      width: 20px;
+      height: 20px;
+    }
+
+    .dropdown-trigger-text{
+      flex: 1;
+      color: var(--text);
+    }
+
+    .dropdown-trigger-arrow{
+      margin-left: auto;
+      transition: transform 0.2s ease;
+    }
+
+    .dropdown-trigger.active .dropdown-trigger-arrow{
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu{
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 100;
+      display: none;
+    }
+
+    .dropdown-menu.show{ display: block; }
+
+    .dropdown-item{
+      padding: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+    }
+
+    .dropdown-item:hover{ background: rgba(102, 126, 234, 0.08); }
+
+    .dropdown-item-icon{
+      width: 20px;
+      height: 20px;
+    }
+
+    .dropdown-item.has-submenu{
+      justify-content: space-between;
+    }
+
+    .dropdown-item-arrow{
+      margin-left: auto;
+      color: var(--muted);
+    }
+
+    .submenu{
+      display: none;
+      padding-left: 1rem;
+      background: rgba(102, 126, 234, 0.03);
+    }
+
+    .submenu.show{ display: block; }
+
+    .dropdown-subitem{
+      padding: 0.6rem 0.75rem;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      font-size: 0.9rem;
+    }
+
+    .dropdown-subitem:hover{ background: rgba(102, 126, 234, 0.12); }
+
+    .dropdown-subitem.disabled{
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: rgba(239, 68, 68, 0.05);
+    }
+
+    .transfer-preview{
+      background: rgba(102, 126, 234, 0.08);
+      border: 1px solid rgba(102, 126, 234, 0.2);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+
+    .error-notice{
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #c53030;
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+    }
+
+    .error-notice.show{ display: flex; }
+
+    .form-actions{
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-transfer, .btn-reset{
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-transfer{
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-transfer:hover:not(:disabled){ background: var(--primary-dark); }
+    .btn-transfer:disabled{ opacity: 0.5; cursor: not-allowed; }
+
+    .btn-reset{
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .btn-reset:hover{ background: #cbd5e0; }
+
+    .platforms-grid{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    .platform-card{
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .platform-card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .platform-card-header{
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .platform-icon{
+      width: 32px;
+      height: 32px;
+    }
+
+    .platform-icon-fallback{
+      font-size: 24px;
+    }
+
+    .platform-name{
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .platform-balances{
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .balance-item{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .balance-label{
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .balance-value{
+      font-size: 1.1rem;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .info-icon{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      background: var(--primary);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: help;
+      margin-left: 4px;
+      position: relative;
+    }
+
+    .info-icon .tooltip{
+      position: absolute;
+      bottom: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--text);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s ease;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .info-icon:hover .tooltip{
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    .info-icon .tooltip::after{
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: var(--text);
+    }
+
+    .custom-modal{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .custom-modal.show{ display: flex; }
+
+    .modal-content{
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 12px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .modal-header{
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
+
+    .modal-body{
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .modal-footer{
+      display: flex;
+      gap: 0.75rem;
+      justify-content: flex-end;
+    }
+
+    .modal-btn{
+      padding: 0.65rem 1.25rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .modal-btn.primary{
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .modal-btn.primary:hover{ background: var(--primary-dark); }
+
+    .modal-btn.secondary{
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .modal-btn.secondary:hover{ background: #cbd5e0; }
+
+    .modal-btn.success{
+      background: var(--success);
+      color: #fff;
+    }
+
+    .modal-btn.success:hover{ background: #38a169; }
+
+    .toast-container{
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      max-width: 400px;
+    }
+
+    .toast{
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      padding: 1rem;
+      animation: toastSlideIn 0.3s ease;
+    }
+
+    @keyframes toastSlideIn{
+      from{ transform: translateX(400px); opacity: 0; }
+      to{ transform: translateX(0); opacity: 1; }
+    }
+
+    .toast.success{ border-left: 4px solid var(--success); }
+    .toast.error{ border-left: 4px solid var(--danger); }
+
+    .toast-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .toast-title{
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .toast-icon{
+      font-size: 1.2rem;
+    }
+
+    .toast-close{
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--muted);
+      line-height: 1;
+      padding: 0;
+      width: 24px;
+      height: 24px;
+    }
+
+    .toast-close:hover{ color: var(--text); }
+
+    .toast-body{
+      font-size: 0.9rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .toast-actions{
+      margin-top: 0.75rem;
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .toast-btn{
+      padding: 0.5rem 1rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toast-btn.secondary{
+      background: #e2e8f0;
+      color: var(--text);
+    }
+
+    .toast-btn.secondary:hover{
+      background: #cbd5e0;
+    }
+
+    .no-general-access{
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: #c53030;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* Platform History Modal */
+    .history-modal{
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .history-modal.show{ display: flex; }
+
+    .history-modal-content{
+      background: #fff;
+      border-radius: 12px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+
+    .history-modal-header{
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .history-modal-title{
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 0;
+    }
+
+    .history-modal-icon{
+      width: 32px;
+      height: 32px;
+    }
+
+    .history-modal-close{
+      background: #e2e8f0;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      font-size: 20px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text);
+    }
+
+    .history-modal-close:hover{
+      background: #cbd5e0;
+    }
+
+    .history-modal-body{
+      padding: 1.5rem;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .history-stats{
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .history-stat{
+      background: rgba(102, 126, 234, 0.05);
+      border: 1px solid rgba(102, 126, 234, 0.15);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .history-stat-label{
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .history-stat-value{
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .history-table{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .history-table thead th{
+      background: #fafafa;
+      color: var(--muted);
+      font-size: 0.75rem;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+    }
+
+    .history-table tbody td{
+      padding: 1rem 0.75rem;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+
+    .history-table tbody tr:hover{
+      background: rgba(102, 126, 234, 0.03);
+    }
+
+    .history-badge{
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .history-badge.in{
+      background: rgba(72, 187, 120, 0.1);
+      color: #2f855a;
+    }
+
+    .history-badge.out{
+      background: rgba(245, 101, 101, 0.1);
+      color: #c53030;
+    }
+
+    .history-amount{
+      font-weight: 900;
+      font-size: 1rem;
+    }
+
+    .history-amount.positive{
+      color: #2f855a;
+    }
+
+    .history-amount.negative{
+      color: #c53030;
+    }
+
+    .empty-history{
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--muted);
+    }
+
+    .empty-history-icon{
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    .platform-card{
+      cursor: pointer;
+    }
+
+    .platform-card:active{
+      transform: translateY(0) scale(0.98);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 1400px) {
+      .wallet-overview{
+        grid-template-columns: 1fr;
+      }
+
+      .wallet-overview-right{
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 1200px) {
+      .wallet-card-amount{
+        font-size: 1.5rem;
+      }
+
+      .platforms-grid{
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .history-modal-content{
+        max-width: 800px;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .wallet-overview-right{
+        grid-template-columns: 1fr;
+      }
+
+      .platforms-grid{
+        grid-template-columns: 1fr;
+      }
+
+      .history-stats{
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .history-modal-content{
+        max-width: 95vw;
+      }
+
+      .history-table{
+        font-size: 0.85rem;
+      }
+
+      .history-table thead th,
+      .history-table tbody td{
+        padding: 0.6rem 0.5rem;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .form-row{
+        grid-template-columns: 1fr;
+      }
+
+      .wallet-card-amount{
+        font-size: 1.25rem;
+      }
+
+      .transfer-section h2{
+        font-size: 1.25rem;
+      }
+
+      .history-stats{
+        grid-template-columns: 1fr;
+      }
+
+      .history-table{
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+      }
+
+      .history-modal-header{
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .history-modal-close{
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .wallet-card{
+        padding: 1rem;
+      }
+
+      .wallet-card-amount{
+        font-size: 1.5rem;
+      }
+
+      .platform-card{
+        padding: 0.75rem;
+      }
+
+      .platform-card-header{
+        gap: 0.5rem;
+      }
+
+      .platform-icon{
+        width: 24px;
+        height: 24px;
+      }
+
+      .platform-name{
+        font-size: 1rem;
+      }
+
+      .balance-value{
+        font-size: 1rem;
+      }
+
+      .transfer-section{
+        padding: 1rem;
+      }
+
+      .history-modal-body{
+        padding: 1rem;
+      }
+
+      .btn-transfer, .btn-reset{
+        padding: 0.65rem 1.25rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* Compact mode for smaller desktops (1024px - 1366px) */
+    @media (min-width: 1024px) and (max-width: 1366px) {
+      .wallet-overview{
+        gap: 0.75rem;
+        grid-template-columns: 0.8fr 2.2fr;
+      }
+
+      .wallet-overview-right{
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+      }
+
+      .wallet-card{
+        padding: 0.85rem;
+      }
+
+      .wallet-card-label{
+        font-size: 0.65rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .wallet-card-amount{
+        font-size: 1.5rem;
+        margin-bottom: 0.15rem;
+      }
+
+      .wallet-card-description{
+        font-size: 0.75rem;
+      }
+
+      .transfer-section{
+        padding: 1.25rem;
+      }
+
+      .transfer-section h2{
+        font-size: 1.35rem;
+      }
+
+      .form-row{
+        gap: 0.75rem;
+      }
+
+      .platforms-grid{
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+      }
+
+      .platform-card{
+        padding: 0.85rem;
+      }
+
+      .platform-card-header{
+        margin-bottom: 0.75rem;
+        padding-bottom: 0.6rem;
+      }
+
+      .platform-icon{
+        width: 28px;
+        height: 28px;
+      }
+
+      .platform-name{
+        font-size: 1rem;
+      }
+
+      .platform-balances{
+        gap: 0.6rem;
+      }
+
+      .balance-label{
+        font-size: 0.8rem;
+      }
+
+      .balance-value{
+        font-size: 1rem;
+      }
+
+      /* Compact history stats for smaller desktops */
+      .history-stats{
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+        margin-bottom: 1.25rem;
+      }
+
+      .history-stat{
+        padding: 0.75rem;
+      }
+
+      .history-stat-label{
+        font-size: 0.65rem;
+        margin-bottom: 0.35rem;
+      }
+
+      .history-stat-value{
+        font-size: 1.25rem;
+      }
+
+      .history-modal-content{
+        max-width: 850px;
+      }
+    }
+
+    /* Extra compact for very small desktops */
+    @media (min-width: 1024px) and (max-width: 1200px) {
+      .wallet-overview-right{
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+      }
+
+      .wallet-card{
+        padding: 0.7rem;
+      }
+
+      .wallet-card-label{
+        font-size: 0.6rem;
+      }
+
+      .wallet-card-amount{
+        font-size: 1.35rem;
+      }
+
+      .wallet-card-description{
+        font-size: 0.7rem;
+      }
+
+      .platforms-grid{
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.6rem;
+      }
+
+      .platform-card{
+        padding: 0.7rem;
+      }
+
+      .platform-card-header{
+        margin-bottom: 0.6rem;
+        padding-bottom: 0.5rem;
+        gap: 0.5rem;
+      }
+
+      .platform-icon{
+        width: 24px;
+        height: 24px;
+      }
+
+      .platform-name{
+        font-size: 0.9rem;
+      }
+
+      .platform-balances{
+        gap: 0.5rem;
+      }
+
+      .balance-label{
+        font-size: 0.75rem;
+      }
+
+      .balance-value{
+        font-size: 0.95rem;
+      }
+
+      .history-stats{
+        gap: 0.5rem;
+      }
+
+      .history-stat{
+        padding: 0.6rem;
+      }
+
+      .history-stat-label{
+        font-size: 0.6rem;
+        letter-spacing: 0.3px;
+      }
+
+      .history-stat-value{
+        font-size: 1.1rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>💳 Platform Payments</h1>
+      <div class="header-right">
+        <div class="user-info">
+          <span id="clientHeaderName">Client</span>
+          <div class="user-avatar" id="clientAvatar">CL</div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <!-- Wallet Overview -->
+      <div class="wallet-overview">
+        <div class="wallet-overview-left">
+          <div class="wallet-card main">
+            <div class="wallet-card-label">Main Wallet (Your Balance)</div>
+            <div class="wallet-card-amount">USD 580.00</div>
+            <div class="wallet-card-description">Available for transfers</div>
+          </div>
+        </div>
+
+        <div class="wallet-overview-right">
+          <div class="wallet-card platform">
+            <div class="wallet-card-label">Platform Vault (Total)</div>
+            <div class="wallet-card-amount">USD 30.00</div>
+            <div class="wallet-card-description">Funds per platform</div>
+          </div>
+
+          <div class="wallet-card individual">
+            <div class="wallet-card-label">Individual Balance</div>
+            <div class="wallet-card-amount">USD 120.00</div>
+            <div class="wallet-card-description">Your individual budget</div>
+          </div>
+
+          <div class="wallet-card general">
+            <div class="wallet-card-label">General Balance</div>
+            <div class="wallet-card-amount">USD 250.00</div>
+            <div class="wallet-card-description">Shared accounts</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transfer Section -->
+      <div class="transfer-section">
+        <h2>Transfer Funds</h2>
+        
+        <!-- No General Access Notice (shown if client doesn't have permission) -->
+        <div id="no_general_access_notice" class="no-general-access" style="display: none;">
+          <strong>⚠️ Limited Access:</strong> You don't have permission to use General Balance. You can only transfer to/from Individual Balance.
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>
+              From
+              <span class="info-icon" id="from_info" style="display: none;">
+                i
+                <span class="tooltip">From Main Wallet you can only transfer to platform vaults</span>
+              </span>
+            </label>
+            <div class="custom-dropdown">
+              <button type="button" class="dropdown-trigger" id="from_dropdown_trigger" onclick="toggleFromDropdown()">
+                <img src="../assets/icons/wallet.svg" alt="" class="dropdown-trigger-icon" id="from_trigger_icon" style="display: none;">
+                <span class="dropdown-trigger-text" id="from_trigger_text">Select source</span>
+                <span class="dropdown-trigger-arrow">▼</span>
+              </button>
+              <div class="dropdown-menu" id="fromDropdown">
+                <!-- Main Wallet -->
+                <div class="dropdown-item" onclick="selectFrom('main', 'Main Wallet', '../assets/icons/wallet.svg')">
+                  <img src="../assets/icons/wallet.svg" alt="Main Wallet" class="dropdown-item-icon" onerror="this.style.display='none';">
+                  <span>Main Wallet</span>
+                </div>
+
+                <!-- Facebook -->
+                <div class="dropdown-item has-submenu" onclick="toggleSubmenu('facebook')">
+                  <img src="../assets/icons/facebook.svg" alt="Facebook" class="dropdown-item-icon" onerror="this.style.display='none';">
+                  <span>Facebook</span>
+                  <span class="dropdown-item-arrow">›</span>
+                </div>
+                <div class="submenu" id="submenu-facebook">
+                  <div class="dropdown-subitem" onclick="selectFrom('facebook_vault', 'Facebook Vault', '../assets/icons/facebook.svg')">Vault</div>
+                  <div class="dropdown-subitem general-option" data-platform="facebook" onclick="selectFrom('facebook_general', 'Facebook General', '../assets/icons/facebook.svg')">General</div>
+                  <div class="dropdown-subitem" onclick="selectFrom('facebook_individual', 'Facebook Individual', '../assets/icons/facebook.svg')">Individual</div>
+                </div>
+
+                <!-- Google -->
+                <div class="dropdown-item has-submenu" onclick="toggleSubmenu('google')">
+                  <img src="../assets/icons/google.svg" alt="Google" class="dropdown-item-icon" onerror="this.style.display='none';">
+                  <span>Google</span>
+                  <span class="dropdown-item-arrow">›</span>
+                </div>
+                <div class="submenu" id="submenu-google">
+                  <div class="dropdown-subitem" onclick="selectFrom('google_vault', 'Google Vault', '../assets/icons/google.svg')">Vault</div>
+                  <div class="dropdown-subitem general-option" data-platform="google" onclick="selectFrom('google_general', 'Google General', '../assets/icons/google.svg')">General</div>
+                  <div class="dropdown-subitem" onclick="selectFrom('google_individual', 'Google Individual', '../assets/icons/google.svg')">Individual</div>
+                </div>
+
+                <!-- TikTok -->
+                <div class="dropdown-item has-submenu" onclick="toggleSubmenu('tiktok')">
+                  <img src="../assets/icons/tiktok.svg" alt="TikTok" class="dropdown-item-icon" onerror="this.style.display='none';">
+                  <span>TikTok</span>
+                  <span class="dropdown-item-arrow">›</span>
+                </div>
+                <div class="submenu" id="submenu-tiktok">
+                  <div class="dropdown-subitem" onclick="selectFrom('tiktok_vault', 'TikTok Vault', '../assets/icons/tiktok.svg')">Vault</div>
+                  <div class="dropdown-subitem general-option" data-platform="tiktok" onclick="selectFrom('tiktok_general', 'TikTok General', '../assets/icons/tiktok.svg')">General</div>
+                  <div class="dropdown-subitem" onclick="selectFrom('tiktok_individual', 'TikTok Individual', '../assets/icons/tiktok.svg')">Individual</div>
+                </div>
+
+                <!-- Instagram -->
+                <div class="dropdown-item has-submenu" onclick="toggleSubmenu('instagram')">
+                  <img src="../assets/icons/instagram.svg" alt="Instagram" class="dropdown-item-icon" onerror="this.style.display='none';">
+                  <span>Instagram</span>
+                  <span class="dropdown-item-arrow">›</span>
+                </div>
+                <div class="submenu" id="submenu-instagram">
+                  <div class="dropdown-subitem" onclick="selectFrom('instagram_vault', 'Instagram Vault', '../assets/icons/instagram.svg')">Vault</div>
+                  <div class="dropdown-subitem general-option" data-platform="instagram" onclick="selectFrom('instagram_general', 'Instagram General', '../assets/icons/instagram.svg')">General</div>
+                  <div class="dropdown-subitem" onclick="selectFrom('instagram_individual', 'Instagram Individual', '../assets/icons/instagram.svg')">Individual</div>
+                </div>
+              </div>
+            </div>
+            <input type="hidden" id="transfer_from" value="">
+          </div>
+
+          <div class="form-group">
+            <label>To</label>
+            <select id="transfer_to" onchange="updateTransferPreview()" disabled>
+              <option value="">Select destination...</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Amount (USD)</label>
+            <input type="number" id="transfer_amount" min="0" step="0.01" placeholder="e.g. 250" oninput="updateTransferPreview()">
+          </div>
+
+          <!-- Fee display (only for Main Wallet transfers) -->
+          <div class="form-group" id="fee_display_group" style="display: none;">
+            <label>Fee</label>
+            <div style="padding: 10px 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(239, 68, 68, 0.05); color: #dc2626; font-size: 14px; font-weight: 700;">
+              $<span id="fee_amount">0.00</span>
+              <span style="font-size: 12px; font-weight: 600; color: var(--muted); margin-left: 8px;">(<span id="fee_percentage">0</span>%)</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="transfer_preview" class="transfer-preview" style="display: none;"></div>
+
+        <div class="error-notice" id="insufficient_funds">
+          <span style="font-size: 16px;">⚠️</span>
+          <span>Insufficient funds - You don't have enough money for this transfer</span>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn-transfer" id="confirm_transfer_btn" onclick="confirmTransfer()">Confirm Transfer</button>
+          <button class="btn-reset" onclick="resetTransferForm()">Reset</button>
+        </div>
+      </div>
+
+      <!-- Platform Balances Overview -->
+      <div class="transfer-section" style="margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <h2 style="margin: 0;">Your Platform Balances</h2>
+          <button class="btn-reset" onclick="resetAllData()" style="padding: 0.5rem 1rem; font-size: 0.85rem;">
+            🔄 Reset Demo Data
+          </button>
+        </div>
+        
+        <div class="platforms-grid">
+          <!-- Facebook -->
+          <div class="platform-card" onclick="openPlatformHistory('facebook')">
+            <div class="platform-card-header">
+              <img src="../assets/icons/facebook.svg" alt="Facebook" class="platform-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div class="platform-icon-fallback" style="display: none;">📘</div>
+              <div class="platform-name">Facebook</div>
+            </div>
+            <div class="platform-balances">
+              <div class="balance-item">
+                <div class="balance-label">Vault</div>
+                <div class="balance-value" id="fb_vault_display">$10.00</div>
+              </div>
+              <div class="balance-item">
+                <div class="balance-label">General</div>
+                <div class="balance-value" id="fb_general_display">$50.00</div>
+              </div>
+              <div class="balance-item">
+                <div class="balance-label">Individual</div>
+                <div class="balance-value" id="fb_individual_display">$25.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Google -->
+          <div class="platform-card" onclick="openPlatformHistory('google')">
+            <div class="platform-card-header">
+              <img src="../assets/icons/google.svg" alt="Google" class="platform-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div class="platform-icon-fallback" style="display: none;">🔍</div>
+              <div class="platform-name">Google</div>
+            </div>
+            <div class="platform-balances">
+              <div class="balance-item">
+                <div class="balance-label">Vault</div>
+                <div class="balance-value" id="google_vault_display">$15.00</div>
+              </div>
+              <div class="balance-item">
+                <div class="balance-label">General</div>
+                <div class="balance-value" id="google_general_display">$80.00</div>
+              </div>
+              <div class="balance-item">
+                <div class="balance-label">Individual</div>
+                <div class="balance-value" id="google_individual_display">$40.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TikTok -->
+          <div class="platform-card" onclick="openPlatformHistory('tiktok')">
+            <div class="platform-card-header">
+              <img src="../assets/icons/tiktok.svg" alt="TikTok" class="platform-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div class="platform-icon-fallback" style="display: none;">🎵</div>
+              <div class="platform-name">TikTok</div>
+            </div>
+            <div class="platform-balances">
+              <div class="balance-item">
+                <div class="balance-label">Vault</div>
+                <div class="balance-value" id="tiktok_vault_display">$5.00</div>
+              </div>
+              <div class="balance-item">
+                <div class="balance-label">General</div>
+                <div class="balance-value" id="tiktok_general_display">$30.00</div>
+              </div>
+              <div class="balance-item">
+                <div class="balance-label">Individual</div>
+                <div class="balance-value" id="tiktok_individual_display">$15.00</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Instagram -->
+          <div class="platform-card" onclick="openPlatformHistory('instagram')">
+            <div class="platform-card-header">
+              <img src="../assets/icons/instagram.svg" alt="Instagram" class="platform-icon" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+              <div class="platform-icon-fallback" style="display: none;">📷</div>
+              <div class="platform-name">Instagram</div>
+            </div>
+            <div class="platform-balances">
+              <div class="balance-item">
+                <div class="balance-label">Vault</div>
+                <div class="balance-value" id="instagram_vault_display">$0.00</div>
+              </div>
+              <div class="balance-item">
+                <div class="balance-label">General</div>
+                <div class="balance-value" id="instagram_general_display">$90.00</div>
+              </div>
+              <div class="balance-item">
+                <div class="balance-label">Individual</div>
+                <div class="balance-value" id="instagram_individual_display">$40.00</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Modals -->
+    <div class="custom-modal" id="confirmModal">
+      <div class="modal-content">
+        <div class="modal-header" id="confirmModalTitle">Confirm Transfer</div>
+        <div class="modal-body" id="confirmModalBody"></div>
+        <div class="modal-footer">
+          <button class="modal-btn secondary" onclick="closeConfirmModal()">Cancel</button>
+          <button class="modal-btn primary" id="confirmModalOkBtn">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="custom-modal" id="alertModal">
+      <div class="modal-content">
+        <div class="modal-header" id="alertModalTitle">Transfer Status</div>
+        <div class="modal-body" id="alertModalBody"></div>
+        <div class="modal-footer">
+          <button class="modal-btn success" onclick="closeAlertModal()">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="custom-modal" id="errorModal">
+      <div class="modal-content">
+        <div class="modal-header" id="errorModalTitle">Error</div>
+        <div class="modal-body" id="errorModalBody"></div>
+        <div class="modal-footer">
+          <button class="modal-btn secondary" onclick="closeErrorModal()">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Platform History Modal -->
+    <div class="history-modal" id="historyModal">
+      <div class="history-modal-content">
+        <div class="history-modal-header">
+          <div class="history-modal-title">
+            <img src="" alt="" class="history-modal-icon" id="historyModalIcon">
+            <div>
+              <h2 style="margin: 0; font-size: 1.5rem;" id="historyModalTitle">Platform History</h2>
+              <p style="margin: 0.25rem 0 0 0; font-size: 0.85rem; color: var(--muted);">All transactions for this platform</p>
+            </div>
+          </div>
+          <button class="history-modal-close" onclick="closeHistoryModal()">×</button>
+        </div>
+
+        <div class="history-modal-body">
+          <!-- Stats -->
+          <div class="history-stats">
+            <div class="history-stat">
+              <div class="history-stat-label">Total In</div>
+              <div class="history-stat-value" id="historyTotalIn">$0.00</div>
+            </div>
+            <div class="history-stat">
+              <div class="history-stat-label">Total Out</div>
+              <div class="history-stat-value" id="historyTotalOut">$0.00</div>
+            </div>
+            <div class="history-stat">
+              <div class="history-stat-label">Net Flow</div>
+              <div class="history-stat-value" id="historyNetFlow">$0.00</div>
+            </div>
+            <div class="history-stat">
+              <div class="history-stat-label">Transactions</div>
+              <div class="history-stat-value" id="historyTxCount">0</div>
+            </div>
+          </div>
+
+          <!-- Transaction History Table -->
+          <div id="historyTableContainer"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    // Client has General Access permission (demo: set to true/false)
+    const hasGeneralAccess = false; // Change to false to test restricted access
+
+    // Load data from localStorage or use defaults
+    function loadFromStorage(key, defaultValue) {
+      const stored = localStorage.getItem(key);
+      return stored ? JSON.parse(stored) : defaultValue;
+    }
+
+    function saveToStorage(key, value) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    // Platform balances (load from localStorage or use defaults)
+    const platformBalances = loadFromStorage('client_platformBalances', {
+      facebook: 10.00,
+      google: 15.00,
+      tiktok: 5.00,
+      instagram: 0.00
+    });
+
+    const platformGeneralBalances = loadFromStorage('client_platformGeneralBalances', {
+      facebook: 50.00,
+      google: 80.00,
+      tiktok: 30.00,
+      instagram: 90.00
+    });
+
+    const platformIndividualBalances = loadFromStorage('client_platformIndividualBalances', {
+      facebook: 25.00,
+      google: 40.00,
+      tiktok: 15.00,
+      instagram: 40.00
+    });
+
+    let mainWalletBalance = loadFromStorage('client_mainWalletBalance', 580.00);
+    let generalBalance = loadFromStorage('client_generalBalance', 250.00);
+    let individualBalance = loadFromStorage('client_individualBalance', 120.00);
+
+    // Client fee percentage per platform (set by admin)
+    const clientFees = {
+      facebook: 2.5,
+      google: 3.0,
+      tiktok: 2.0,
+      instagram: 2.5
+    };
+
+    // Transaction history storage (load from localStorage)
+    let transactionHistory = loadFromStorage('client_transactionHistory', []);
+
+    // Platform info
+    const platformInfo = {
+      facebook: { name: 'Facebook', icon: '../assets/icons/facebook.svg', fallback: '📘' },
+      google: { name: 'Google', icon: '../assets/icons/google.svg', fallback: '🔍' },
+      tiktok: { name: 'TikTok', icon: '../assets/icons/tiktok.svg', fallback: '🎵' },
+      instagram: { name: 'Instagram', icon: '../assets/icons/instagram.svg', fallback: '📷' }
+    };
+
+    // Save all data to localStorage
+    function saveAllData() {
+      saveToStorage('client_platformBalances', platformBalances);
+      saveToStorage('client_platformGeneralBalances', platformGeneralBalances);
+      saveToStorage('client_platformIndividualBalances', platformIndividualBalances);
+      saveToStorage('client_mainWalletBalance', mainWalletBalance);
+      saveToStorage('client_generalBalance', generalBalance);
+      saveToStorage('client_individualBalance', individualBalance);
+      saveToStorage('client_transactionHistory', transactionHistory);
+    }
+
+    // Add transaction to history
+    function addTransactionToHistory(transaction) {
+      transactionHistory.unshift({
+        ...transaction,
+        id: Date.now() + Math.random(),
+        timestamp: new Date().toISOString(),
+        date: new Date().toLocaleString()
+      });
+      saveAllData(); // Save after adding transaction
+    }
+
+    // Initialize page
+    function initializePage() {
+      // Show/hide general access notice
+      if (!hasGeneralAccess) {
+        document.getElementById('no_general_access_notice').style.display = 'block';
+      }
+
+      // Disable General options if no access
+      updateGeneralAccessUI();
+
+      // Load and display saved balances
+      document.querySelector('.wallet-card.main .wallet-card-amount').textContent = `USD ${mainWalletBalance.toFixed(2)}`;
+      
+      const totalPlatformVault = Object.values(platformBalances).reduce((sum, val) => sum + val, 0);
+      document.querySelector('.wallet-card.platform .wallet-card-amount').textContent = `USD ${totalPlatformVault.toFixed(2)}`;
+      
+      document.querySelector('.wallet-card.individual .wallet-card-amount').textContent = `USD ${individualBalance.toFixed(2)}`;
+      document.querySelector('.wallet-card.general .wallet-card-amount').textContent = `USD ${generalBalance.toFixed(2)}`;
+
+      // Update platform overview
+      updatePlatformOverview();
+    }
+
+    function updateGeneralAccessUI() {
+      const generalOptions = document.querySelectorAll('.general-option');
+      generalOptions.forEach(option => {
+        if (!hasGeneralAccess) {
+          option.classList.add('disabled');
+          option.onclick = (e) => {
+            e.stopPropagation();
+            showErrorModal('You don\'t have permission to use General Balance. Contact admin for access.');
+          };
+        }
+      });
+    }
+
+    function calculateFee(platform, amount) {
+      if (!platform || amount <= 0) return 0;
+      const feePercentage = clientFees[platform] || 0;
+      return (amount * feePercentage) / 100;
+    }
+
+    function getFeePercentage(platform) {
+      return clientFees[platform] || 0;
+    }
+
+    function toggleFromDropdown() {
+      const dropdown = document.getElementById('fromDropdown');
+      const trigger = document.getElementById('from_dropdown_trigger');
+      
+      dropdown.classList.toggle('show');
+      trigger.classList.toggle('active');
+      
+      if (dropdown.classList.contains('show')) {
+        setTimeout(() => {
+          document.addEventListener('click', closeFromDropdownOutside);
+        }, 0);
+      } else {
+        document.removeEventListener('click', closeFromDropdownOutside);
+      }
+    }
+
+    function closeFromDropdownOutside(e) {
+      const dropdown = document.getElementById('fromDropdown');
+      const trigger = document.getElementById('from_dropdown_trigger');
+      
+      if (!dropdown.contains(e.target) && !trigger.contains(e.target)) {
+        dropdown.classList.remove('show');
+        trigger.classList.remove('active');
+        document.removeEventListener('click', closeFromDropdownOutside);
+      }
+    }
+
+    function toggleSubmenu(platform) {
+      event.stopPropagation();
+      const submenu = document.getElementById(`submenu-${platform}`);
+      submenu.classList.toggle('show');
+    }
+
+    function selectFrom(value, label, iconPath) {
+      event.stopPropagation();
+      
+      document.getElementById('transfer_from').value = value;
+      
+      const triggerText = document.getElementById('from_trigger_text');
+      const triggerIcon = document.getElementById('from_trigger_icon');
+      
+      triggerText.textContent = label;
+      triggerIcon.src = iconPath;
+      triggerIcon.style.display = 'block';
+      
+      document.getElementById('transfer_to').disabled = false;
+      
+      const dropdown = document.getElementById('fromDropdown');
+      const trigger = document.getElementById('from_dropdown_trigger');
+      dropdown.classList.remove('show');
+      trigger.classList.remove('active');
+      
+      document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('show'));
+      
+      updateTransferOptions();
+    }
+
+    function updateTransferOptions() {
+      const from = document.getElementById('transfer_from').value;
+      const toSelect = document.getElementById('transfer_to');
+      const fromInfo = document.getElementById('from_info');
+      const feeDisplayGroup = document.getElementById('fee_display_group');
+
+      toSelect.innerHTML = '<option value="">Select destination...</option>';
+
+      if (!from) {
+        fromInfo.style.display = 'none';
+        feeDisplayGroup.style.display = 'none';
+        updateTransferPreview();
+        return;
+      }
+
+      if (from === 'main') {
+        // Main Wallet → Platform Vaults
+        toSelect.innerHTML += `
+          <option value="facebook_vault">Facebook Vault</option>
+          <option value="google_vault">Google Vault</option>
+          <option value="tiktok_vault">TikTok Vault</option>
+          <option value="instagram_vault">Instagram Vault</option>
+        `;
+        fromInfo.style.display = 'inline-flex';
+        feeDisplayGroup.style.display = 'block';
+      } else {
+        const [platform, type] = from.split('_');
+        const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+        
+        if (type === 'vault') {
+          toSelect.innerHTML += `<option value="main">Main Wallet</option>`;
+          
+          if (hasGeneralAccess) {
+            toSelect.innerHTML += `<option value="${platform}_general">${platformName} General</option>`;
+          }
+          
+          toSelect.innerHTML += `<option value="${platform}_individual">${platformName} Individual</option>`;
+        } else if (type === 'general') {
+          if (hasGeneralAccess) {
+            toSelect.innerHTML += `<option value="${platform}_vault">${platformName} Vault</option>`;
+          }
+        } else if (type === 'individual') {
+          toSelect.innerHTML += `<option value="${platform}_vault">${platformName} Vault</option>`;
+        }
+        
+        fromInfo.style.display = 'none';
+        feeDisplayGroup.style.display = 'none';
+      }
+
+      updateTransferPreview();
+    }
+
+    function updateTransferPreview() {
+      const from = document.getElementById('transfer_from').value;
+      const to = document.getElementById('transfer_to').value;
+      const amount = parseFloat(document.getElementById('transfer_amount').value) || 0;
+      const preview = document.getElementById('transfer_preview');
+      const confirmBtn = document.getElementById('confirm_transfer_btn');
+      const insufficientFunds = document.getElementById('insufficient_funds');
+
+      if (from === 'main' && to) {
+        const [platform, type] = to.split('_');
+        const fee = calculateFee(platform, amount);
+        const feePercentage = getFeePercentage(platform);
+        
+        document.getElementById('fee_amount').textContent = fee.toFixed(2);
+        document.getElementById('fee_percentage').textContent = feePercentage.toFixed(1);
+      }
+
+      if (!from || !to || amount <= 0) {
+        preview.style.display = 'none';
+        insufficientFunds.classList.remove('show');
+        confirmBtn.disabled = true;
+        return;
+      }
+
+      let fromBalance = 0;
+      let toBalance = 0;
+      let fromName = '';
+      let toName = '';
+      let totalAmount = amount;
+      let fee = 0;
+
+      if (from === 'main') {
+        const [platform, type] = to.split('_');
+        const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+        fee = calculateFee(platform, amount);
+        totalAmount = amount + fee;
+        
+        fromBalance = mainWalletBalance;
+        toBalance = platformBalances[platform] || 0;
+        fromName = 'Main Wallet';
+        toName = `${platformName} Vault`;
+      } else {
+        const [fromPlatform, fromType] = from.split('_');
+        const platformName = fromPlatform.charAt(0).toUpperCase() + fromPlatform.slice(1);
+        
+        if (fromType === 'vault') {
+          fromBalance = platformBalances[fromPlatform] || 0;
+          fromName = `${platformName} Vault`;
+        } else if (fromType === 'general') {
+          fromBalance = platformGeneralBalances[fromPlatform] || 0;
+          fromName = `${platformName} General`;
+        } else if (fromType === 'individual') {
+          fromBalance = platformIndividualBalances[fromPlatform] || 0;
+          fromName = `${platformName} Individual`;
+        }
+        
+        if (to === 'main') {
+          toBalance = mainWalletBalance;
+          toName = 'Main Wallet';
+        } else {
+          const [toPlatform, toType] = to.split('_');
+          const toPlatformName = toPlatform.charAt(0).toUpperCase() + toPlatform.slice(1);
+          
+          if (toType === 'vault') {
+            toBalance = platformBalances[toPlatform] || 0;
+            toName = `${toPlatformName} Vault`;
+          } else if (toType === 'general') {
+            toBalance = platformGeneralBalances[toPlatform] || 0;
+            toName = `${toPlatformName} General`;
+          } else if (toType === 'individual') {
+            toBalance = platformIndividualBalances[toPlatform] || 0;
+            toName = `${toPlatformName} Individual`;
+          }
+        }
+      }
+
+      const newFromBalance = fromBalance - totalAmount;
+      const newToBalance = toBalance + amount;
+
+      if (totalAmount > fromBalance) {
+        insufficientFunds.classList.add('show');
+        confirmBtn.disabled = true;
+        preview.style.display = 'none';
+      } else {
+        insufficientFunds.classList.remove('show');
+        confirmBtn.disabled = false;
+        preview.style.display = 'block';
+        
+        let previewHTML = `<strong>Transfer Preview:</strong><br>`;
+        
+        if (from === 'main' && fee > 0) {
+          previewHTML += `Amount: $${amount.toFixed(2)}<br>`;
+          previewHTML += `Fee: $${fee.toFixed(2)}<br>`;
+          previewHTML += `Total: $${totalAmount.toFixed(2)}<br><br>`;
+        }
+        
+        previewHTML += `${fromName}: $${fromBalance.toFixed(2)} → $${newFromBalance.toFixed(2)}<br>`;
+        previewHTML += `${toName}: $${toBalance.toFixed(2)} → $${newToBalance.toFixed(2)}`;
+        
+        preview.innerHTML = previewHTML;
+      }
+    }
+
+    function confirmTransfer() {
+      const from = document.getElementById('transfer_from').value;
+      const to = document.getElementById('transfer_to').value;
+      const amount = parseFloat(document.getElementById('transfer_amount').value) || 0;
+
+      if (amount <= 0) {
+        showErrorModal('Please enter a valid amount');
+        return;
+      }
+
+      if (from === 'main') {
+        const [platform, type] = to.split('_');
+        const platformName = platform.charAt(0).toUpperCase() + platform.slice(1);
+        const fee = calculateFee(platform, amount);
+        const totalAmount = amount + fee;
+
+        if (totalAmount > mainWalletBalance) {
+          showErrorModal('Insufficient balance in Main Wallet (including fee)');
+          return;
+        }
+
+        const confirmMessage = `
+          Confirm transfer of <strong>$${amount.toFixed(2)}</strong> from Main Wallet to ${platformName} Vault?
+          <br><br>
+          <strong>Fee:</strong> $${fee.toFixed(2)}<br>
+          <strong>Total deducted:</strong> $${totalAmount.toFixed(2)}
+        `;
+
+        showConfirmModal(confirmMessage, () => {
+          mainWalletBalance -= totalAmount;
+          platformBalances[platform] = (platformBalances[platform] || 0) + amount;
+
+          document.querySelector('.wallet-card.main .wallet-card-amount').textContent = `USD ${mainWalletBalance.toFixed(2)}`;
+          
+          const totalPlatformVault = Object.values(platformBalances).reduce((sum, val) => sum + val, 0);
+          document.querySelector('.wallet-card.platform .wallet-card-amount').textContent = `USD ${totalPlatformVault.toFixed(2)}`;
+
+          // Add to transaction history
+          addTransactionToHistory({
+            platform: platform,
+            type: 'Main → Vault',
+            from: 'Main Wallet',
+            to: `${platformName} Vault`,
+            amount: amount,
+            fee: fee,
+            direction: 'in'
+          });
+
+          const successMessage = `<strong>$${amount.toFixed(2)}</strong> transferred to ${platformName} Vault<br><br><strong>Fee:</strong> $${fee.toFixed(2)}<br><strong>Total deducted:</strong> $${totalAmount.toFixed(2)}`;
+          
+          // Store transaction details for reversal
+          const transactionDetails = {
+            from: 'main',
+            to: platform,
+            amount: amount,
+            fee: fee,
+            totalAmount: totalAmount,
+            historyId: transactionHistory[0].id
+          };
+          
+          // Show toast with cancel option
+          showToast('success', '✓ Transfer Successful', successMessage, {
+            showCancel: true,
+            onCancel: () => {
+              // Reverse the transaction
+              mainWalletBalance += transactionDetails.totalAmount;
+              platformBalances[transactionDetails.to] -= transactionDetails.amount;
+              
+              // Remove from history
+              transactionHistory = transactionHistory.filter(tx => tx.id !== transactionDetails.historyId);
+              
+              // Save changes
+              saveAllData();
+              
+              // Update UI - Main Wallet card
+              document.querySelector('.wallet-card.main .wallet-card-amount').textContent = `USD ${mainWalletBalance.toFixed(2)}`;
+              
+              // Update UI - Platform Vault card (total of all platforms)
+              const totalPlatformVault = Object.values(platformBalances).reduce((sum, val) => sum + val, 0);
+              document.querySelector('.wallet-card.platform .wallet-card-amount').textContent = `USD ${totalPlatformVault.toFixed(2)}`;
+              
+              updatePlatformOverview();
+            }
+          });
+          
+          updatePlatformOverview();
+          resetTransferForm();
+        });
+      } else {
+        const [fromPlatform, fromType] = from.split('_');
+        const platformName = fromPlatform.charAt(0).toUpperCase() + fromPlatform.slice(1);
+        
+        let fromBalance = 0;
+        let fromName = '';
+        
+        if (fromType === 'vault') {
+          fromBalance = platformBalances[fromPlatform] || 0;
+          fromName = `${platformName} Vault`;
+        } else if (fromType === 'general') {
+          fromBalance = platformGeneralBalances[fromPlatform] || 0;
+          fromName = `${platformName} General`;
+        } else if (fromType === 'individual') {
+          fromBalance = platformIndividualBalances[fromPlatform] || 0;
+          fromName = `${platformName} Individual`;
+        }
+
+        if (amount > fromBalance) {
+          showErrorModal(`Insufficient balance in ${fromName}`);
+          return;
+        }
+
+        let toName = '';
+        if (to === 'main') {
+          toName = 'Main Wallet';
+        } else {
+          const [toPlatform, toType] = to.split('_');
+          const toPlatformName = toPlatform.charAt(0).toUpperCase() + toPlatform.slice(1);
+          
+          if (toType === 'vault') {
+            toName = `${toPlatformName} Vault`;
+          } else if (toType === 'general') {
+            toName = `${toPlatformName} General`;
+          } else if (toType === 'individual') {
+            toName = `${toPlatformName} Individual`;
+          }
+        }
+
+        const confirmMessage = `Confirm transfer of <strong>$${amount.toFixed(2)}</strong> from ${fromName} to ${toName}?`;
+
+        showConfirmModal(confirmMessage, () => {
+          if (fromType === 'vault') {
+            platformBalances[fromPlatform] -= amount;
+          } else if (fromType === 'general') {
+            platformGeneralBalances[fromPlatform] -= amount;
+            generalBalance -= amount;
+          } else if (fromType === 'individual') {
+            platformIndividualBalances[fromPlatform] -= amount;
+            individualBalance -= amount;
+          }
+          
+          if (to === 'main') {
+            mainWalletBalance += amount;
+            document.querySelector('.wallet-card.main .wallet-card-amount').textContent = `USD ${mainWalletBalance.toFixed(2)}`;
+          } else {
+            const [toPlatform, toType] = to.split('_');
+            
+            if (toType === 'vault') {
+              platformBalances[toPlatform] = (platformBalances[toPlatform] || 0) + amount;
+            } else if (toType === 'general') {
+              platformGeneralBalances[toPlatform] = (platformGeneralBalances[toPlatform] || 0) + amount;
+              generalBalance += amount;
+              document.querySelector('.wallet-card.general .wallet-card-amount').textContent = `USD ${generalBalance.toFixed(2)}`;
+            } else if (toType === 'individual') {
+              platformIndividualBalances[toPlatform] = (platformIndividualBalances[toPlatform] || 0) + amount;
+              individualBalance += amount;
+              document.querySelector('.wallet-card.individual .wallet-card-amount').textContent = `USD ${individualBalance.toFixed(2)}`;
+            }
+          }
+
+          const totalPlatformVault = Object.values(platformBalances).reduce((sum, val) => sum + val, 0);
+          document.querySelector('.wallet-card.platform .wallet-card-amount').textContent = `USD ${totalPlatformVault.toFixed(2)}`;
+
+          // Determine direction for history (from platform perspective)
+          let direction = 'out'; // Default: money leaving platform
+          let historyPlatform = fromPlatform;
+          
+          if (to !== 'main') {
+            const [toPlatform, toType] = to.split('_');
+            if (toPlatform === fromPlatform) {
+              // Internal transfer within same platform (e.g., Vault → General)
+              direction = 'in'; // Money staying in platform ecosystem
+            }
+          }
+          
+          // Add to transaction history
+          addTransactionToHistory({
+            platform: historyPlatform,
+            type: `${fromName} → ${toName}`,
+            from: fromName,
+            to: toName,
+            amount: amount,
+            fee: 0,
+            direction: direction
+          });
+
+          const successMessage = `<strong>$${amount.toFixed(2)}</strong> transferred from ${fromName} to ${toName}`;
+          
+          // Store transaction details for reversal
+          const transactionDetails = {
+            from: from,
+            fromPlatform: fromPlatform,
+            fromType: fromType,
+            to: to,
+            amount: amount,
+            historyId: transactionHistory[0].id
+          };
+          
+          // Show toast with cancel option
+          showToast('success', '✓ Transfer Successful', successMessage, {
+            showCancel: true,
+            onCancel: () => {
+              // Reverse the transaction - add back to source
+              if (transactionDetails.fromType === 'vault') {
+                platformBalances[transactionDetails.fromPlatform] += transactionDetails.amount;
+              } else if (transactionDetails.fromType === 'general') {
+                platformGeneralBalances[transactionDetails.fromPlatform] += transactionDetails.amount;
+                generalBalance += transactionDetails.amount;
+                document.querySelector('.wallet-card.general .wallet-card-amount').textContent = `USD ${generalBalance.toFixed(2)}`;
+              } else if (transactionDetails.fromType === 'individual') {
+                platformIndividualBalances[transactionDetails.fromPlatform] += transactionDetails.amount;
+                individualBalance += transactionDetails.amount;
+                document.querySelector('.wallet-card.individual .wallet-card-amount').textContent = `USD ${individualBalance.toFixed(2)}`;
+              }
+              
+              // Reverse the transaction - deduct from destination
+              if (transactionDetails.to === 'main') {
+                mainWalletBalance -= transactionDetails.amount;
+                document.querySelector('.wallet-card.main .wallet-card-amount').textContent = `USD ${mainWalletBalance.toFixed(2)}`;
+              } else {
+                const [toPlatform, toType] = transactionDetails.to.split('_');
+                
+                if (toType === 'vault') {
+                  platformBalances[toPlatform] -= transactionDetails.amount;
+                } else if (toType === 'general') {
+                  platformGeneralBalances[toPlatform] -= transactionDetails.amount;
+                  generalBalance -= transactionDetails.amount;
+                  document.querySelector('.wallet-card.general .wallet-card-amount').textContent = `USD ${generalBalance.toFixed(2)}`;
+                } else if (toType === 'individual') {
+                  platformIndividualBalances[toPlatform] -= transactionDetails.amount;
+                  individualBalance -= transactionDetails.amount;
+                  document.querySelector('.wallet-card.individual .wallet-card-amount').textContent = `USD ${individualBalance.toFixed(2)}`;
+                }
+              }
+              
+              // Remove from history
+              transactionHistory = transactionHistory.filter(tx => tx.id !== transactionDetails.historyId);
+              
+              // Save changes
+              saveAllData();
+              
+              // Update UI - Platform Vault card (total of all platforms)
+              const totalPlatformVault = Object.values(platformBalances).reduce((sum, val) => sum + val, 0);
+              document.querySelector('.wallet-card.platform .wallet-card-amount').textContent = `USD ${totalPlatformVault.toFixed(2)}`;
+              
+              updatePlatformOverview();
+            }
+          });
+          
+          updatePlatformOverview();
+          resetTransferForm();
+        });
+      }
+    }
+
+    function updatePlatformOverview() {
+      document.getElementById('fb_vault_display').textContent = `$${platformBalances.facebook.toFixed(2)}`;
+      document.getElementById('fb_general_display').textContent = `$${platformGeneralBalances.facebook.toFixed(2)}`;
+      document.getElementById('fb_individual_display').textContent = `$${platformIndividualBalances.facebook.toFixed(2)}`;
+      
+      document.getElementById('google_vault_display').textContent = `$${platformBalances.google.toFixed(2)}`;
+      document.getElementById('google_general_display').textContent = `$${platformGeneralBalances.google.toFixed(2)}`;
+      document.getElementById('google_individual_display').textContent = `$${platformIndividualBalances.google.toFixed(2)}`;
+      
+      document.getElementById('tiktok_vault_display').textContent = `$${platformBalances.tiktok.toFixed(2)}`;
+      document.getElementById('tiktok_general_display').textContent = `$${platformGeneralBalances.tiktok.toFixed(2)}`;
+      document.getElementById('tiktok_individual_display').textContent = `$${platformIndividualBalances.tiktok.toFixed(2)}`;
+      
+      document.getElementById('instagram_vault_display').textContent = `$${platformBalances.instagram.toFixed(2)}`;
+      document.getElementById('instagram_general_display').textContent = `$${platformGeneralBalances.instagram.toFixed(2)}`;
+      document.getElementById('instagram_individual_display').textContent = `$${platformIndividualBalances.instagram.toFixed(2)}`;
+    }
+
+    function resetTransferForm() {
+      document.getElementById('transfer_from').value = '';
+      document.getElementById('from_trigger_text').textContent = 'Select source';
+      document.getElementById('from_trigger_icon').style.display = 'none';
+      document.getElementById('fromDropdown').classList.remove('show');
+      document.getElementById('from_dropdown_trigger').classList.remove('active');
+      document.querySelectorAll('.submenu').forEach(sub => sub.classList.remove('show'));
+      
+      document.getElementById('transfer_to').innerHTML = '<option value="">Select destination...</option>';
+      document.getElementById('transfer_to').disabled = true;
+      document.getElementById('transfer_amount').value = '';
+      document.getElementById('transfer_preview').style.display = 'none';
+      document.getElementById('insufficient_funds').classList.remove('show');
+      document.getElementById('confirm_transfer_btn').disabled = true;
+      document.getElementById('from_info').style.display = 'none';
+      document.getElementById('fee_display_group').style.display = 'none';
+    }
+
+    // Modal functions
+    function showConfirmModal(message, onConfirm) {
+      const modal = document.getElementById('confirmModal');
+      const body = document.getElementById('confirmModalBody');
+      const okBtn = document.getElementById('confirmModalOkBtn');
+      
+      body.innerHTML = message;
+      modal.classList.add('show');
+      
+      const newOkBtn = okBtn.cloneNode(true);
+      okBtn.parentNode.replaceChild(newOkBtn, okBtn);
+      
+      newOkBtn.addEventListener('click', () => {
+        closeConfirmModal();
+        onConfirm();
+      });
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.remove('show');
+    }
+
+    function showAlertModal(title, message) {
+      const modal = document.getElementById('alertModal');
+      const titleEl = document.getElementById('alertModalTitle');
+      const body = document.getElementById('alertModalBody');
+      
+      titleEl.textContent = title;
+      body.innerHTML = message;
+      modal.classList.add('show');
+    }
+
+    function closeAlertModal() {
+      document.getElementById('alertModal').classList.remove('show');
+    }
+
+    function showErrorModal(message) {
+      const modal = document.getElementById('errorModal');
+      const body = document.getElementById('errorModalBody');
+      
+      body.innerHTML = message;
+      modal.classList.add('show');
+    }
+
+    function closeErrorModal() {
+      document.getElementById('errorModal').classList.remove('show');
+    }
+
+    // Toast notification
+    let toastIdCounter = 0;
+    let pendingTransactions = new Map(); // Store transactions that can be cancelled
+
+    function showToast(type, title, message, options = {}) {
+      const toastId = ++toastIdCounter;
+      const container = document.getElementById('toastContainer');
+      
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.id = `toast-${toastId}`;
+      
+      const icon = type === 'success' ? '✓' : '✕';
+      
+      let actionsHTML = '';
+      if (options.showCancel && options.onCancel) {
+        actionsHTML = `
+          <div class="toast-actions">
+            <button class="toast-btn secondary" onclick="cancelTransaction(${toastId})">Cancel Transaction</button>
+          </div>
+        `;
+        
+        // Store the cancel callback
+        pendingTransactions.set(toastId, options.onCancel);
+      }
+      
+      toast.innerHTML = `
+        <div class="toast-header">
+          <div class="toast-title">
+            <span class="toast-icon">${icon}</span>
+            <span>${title}</span>
+          </div>
+          <button class="toast-close" onclick="closeToast(${toastId})">×</button>
+        </div>
+        <div class="toast-body">${message}</div>
+        ${actionsHTML}
+      `;
+      
+      container.appendChild(toast);
+      
+      // Auto close after duration (if no cancel button)
+      if (!options.showCancel) {
+        setTimeout(() => {
+          closeToast(toastId);
+        }, 5000);
+      }
+      
+      return toastId;
+    }
+
+    function closeToast(toastId) {
+      const toast = document.getElementById(`toast-${toastId}`);
+      if (toast) {
+        toast.style.animation = 'toastSlideIn 0.3s ease reverse';
+        setTimeout(() => {
+          toast.remove();
+          pendingTransactions.delete(toastId);
+        }, 300);
+      }
+    }
+
+    function cancelTransaction(toastId) {
+      const onCancel = pendingTransactions.get(toastId);
+      if (onCancel) {
+        onCancel();
+        closeToast(toastId);
+        showToast('error', 'Transaction Cancelled', 'The transfer has been cancelled and reversed.', { duration: 3000 });
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', initializePage);
+
+    // Open platform history modal
+    function openPlatformHistory(platform) {
+      const modal = document.getElementById('historyModal');
+      const info = platformInfo[platform];
+      
+      // Set modal title and icon
+      document.getElementById('historyModalTitle').textContent = `${info.name} History`;
+      document.getElementById('historyModalIcon').src = info.icon;
+      
+      // Filter transactions for this platform
+      const platformTransactions = transactionHistory.filter(tx => tx.platform === platform);
+      
+      // Calculate stats
+      let totalIn = 0;
+      let totalOut = 0;
+      
+      platformTransactions.forEach(tx => {
+        if (tx.direction === 'in') {
+          totalIn += tx.amount;
+        } else {
+          totalOut += tx.amount;
+        }
+      });
+      
+      const netFlow = totalIn - totalOut;
+      
+      // Update stats
+      document.getElementById('historyTotalIn').textContent = `$${totalIn.toFixed(2)}`;
+      document.getElementById('historyTotalOut').textContent = `$${totalOut.toFixed(2)}`;
+      document.getElementById('historyNetFlow').textContent = `$${netFlow.toFixed(2)}`;
+      document.getElementById('historyTxCount').textContent = platformTransactions.length;
+      
+      // Render transaction table
+      const tableContainer = document.getElementById('historyTableContainer');
+      
+      if (platformTransactions.length === 0) {
+        tableContainer.innerHTML = `
+          <div class="empty-history">
+            <div class="empty-history-icon">📭</div>
+            <p style="margin: 0; font-size: 1.1rem; font-weight: 700;">No transactions yet</p>
+            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">Start by transferring funds to this platform</p>
+          </div>
+        `;
+      } else {
+        tableContainer.innerHTML = `
+          <table class="history-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>From → To</th>
+                <th>Direction</th>
+                <th style="text-align: right;">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${platformTransactions.map(tx => `
+                <tr>
+                  <td>${tx.date}</td>
+                  <td>${tx.from} → ${tx.to}</td>
+                  <td>
+                    <span class="history-badge ${tx.direction}">${tx.direction === 'in' ? 'IN' : 'OUT'}</span>
+                  </td>
+                  <td style="text-align: right;">
+                    <span class="history-amount ${tx.direction === 'in' ? 'positive' : 'negative'}">
+                      ${tx.direction === 'in' ? '+' : '-'}$${tx.amount.toFixed(2)}
+                    </span>
+                  </td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+      
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close platform history modal
+    function closeHistoryModal() {
+      const modal = document.getElementById('historyModal');
+      modal.classList.remove('show');
+      document.body.style.overflow = '';
+    }
+
+    // Reset all data to defaults
+    function resetAllData() {
+      if (!confirm('Are you sure you want to reset all data? This will clear all balances and transaction history.')) {
+        return;
+      }
+
+      // Clear localStorage
+      localStorage.removeItem('client_platformBalances');
+      localStorage.removeItem('client_platformGeneralBalances');
+      localStorage.removeItem('client_platformIndividualBalances');
+      localStorage.removeItem('client_mainWalletBalance');
+      localStorage.removeItem('client_generalBalance');
+      localStorage.removeItem('client_individualBalance');
+      localStorage.removeItem('client_transactionHistory');
+
+      // Show success message
+      showToast('success', '✓ Data Reset', 'All data has been reset to defaults. Reloading page...', { duration: 2000 });
+
+      // Reload page after 2 seconds
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+    }
+  </script>
+</body>
+</html>
