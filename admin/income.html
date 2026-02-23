@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Income</title>
+
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/accounts.css" />
+
+   <style>
+    /* =========================================================
+       LIQUID GLASS (WHITE) – READY UI OVERLAY
+       - Works with your existing HTML + JS
+       - Adds modern spacing, sticky filters, glass panels, chips
+       - Includes Light/Dark switch (optional)
+    ========================================================= */
+
+    :root{
+      --bg0:#f7f8fb;
+      --bg1:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+
+      --line: rgba(15,23,42,.10);
+      --line2: rgba(15,23,42,.07);
+
+      --glass: rgba(255,255,255,.72);
+      --glass2: rgba(255,255,255,.58);
+
+      --shadow: 0 18px 50px rgba(15,23,42,.12);
+      --shadow2: 0 12px 28px rgba(15,23,42,.10);
+
+      --r-xl: 18px;
+      --r-lg: 14px;
+      --r-md: 12px;
+
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --info:#2563eb;
+
+      --focus: rgba(37,99,235,.25);
+    }
+
+    /* Dark theme (optional, toggled by JS) */
+    [data-theme="dark"]{
+      --bg0:#0b1220;
+      --bg1:#0f172a;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.08);
+
+      --glass: rgba(17,24,39,.58);
+      --glass2: rgba(17,24,39,.45);
+
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --shadow2: 0 12px 28px rgba(0,0,0,.35);
+
+      --focus: rgba(96,165,250,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+
+    body{
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(37,99,235,.14), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(99,102,241,.14), transparent 55%),
+        radial-gradient(900px 600px at 35% 95%, rgba(16,185,129,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0) 0%, color-mix(in srgb, var(--bg0) 55%, var(--bg1)) 100%);
+    }
+
+    /* Subtle noise overlay (very light) */
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    }
+
+    /* ============ Helpers ============ */
+    .glass{
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--r-xl);
+    }
+
+    .muted{ color: var(--muted); }
+    .mini-hint{
+      font-size:.9rem;
+      color: var(--muted);
+      line-height:1.35;
+      margin-top:.2rem;
+    }
+
+    /* Inputs */
+    input, select, textarea{
+      width:100%;
+      padding:.7rem .8rem;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      outline:none;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .08s ease;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: color-mix(in srgb, var(--info) 45%, var(--line2));
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+    input::placeholder, textarea::placeholder{ color: color-mix(in srgb, var(--muted) 78%, transparent); }
+
+    /* Buttons */
+    .btn{
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      padding: .7rem .95rem;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.55rem;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .btn:active{ transform: translateY(0px); }
+
+    /* Header polish (keeps your .header but makes it glassy) */
+    .header{
+      background: rgba(255,255,255,.55);
+      border-bottom: 1px solid var(--line2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    [data-theme="dark"] .header{
+      background: rgba(15,23,42,.55);
+    }
+
+    /* Theme toggle */
+    .header-right{ display:flex; align-items:center; gap:14px; }
+    .theme-toggle{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius: 999px;
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+    }
+    .theme-btn{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease;
+    }
+    .theme-btn.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    /* Make main area nicer */
+    .main{ padding: 18px; }
+    @media (max-width: 720px){ .main{ padding: 14px; } }
+
+    /* ============ KPI Cards ============ */
+    .statistics{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 1200px){
+      .statistics{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 620px){
+      .statistics{ grid-template-columns: 1fr; }
+    }
+
+    .stat-box{
+      padding: 14px 14px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      min-height: 108px;
+    }
+    .stat-box h4{
+      margin:0;
+      font-size: 11px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 950;
+    }
+    .stat-value{
+      font-size: 28px;
+      font-weight: 950;
+      margin-top: 6px;
+      letter-spacing: .2px;
+    }
+    .stat-description{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    /* Tags + amounts */
+    .amount-pos{ font-weight: 950; color: color-mix(in srgb, var(--good) 92%, var(--text)); }
+    .amount-neg{ font-weight: 950; color: color-mix(in srgb, var(--bad) 92%, var(--text)); }
+
+    /* Topups table */
+    .topups-table-wrap{
+      border:1px solid var(--line2);
+      border-radius: var(--r-xl);
+      overflow:auto;
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow2);
+    }
+    .topups-table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .92rem;
+      min-width: 980px;
+    }
+    .topups-table th, .topups-table td{
+      padding: .85rem .75rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      text-align:left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .topups-table th{
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 88%, var(--bg1));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .topups-row{
+      cursor:pointer;
+      transition: background .12s ease;
+    }
+    .topups-row:hover{
+      background: color-mix(in srgb, rgba(37,99,235,.10) 60%, transparent);
+    }
+    .td-muted{ color: var(--muted); }
+
+    /* Fix "layout.css/dashboard.css" sometimes set section backgrounds to pure white */
+    .wallet-section{
+      background: var(--glass) !important;
+      border: 1px solid var(--line2) !important;
+      box-shadow: var(--shadow2) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border-radius: var(--r-xl) !important;
+    }
+
+/* ===== Header Tabs (Finance / Transactions / Ledger) ===== */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding: 12px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,.85);
+  border-bottom: 1px solid var(--line2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.header-left{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width: 280px;
+}
+
+.page-tabs{
+  display:flex;
+  gap:8px;
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line2);
+  background: color-mix(in srgb, var(--glass) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: fit-content;
+}
+
+.page-tab{
+  border:1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 950;
+  cursor:pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+  letter-spacing: .2px;
+  user-select:none;
+}
+
+.page-tab:hover{ transform: translateY(-1px); }
+
+.page-tab.active{
+  background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+  border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+  color: var(--text);
+}
+
+/* Mobile */
+@media (max-width: 820px){
+  .header{ flex-wrap:wrap; align-items:flex-start; }
+  .header-left{ width:100%; }
+  .page-tabs{ width:100%; justify-content:space-between; }
+  .page-tab{ flex:1; text-align:center; }
+}
+
+  </style>
+</head>
+
+<body>
+    <div class="layout">
+<header class="header">
+  <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+    <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="false">
+      Topups
+    </button>
+    <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">
+      Finance
+    </button>
+    <button type="button" class="page-tab active" data-page="income" role="tab" aria-selected="true">
+      Income
+    </button>
+    <button type="button" class="page-tab" data-page="fees" role="tab" aria-selected="false">
+      Charges
+    </button>
+    <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">
+      Internal Transactions
+    </button>
+    <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">
+      Transactions
+    </button>
+  </div>
+
+  <div class="header-right">
+    <div class="theme-toggle" id="themeToggle">
+      <button class="theme-btn active" data-theme="light" type="button">Light</button>
+      <button class="theme-btn" data-theme="dark" type="button">Dark</button>
+    </div>
+  </div>
+</header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <!-- Filters -->
+      <div class="wallet-section" style="margin-top: 1.5rem; padding: 14px;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <div class="form-group" style="min-width: 200px; margin: 0;">
+            <label>Filter by Year</label>
+            <select id="yearFilter">
+              <option value="all">All Years</option>
+              <option value="2024" selected>2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+            </select>
+          </div>
+          
+          <div class="form-group" style="min-width: 200px; margin: 0;">
+            <label>Filter by Platform</label>
+            <select id="platformFilter">
+              <option value="all">All Platforms</option>
+              <option value="facebook">Facebook</option>
+              <option value="google">Google</option>
+              <option value="tiktok">TikTok</option>
+              <option value="instagram">Instagram</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="min-width: 200px; margin: 0;">
+            <label>Filter by Client</label>
+            <select id="clientFilter">
+              <option value="all">All Clients</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="wallet-section" style="margin-top: 1.5rem;">
+        <div class="widget-title">
+          <div>
+            <h2>💰 Monthly Income Overview</h2>
+            <div class="mini-hint">Track company revenue from fees and services per month</div>
+          </div>
+        </div>
+
+        <!-- Income KPIs -->
+        <div class="statistics">
+          <div class="stat-box">
+            <h4>Total Topup Fees</h4>
+            <div class="stat-value" id="income_topup_fees">$5,880.00</div>
+            <div class="stat-description">
+              <span class="muted">All topup fees collected</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Total Transfer Fees</h4>
+            <div class="stat-value" id="income_transfer_fees">$3,920.00</div>
+            <div class="stat-description">
+              <span class="muted">All transfer fees collected</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Total Setup + Services Fees</h4>
+            <div class="stat-value" id="income_setup_services">$2,380.00</div>
+            <div class="stat-description">
+              <span class="muted">Setup and service charges</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Total Income</h4>
+            <div class="stat-value" id="income_total">$12,180.00</div>
+            <div class="stat-description">
+              <span class="muted">All revenue generated</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Income Table -->
+        <div class="topups-table-wrap">
+          <table class="topups-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th style="text-align:right;">Topup Fees</th>
+                <th style="text-align:right;">Transfer Fees</th>
+                <th style="text-align:right;">Setup + Services</th>
+                <th style="text-align:right;">Total Income</th>
+              </tr>
+            </thead>
+            <tbody id="incomeTableBody">
+              <!-- Mockup data -->
+              <tr class="topups-row">
+                <td><strong>December 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$1,250.00</td>
+                <td style="text-align:right;" class="amount-pos">$850.00</td>
+                <td style="text-align:right;" class="amount-pos">$500.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,600.00</strong></td>
+              </tr>
+              <tr class="topups-row">
+                <td><strong>November 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$1,100.00</td>
+                <td style="text-align:right;" class="amount-pos">$720.00</td>
+                <td style="text-align:right;" class="amount-pos">$450.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,270.00</strong></td>
+              </tr>
+              <tr class="topups-row">
+                <td><strong>October 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$980.00</td>
+                <td style="text-align:right;" class="amount-pos">$650.00</td>
+                <td style="text-align:right;" class="amount-pos">$400.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,030.00</strong></td>
+              </tr>
+              <tr class="topups-row">
+                <td><strong>September 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$1,350.00</td>
+                <td style="text-align:right;" class="amount-pos">$900.00</td>
+                <td style="text-align:right;" class="amount-pos">$550.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,800.00</strong></td>
+              </tr>
+              <tr class="topups-row">
+                <td><strong>August 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$1,200.00</td>
+                <td style="text-align:right;" class="amount-pos">$800.00</td>
+                <td style="text-align:right;" class="amount-pos">$480.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,480.00</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    /* ==============================
+       PAGE NAVIGATION
+    ============================== */
+    const PAGE_ROUTES = {
+      topups: "topups.html",
+      finance: "finance.html",
+      income: "income.html",
+      fees: "fees.html",
+      "internal-transactions": "internal-transactions.html",
+      transactions: "transactions.html"
+    };
+
+    document.getElementById("pageTabs")?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".page-tab");
+      if(!btn) return;
+      const key = btn.dataset.page;
+      if(!PAGE_ROUTES[key]) return;
+      window.location.href = PAGE_ROUTES[key];
+    });
+
+    /* =========================
+       THEME
+    ========================= */
+    (function initTheme(){
+      const root = document.documentElement;
+      const saved = localStorage.getItem("ui_theme") || "light";
+      if(saved === "dark") root.setAttribute("data-theme","dark");
+
+      const buttons = document.querySelectorAll("#themeToggle .theme-btn");
+      buttons.forEach(btn => {
+        if(btn.dataset.theme === saved) btn.classList.add("active");
+        else btn.classList.remove("active");
+
+        btn.addEventListener("click", () => {
+          const theme = btn.dataset.theme;
+          root.setAttribute("data-theme", theme);
+          localStorage.setItem("ui_theme", theme);
+          buttons.forEach(b => b.classList.toggle("active", b === btn));
+        });
+      });
+    })();
+
+    /* =========================
+       STATE & STORAGE
+    ========================= */
+    var state = {
+      ledger: [],
+      clients: [],
+      selectedYear: "2024",
+      selectedPlatform: "all",
+      selectedClient: "all"
+    };
+
+    function load(){
+      try {
+        var raw = localStorage.getItem("financeState");
+        if(raw){
+          var parsed = JSON.parse(raw);
+          if(parsed.ledger) state.ledger = parsed.ledger;
+          if(parsed.clients) state.clients = parsed.clients;
+        }
+      } catch(e) {
+        console.error("Error loading state:", e);
+      }
+      
+      // Populate client filter
+      populateClientFilter();
+    }
+
+    function populateClientFilter(){
+      var select = document.getElementById("clientFilter");
+      if(!select) return;
+      
+      // Keep "All Clients" option
+      select.innerHTML = '<option value="all">All Clients</option>';
+      
+      // Add clients from state
+      if(state.clients && Array.isArray(state.clients)){
+        state.clients.forEach(function(client){
+          var option = document.createElement("option");
+          option.value = client.id;
+          option.textContent = client.name || client.id;
+          select.appendChild(option);
+        });
+      }
+    }
+
+    function money(val){
+      var num = parseFloat(val) || 0;
+      return "$" + num.toFixed(2);
+    }
+
+    /* =========================
+       FILTERS
+    ========================= */
+    document.getElementById("yearFilter")?.addEventListener("change", function(e){
+      state.selectedYear = e.target.value;
+      renderIncomePage();
+    });
+
+    document.getElementById("platformFilter")?.addEventListener("change", function(e){
+      state.selectedPlatform = e.target.value;
+      renderIncomePage();
+    });
+
+    document.getElementById("clientFilter")?.addEventListener("change", function(e){
+      state.selectedClient = e.target.value;
+      renderIncomePage();
+    });
+
+    /* =========================
+       RENDER INCOME PAGE
+    ========================= */
+    function renderIncomePage(){
+      try {
+        // Filter ledger by year, platform, and client
+        var filteredLedger = state.ledger;
+        
+        if(state.selectedYear !== "all"){
+          filteredLedger = filteredLedger.filter(function(tx){
+            if(!tx.date) return false;
+            var year = new Date(tx.date).getFullYear();
+            return year.toString() === state.selectedYear;
+          });
+        }
+        
+        if(state.selectedPlatform !== "all"){
+          filteredLedger = filteredLedger.filter(function(tx){
+            return tx.platform && tx.platform.toLowerCase() === state.selectedPlatform.toLowerCase();
+          });
+        }
+        
+        if(state.selectedClient !== "all"){
+          filteredLedger = filteredLedger.filter(function(tx){
+            return tx.clientId === state.selectedClient;
+          });
+        }
+
+        // Calculate totals by fee type
+        var totalTopupFees = 0;
+        var totalTransferFees = 0;
+        var totalSetupServices = 0;
+        
+        var monthlyData = {};
+        
+        // Process all ledger entries for fees
+        if(filteredLedger && Array.isArray(filteredLedger)){
+          filteredLedger.forEach(function(tx){
+            if(!tx || !tx.date) return;
+            
+            try {
+              var date = new Date(tx.date);
+              if(isNaN(date.getTime())) return; // Invalid date
+              
+              var month = date.getMonth() + 1;
+              var monthStr = month < 10 ? "0" + month : "" + month;
+              var monthKey = date.getFullYear() + "-" + monthStr;
+              
+              if(!monthlyData[monthKey]){
+                monthlyData[monthKey] = {
+                  topupFees: 0,
+                  transferFees: 0,
+                  setupServices: 0,
+                  total: 0
+                };
+              }
+              
+              var amount = parseFloat(tx.amount) || 0;
+              
+              // Categorize fees
+              if(tx.category === "TOPUP_FEE"){
+                monthlyData[monthKey].topupFees += amount;
+                totalTopupFees += amount;
+              } else if(tx.category === "TRANSFER_FEE"){
+                monthlyData[monthKey].transferFees += amount;
+                totalTransferFees += amount;
+              } else if(tx.category === "SETUP_CHARGE" || tx.category === "SERVICE_CHARGE"){
+                monthlyData[monthKey].setupServices += amount;
+                totalSetupServices += amount;
+              }
+            } catch(e) {
+              console.error("Error processing transaction:", e, tx);
+            }
+          });
+        }
+        
+        // Calculate totals
+        Object.keys(monthlyData).forEach(function(month){
+          var data = monthlyData[month];
+          data.total = data.topupFees + data.transferFees + data.setupServices;
+        });
+        
+        var totalIncome = totalTopupFees + totalTransferFees + totalSetupServices;
+        
+        // Update KPIs (only if we have real data, otherwise keep mockup values)
+        if(filteredLedger.length > 0){
+          var topupFeesEl = document.getElementById("income_topup_fees");
+          var transferFeesEl = document.getElementById("income_transfer_fees");
+          var setupServicesEl = document.getElementById("income_setup_services");
+          var totalEl = document.getElementById("income_total");
+          
+          if(topupFeesEl) topupFeesEl.textContent = money(totalTopupFees);
+          if(transferFeesEl) transferFeesEl.textContent = money(totalTransferFees);
+          if(setupServicesEl) setupServicesEl.textContent = money(totalSetupServices);
+          if(totalEl) totalEl.textContent = money(totalIncome);
+        }
+        
+        // Sort months descending
+        var sortedMonths = Object.keys(monthlyData).sort().reverse();
+        
+        // Render table
+        var tbody = document.getElementById("incomeTableBody");
+        if(!tbody) return;
+        
+        if(sortedMonths.length === 0){
+          // Keep mockup data if no real data
+          return;
+        }
+        
+        var rows = sortedMonths.map(function(month){
+          var data = monthlyData[month];
+          try {
+            var monthDate = new Date(month + "-01");
+            var monthName = monthDate.toLocaleDateString("en-US", { year: "numeric", month: "long" });
+            
+            return "<tr class=\"topups-row\">" +
+              "<td><strong>" + monthName + "</strong></td>" +
+              "<td style=\"text-align:right;\" class=\"amount-pos\">" + money(data.topupFees) + "</td>" +
+              "<td style=\"text-align:right;\" class=\"amount-pos\">" + money(data.transferFees) + "</td>" +
+              "<td style=\"text-align:right;\" class=\"amount-pos\">" + money(data.setupServices) + "</td>" +
+              "<td style=\"text-align:right;\"><strong class=\"amount-pos\">" + money(data.total) + "</strong></td>" +
+              "</tr>";
+          } catch(e) {
+            console.error("Error rendering month:", e, month);
+            return "";
+          }
+        });
+        
+        tbody.innerHTML = rows.join("");
+      } catch(e) {
+        console.error("Error in renderIncomePage:", e);
+        var tbody = document.getElementById("incomeTableBody");
+        if(tbody) {
+          tbody.innerHTML = "<tr><td colspan=\"5\" class=\"td-muted\" style=\"text-align:center; padding:2rem;\">Error loading income data. Please refresh the page.</td></tr>";
+        }
+      }
+    }
+
+    /* =========================
+       INIT
+    ========================= */
+    load();
+    renderIncomePage();
+  </script>
+</body>
+</html>

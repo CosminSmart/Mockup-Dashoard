@@ -829,6 +829,13 @@
   justify-content:space-between;
   gap:14px;
   padding: 12px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,.85);
+  border-bottom: 1px solid var(--line2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .header-left{
@@ -938,6 +945,9 @@
     </button>
     <button type="button" class="page-tab active" data-page="finance" role="tab" aria-selected="true">
       Finance
+    </button>
+    <button type="button" class="page-tab" data-page="income" role="tab" aria-selected="false">
+      Income
     </button>
     <button type="button" class="page-tab" data-page="fees" role="tab" aria-selected="false">
       Charges
@@ -1105,172 +1115,6 @@
           <!-- FINANCE WORKSPACE -->
           
 
-            <!-- TAB: Funding -->
-            <div id="tab_funding">
-
-              <!-- SUBTABS IN FUNDING -->
-              <div class="subtab-header">
-                <div class="mini-hint">Alege fluxul (funding / allocate / individual send).</div>
-                <div class="pillbar" id="fundingSubTabs">
-                  <div class="pill active" data-subtab="main_to_vault">Main → Vault</div>
-                  <div class="pill" data-subtab="vault_allocate">Vault → (General/Individual/Account)</div>
-                  <div class="pill" data-subtab="individual_to_account">Individual → Account</div>
-                </div>
-              </div>
-
-              <!-- SUBTAB: Main -> Vault -->
-              <div id="subtab_main_to_vault">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>From</label>
-                    <select disabled>
-                      <option>Main Wallet</option>
-                    </select>
-                    <div class="mini-hint" id="tx_fromHint"></div>
-                  </div>
-
-                  <div class="form-group">
-                    <label>To</label>
-                    <select disabled>
-                      <option>Platform Vault</option>
-                    </select>
-                    <div class="mini-hint">Din Main Wallet poți trimite doar către Platform Vault.</div>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Platform</label>
-                    <select id="tx_platform" onchange="updateFundingPreview()">
-                      <option value="facebook">Facebook</option>
-                      <option value="google">Google</option>
-                      <option value="tiktok">TikTok</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label>Amount (USD)</label>
-                    <input type="number" id="tx_amount" min="0" step="0.01" placeholder="e.g. 250" oninput="updateFundingPreview()">
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Note (optional)</label>
-                  <input type="text" id="tx_note" placeholder="e.g. Funding for campaigns Feb" oninput="updateFundingPreview()">
-                </div>
-
-     
-                <div class="split">
-                  <div class="muted" id="tx_preview"></div>
-                  <div class="quick-actions">
-                    <button class="transfer-btn secondary" onclick="submitMainToVault()">Confirm Transfer</button>
-                    <button class="transfer-btn gray" onclick="seedDemo()">Reset Demo Data</button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- SUBTAB: Vault -> Allocate -->
-              <div id="subtab_vault_allocate" style="display:none;">
-                <div class="mini-hint" style="margin-bottom:.6rem;">
-                  <strong>Allocate from Platform Vault</strong> către General / Individual / Accounts:
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Platform Vault</label>
-                    <select id="alloc_platform" onchange="updateAllocationPreview()">
-                      <option value="facebook">Facebook</option>
-                      <option value="google">Google</option>
-                      <option value="tiktok">TikTok</option>
-                    </select>
-                    <div class="mini-hint" id="alloc_platformHint"></div>
-                  </div>
-
-                  <div class="form-group">
-                    <label>Allocate To</label>
-                    <select id="alloc_to" onchange="toggleAllocAccountSelect(); updateAllocationPreview();">
-                      <option value="generalBalance">General Balance</option>
-                      <option value="individualBalance">Individual Balance</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group" id="alloc_accountGroup" style="display:none;">
-                    <label>Select Account</label>
-                    <select id="alloc_account" onchange="updateAllocationPreview()">
-                      <option value="acc_1">acc_1</option>
-                      <option value="acc_2">acc_2</option>
-                      <option value="acc_3">acc_3</option>
-                    </select>
-                  </div>
-
-                  <div class="form-group">
-                    <label>Amount (USD)</label>
-                    <input type="number" id="alloc_amount" min="0" step="0.01" placeholder="e.g. 120" oninput="updateAllocationPreview()">
-                  </div>
-                </div>
-
-                <div class="form-group">
-                  <label>Note (optional)</label>
-                  <input type="text" id="alloc_note" placeholder="e.g. allocate to acc_1" oninput="updateAllocationPreview()">
-                </div>
-
-                <div class="split">
-                  <div class="muted" id="alloc_preview"></div>
-                  <div class="quick-actions">
-                    <button class="transfer-btn secondary" onclick="submitAllocation()">Confirm Allocation</button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- SUBTAB: Individual -> Account -->
-              <div id="subtab_individual_to_account" style="display:none;">
-                <div class="mini-hint" style="margin-bottom:.6rem;">
-                  <strong>Send from Individual Balance</strong> către un cont anume:
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>From</label>
-                    <select disabled>
-                      <option>Individual Balance</option>
-                    </select>
-                    <div class="mini-hint" id="ind_fromHint"></div>
-                  </div>
-
-                  <div class="form-group">
-                    <label>To (Account)</label>
-                    <select id="ind_toAccount" onchange="updateIndToAccountPreview()">
-                      <option value="acc_1">acc_1</option>
-                      <option value="acc_2">acc_2</option>
-                      <option value="acc_3">acc_3</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label>Amount (USD)</label>
-                    <input type="number" id="ind_amount" min="0" step="0.01" placeholder="e.g. 100" oninput="updateIndToAccountPreview()">
-                  </div>
-
-                  <div class="form-group">
-                    <label>Note (optional)</label>
-                    <input type="text" id="ind_note" placeholder="e.g. assign to acc_2 budget" oninput="updateIndToAccountPreview()">
-                  </div>
-                </div>
-
-                <div class="split">
-                  <div class="muted" id="ind_preview"></div>
-                  <div class="quick-actions">
-                    <button class="transfer-btn secondary" onclick="submitIndividualToAccount()">Confirm Send</button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-
             <!-- TAB: Setup & Services -->
             <div id="tab_setup" style="display:none;">
               <div class="mini-hint" style="margin-bottom:.75rem;">
@@ -1409,7 +1253,6 @@
         <div class="topups-section" style="display: none !important;">
 
         </div>
-        <!-- END PAGE: Finance -->
 
         <!-- PAGE: Transactions -->
         <div id="page_transactions" style="display:none;">
@@ -3075,6 +2918,16 @@ function populateGlobalClientFilter(){
 ================================ */
 state.activePage = state.activePage || "finance";
 
+// Page routes for navigation
+const PAGE_ROUTES = {
+  topups: "topups.html",
+  finance: null, // Stay on current page
+  income: "income.html",
+  fees: "fees.html",
+  "internal-transactions": "internal-transactions.html",
+  transactions: "transactions.html"
+};
+
 function setActivePage(page){
   state.activePage = page;
   save();
@@ -3102,7 +2955,7 @@ function setActivePage(page){
   if(topupsSection) topupsSection.style.display = isDefaultPage ? "block" : "none";
 
   // Show/hide page-specific sections
-  const pageSpecificSections = ["fees","transactions","ledger"];
+  const pageSpecificSections = ["fees","transactions","internal-transactions","ledger"];
   pageSpecificSections.forEach(p=>{
     const el = document.getElementById(`page_${p}`);
     if(el) el.style.display = (p === page) ? "block" : "none";
@@ -3114,12 +2967,14 @@ function setActivePage(page){
     sub.textContent =
       page === "topups" ? "Top-ups • Client Funding • Status Management"
       : page === "finance" ? "Overview • KPIs • Funding / Setup"
+      : page === "income" ? "Monthly Income • Revenue Tracking • Fee Analysis"
       : page === "fees" ? "Fee Management • Audit • Service Fees"
+      : page === "internal-transactions" ? "Internal Transactions • Account Transfers"
       : page === "transactions" ? "Transactions • Filters • Export"
       : "Ledger • Audit trail • Review";
   }
 
-  // render page bodies
+  // render page bodies (no longer rendering income inline)
   if(page === "fees") renderFeesPage();
   if(page === "transactions") renderTransactionsPage();
   if(page === "ledger") renderLedgerPage();
@@ -3128,7 +2983,18 @@ function setActivePage(page){
 document.getElementById("pageTabs").addEventListener("click", (e)=>{
   const btn = e.target.closest(".page-tab");
   if(!btn) return;
-  setActivePage(btn.getAttribute("data-page"));
+  e.preventDefault(); // Prevent any default navigation
+  
+  const page = btn.getAttribute("data-page");
+  
+  // Navigate to separate page if route exists
+  if(PAGE_ROUTES[page]){
+    window.location.href = PAGE_ROUTES[page];
+    return;
+  }
+  
+  // Otherwise handle inline page switching
+  setActivePage(page);
 });
 
 /* Render Transactions Page */
