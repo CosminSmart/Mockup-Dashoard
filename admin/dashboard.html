@@ -31,18 +31,18 @@
       --gap: 16px;
     }
 
-    body{ background: var(--bg) !important; color: var(--text); }
+    body{ 
+      background: var(--bg) !important; 
+      color: var(--text);
+    }
 
     .header{
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(255,255,255,.92);
+      background: rgba(255,255,255,.92) !important;
       backdrop-filter: blur(10px);
       border-bottom: 1px solid var(--border);
-      box-shadow: 0 8px 20px rgba(15,23,42,.06);
-      padding: 16px 24px;
+      box-shadow: 0 8px 20px rgba(15,23,42,.06) !important;
     }
+    
     .header h1{
       margin: 0;
       font-size: 24px;
@@ -50,7 +50,9 @@
       color: var(--text);
     }
 
-    .main{ padding: 24px !important; max-width: 1400px; margin: 0 auto; }
+    .main{ 
+      padding: 24px !important;
+    }
 
     /* Dashboard Grid */
     .dash-grid{ display: grid; gap: var(--gap); }
@@ -366,11 +368,19 @@
 
 <body>
   <div class="layout">
-    <header class="header">
-      <h1>📊 Admin Dashboard</h1>
-    </header>
-
     <aside class="sidebar" id="sidebar"></aside>
+
+    <header class="header">
+      <div>
+        <h1>📊 Dashboard</h1>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <span>Admin User</span>
+          <div class="user-avatar">AU</div>
+        </div>
+      </div>
+    </header>
 
     <main class="main">
       <div class="dash-grid">
