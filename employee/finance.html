@@ -13,6 +13,66 @@
   <style>
     .finance-container { width: 100%; }
 
+    /* ===== Header Tabs (Finance / Transactions / Ledger) ===== */
+    .header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 12px 18px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(255,255,255,.85);
+      border-bottom: 1px solid #ddd;
+    }
+
+    .header-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 280px;
+    }
+
+    .page-tabs{
+      display:flex;
+      gap:8px;
+      padding: 6px;
+      border-radius: 999px;
+      border: 1px solid #ddd;
+      background: #fafafa;
+      width: fit-content;
+    }
+
+    .page-tab{
+      border:1px solid transparent;
+      background: transparent;
+      color: #6c7a89;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+      letter-spacing: .2px;
+      user-select:none;
+    }
+
+    .page-tab:hover{ transform: translateY(-1px); }
+
+    .page-tab.active{
+      background: rgba(52,152,219,.18);
+      border-color: rgba(52,152,219,.35);
+      color: #2c3e50;
+    }
+
+    /* Mobile */
+    @media (max-width: 820px){
+      .header{ flex-wrap:wrap; align-items:flex-start; }
+      .header-left{ width:100%; }
+      .page-tabs{ width:100%; justify-content:space-between; }
+      .page-tab{ flex:1; text-align:center; }
+    }
+
     /* GLOBAL FILTERS BAR */
     .global-filters{
       background:#fff;
@@ -552,7 +612,27 @@
 <body>
     <div class="layout">
         <header class="header">
-            <h1>Finance</h1>
+            <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+                <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="false">
+                    Topups
+                </button>
+                <button type="button" class="page-tab active" data-page="finance" role="tab" aria-selected="true">
+                    Finance
+                </button>
+                <button type="button" class="page-tab" data-page="income" role="tab" aria-selected="false">
+                    Income
+                </button>
+                <button type="button" class="page-tab" data-page="fees" role="tab" aria-selected="false">
+                    Charges
+                </button>
+                <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">
+                    Internal Transactions
+                </button>
+                <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">
+                    Transactions
+                </button>
+            </div>
+
             <div class="header-right">
                 <div class="theme-toggle">
                     <button class="theme-btn active">Light</button>
