@@ -8,362 +8,10 @@
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/sidebar.css">
+  <link rel="stylesheet" href="../css/admin-dashboard.css">
   
   <!-- Google Charts -->
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
-  <style>
-    :root{
-      --bg: #f6f7fb;
-      --panel: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: rgba(15,23,42,.10);
-      --shadow: 0 12px 30px rgba(15,23,42,.08);
-
-      --green: #10b981;
-      --red: #ef4444;
-      --blue: #2563eb;
-      --amber: #f59e0b;
-      --violet: #8b5cf6;
-
-      --r: 16px;
-      --gap: 16px;
-    }
-
-    body{ 
-      background: var(--bg) !important; 
-      color: var(--text);
-    }
-
-    .header{
-      background: rgba(255,255,255,.92) !important;
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 8px 20px rgba(15,23,42,.06) !important;
-    }
-    
-    .header h1{
-      margin: 0;
-      font-size: 24px;
-      font-weight: 900;
-      color: var(--text);
-    }
-
-    .main{ 
-      padding: 24px !important;
-    }
-
-    /* Dashboard Grid */
-    .dash-grid{ display: grid; gap: var(--gap); }
-
-    /* KPI Cards */
-    .kpi-row{
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: var(--gap);
-    }
-    @media (max-width: 1100px){ .kpi-row{ grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 600px){ .kpi-row{ grid-template-columns: 1fr; } }
-
-    .kpi-card{
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      padding: 20px;
-      box-shadow: var(--shadow);
-      position: relative;
-      overflow: hidden;
-    }
-    .kpi-card:before{
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-      background: var(--blue);
-    }
-    .kpi-card.green:before{ background: var(--green); }
-    .kpi-card.amber:before{ background: var(--amber); }
-    .kpi-card.violet:before{ background: var(--violet); }
-
-    .kpi-label{
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .kpi-value{
-      font-size: 32px;
-      font-weight: 900;
-      color: var(--text);
-      letter-spacing: -0.5px;
-    }
-    .kpi-sub{
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 8px;
-      font-weight: 600;
-    }
-
-    /* Content Row */
-    .content-row{
-      display: grid;
-      grid-template-columns: 1.5fr 1fr;
-      gap: var(--gap);
-    }
-    @media (max-width: 1000px){ .content-row{ grid-template-columns: 1fr; } }
-
-    /* Card */
-    .card{
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--r);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .card-header{
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(15,23,42,.02), transparent);
-    }
-    .card-title{
-      font-size: 16px;
-      font-weight: 900;
-      color: var(--text);
-      margin: 0;
-    }
-    .card-subtitle{
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-    .card-body{
-      padding: 20px;
-    }
-
-    /* Table */
-    table{
-      width: 100%;
-      border-collapse: collapse;
-    }
-    thead th{
-      text-align: left;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--muted);
-      padding: 12px;
-      font-weight: 800;
-      border-bottom: 1px solid var(--border);
-    }
-    tbody td{
-      padding: 14px 12px;
-      border-bottom: 1px solid var(--border);
-      font-size: 14px;
-    }
-    tbody tr:last-child td{ border-bottom: none; }
-    tbody tr:hover{ background: rgba(37,99,235,.04); }
-
-    .name{
-      font-weight: 800;
-      color: var(--text);
-    }
-    .email{
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .action-btn{
-      padding: 6px 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: var(--panel);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .action-btn.approve{
-      background: rgba(16,185,129,.12);
-      border-color: rgba(16,185,129,.30);
-      color: #065f46;
-    }
-    .action-btn.approve:hover{
-      background: rgba(16,185,129,.20);
-    }
-    .action-btn.reject{
-      background: rgba(239,68,68,.12);
-      border-color: rgba(239,68,68,.30);
-      color: #991b1b;
-    }
-    .action-btn.reject:hover{
-      background: rgba(239,68,68,.20);
-    }
-
-    .badge{
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,.04);
-    }
-    .badge.active{
-      background: rgba(16,185,129,.12);
-      border-color: rgba(16,185,129,.30);
-      color: #065f46;
-    }
-    .badge.pending{
-      background: rgba(245,158,11,.12);
-      border-color: rgba(245,158,11,.30);
-      color: #92400e;
-    }
-    .badge.suspended{
-      background: rgba(239,68,68,.12);
-      border-color: rgba(239,68,68,.30);
-      color: #991b1b;
-    }
-
-    .dot{
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #94a3b8;
-    }
-    .badge.active .dot{ background: var(--green); }
-    .badge.pending .dot{ background: var(--amber); }
-    .badge.suspended .dot{ background: var(--red); }
-
-    /* Activity List */
-    .topup-list{
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .topup-item{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(245,158,11,.05);
-      border-color: rgba(245,158,11,.20);
-    }
-    .topup-info{
-      flex: 1;
-    }
-    .topup-client{
-      font-size: 14px;
-      font-weight: 800;
-      color: var(--text);
-      margin-bottom: 4px;
-    }
-    .topup-details{
-      font-size: 13px;
-      color: var(--muted);
-    }
-    .topup-amount{
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--amber);
-    }
-
-    /* Fee Breakdown with Google Charts */
-    .fee-breakdown{
-      padding: 20px;
-      min-height: 450px;
-    }
-
-    #feeChart{
-      width: 100%;
-      height: 400px;
-    }
-
-    /* Client Stats */
-    .client-stats{
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-    .stat-item{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(15,23,42,.02);
-    }
-    .stat-label{
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .stat-value{
-      font-size: 24px;
-      font-weight: 900;
-      color: var(--text);
-    }
-    .stat-bar{
-      margin-top: 8px;
-      height: 6px;
-      background: rgba(15,23,42,.08);
-      border-radius: 3px;
-      overflow: hidden;
-    }
-    .stat-bar-fill{
-      height: 100%;
-      background: var(--blue);
-      border-radius: 3px;
-      transition: width 0.3s ease;
-    }
-    .stat-bar-fill.green{ background: var(--green); }
-    .stat-bar-fill.amber{ background: var(--amber); }
-    .stat-bar-fill.red{ background: var(--red); }
-
-    /* Platform Stats */
-    .platform-stats{
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-    .platform-item{
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      background: rgba(15,23,42,.02);
-    }
-    .platform-info{
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .platform-icon{
-      font-size: 20px;
-    }
-    .platform-name{
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-    }
-    .platform-balance{
-      font-size: 16px;
-      font-weight: 900;
-      color: var(--text);
-    }
-  </style>
 </head>
 
 <body>
@@ -389,25 +37,25 @@
         <div class="kpi-row">
           <div class="kpi-card blue">
             <div class="kpi-label">Main Wallet</div>
-            <div class="kpi-value" id="kpiMainWallet">$0.00</div>
+            <div class="kpi-value" id="kpiMainWallet">$2,450.00</div>
             <div class="kpi-sub">Available balance</div>
           </div>
 
           <div class="kpi-card green">
             <div class="kpi-label">Total Topups</div>
-            <div class="kpi-value" id="kpiTopups">$0.00</div>
+            <div class="kpi-value" id="kpiTopups">$4,500.00</div>
             <div class="kpi-sub">All time deposits</div>
           </div>
 
           <div class="kpi-card amber">
             <div class="kpi-label">Platform Spend</div>
-            <div class="kpi-value" id="kpiSpend">$0.00</div>
+            <div class="kpi-value" id="kpiSpend">$3,211.25</div>
             <div class="kpi-sub">Allocated to platforms</div>
           </div>
 
           <div class="kpi-card violet">
             <div class="kpi-label">Total Fees</div>
-            <div class="kpi-value" id="kpiFees">$0.00</div>
+            <div class="kpi-value" id="kpiFees">$125.00</div>
             <div class="kpi-sub">Collected fees</div>
           </div>
         </div>
@@ -431,7 +79,63 @@
                   </tr>
                 </thead>
                 <tbody id="pendingClientsTable">
-                  <!-- Populated by JS -->
+                  <tr>
+                    <td>
+                      <div class="name">John D.</div>
+                      <div class="email">john@example.com</div>
+                    </td>
+                    <td>2 days ago</td>
+                    <td>
+                      <span class="badge pending">
+                        <span class="dot"></span>
+                        Client
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; gap: 8px;">
+                        <button class="action-btn approve" onclick="alert('Approved: John D.')">✓ Approve</button>
+                        <button class="action-btn reject" onclick="alert('Rejected: John D.')">✗ Reject</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Sarah K.</div>
+                      <div class="email">sarah@example.com</div>
+                    </td>
+                    <td>3 days ago</td>
+                    <td>
+                      <span class="badge pending">
+                        <span class="dot"></span>
+                        Employee
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; gap: 8px;">
+                        <button class="action-btn approve" onclick="alert('Approved: Sarah K.')">✓ Approve</button>
+                        <button class="action-btn reject" onclick="alert('Rejected: Sarah K.')">✗ Reject</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Mike R.</div>
+                      <div class="email">mike@example.com</div>
+                    </td>
+                    <td>5 days ago</td>
+                    <td>
+                      <span class="badge pending">
+                        <span class="dot"></span>
+                        Client
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; gap: 8px;">
+                        <button class="action-btn approve" onclick="alert('Approved: Mike R.')">✓ Approve</button>
+                        <button class="action-btn reject" onclick="alert('Rejected: Mike R.')">✗ Reject</button>
+                      </div>
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
@@ -445,7 +149,27 @@
             </div>
             <div class="card-body">
               <div class="topup-list" id="topupList">
-                <!-- Populated by JS -->
+                <div class="topup-item">
+                  <div class="topup-info">
+                    <div class="topup-client">Alex M.</div>
+                    <div class="topup-details">Wire • Today</div>
+                  </div>
+                  <div class="topup-amount">$1,500.00</div>
+                </div>
+                <div class="topup-item">
+                  <div class="topup-info">
+                    <div class="topup-client">Maria P.</div>
+                    <div class="topup-details">Wire • Today</div>
+                  </div>
+                  <div class="topup-amount">$1,200.00</div>
+                </div>
+                <div class="topup-item">
+                  <div class="topup-info">
+                    <div class="topup-client">John D.</div>
+                    <div class="topup-details">Crypto USDT • Yesterday</div>
+                  </div>
+                  <div class="topup-amount">$1,000.00</div>
+                </div>
               </div>
             </div>
           </div>
@@ -462,6 +186,326 @@
             <div class="card-body">
               <div class="fee-breakdown">
                 <div id="feeChart"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Clients Last Month -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Top Clients Last Month</h2>
+              <div class="card-subtitle">Highest charges in previous month</div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Client</th>
+                    <th style="text-align: right;">Total Charges</th>
+                  </tr>
+                </thead>
+                <tbody id="topClientsTable">
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">🥇</td>
+                    <td>
+                      <div class="name">Alex M.</div>
+                      <div class="email">alex@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$1,250.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">🥈</td>
+                    <td>
+                      <div class="name">Maria P.</div>
+                      <div class="email">maria@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$980.50</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">🥉</td>
+                    <td>
+                      <div class="name">John D.</div>
+                      <div class="email">john@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$750.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">4</td>
+                    <td>
+                      <div class="name">Sarah K.</div>
+                      <div class="email">sarah@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$620.75</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">5</td>
+                    <td>
+                      <div class="name">Mike R.</div>
+                      <div class="email">mike@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$450.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Third Row -->
+        <div class="content-row">
+          <!-- Accounts Overview -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">📱 Accounts Overview</h2>
+              <div class="card-subtitle">Distribution across platforms</div>
+            </div>
+            <div class="card-body">
+              <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: center;">
+                <!-- Donut Chart -->
+                <div>
+                  <div id="accountsChart" style="height: 250px;"></div>
+                </div>
+                
+                <!-- Platform Breakdown -->
+                <div class="platform-accounts">
+                  <div class="platform-account-item">
+                    <div class="platform-account-header">
+                      <span class="platform-account-icon">📘</span>
+                      <span class="platform-account-name">Facebook</span>
+                      <span class="platform-account-count">100</span>
+                    </div>
+                    <div class="platform-account-bar">
+                      <div class="platform-account-fill assigned" style="width: 80%;" data-tooltip="80 Assigned"></div>
+                      <div class="platform-account-fill unassigned" style="width: 20%;" data-tooltip="20 Unassigned"></div>
+                    </div>
+                    <div class="platform-account-stats">
+                      <span class="stat-assigned">✓ 80 Assigned</span>
+                      <span class="stat-unassigned">○ 20 Available</span>
+                    </div>
+                  </div>
+
+                  <div class="platform-account-item">
+                    <div class="platform-account-header">
+                      <span class="platform-account-icon">🔍</span>
+                      <span class="platform-account-name">Google</span>
+                      <span class="platform-account-count">50</span>
+                    </div>
+                    <div class="platform-account-bar">
+                      <div class="platform-account-fill assigned" style="width: 90%;"></div>
+                      <div class="platform-account-fill unassigned" style="width: 10%;"></div>
+                    </div>
+                    <div class="platform-account-stats">
+                      <span class="stat-assigned">✓ 45 Assigned</span>
+                      <span class="stat-unassigned">○ 5 Available</span>
+                    </div>
+                  </div>
+
+                  <div class="platform-account-item">
+                    <div class="platform-account-header">
+                      <span class="platform-account-icon">🎵</span>
+                      <span class="platform-account-name">TikTok</span>
+                      <span class="platform-account-count">50</span>
+                    </div>
+                    <div class="platform-account-bar">
+                      <div class="platform-account-fill assigned" style="width: 60%;"></div>
+                      <div class="platform-account-fill unassigned" style="width: 40%;"></div>
+                    </div>
+                    <div class="platform-account-stats">
+                      <span class="stat-assigned">✓ 30 Assigned</span>
+                      <span class="stat-unassigned">○ 20 Available</span>
+                    </div>
+                  </div>
+
+                  <div class="platform-account-item">
+                    <div class="platform-account-header">
+                      <span class="platform-account-icon">📷</span>
+                      <span class="platform-account-name">Instagram</span>
+                      <span class="platform-account-count">50</span>
+                    </div>
+                    <div class="platform-account-bar">
+                      <div class="platform-account-fill assigned" style="width: 30%;"></div>
+                      <div class="platform-account-fill unassigned" style="width: 70%;"></div>
+                    </div>
+                    <div class="platform-account-stats">
+                      <span class="stat-assigned">✓ 15 Assigned</span>
+                      <span class="stat-unassigned">○ 35 Available</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Low Balance Alerts -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">⚠️ Low Balance Alerts</h2>
+              <div class="card-subtitle">Clients with main wallet below threshold</div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th style="text-align: right;">Main Wallet</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="lowBalanceTable">
+                  <tr>
+                    <td>
+                      <div class="name">Tom B.</div>
+                      <div class="email">tom@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--red);">$15.00</td>
+                    <td><span class="badge suspended"><span class="dot"></span>Critical</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Emily R.</div>
+                      <div class="email">emily@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--red);">$45.00</td>
+                    <td><span class="badge suspended"><span class="dot"></span>Critical</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Anna K.</div>
+                      <div class="email">anna@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$65.25</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">David L.</div>
+                      <div class="email">david@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$78.50</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Lisa M.</div>
+                      <div class="email">lisa@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$92.00</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fourth Row -->
+        <div class="content-row">
+          <!-- Low Balance Alerts -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">⚠️ Low Balance Alerts</h2>
+              <div class="card-subtitle">Clients with main wallet below threshold</div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th style="text-align: right;">Main Wallet</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="lowBalanceTable">
+                  <tr>
+                    <td>
+                      <div class="name">Tom B.</div>
+                      <div class="email">tom@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--red);">$15.00</td>
+                    <td><span class="badge suspended"><span class="dot"></span>Critical</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Emily R.</div>
+                      <div class="email">emily@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--red);">$45.00</td>
+                    <td><span class="badge suspended"><span class="dot"></span>Critical</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Anna K.</div>
+                      <div class="email">anna@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$65.25</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">David L.</div>
+                      <div class="email">david@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$78.50</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Lisa M.</div>
+                      <div class="email">lisa@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$92.00</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Most Requested Marketplace Items -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">🔥 Most Requested Items</h2>
+              <div class="card-subtitle">Top 3 marketplace requests this month</div>
+            </div>
+            <div class="card-body">
+              <div id="hotItemsList" style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="hot-item">
+                  <div class="hot-item-rank">🥇</div>
+                  <div class="hot-item-icon">📘</div>
+                  <div class="hot-item-info">
+                    <div class="hot-item-name">Facebook Account + BM</div>
+                    <div class="hot-item-subtitle">3 Ad Acc • $250 Limit</div>
+                  </div>
+                  <div class="hot-item-stats">
+                    <div class="hot-item-requests">24</div>
+                    <span class="hot-item-trend up">↗ Trending</span>
+                  </div>
+                </div>
+                <div class="hot-item">
+                  <div class="hot-item-rank">🥈</div>
+                  <div class="hot-item-icon">🎵</div>
+                  <div class="hot-item-info">
+                    <div class="hot-item-name">Premium TikTok Ads</div>
+                    <div class="hot-item-subtitle">No Spending Limits</div>
+                  </div>
+                  <div class="hot-item-stats">
+                    <div class="hot-item-requests">18</div>
+                    <span class="hot-item-trend up">↗ Trending</span>
+                  </div>
+                </div>
+                <div class="hot-item">
+                  <div class="hot-item-rank">🥉</div>
+                  <div class="hot-item-icon">G</div>
+                  <div class="hot-item-info">
+                    <div class="hot-item-name">Google Agency</div>
+                    <div class="hot-item-subtitle">Premium Tier</div>
+                  </div>
+                  <div class="hot-item-stats">
+                    <div class="hot-item-requests">15</div>
+                    <span class="hot-item-trend stable">→ Stable</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>

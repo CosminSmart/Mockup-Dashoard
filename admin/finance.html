@@ -193,5 +193,99 @@
   </div>
 
   <script src="../js/sidebar.js"></script>
+  
+  <script>
+    // Mock data for finance statistics
+    const LS_KEY = "admin_finance_demo_v7";
+
+    function money(n){
+      const v = Number(n || 0);
+      return v.toLocaleString(undefined, { style:"currency", currency:"USD" });
+    }
+
+    function loadFinanceData(){
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return null;
+      try{
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
+      }
+    }
+
+    function calculateFinanceStats(){
+      const data = loadFinanceData();
+      
+      // Default mock values if no data in localStorage
+      if(!data || !data.ledger) {
+        return {
+          totalTopups: 4500.00,
+          mainWallet: 2450.00,
+          platformsVault: 3211.25,
+          generalBalance: 1850.00,
+          individualBalance: 1361.25,
+          spend: 2288.75,
+          totalFees: 125.00,
+          setupServices: 450.00
+        };
+      }
+
+      // Calculate from ledger if available
+      let totalTopups = 0;
+      let mainWallet = 0;
+      let platformsVault = 0;
+      let generalBalance = 0;
+      let individualBalance = 0;
+      let spend = 0;
+      let totalFees = 0;
+      let setupServices = 0;
+
+      data.ledger.forEach(tx => {
+        const amt = Number(tx.amount || 0);
+        
+        if(tx.type === "topup") totalTopups += amt;
+        if(tx.to === "mainWallet") mainWallet += amt;
+        if(tx.from === "mainWallet") mainWallet -= amt;
+        if(tx.to === "platformsVault") platformsVault += amt;
+        if(tx.category === "general") generalBalance += amt;
+        if(tx.category === "individual") individualBalance += amt;
+        if(tx.type === "transfer" && tx.from === "mainWallet") spend += amt;
+        if(tx.type === "fee" || tx.category?.includes("fee")) totalFees += amt;
+        if(tx.category === "setup" || tx.category === "service") setupServices += amt;
+      });
+
+      return {
+        totalTopups,
+        mainWallet,
+        platformsVault,
+        generalBalance,
+        individualBalance,
+        spend,
+        totalFees,
+        setupServices
+      };
+    }
+
+    function renderFinanceStats(){
+      const stats = calculateFinanceStats();
+      const statBoxes = document.querySelectorAll('.stat-box');
+      
+      if(statBoxes.length >= 8){
+        statBoxes[0].querySelector('.stat-value').textContent = money(stats.totalTopups);
+        statBoxes[1].querySelector('.stat-value').textContent = money(stats.mainWallet);
+        statBoxes[2].querySelector('.stat-value').textContent = money(stats.platformsVault);
+        statBoxes[3].querySelector('.stat-value').textContent = money(stats.generalBalance);
+        statBoxes[4].querySelector('.stat-value').textContent = money(stats.individualBalance);
+        statBoxes[5].querySelector('.stat-value').textContent = money(stats.spend);
+        statBoxes[6].querySelector('.stat-value').textContent = money(stats.totalFees);
+        statBoxes[7].querySelector('.stat-value').textContent = money(stats.setupServices);
+      }
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', function(){
+      renderFinanceStats();
+    });
+  </script>
 </body>
 </html>
