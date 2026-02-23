@@ -422,6 +422,97 @@
       color: color-mix(in srgb, var(--bad) 82%, var(--text));
     }
 
+    /* Timeline in table - horizontal with circles */
+    .timeline-mini {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 18px 0 6px;
+      min-width: 140px;
+      max-width: 160px;
+    }
+
+    .timeline-mini-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #e2e8f0;
+      z-index: 1;
+    }
+
+    .timeline-mini-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: #334155;
+      transition: width 0.4s ease;
+      z-index: 2;
+    }
+
+    .timeline-mini-steps {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      z-index: 3;
+    }
+
+    .timeline-mini-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .timeline-mini-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+
+    .timeline-mini-step.active .timeline-mini-circle {
+      background: #334155;
+      box-shadow: 0 1px 4px rgba(51, 65, 85, 0.25);
+    }
+
+    .timeline-mini-step.completed .timeline-mini-circle {
+      background: #334155;
+    }
+
+    .timeline-mini-step.declined .timeline-mini-circle {
+      background: #ef4444;
+    }
+
+    .timeline-mini-label {
+      position: absolute;
+      top: -28px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      white-space: normal;
+      text-align: center;
+      text-transform: lowercase;
+      letter-spacing: 0.2px;
+      line-height: 1.2;
+      max-width: 50px;
+    }
+
+    .timeline-mini-step.active .timeline-mini-label,
+    .timeline-mini-step.completed .timeline-mini-label {
+      color: var(--text);
+    }
+
+    .timeline-mini-step.declined .timeline-mini-label {
+      color: #ef4444;
+    }
+
     /* =========================
        RIGHT DRAWER (GENERIC)
     ========================= */
@@ -1382,12 +1473,46 @@
       </span>`;
     }
     function timelineChips(t){
-      const s = t.steps || {};
-      return [
-        chip("Invoice provided", !!s.invoiceProvided),
-        chip("Proof uploaded", !!s.proofUploaded),
-        chip("Money OTW", !!s.moneyOTW)
-      ].join(" ");
+      const status = (t.status || "pending").toLowerCase();
+      const steps = t.steps || {};
+      
+      // Define steps with original names
+      const timelineSteps = [
+        { id: 'invoice', label: 'Invoice<br>provided', completed: !!steps.invoiceProvided },
+        { id: 'proof', label: 'Proof<br>uploaded', completed: !!steps.proofUploaded },
+        { id: 'otw', label: 'Money<br>OTW', completed: !!steps.moneyOTW }
+      ];
+      
+      // Calculate progress based on completed steps
+      const completedCount = timelineSteps.filter(s => s.completed).length;
+      const progress = (completedCount / timelineSteps.length) * 100;
+      
+      // Generate steps HTML
+      const stepsHTML = timelineSteps.map(step => {
+        let stepClass = 'timeline-mini-step';
+        
+        if (step.completed) {
+          stepClass += ' completed';
+        }
+        
+        return `
+          <div class="${stepClass}">
+            <span class="timeline-mini-label">${step.label}</span>
+            <div class="timeline-mini-circle"></div>
+          </div>
+        `;
+      }).join('');
+      
+      return `
+        <div class="timeline-mini">
+          <div class="timeline-mini-line">
+            <div class="timeline-mini-progress" style="width: ${progress}%"></div>
+          </div>
+          <div class="timeline-mini-steps">
+            ${stepsHTML}
+          </div>
+        </div>
+      `;
     }
 
     function usdValueForKpi(t){

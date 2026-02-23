@@ -39,9 +39,9 @@
     }
 
     .main{ 
-      padding: 24px !important; 
-      max-width: 1400px; 
-      margin: 0 auto;
+      padding: 24px 20px !important; 
+      max-width: 100%; 
+      margin: 0;
     }
 
     .wallet-overview{
@@ -421,6 +421,7 @@
       font-size: 14px;
       font-weight: 600;
       color: var(--text);
+      justify-content: flex-start;
     }
 
     .dropdown-item:hover{
@@ -435,11 +436,19 @@
       width: 20px;
       height: 20px;
       object-fit: contain;
+      flex-shrink: 0;
+    }
+
+    .dropdown-item span:not(.dropdown-item-arrow){
+      flex: 1;
+      text-align: left;
     }
 
     .dropdown-item-arrow{
       font-size: 16px;
       color: var(--muted);
+      flex-shrink: 0;
+      margin-left: auto;
     }
 
     .submenu{
@@ -1009,7 +1018,7 @@
         <h2>Transfer Funds</h2>
         
         <!-- Client Selector (required for all transfers to check permissions) -->
-        <div id="client_selector_row" style="margin-bottom: 16px;">
+        <div id="client_selector_row" style="margin-bottom: 16px; max-width: 400px;">
           <div class="form-group">
             <label>Client</label>
             <select id="transfer_client" onchange="updateFromDropdownPermissions(); updateTransferOptions();">
