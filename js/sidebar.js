@@ -58,6 +58,55 @@ const walletData = {
     ]
 };
 
+// Notifications data (hardcoded demo)
+const notificationsData = [
+    {
+        id: 1,
+        title: 'New client pending approval',
+        content: 'Client "Digital Marketing Pro SRL" (ID: 103) has registered and is waiting for account approval.',
+        time: '14:32 23 Feb 2026',
+        read: false,
+        link: 'clients.html'
+    },
+    {
+        id: 2,
+        title: 'New top-up request from client',
+        content: 'Client "Alex M." (ID: 100) created a new top-up request TU-120450 for 2,500.00 EUR via Wire transfer.',
+        time: '13:15 23 Feb 2026',
+        read: false,
+        link: 'topups.html'
+    },
+    {
+        id: 3,
+        title: 'Client low balance alert',
+        content: 'Client "Dana P." (ID: 101) main wallet balance is 45.00 USD, below their threshold of 100.00 USD.',
+        time: '11:20 23 Feb 2026',
+        read: false,
+        link: 'clients.html'
+    },
+    {
+        id: 4,
+        title: 'New marketplace request',
+        content: 'Client "Mihai R." (ID: 102) submitted a marketplace request for Facebook account setup.',
+        time: '09:45 23 Feb 2026',
+        read: false,
+        link: 'marketplace.html'
+    },
+    {
+        id: 5,
+        title: 'Monthly income report ready',
+        content: 'Monthly income report for February 2026 is now available. Total revenue: 15,420.00 USD.',
+        time: '08:00 23 Feb 2026',
+        read: true,
+        link: 'income.html'
+    }
+];
+
+// Get unread notifications count
+function getUnreadNotificationsCount() {
+    return notificationsData.filter(n => !n.read).length;
+}
+
 // Generate sidebar HTML
 function generateSidebar() {
     const currentRole = getCurrentRole();
@@ -66,7 +115,18 @@ function generateSidebar() {
 
     const sidebarHTML = `
         <div class="sidebar-header">
-            <h2>${currentRole.charAt(0).toUpperCase() + currentRole.slice(1)} Panel</h2>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                <h2 style="margin: 0;">${currentRole.charAt(0).toUpperCase() + currentRole.slice(1)} Panel</h2>
+                ${currentRole === 'admin' ? `
+                    <button class="notification-btn-sidebar" id="notificationBtnSidebar" onclick="openNotifications()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        <span class="notification-badge-sidebar">${getUnreadNotificationsCount()}</span>
+                    </button>
+                ` : ''}
+            </div>
             <div class="role-switcher">
                 <label class="role-switcher-label">Switch Role</label>
                 <select class="role-select" id="roleSwitcher" onchange="switchRole(this.value)">
@@ -560,5 +620,84 @@ function closeWalletCardsModal() {
     if (modal) {
         modal.style.display = 'none';
         document.body.style.overflow = '';
+    }
+}
+
+// Notifications functions
+function openNotifications(){
+    let drawer = document.getElementById('notificationsDrawer');
+    if (!drawer) {
+        createNotificationsDrawer();
+        drawer = document.getElementById('notificationsDrawer');
+    }
+    drawer.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeNotifications(){
+    const drawer = document.getElementById('notificationsDrawer');
+    if (drawer) {
+        drawer.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+}
+
+function createNotificationsDrawer() {
+    const drawerHTML = `
+        <div class="notifications-drawer" id="notificationsDrawer">
+            <div class="notifications-overlay" onclick="closeNotifications()"></div>
+            
+            <div class="notifications-panel">
+                <div class="notifications-header">
+                    <h2>Notifications</h2>
+                    <button class="notifications-close" onclick="closeNotifications()">×</button>
+                </div>
+                
+                <div class="notifications-body">
+                    ${notificationsData.map(notif => `
+                        <div class="notification-item ${notif.read ? 'read' : ''}" data-notification-id="${notif.id}">
+                            <div class="notification-dot"></div>
+                            <div class="notification-title">
+                                <span>${notif.title}</span>
+                                <span class="notification-time">${notif.time}</span>
+                            </div>
+                            <div class="notification-content">
+                                ${notif.content}
+                            </div>
+                            <div class="notification-actions">
+                                ${!notif.read ? `<button class="notification-action-btn mark-read" onclick="event.stopPropagation(); markNotificationAsRead(${notif.id})">Mark as Read</button>` : ''}
+                                <button class="notification-action-btn go-to" onclick="event.stopPropagation(); window.location.href='${notif.link}'">Go to</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', drawerHTML);
+}
+
+// Mark notification as read
+function markNotificationAsRead(notifId) {
+    const notif = notificationsData.find(n => n.id === notifId);
+    if (notif) {
+        notif.read = true;
+        
+        // Update UI
+        const notifElement = document.querySelector(`[data-notification-id="${notifId}"]`);
+        if (notifElement) {
+            notifElement.classList.add('read');
+            const markReadBtn = notifElement.querySelector('.mark-read');
+            if (markReadBtn) {
+                markReadBtn.remove();
+            }
+        }
+        
+        // Update badge count
+        const badge = document.querySelector('.notification-badge-sidebar');
+        if (badge) {
+            badge.textContent = getUnreadNotificationsCount();
+        }
     }
 }

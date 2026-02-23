@@ -1,0 +1,2241 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Finance • Topups</title>
+
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/accounts.css" />
+
+  <style>
+    :root{
+      --bg0:#f7f8fb;
+      --bg1:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+
+      --line: rgba(15,23,42,.10);
+      --line2: rgba(15,23,42,.07);
+
+      --glass: rgba(255,255,255,.72);
+      --glass2: rgba(255,255,255,.58);
+
+      --shadow: 0 18px 50px rgba(15,23,42,.12);
+      --shadow2: 0 12px 28px rgba(15,23,42,.10);
+
+      --r-xl: 18px;
+      --r-lg: 14px;
+      --r-md: 12px;
+
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --info:#2563eb;
+
+      --focus: rgba(37,99,235,.25);
+    }
+    [data-theme="dark"]{
+      --bg0:#0b1220;
+      --bg1:#0f172a;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.08);
+
+      --glass: rgba(17,24,39,.58);
+      --glass2: rgba(17,24,39,.45);
+
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --shadow2: 0 12px 28px rgba(0,0,0,.35);
+
+      --focus: rgba(96,165,250,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+
+    body{
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(37,99,235,.14), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(99,102,241,.14), transparent 55%),
+        radial-gradient(900px 600px at 35% 95%, rgba(16,185,129,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0) 0%, color-mix(in srgb, var(--bg0) 55%, var(--bg1)) 100%);
+    }
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    }
+    body.modal-open{ overflow:hidden; }
+
+    .muted{ color: var(--muted); }
+    .mini-hint{ font-size:.9rem; color: var(--muted); line-height:1.35; margin-top:.2rem; }
+
+    input, select, textarea{
+      width:100%;
+      padding:.7rem .8rem;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      outline:none;
+      transition: box-shadow .15s ease, border-color .15s ease;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: color-mix(in srgb, var(--info) 45%, var(--line2));
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+
+    .header{
+      background: rgba(255,255,255,.55);
+      border-bottom: 1px solid var(--line2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding: 12px 18px;
+    }
+    [data-theme="dark"] .header{ background: rgba(15,23,42,.55); }
+
+    .header-left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width: 280px;
+    }
+    .page-tabs{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius:999px;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      width: fit-content;
+    }
+    .page-tab{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-weight: 950;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+      user-select:none;
+      letter-spacing:.2px;
+      white-space:nowrap;
+    }
+    .page-tab:hover{ transform: translateY(-1px); }
+    .page-tab.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .header-right{ display:flex; align-items:center; gap:14px; }
+
+    .theme-toggle{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius: 999px;
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .theme-btn{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease;
+    }
+    .theme-btn.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .main{ padding: 18px; }
+    @media (max-width: 720px){ .main{ padding: 14px; } }
+
+    @media (max-width: 980px){
+      .header{ flex-wrap:wrap; align-items:flex-start; }
+      .header-left{ width:100%; }
+      .page-tabs{ width:100%; justify-content:space-between; }
+      .page-tab{ flex:1; text-align:center; }
+    }
+
+    .glass-panel{
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--r-xl);
+      padding: 16px;
+    }
+
+    .btn{
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      padding: .7rem .95rem;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.55rem;
+      white-space:nowrap;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .btn:active{ transform: translateY(0px); }
+    .btn.primary{
+      background: color-mix(in srgb, rgba(37,99,235,.20) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.35) 55%, var(--line2));
+    }
+    .btn.ghost{
+      background: color-mix(in srgb, rgba(148,163,184,.18) 70%, var(--glass));
+    }
+    .btn.danger{
+      background: color-mix(in srgb, rgba(239,68,68,.16) 70%, var(--glass));
+      border-color: color-mix(in srgb, rgba(239,68,68,.32) 60%, var(--line2));
+      color: #991b1b;
+    }
+    .btn[disabled], .btn.disabled{ opacity:.55; pointer-events:none; }
+
+    .top-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+    .top-head__title{
+      font-weight:950;
+      font-size:1.15rem;
+      letter-spacing:.2px;
+    }
+
+    .filters{
+      position: sticky;
+      top: 10px;
+      z-index: 50;
+      padding: 12px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .filters__row{
+      display:grid;
+      grid-template-columns:
+        1.25fr
+        340px
+        180px
+        170px
+        170px
+        auto;
+      gap: 12px;
+      align-items:end;
+    }
+    @media (max-width: 1200px){
+      .filters__row{ grid-template-columns: 1fr 1fr; }
+    }
+    .fg .label{
+      display:block;
+      margin: 0 0 .45rem 0;
+      font-weight: 900;
+      font-size: .88rem;
+      color: color-mix(in srgb, var(--text) 85%, var(--muted));
+      letter-spacing:.2px;
+    }
+    .date-range{
+      display:grid;
+      grid-template-columns: 1fr 40px 1fr;
+      gap: 10px;
+      align-items:end;
+    }
+    .date-range .sep{
+      height: 44px;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+    @media (max-width: 1200px){ .stats{ grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 620px){ .stats{ grid-template-columns: 1fr; } }
+
+    .stat-box{
+      padding: 14px 14px 12px 14px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      min-height: 112px;
+      position: relative;
+      overflow:hidden;
+    }
+    .stat-box:before{
+      content:"";
+      position:absolute;
+      left:0; top:0; bottom:0;
+      width:4px;
+      background: color-mix(in srgb, rgba(37,99,235,.55) 70%, transparent);
+      opacity:.9;
+    }
+    .stat-box.pending:before{ background: color-mix(in srgb, rgba(245,158,11,.65) 70%, transparent); }
+    .stat-box.approved:before{ background: color-mix(in srgb, rgba(22,163,74,.65) 70%, transparent); }
+    .stat-box.declined:before{ background: color-mix(in srgb, rgba(239,68,68,.65) 70%, transparent); }
+
+    .stat-box h4{
+      margin:0;
+      font-size: 11px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 950;
+    }
+    .stat-value{
+      font-size: 30px;
+      font-weight: 950;
+      margin-top: 6px;
+      letter-spacing: .2px;
+      line-height:1.05;
+    }
+    .stat-count{
+      position:absolute;
+      top:12px;
+      right:14px;
+      font-size: 12px;
+      font-weight: 950;
+      color: var(--muted);
+      letter-spacing:.2px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 72%, transparent);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .table-wrap{
+      border:1px solid var(--line2);
+      border-radius: var(--r-xl);
+      overflow:auto;
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow2);
+    }
+    table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .92rem;
+      min-width: 1180px;
+    }
+    th, td{
+      padding: .85rem .75rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      text-align:left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    th{
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 88%, var(--bg1));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    tr.row{ cursor:pointer; transition: background .12s ease; }
+    tr.row:hover{ background: color-mix(in srgb, rgba(37,99,235,.10) 60%, transparent); }
+    .td-right{ text-align:right; }
+    .td-muted{ color: var(--muted); }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:.28rem .65rem;
+      border-radius: 999px;
+      font-weight: 950;
+      font-size:.82rem;
+      border:1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 72%, transparent);
+      color: color-mix(in srgb, var(--text) 92%, var(--muted));
+    }
+    .pill.pending{
+      background: color-mix(in srgb, rgba(245,158,11,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(245,158,11,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--warn) 82%, var(--text));
+    }
+    .pill.approved{
+      background: color-mix(in srgb, rgba(22,163,74,.18) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(22,163,74,.35) 55%, var(--line2));
+      color: color-mix(in srgb, var(--good) 85%, var(--text));
+    }
+    .pill.declined{
+      background: color-mix(in srgb, rgba(239,68,68,.16) 65%, var(--glass));
+      border-color: color-mix(in srgb, rgba(239,68,68,.32) 55%, var(--line2));
+      color: color-mix(in srgb, var(--bad) 82%, var(--text));
+    }
+
+    /* Timeline in table - horizontal with circles */
+    .timeline-mini {
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 18px 0 6px;
+      min-width: 140px;
+      max-width: 160px;
+    }
+
+    .timeline-mini-line {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #e2e8f0;
+      z-index: 1;
+    }
+
+    .timeline-mini-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      background: #334155;
+      transition: width 0.4s ease;
+      z-index: 2;
+    }
+
+    .timeline-mini-steps {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      z-index: 3;
+    }
+
+    .timeline-mini-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .timeline-mini-circle {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #cbd5e1;
+      border: 2px solid #fff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+      transition: all 0.3s ease;
+    }
+
+    .timeline-mini-step.active .timeline-mini-circle {
+      background: #334155;
+      box-shadow: 0 1px 4px rgba(51, 65, 85, 0.25);
+    }
+
+    .timeline-mini-step.completed .timeline-mini-circle {
+      background: #334155;
+    }
+
+    .timeline-mini-step.declined .timeline-mini-circle {
+      background: #ef4444;
+    }
+
+    .timeline-mini-label {
+      position: absolute;
+      top: -28px;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--muted);
+      white-space: normal;
+      text-align: center;
+      text-transform: lowercase;
+      letter-spacing: 0.2px;
+      line-height: 1.2;
+      max-width: 50px;
+    }
+
+    .timeline-mini-step.active .timeline-mini-label,
+    .timeline-mini-step.completed .timeline-mini-label {
+      color: var(--text);
+    }
+
+    .timeline-mini-step.declined .timeline-mini-label {
+      color: #ef4444;
+    }
+
+    /* =========================
+       RIGHT DRAWER (GENERIC)
+    ========================= */
+    .drawer-modal{
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+    }
+    .drawer-modal.active{ display:block; }
+
+    .drawer-modal__overlay{
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,.38);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      transition: opacity .18s ease;
+    }
+    .drawer-modal.active .drawer-modal__overlay{ opacity:1; }
+
+    .drawer-modal__panel{
+      position: absolute;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: min(980px, 94vw);
+      background: var(--bg1);
+      border-left: 1px solid var(--line2);
+      box-shadow: -22px 0 60px rgba(15,23,42,.22);
+      transform: translateX(100%);
+      transition: transform .18s ease;
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+      border-top-left-radius: 16px;
+      border-bottom-left-radius: 16px;
+    }
+    [data-theme="dark"] .drawer-modal__panel{
+      background: color-mix(in srgb, var(--glass) 30%, var(--bg1));
+    }
+    .drawer-modal.active .drawer-modal__panel{ transform: translateX(0); }
+
+    .drawer-modal__header{
+      padding: 14px 16px;
+      border-bottom:1px solid var(--line2);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      background: color-mix(in srgb, var(--glass) 55%, var(--bg1));
+    }
+    .drawer-modal__title{
+      font-weight: 950;
+      font-size: 1.05rem;
+    }
+    .drawer-modal__close{
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      font-weight: 900;
+      color: var(--muted);
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+    .drawer-modal__close:hover{
+      background: color-mix(in srgb, rgba(148,163,184,.18) 70%, transparent);
+      color: var(--text);
+    }
+    .drawer-modal__body{
+      padding: 16px;
+      overflow:auto;
+      flex:1;
+    }
+
+    .topup-layout{
+      display:grid;
+      grid-template-columns: 1fr 420px;
+      gap: 16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .drawer-modal__panel{ width: min(980px, 98vw); }
+      .topup-layout{ grid-template-columns: 1fr; }
+    }
+
+    .seg{
+      display:flex;
+      gap:10px;
+      margin: 8px 0 14px 0;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+    .seg button{
+      border:1px solid var(--line2);
+      background: transparent;
+      padding: 9px 12px;
+      border-radius: 12px;
+      font-weight: 900;
+      cursor:pointer;
+      color: var(--muted);
+    }
+    .seg button.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    .step-card{
+      border:1px dashed color-mix(in srgb, var(--line2) 90%, transparent);
+      border-radius: 16px;
+      padding: 14px;
+      background: #fbfcff;
+    }
+    [data-theme="dark"] .step-card{
+      background: color-mix(in srgb, var(--glass) 25%, transparent);
+    }
+    .step{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding: 10px 8px;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+    }
+    .step:last-child{ border-bottom:none; }
+    .dot{
+      width: 14px; height: 14px;
+      border-radius: 999px;
+      border: 2px solid color-mix(in srgb, var(--muted) 70%, transparent);
+      margin-top: 4px;
+      flex: 0 0 auto;
+      background: transparent;
+    }
+    .dot.done{
+      border-color: color-mix(in srgb, var(--good) 70%, transparent);
+      background: color-mix(in srgb, rgba(22,163,74,.18) 70%, transparent);
+    }
+
+    .right-box{
+      border-left: 1px solid var(--line2);
+      padding-left: 16px;
+    }
+    @media (max-width: 980px){
+      .right-box{ border-left:none; padding-left:0; }
+    }
+
+    .kv{
+      border-top: 1px solid var(--line2);
+      margin-top: 10px;
+    }
+    .kv-row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      align-items:center;
+    }
+    .kv-row .k{
+      color: color-mix(in srgb, var(--muted) 95%, var(--text));
+      font-weight: 850;
+      font-size: .84rem;
+    }
+    .kv-row .v{ font-weight: 950; color: var(--text); }
+
+    .admin-actions{ margin-top: 14px; }
+
+    .card-lite{
+      border: 1px solid var(--line2);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+      margin-top: 10px;
+    }
+    [data-theme="dark"] .card-lite{
+      background: color-mix(in srgb, var(--glass) 35%, transparent);
+    }
+    .card-lite h5{ margin:0; font-size: .95rem; font-weight: 950; }
+    .card-lite .muted{ font-size: .82rem; font-weight: 800; }
+
+    .fx-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .hr{ height:1px; background: var(--line2); margin: 12px 0; }
+
+    .totals{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap:10px;
+      align-items:center;
+      margin-top: 10px;
+    }
+    .totals .label{ color: var(--muted); font-weight: 900; font-size:.85rem; }
+    .totals .val{ font-weight: 950; }
+
+    .danger-zone{
+      margin-top: 10px;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .form-card{
+      border:1px solid var(--line2);
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--glass) 65%, var(--bg1));
+      box-shadow: var(--shadow2);
+      padding: 14px;
+    }
+
+    .grid-4{
+      display:grid;
+      grid-template-columns: 1.1fr 1.2fr 1fr .9fr;
+      gap: 12px;
+      align-items:end;
+    }
+    @media (max-width: 1100px){
+      .grid-4{ grid-template-columns: 1fr 1fr; }
+    }
+
+    .drawer-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 12px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+
+    <header class="header">
+      <div class="header-left">
+        <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+          <button type="button" class="page-tab active" data-page="topups" role="tab" aria-selected="true">Topups</button>
+          <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
+          <button type="button" class="page-tab" data-page="income" role="tab" aria-selected="false">Income</button>
+          <button type="button" class="page-tab" data-page="fees" role="tab" aria-selected="false">Charges</button>
+          <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">Internal Transactions</button>
+          <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="theme-toggle" id="themeToggle">
+          <button class="theme-btn active" data-theme="light" type="button">Light</button>
+          <button class="theme-btn" data-theme="dark" type="button">Dark</button>
+        </div>
+
+        <div class="user-info">
+          <span>Admin User</span>
+          <div class="user-avatar">AU</div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div style="display:flex; flex-direction:column; gap:14px;">
+
+        <div class="glass-panel top-head">
+          <div>
+            <div class="top-head__title">Top-ups</div>
+            <div class="mini-hint">Wire + Crypto flows • Timeline shown in list • Admin-only wallets editor</div>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn ghost" type="button" id="btnWallets">Wallets</button>
+            <button class="btn ghost" type="button" id="btnExport">Export</button>
+            <button class="btn primary" type="button" id="btnCreate">+ Create Top-up</button>
+          </div>
+        </div>
+
+        <div class="filters">
+          <div class="filters__row">
+            <div class="fg">
+              <label class="label">Search</label>
+              <input id="fSearch" type="search" placeholder="ID / client / wire / crypto / hash" />
+            </div>
+
+            <div class="fg">
+              <label class="label">Date range</label>
+              <div class="date-range">
+                <input type="date" id="fFrom" />
+                <div class="sep">→</div>
+                <input type="date" id="fTo" />
+              </div>
+            </div>
+
+            <div class="fg">
+              <label class="label">Status</label>
+              <select id="fStatus">
+                <option value="all">All</option>
+                <option value="pending">Pending</option>
+                <option value="approved">Approved</option>
+                <option value="declined">Declined</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Type</label>
+              <select id="fType">
+                <option value="all">All</option>
+                <option value="wire">WIRE</option>
+                <option value="crypto">CRYPTO</option>
+                <option value="refund">REFUND</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <label class="label">Network</label>
+              <select id="fNetwork">
+                <option value="all">All</option>
+                <option value="USDT_ERC20">USDT ERC20</option>
+                <option value="USDT_TRC20">USDT TRC20</option>
+              </select>
+            </div>
+
+            <div class="fg">
+              <button class="btn ghost" type="button" id="btnClear">Clear</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat-box pending">
+            <div class="stat-count" id="cPending">0 </div>
+            <h4>PENDING</h4>
+            <div class="stat-value" id="kPendingSum">$ 0.00</div>
+          </div>
+          <div class="stat-box approved">
+            <div class="stat-count" id="cApproved">0 </div>
+            <h4>APPROVED</h4>
+            <div class="stat-value" id="kApprovedSum">$ 0.00</div>
+          </div>
+          <div class="stat-box declined">
+            <div class="stat-count" id="cDeclined">0 </div>
+            <h4>DECLINED</h4>
+            <div class="stat-value" id="kDeclinedSum">$ 0.00</div>
+          </div>
+        </div>
+
+        <div class="glass-panel" style="padding:16px;">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Top-up ID</th>
+                  <th>Type</th>
+                  <th>Network</th>
+                  <th class="td-right">Amount (USD)</th>
+                  <th>Status</th>
+                  <th>Timeline</th>
+                  <th class="td-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ✅ RIGHT DRAWER: Top-up details -->
+  <div class="drawer-modal" id="topupDrawerModal" aria-hidden="true">
+    <div class="drawer-modal__overlay" data-close="topupDrawerModal"></div>
+
+    <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Topup details">
+      <div class="drawer-modal__header">
+        <div class="drawer-modal__title" id="dTitle">Top-up • TU-00000</div>
+        <button class="drawer-modal__close" type="button" data-close="topupDrawerModal">Close</button>
+      </div>
+
+      <div class="drawer-modal__body">
+        <div class="seg" id="viewSeg">
+          <button type="button" data-view="client" class="active">Client view</button>
+          <button type="button" data-view="admin">Admin view</button>
+        </div>
+
+        <div class="topup-layout">
+          <div>
+            <div class="step-card">
+              <div class="step">
+                <div class="dot" id="dotInvoice"></div>
+                <div>
+                  <h4>Invoice provided</h4>
+                  <div class="sub muted" id="txtInvoice">—</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="dot" id="dotProof"></div>
+                <div>
+                  <h4>Proof uploaded</h4>
+                  <div class="sub muted" id="txtProof">—</div>
+                </div>
+              </div>
+              <div class="step">
+                <div class="dot" id="dotOTW"></div>
+                <div>
+                  <h4>Money OTW</h4>
+                  <div class="sub muted" id="txtOTW">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-box">
+            <div style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+              <span class="pill pending" id="dStatusPill">PENDING</span>
+              <span class="muted" id="dMainWallet">Main Wallet: USD 0.00</span>
+            </div>
+
+            <div class="kv" id="dKv"></div>
+
+            <div style="margin-top:10px;" id="billingBlock">
+              <div class="kv-row">
+                <div class="k">Billing company</div>
+                <div class="v" id="dCompany">—</div>
+              </div>
+              <div class="kv-row">
+                <div class="k">IBAN</div>
+                <div class="v" id="dIban">—</div>
+              </div>
+              <div class="kv-row">
+                <div class="k">Currency</div>
+                <div class="v" id="dCurrency">—</div>
+              </div>
+
+              <div class="mini-hint" style="margin-top:8px;">Admin can edit billing company while pending.</div>
+              <button class="btn" type="button" id="btnEditBilling">Edit billing company</button>
+            </div>
+
+            <div class="admin-actions" id="adminActions">
+              <div class="hr"></div>
+              <div style="font-weight:950; margin-bottom:6px;">Admin actions</div>
+
+              <div class="card-lite">
+                <h5>Invoice upload</h5>
+                <div class="muted">Demo stores metadata only.</div>
+                <div style="margin-top:8px;">
+                  <input type="file" id="fileInvoice" />
+                </div>
+              </div>
+
+              <div class="card-lite">
+                <h5>Payment proof upload</h5>
+                <div class="muted">Admin can upload if client asks.</div>
+                <div style="margin-top:8px;">
+                  <input type="file" id="fileProof" />
+                </div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <button class="btn" type="button" id="btnMarkWire">Mark wire received</button>
+                <div class="mini-hint">FX shows only here (admin). Locked until “wire received”.</div>
+              </div>
+
+              <div class="fx-grid">
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Received amount</label>
+                  <input id="fxReceivedAmount" type="number" step="0.01" placeholder="0" />
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Received currency</label>
+                  <select id="fxCurrency">
+                    <option value="EUR">EUR</option>
+                    <option value="USD">USD</option>
+                    <option value="GBP">GBP</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">FX rate to USD</label>
+                  <input id="fxRate" type="number" step="0.0001" placeholder="1" />
+                </div>
+                <div>
+                  <label class="label" style="margin:0 0 6px;">Fee (USD)</label>
+                  <input id="fxFee" type="number" step="0.01" placeholder="0" />
+                </div>
+              </div>
+
+              <div class="totals">
+                <div class="label">Approved USD amount</div>
+                <div class="val" id="dApprovedUsd">USD 0.00</div>
+              </div>
+              <div class="totals">
+                <div class="label">Net to Main Wallet</div>
+                <div class="val" id="dNetUsd">USD 0.00</div>
+              </div>
+
+              <div style="margin-top:10px;">
+                <button class="btn" type="button" id="btnApprove">Approve</button>
+              </div>
+
+              <div class="hr"></div>
+
+              <div>
+                <label class="label" style="margin:0 0 6px;">Decline preset</label>
+                <select id="declinePreset">
+                  <option value="">Select…</option>
+                  <option value="missing_docs">Missing documents</option>
+                  <option value="iban_mismatch">IBAN mismatch</option>
+                  <option value="wrong_amount">Wrong amount</option>
+                  <option value="compliance">Compliance issue</option>
+                </select>
+              </div>
+
+              <div style="margin-top:10px;">
+                <label class="label" style="margin:0 0 6px;">Decline reason (required)</label>
+                <input id="declineReason" placeholder="Write details…" />
+              </div>
+
+              <div class="danger-zone">
+                <button class="btn danger" type="button" id="btnDecline">Decline</button>
+                <button class="btn" type="button" id="btnDelete">Delete</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ RIGHT DRAWER: Wallets -->
+  <div class="drawer-modal" id="walletsDrawer" aria-hidden="true">
+    <div class="drawer-modal__overlay" data-close="walletsDrawer"></div>
+
+    <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Wallets">
+      <div class="drawer-modal__header">
+        <div class="drawer-modal__title">Crypto wallets (Admin)</div>
+        <button class="drawer-modal__close" type="button" data-close="walletsDrawer">Close</button>
+      </div>
+
+      <div class="drawer-modal__body">
+        <div class="mini-hint" style="margin-bottom:12px;">
+          These are global platform wallets. Clients only see the wallet, cannot edit.
+        </div>
+
+        <div class="form-card">
+          <div class="fg" style="margin-bottom:12px;">
+            <label class="label">USDT ERC20 wallet</label>
+            <input id="wErc20" placeholder="0x..." />
+          </div>
+
+          <div class="fg">
+            <label class="label">USDT TRC20 wallet</label>
+            <input id="wTrc20" placeholder="T..." />
+          </div>
+
+          <div class="drawer-actions">
+            <button class="btn primary" type="button" id="btnSaveWallets">Save</button>
+            <button class="btn" type="button" data-close="walletsDrawer">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ RIGHT DRAWER: Create Top-up / Refund -->
+  <div class="drawer-modal" id="createDrawer" aria-hidden="true">
+    <div class="drawer-modal__overlay" id="createOverlay"></div>
+
+    <div class="drawer-modal__panel" role="dialog" aria-modal="true" aria-label="Create topup">
+      <div class="drawer-modal__header">
+        <div class="drawer-modal__title">Create Top-up (Client/Admin)</div>
+        <button class="drawer-modal__close" type="button" id="createClose">Close</button>
+      </div>
+
+      <div class="drawer-modal__body">
+        <!-- ✅ Seg 1: Client/Admin (hidden for client view) -->
+        <div class="seg" id="createSeg" style="margin-top:0; display:none;">
+          <button type="button" data-mode="client">Client</button>
+          <button type="button" data-mode="admin" class="active">Admin</button>
+        </div>
+
+        <!-- ✅ Seg 2: Top-up / Refund (hidden for client view) -->
+        <div class="seg" id="createKindSeg" style="margin-top:-6px; display:none;">
+          <button type="button" data-kind="topup" class="active">Top-up</button>
+          <button type="button" data-kind="refund">Refund</button>
+        </div>
+
+        <!-- =====================
+             TOP-UP BLOCK (unchanged)
+        ====================== -->
+        <div id="createTopupBlock">
+          <div class="glass-panel" style="padding:14px; margin-bottom:12px;">
+            <div style="display:grid; grid-template-columns: 200px 220px 220px 1fr; gap:12px; align-items:end;">
+              <div class="fg">
+                <label class="label">Type</label>
+                <select id="cType">
+                  <option value="wire">Wire</option>
+                  <option value="crypto">Crypto (USDT)</option>
+                </select>
+              </div>
+
+              <div class="fg" style="display:none;">
+                <label class="label">Client</label>
+                <select id="cClient"></select>
+              </div>
+
+              <div class="fg">
+                <label class="label">Amount</label>
+                <input id="cAmount" type="number" step="0.01" placeholder="0" />
+              </div>
+
+              <div class="fg">
+                <label class="label">Description (optional)</label>
+                <input id="cDesc" placeholder="Optional note..." />
+              </div>
+            </div>
+
+            <div class="mini-hint" id="cHint" style="margin-top:10px;">
+              Client/Admin selects billing company (includes IBAN). Currency is auto from billing company.
+            </div>
+          </div>
+
+          <div id="wireSection" class="glass-panel" style="padding:14px; margin-bottom:12px;">
+            <div style="font-weight:950; margin-bottom:10px;">Billing company</div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+              <select id="cBilling" style="flex:1; min-width:280px;"></select>
+              <button class="btn" type="button" id="btnAddBilling">+ Add billing company</button>
+              <button class="btn" type="button" id="btnEditBilling2">Edit</button>
+            </div>
+
+            <div class="kv" style="margin-top:10px;">
+              <div class="kv-row"><div class="k">Company</div><div class="v" id="bName">—</div></div>
+              <div class="kv-row"><div class="k">Address</div><div class="v" id="bAddr">—</div></div>
+              <div class="kv-row"><div class="k">VAT</div><div class="v" id="bVat2">—</div></div>
+              <div class="kv-row"><div class="k">IBAN</div><div class="v" id="bIban2">—</div></div>
+              <div class="kv-row"><div class="k">Currency</div><div class="v" id="bCur">—</div></div>
+            </div>
+          </div>
+
+          <div id="cryptoSection" class="glass-panel" style="padding:14px; margin-bottom:12px; display:none;">
+            <div class="mini-hint" style="margin-bottom:12px;">
+              Crypto is always USDT. Choose network, verify wallet twice, then paste Tx hash.
+            </div>
+
+            <div style="display:grid; grid-template-columns: 220px 1fr; gap:12px; align-items:end;">
+              <div class="fg">
+                <label class="label">Network</label>
+                <select id="cNetwork">
+                  <option value="USDT_ERC20">USDT ERC20</option>
+                  <option value="USDT_TRC20">USDT TRC20</option>
+                </select>
+              </div>
+
+              <div class="fg">
+                <label class="label">Wallet address (read-only)</label>
+                <input id="cWalletAddr" readonly />
+                <div class="mini-hint">Double-check address + network before sending.</div>
+              </div>
+            </div>
+
+            <div class="fg" style="margin-top:12px;">
+              <label class="label">Tx hash (required)</label>
+              <input id="cTxHash" placeholder="Paste transaction hash" />
+            </div>
+          </div>
+        </div>
+
+        <!-- =====================
+             REFUND BLOCK (new)
+        ====================== -->
+        <div id="createRefundBlock" style="display:none;">
+          <div class="glass-panel" style="padding:14px; margin-bottom:12px;">
+            <div style="font-weight:950; margin-bottom:10px;">Create refund</div>
+
+            <div style="display:grid; grid-template-columns: 260px 220px 1fr; gap:12px; align-items:end;">
+              <div class="fg">
+                <label class="label">Client</label>
+                <select id="crClient"></select>
+              </div>
+
+              <div class="fg">
+                <label class="label">Amount (USD)</label>
+                <input id="crAmount" type="number" step="0.01" placeholder="0" />
+              </div>
+
+              <div class="fg">
+                <label class="label">Description</label>
+                <input id="crDesc" placeholder="Refund reason / note..." />
+              </div>
+            </div>
+
+            <div class="mini-hint" style="margin-top:10px;">
+              Refund is created as an internal negative USD entry (demo). Main Wallet is reduced accordingly.
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer buttons -->
+        <div style="display:flex; gap:10px; justify-content:flex-start; margin-top:10px;">
+          <button class="btn primary" type="button" id="btnCreateSubmit">Create (Pending)</button>
+          <button class="btn" type="button" id="btnCreateCancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script>
+    /* ==============================
+       Tabs routes
+    ============================== */
+    const PAGE_ROUTES = {
+      topups: "topups.html",
+      finance: "finance.html",
+      income: "income.html",
+      fees: "fees.html",
+      "internal-transactions": "internal-transactions.html",
+      transactions: "transactions.html"
+    };
+    document.getElementById("pageTabs")?.addEventListener("click",(e)=>{
+      const btn = e.target.closest(".page-tab");
+      if(!btn) return;
+      const key = btn.dataset.page;
+      if(!PAGE_ROUTES[key]) return;
+      if(key === "topups") return;
+      window.location.href = PAGE_ROUTES[key];
+    });
+
+    /* ==============================
+       Theme
+    ============================== */
+    (function initTheme(){
+      const root = document.documentElement;
+      const saved = localStorage.getItem("ui_theme") || "light";
+      if(saved === "dark") root.setAttribute("data-theme","dark");
+
+      const buttons = document.querySelectorAll("#themeToggle .theme-btn");
+      function setTheme(t){
+        if(t === "dark") root.setAttribute("data-theme","dark");
+        else root.removeAttribute("data-theme");
+        localStorage.setItem("ui_theme", t);
+        buttons.forEach(b=> b.classList.toggle("active", b.dataset.theme === t));
+      }
+      buttons.forEach(b=> b.addEventListener("click", ()=> setTheme(b.dataset.theme)));
+      setTheme(saved);
+    })();
+
+    /* ==============================
+       Demo data
+    ============================== */
+    const clients = [
+      { id:"100", name:"Alex M." },
+      { id:"101", name:"Dana P." },
+      { id:"102", name:"Mihai R." },
+    ];
+
+    let wallets = {
+      erc20: "0x7b3c...a19f (ERC20 demo)",
+      trc20: "TQ8h...3kZp (TRC20 demo)"
+    };
+
+    let billingCompanies = [
+      {
+        id: "bc_1",
+        name: "Alpha Media SRL",
+        address: "Str. Exemplu 10, Iași, România",
+        vat: "RO12345678",
+        iban: "RO49AAAAA1B31007593840000",
+        currency: "EUR"
+      }
+    ];
+
+    let mainWalletUsd = 580.00;
+
+    let topups = [
+      {
+        id:"TU-120401",
+        created:"2026-02-19",
+        clientId:"100",
+        type:"wire",
+        network:null,
+        status:"pending",
+        description:"Monthly spend funding",
+        initialAmount:1500,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          id:"bc_1",
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:false, proofUploaded:false, moneyOTW:false, invoiceFile:null, proofFile:null },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:"EUR", fxRate:null, feeUsd:0, declineReason:"" }
+      },
+      {
+        id:"TU-120402",
+        created:"2026-02-19",
+        clientId:"101",
+        type:"wire",
+        network:null,
+        status:"pending",
+        description:"",
+        initialAmount:1200,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          id:"bc_1",
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:false, moneyOTW:false, invoiceFile:"INV_TU-120402.pdf", proofFile:null },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:"EUR", fxRate:null, feeUsd:0, declineReason:"" }
+      },
+      {
+        id:"TU-120403",
+        created:"2026-02-19",
+        clientId:"102",
+        type:"crypto",
+        network:"USDT_TRC20",
+        status:"pending",
+        description:"USDT top-up",
+        initialAmount:1000,
+        initialCurrency:"USD",
+        amountUsd:1000,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:false, invoiceFile:null, proofFile:"0xabc...def (hash)" },
+        admin:{ wireReceived:true, receivedAmount:1000, receivedCurrency:"USD", fxRate:1, feeUsd:0, declineReason:"" }
+      },
+      {
+        id:"TU-120404",
+        created:"2026-02-18",
+        clientId:"100",
+        type:"wire",
+        network:null,
+        status:"approved",
+        description:"Campaign budget Q1",
+        initialAmount:3500,
+        initialCurrency:"EUR",
+        amountUsd:3780,
+        billingCompany:{
+          id:"bc_1",
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:true, moneyOTW:true, invoiceFile:"INV_TU-120404.pdf", proofFile:"Proof_TU-120404.png" },
+        admin:{ wireReceived:true, receivedAmount:3500, receivedCurrency:"EUR", fxRate:1.08, feeUsd:25, declineReason:"" }
+      },
+      {
+        id:"TU-120405",
+        created:"2026-02-17",
+        clientId:"101",
+        type:"crypto",
+        network:"USDT_ERC20",
+        status:"approved",
+        description:"Quick funding",
+        initialAmount:1500,
+        initialCurrency:"USD",
+        amountUsd:1500,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:true, invoiceFile:null, proofFile:"0x9f2a...b8c4" },
+        admin:{ wireReceived:true, receivedAmount:1500, receivedCurrency:"USD", fxRate:1, feeUsd:15, declineReason:"" }
+      },
+      {
+        id:"TU-120350",
+        created:"2026-02-10",
+        clientId:"100",
+        type:"crypto",
+        network:"USDT_ERC20",
+        status:"approved",
+        description:"Funding",
+        initialAmount:2000,
+        initialCurrency:"USD",
+        amountUsd:2000,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:true, invoiceFile:null, proofFile:"0x7b3c...a19f" },
+        admin:{ wireReceived:true, receivedAmount:2000, receivedCurrency:"USD", fxRate:1, feeUsd:10, declineReason:"" }
+      },
+      {
+        id:"TU-120351",
+        created:"2026-02-08",
+        clientId:"102",
+        type:"wire",
+        network:null,
+        status:"approved",
+        description:"Monthly budget",
+        initialAmount:2800,
+        initialCurrency:"EUR",
+        amountUsd:3024,
+        billingCompany:{
+          id:"bc_1",
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:true, moneyOTW:true, invoiceFile:"INV_TU-120351.pdf", proofFile:"Proof_TU-120351.png" },
+        admin:{ wireReceived:true, receivedAmount:2800, receivedCurrency:"EUR", fxRate:1.08, feeUsd:20, declineReason:"" }
+      },
+      {
+        id:"TU-120300",
+        created:"2026-02-05",
+        clientId:"100",
+        type:"wire",
+        network:null,
+        status:"approved",
+        description:"Initial funding February",
+        initialAmount:5000,
+        initialCurrency:"EUR",
+        amountUsd:5400,
+        billingCompany:{
+          id:"bc_1",
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:true, moneyOTW:true, invoiceFile:"INV_TU-120300.pdf", proofFile:"Proof_TU-120300.png" },
+        admin:{ wireReceived:true, receivedAmount:5000, receivedCurrency:"EUR", fxRate:1.08, feeUsd:35, declineReason:"" }
+      },
+      {
+        id:"TU-120250",
+        created:"2026-02-01",
+        clientId:"101",
+        type:"crypto",
+        network:"USDT_TRC20",
+        status:"approved",
+        description:"TRC20 transfer",
+        initialAmount:800,
+        initialCurrency:"USD",
+        amountUsd:800,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:true, invoiceFile:null, proofFile:"0x4d8e...f3a1" },
+        admin:{ wireReceived:true, receivedAmount:800, receivedCurrency:"USD", fxRate:1, feeUsd:8, declineReason:"" }
+      },
+      {
+        id:"TU-120200",
+        created:"2026-01-30",
+        clientId:"102",
+        type:"wire",
+        network:null,
+        status:"declined",
+        description:"Incomplete documentation",
+        initialAmount:1800,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          id:"bc_1",
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:false, moneyOTW:false, invoiceFile:"INV_TU-120200.pdf", proofFile:null },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:"EUR", fxRate:null, feeUsd:0, declineReason:"Missing payment proof" }
+      },
+      {
+        id:"TU-120120",
+        created:"2026-01-28",
+        clientId:"101",
+        type:"wire",
+        network:null,
+        status:"declined",
+        description:"Top-up attempt",
+        initialAmount:500,
+        initialCurrency:"EUR",
+        amountUsd:null,
+        billingCompany:{
+          id:"bc_1",
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:true, moneyOTW:true, invoiceFile:"INV_TU-120120.pdf", proofFile:"Proof_TU-120120.png" },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:"EUR", fxRate:null, feeUsd:0, declineReason:"Missing documents" }
+      },
+      {
+        id:"TU-120100",
+        created:"2026-01-25",
+        clientId:"100",
+        type:"crypto",
+        network:"USDT_ERC20",
+        status:"approved",
+        description:"January funding",
+        initialAmount:4000,
+        initialCurrency:"USD",
+        amountUsd:4000,
+        billingCompany:null,
+        steps:{ invoiceProvided:false, proofUploaded:true, moneyOTW:true, invoiceFile:null, proofFile:"0x1a2b...c3d4" },
+        admin:{ wireReceived:true, receivedAmount:4000, receivedCurrency:"USD", fxRate:1, feeUsd:30, declineReason:"" }
+      },
+      {
+        id:"TU-120050",
+        created:"2026-01-20",
+        clientId:"101",
+        type:"wire",
+        network:null,
+        status:"approved",
+        description:"Start of year budget",
+        initialAmount:6000,
+        initialCurrency:"EUR",
+        amountUsd:6480,
+        billingCompany:{
+          id:"bc_1",
+          name:"Alpha Media SRL",
+          iban:"RO49AAAAA1B31007593840000",
+          currency:"EUR",
+        },
+        steps:{ invoiceProvided:true, proofUploaded:true, moneyOTW:true, invoiceFile:"INV_TU-120050.pdf", proofFile:"Proof_TU-120050.png" },
+        admin:{ wireReceived:true, receivedAmount:6000, receivedCurrency:"EUR", fxRate:1.08, feeUsd:45, declineReason:"" }
+      }
+    ];
+
+    function $(id){ return document.getElementById(id); }
+    function clientName(id){ return clients.find(c=>c.id===id)?.name || ("Client " + id); }
+    function fmtDate(iso){
+      const d = new Date(iso + "T00:00:00");
+      try{ return new Intl.DateTimeFormat("ro-RO",{ day:"2-digit", month:"long", year:"numeric" }).format(d); }
+      catch(e){ return d.toLocaleDateString(); }
+    }
+    function moneyUSD(n){
+      const v = Number(n||0);
+      return "$ " + v.toFixed(2);
+    }
+    function pillHtml(status){
+      const s = (status||"pending").toLowerCase();
+      return `<span class="pill ${s}">${s.toUpperCase()}</span>`;
+    }
+
+    /* ==============================
+       Filters init
+    ============================== */
+    function initFilters(){
+      // Client filter removed for client view
+    }
+    initFilters();
+
+    function readFilters(){
+      return {
+        q: ($("fSearch").value || "").trim().toLowerCase(),
+        client: "all",
+        from: $("fFrom").value,
+        to: $("fTo").value,
+        status: $("fStatus").value,
+        type: $("fType").value,
+        network: $("fNetwork").value
+      };
+    }
+
+    function passFilters(t, f){
+      if(f.client !== "all" && t.clientId !== f.client) return false;
+
+      const iso = t.created;
+      if(f.from && iso < f.from) return false;
+      if(f.to && iso > f.to) return false;
+
+      if(f.status !== "all" && (t.status||"").toLowerCase() !== f.status) return false;
+
+      if(f.type !== "all"){
+        const tt = (t.type||"").toLowerCase();
+        if(tt !== f.type) return false;
+      }
+
+      if(f.network !== "all"){
+        const n = (t.network||"").toUpperCase();
+        if(n !== f.network.toUpperCase()) return false;
+      }
+
+      if(f.q){
+        const blob = [
+          t.id, clientName(t.clientId), t.type, t.network, t.description,
+          t.steps?.invoiceFile, t.steps?.proofFile, t.billingCompany?.name, t.billingCompany?.iban
+        ].filter(Boolean).join(" ").toLowerCase();
+        if(!blob.includes(f.q)) return false;
+      }
+
+      return true;
+    }
+
+    /* ==============================
+       Render list + KPIs
+    ============================== */
+    function chip(label, on){
+      const bg = on ? "color-mix(in srgb, rgba(22,163,74,.14) 70%, #fff)" : "color-mix(in srgb, rgba(148,163,184,.18) 70%, #fff)";
+      const bd = on ? "color-mix(in srgb, rgba(22,163,74,.30) 70%, rgba(15,23,42,.10))" : "rgba(15,23,42,.10)";
+      const col = on ? "#166534" : "#64748b";
+      return `<span style="display:inline-flex;align-items:center;gap:6px;padding:.26rem .55rem;border:1px solid ${bd};border-radius:999px;background:${bg};color:${col};font-weight:900;font-size:.78rem;">
+        <span style="width:8px;height:8px;border-radius:999px;border:2px solid ${on? "rgba(22,163,74,.55)" : "rgba(100,116,139,.55)"};background:${on? "rgba(22,163,74,.12)" : "transparent"};"></span>
+        ${label}
+      </span>`;
+    }
+    function timelineChips(t){
+      const status = (t.status || "pending").toLowerCase();
+      const steps = t.steps || {};
+      
+      // Define steps with original names
+      const timelineSteps = [
+        { id: 'invoice', label: 'Invoice<br>provided', completed: !!steps.invoiceProvided },
+        { id: 'proof', label: 'Proof<br>uploaded', completed: !!steps.proofUploaded },
+        { id: 'otw', label: 'Money<br>OTW', completed: !!steps.moneyOTW }
+      ];
+      
+      // Calculate progress based on completed steps
+      const completedCount = timelineSteps.filter(s => s.completed).length;
+      const progress = (completedCount / timelineSteps.length) * 100;
+      
+      // Generate steps HTML
+      const stepsHTML = timelineSteps.map(step => {
+        let stepClass = 'timeline-mini-step';
+        
+        if (step.completed) {
+          stepClass += ' completed';
+        }
+        
+        return `
+          <div class="${stepClass}">
+            <span class="timeline-mini-label">${step.label}</span>
+            <div class="timeline-mini-circle"></div>
+          </div>
+        `;
+      }).join('');
+      
+      return `
+        <div class="timeline-mini">
+          <div class="timeline-mini-line">
+            <div class="timeline-mini-progress" style="width: ${progress}%"></div>
+          </div>
+          <div class="timeline-mini-steps">
+            ${stepsHTML}
+          </div>
+        </div>
+      `;
+    }
+
+    function usdValueForKpi(t){
+      // KPI sums: amountUsd if exists (can be negative for refund)
+      if(t.amountUsd != null) return Number(t.amountUsd || 0);
+      if((t.initialCurrency||"").toUpperCase() === "USD") return Number(t.initialAmount || 0);
+      return 0;
+    }
+
+    function computeKpis(items){
+      let pSum=0,aSum=0,dSum=0;
+      let p=0,a=0,d=0;
+
+      for(const t of items){
+        const s = (t.status||"pending").toLowerCase();
+        const val = usdValueForKpi(t);
+
+        if(s==="pending"){ p++; pSum += val; }
+        if(s==="approved"){ a++; aSum += val; }
+        if(s==="declined"){ d++; dSum += val; }
+      }
+
+      $("kPendingSum").textContent = moneyUSD(pSum);
+      $("kApprovedSum").textContent = moneyUSD(aSum);
+      $("kDeclinedSum").textContent = moneyUSD(dSum);
+
+      $("cPending").textContent = `${p} `;
+      $("cApproved").textContent = `${a}`;
+      $("cDeclined").textContent = `${d} `;
+    }
+
+    function render(){
+      const f = readFilters();
+      const items = topups
+        .filter(t => passFilters(t,f))
+        .sort((x,y)=> (y.created||"").localeCompare(x.created||""));
+
+      computeKpis(items);
+
+      const tbody = $("tbody");
+      if(!items.length){
+        tbody.innerHTML = `<tr><td colspan="9" class="td-muted">No results.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = items.map(t=>{
+        const amountUsd = (t.amountUsd != null) ? moneyUSD(t.amountUsd) : "—";
+        const net = t.network ? t.network : "—";
+        return `
+          <tr class="row" data-open="${t.id}">
+            <td>${fmtDate(t.created)}</td>
+            <td><strong>${t.id}</strong></td>
+            <td>${String(t.type||"").toUpperCase()}</td>
+            <td>${net}</td>
+            <td class="td-right">${amountUsd}</td>
+            <td>${pillHtml(t.status)}</td>
+            <td>${timelineChips(t)}</td>
+            <td class="td-right">
+              <button class="btn" type="button" data-open-btn="${t.id}">Open</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      tbody.querySelectorAll("[data-open]").forEach(tr=>{
+        tr.addEventListener("click",()=> openTopupDrawer(tr.getAttribute("data-open")));
+      });
+      tbody.querySelectorAll("[data-open-btn]").forEach(btn=>{
+        btn.addEventListener("click",(e)=>{
+          e.stopPropagation();
+          openTopupDrawer(btn.getAttribute("data-open-btn"));
+        });
+      });
+    }
+
+    ["fSearch","fFrom","fTo","fStatus","fType","fNetwork"].forEach(id=>{
+      $(id).addEventListener("input", render);
+      $(id).addEventListener("change", render);
+    });
+
+    $("btnClear").addEventListener("click", ()=>{
+      $("fSearch").value="";
+      $("fFrom").value="";
+      $("fTo").value="";
+      $("fStatus").value="all";
+      $("fType").value="all";
+      $("fNetwork").value="all";
+      render();
+    });
+
+    $("btnExport").addEventListener("click", ()=> alert("Demo: export (CSV/XLSX) next step."));
+
+    /* ==============================
+       Drawer helpers
+    ============================== */
+    function setBodyModal(open){ document.body.classList.toggle("modal-open", !!open); }
+    function openDrawer(id){
+      $(id).classList.add("active");
+      $(id).setAttribute("aria-hidden","false");
+      setBodyModal(true);
+    }
+    function closeDrawerById(id){
+      $(id).classList.remove("active");
+      $(id).setAttribute("aria-hidden","true");
+      const anyOpen = document.querySelector(".drawer-modal.active");
+      if(!anyOpen) setBodyModal(false);
+    }
+
+    document.addEventListener("click",(e)=>{
+      const closer = e.target.closest("[data-close]");
+      if(!closer) return;
+      closeDrawerById(closer.getAttribute("data-close"));
+    });
+
+    document.addEventListener("keydown",(e)=>{
+      if(e.key !== "Escape") return;
+      const top = document.querySelector(".drawer-modal.active:last-of-type") || document.querySelector(".drawer-modal.active");
+      if(top?.id) closeDrawerById(top.id);
+    });
+
+    /* ==============================
+       Wallets drawer
+    ============================== */
+    $("btnWallets").addEventListener("click", ()=>{
+      $("wErc20").value = wallets.erc20 || "";
+      $("wTrc20").value = wallets.trc20 || "";
+      openDrawer("walletsDrawer");
+    });
+    $("btnSaveWallets").addEventListener("click", ()=>{
+      wallets.erc20 = ($("wErc20").value || "").trim();
+      wallets.trc20 = ($("wTrc20").value || "").trim();
+      closeDrawerById("walletsDrawer");
+    });
+
+    /* ==============================
+       CREATE drawer (Client/Admin + Topup/Refund) ✅
+    ============================== */
+    let createMode = "admin";   // client | admin (demo toggle only)
+    let createKind = "topup";   // topup | refund
+
+    const cryptoWallets = {
+      USDT_ERC20: () => wallets.erc20,
+      USDT_TRC20: () => wallets.trc20
+    };
+
+    function openCreateDrawer(){
+      // clients
+      $("cClient").innerHTML = clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+      $("crClient").innerHTML = clients.map(c=>`<option value="${c.id}">${c.name}</option>`).join("");
+
+      // billing companies
+      $("cBilling").innerHTML = billingCompanies
+        .map(b=>`<option value="${b.id}">${b.name} • ${b.currency} • IBAN ✓</option>`)
+        .join("");
+
+      // defaults topup
+      $("cType").value = "wire";
+      $("cNetwork").value = "USDT_ERC20";
+      $("cAmount").value = "1200";
+      $("cDesc").value = "";
+      $("cTxHash").value = "";
+
+      // defaults refund
+      $("crAmount").value = "";
+      $("crDesc").value = "";
+
+      // force UI
+      syncCreateModeUI();
+      syncCreateKindUI();
+      syncCreateTypeUI();
+      syncBillingPreview();
+      syncWalletAddress();
+
+      openDrawer("createDrawer");
+    }
+
+    $("btnCreate").addEventListener("click", openCreateDrawer);
+    $("createOverlay").addEventListener("click", ()=> closeDrawerById("createDrawer"));
+    $("createClose").addEventListener("click", ()=> closeDrawerById("createDrawer"));
+    $("btnCreateCancel").addEventListener("click", ()=> closeDrawerById("createDrawer"));
+
+    $("createSeg").addEventListener("click",(e)=>{
+      const btn = e.target.closest("button[data-mode]");
+      if(!btn) return;
+      createMode = btn.dataset.mode;
+      syncCreateModeUI();
+    });
+
+    $("createKindSeg").addEventListener("click",(e)=>{
+      const btn = e.target.closest("button[data-kind]");
+      if(!btn) return;
+      createKind = btn.dataset.kind;
+      syncCreateKindUI();
+    });
+
+    function syncCreateModeUI(){
+      $("createSeg").querySelectorAll("button[data-mode]").forEach(b=>{
+        b.classList.toggle("active", b.dataset.mode === createMode);
+      });
+    }
+
+    function syncCreateKindUI(){
+      $("createKindSeg").querySelectorAll("button[data-kind]").forEach(b=>{
+        b.classList.toggle("active", b.dataset.kind === createKind);
+      });
+
+      const isRefund = createKind === "refund";
+      $("createTopupBlock").style.display = isRefund ? "none" : "block";
+      $("createRefundBlock").style.display = isRefund ? "block" : "none";
+
+      $("btnCreateSubmit").textContent = isRefund ? "Create refund" : "Create (Pending)";
+    }
+
+    /* Topup: wire/crypto switch */
+    $("cType").addEventListener("change", syncCreateTypeUI);
+    function syncCreateTypeUI(){
+      const type = $("cType").value;
+      const isCrypto = type === "crypto";
+
+      $("wireSection").style.display = isCrypto ? "none" : "block";
+      $("cryptoSection").style.display = isCrypto ? "block" : "none";
+
+      $("cHint").textContent = isCrypto
+        ? "Crypto is always USDT. Choose network, verify wallet twice, then paste Tx hash."
+        : "Client/Admin selects billing company (includes IBAN). Currency is auto from billing company.";
+
+      $("cTxHash").required = isCrypto;
+    }
+
+    $("cBilling").addEventListener("change", syncBillingPreview);
+    function syncBillingPreview(){
+      const id = $("cBilling").value;
+      const b = billingCompanies.find(x=>x.id===id);
+      if(!b) return;
+      $("bName").textContent = b.name;
+      $("bAddr").textContent = b.address;
+      $("bVat2").textContent = b.vat;
+      $("bIban2").textContent = b.iban;
+      $("bCur").textContent = b.currency;
+    }
+
+    $("cNetwork").addEventListener("change", syncWalletAddress);
+    function syncWalletAddress(){
+      const net = $("cNetwork").value;
+      $("cWalletAddr").value = cryptoWallets[net]?.() || "";
+    }
+
+    /* Submit: Topup OR Refund */
+    $("btnCreateSubmit").addEventListener("click", ()=>{
+      if(createKind === "refund"){
+        const clientId = $("crClient").value;
+        const amount = Number($("crAmount").value || 0);
+        const desc = ($("crDesc").value || "").trim();
+
+        if(!clientId) return alert("Select client.");
+        if(!(amount > 0)) return alert("Amount must be > 0.");
+        if(!desc) return alert("Description is required.");
+
+        const newId = "RF-" + String(Math.floor(120000 + Math.random()*900)).padStart(6,"0");
+
+        topups.unshift({
+          id: newId,
+          created: new Date().toISOString().slice(0,10),
+          clientId,
+          type: "refund",
+          network: null,
+          status: "approved",
+          description: desc,
+          initialAmount: amount,
+          initialCurrency: "USD",
+          amountUsd: -amount,
+          billingCompany: null,
+          steps: { invoiceProvided:false, proofUploaded:false, moneyOTW:false, invoiceFile:null, proofFile:null },
+          admin: { wireReceived:true, receivedAmount:amount, receivedCurrency:"USD", fxRate:1, feeUsd:0, declineReason:"" }
+        });
+
+        mainWalletUsd = +(mainWalletUsd - amount).toFixed(2);
+
+        closeDrawerById("createDrawer");
+        render();
+        openTopupDrawer(newId);
+        return;
+      }
+
+      // TOPUP create (existing behavior)
+      const type = $("cType").value;
+      const clientId = $("cClient").value;
+      const amount = Number($("cAmount").value || 0);
+      const desc = ($("cDesc").value || "").trim();
+
+      if(!clientId) return alert("Select client.");
+      if(!(amount > 0)) return alert("Amount must be > 0.");
+
+      const newId = "TU-" + String(Math.floor(120000 + Math.random()*900)).padStart(6,"0");
+
+      if(type === "crypto"){
+        const net = $("cNetwork").value;
+        const tx = ($("cTxHash").value || "").trim();
+        if(!tx) return alert("Tx hash is required for crypto.");
+
+        topups.unshift({
+          id:newId,
+          created:new Date().toISOString().slice(0,10),
+          clientId,
+          type:"crypto",
+          network: net,
+          status:"pending",
+          description: desc,
+          initialAmount: amount,
+          initialCurrency:"USD",
+          amountUsd: amount,
+          billingCompany:null,
+          steps:{ invoiceProvided:false, proofUploaded:false, moneyOTW:false, invoiceFile:null, proofFile:tx },
+          admin:{ wireReceived:true, receivedAmount:amount, receivedCurrency:"USD", fxRate:1, feeUsd:0, declineReason:"" }
+        });
+
+        closeDrawerById("createDrawer");
+        render();
+        return;
+      }
+
+      // wire
+      const bcId = $("cBilling").value;
+      const b = billingCompanies.find(x=>x.id===bcId);
+      if(!b) return alert("Select billing company.");
+
+      topups.unshift({
+        id:newId,
+        created:new Date().toISOString().slice(0,10),
+        clientId,
+        type:"wire",
+        network:null,
+        status:"pending",
+        description: desc,
+        initialAmount: amount,
+        initialCurrency: b.currency,
+        amountUsd: null,
+        billingCompany:{ name:b.name, iban:b.iban, currency:b.currency },
+        steps:{ invoiceProvided:false, proofUploaded:false, moneyOTW:false, invoiceFile:null, proofFile:null },
+        admin:{ wireReceived:false, receivedAmount:null, receivedCurrency:b.currency, fxRate:null, feeUsd:0, declineReason:"" }
+      });
+
+      closeDrawerById("createDrawer");
+      render();
+    });
+
+    $("btnAddBilling").addEventListener("click", ()=> alert("Demo: Add billing company modal (next step)."));
+    $("btnEditBilling2").addEventListener("click", ()=> alert("Demo: Edit billing company modal (next step)."));
+
+    /* ==============================
+       Details drawer
+    ============================== */
+    let activeId = null;
+    let activeView = "client";
+
+    function openTopupDrawer(id){
+      const t = topups.find(x=>x.id===id);
+      if(!t) return;
+      activeId = id;
+
+      $("dTitle").textContent = `Top-up • ${t.id}`;
+
+      activeView = "admin";
+      syncViewButtons();
+
+      $("dStatusPill").className = "pill " + (t.status||"pending");
+      $("dStatusPill").textContent = (t.status||"pending").toUpperCase();
+      $("dMainWallet").textContent = `Main Wallet: ${moneyUSD(mainWalletUsd)}`;
+
+      const s = t.steps || {};
+      setDot("dotInvoice", !!s.invoiceProvided);
+      setDot("dotProof", !!s.proofUploaded);
+      setDot("dotOTW", !!s.moneyOTW);
+
+      $("txtInvoice").textContent = s.invoiceFile ? s.invoiceFile : "—";
+      $("txtProof").textContent = s.proofFile ? s.proofFile : "—";
+      $("txtOTW").textContent = s.moneyOTW ? "In progress" : "—";
+
+      const amountUsd = (t.amountUsd != null) ? moneyUSD(t.amountUsd) : "—";
+      const network = t.network ? t.network : "—";
+      $("dKv").innerHTML = `
+        <div class="kv-row"><div class="k">Client</div><div class="v">${clientName(t.clientId)}</div></div>
+        <div class="kv-row"><div class="k">Type</div><div class="v">${String(t.type||"").toUpperCase()}</div></div>
+        <div class="kv-row"><div class="k">Network</div><div class="v">${network}</div></div>
+        <div class="kv-row"><div class="k">Created</div><div class="v">${fmtDate(t.created)}</div></div>
+        <div class="kv-row"><div class="k">Initial</div><div class="v">${Number(t.initialAmount||0).toFixed(0)} ${t.initialCurrency||"—"}</div></div>
+        <div class="kv-row"><div class="k">Amount (USD)</div><div class="v">${amountUsd}</div></div>
+        <div class="kv-row"><div class="k">Status</div><div class="v">${pillHtml(t.status)}</div></div>
+        <div class="kv-row"><div class="k">Description</div><div class="v">${t.description ? t.description : "—"}</div></div>
+      `;
+
+      if(t.billingCompany){
+        $("billingBlock").style.display = "block";
+        $("dCompany").textContent = t.billingCompany.name || "—";
+        $("dIban").textContent = t.billingCompany.iban || "—";
+        $("dCurrency").textContent = t.billingCompany.currency || "—";
+      }else{
+        $("billingBlock").style.display = "none";
+      }
+
+      const a = t.admin || {};
+      $("fxCurrency").value = a.receivedCurrency || "EUR";
+      $("fxReceivedAmount").value = a.receivedAmount ?? "";
+      $("fxRate").value = a.fxRate ?? "";
+      $("fxFee").value = a.feeUsd ?? 0;
+
+      syncFxLock();
+      recalcTotals();
+
+      openDrawer("topupDrawerModal");
+    }
+
+    function setDot(id, done){
+      const el = $(id);
+      el.classList.toggle("done", !!done);
+    }
+
+    function syncViewButtons(){
+      $("viewSeg").querySelectorAll("button[data-view]").forEach(b=>{
+        b.classList.toggle("active", b.dataset.view === activeView);
+      });
+      $("adminActions").style.display = (activeView === "admin") ? "block" : "none";
+      $("btnEditBilling").style.display = (activeView === "admin") ? "inline-flex" : "none";
+    }
+
+    $("viewSeg").addEventListener("click",(e)=>{
+      const btn = e.target.closest("button[data-view]");
+      if(!btn) return;
+      activeView = btn.dataset.view;
+      syncViewButtons();
+    });
+
+    function getActive(){ return topups.find(x=>x.id===activeId); }
+
+    $("fileInvoice").addEventListener("change",(e)=>{
+      const t = getActive(); if(!t) return;
+      const f = e.target.files?.[0];
+      if(f){
+        t.steps.invoiceProvided = true;
+        t.steps.invoiceFile = f.name;
+        render();
+        openTopupDrawer(t.id);
+      }
+    });
+
+    $("fileProof").addEventListener("change",(e)=>{
+      const t = getActive(); if(!t) return;
+      const f = e.target.files?.[0];
+      if(f){
+        t.steps.proofUploaded = true;
+        t.steps.proofFile = f.name;
+        render();
+        openTopupDrawer(t.id);
+      }
+    });
+
+    $("btnMarkWire").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      if(t.type !== "wire") return alert("Mark wire received is only for WIRE.");
+      t.admin.wireReceived = true;
+      syncFxLock();
+      recalcTotals();
+    });
+
+    function syncFxLock(){
+      const t = getActive(); if(!t) return;
+      const isWire = t.type === "wire";
+      const unlocked = !isWire || !!t.admin.wireReceived;
+      ["fxReceivedAmount","fxCurrency","fxRate","fxFee","btnApprove"].forEach(id=>{
+        $(id).disabled = !unlocked;
+      });
+      $("btnMarkWire").disabled = !isWire ? true : false;
+
+      if(t.type === "crypto" || t.type === "refund"){
+        $("btnApprove").disabled = (t.type === "refund"); // refunds already approved in demo
+        ["fxReceivedAmount","fxCurrency","fxRate","fxFee"].forEach(id=> $(id).disabled = true);
+      }
+    }
+
+    function recalcTotals(){
+      const t = getActive(); if(!t) return;
+
+      if(t.type === "crypto"){
+        const gross = Number(t.amountUsd ?? t.initialAmount ?? 0);
+        const fee = Number(t.admin.feeUsd ?? 0);
+        const net = Math.max(0, gross - fee);
+        $("dApprovedUsd").textContent = moneyUSD(gross);
+        $("dNetUsd").textContent = moneyUSD(net);
+        return;
+      }
+
+      if(t.type === "refund"){
+        $("dApprovedUsd").textContent = moneyUSD(Math.abs(Number(t.amountUsd || 0)));
+        $("dNetUsd").textContent = moneyUSD(Number(t.amountUsd || 0));
+        return;
+      }
+
+      const received = Number($("fxReceivedAmount").value || 0);
+      const rate = Number($("fxRate").value || 0);
+      const fee = Number($("fxFee").value || 0);
+
+      const approvedUsd = rate > 0 ? (received * rate) : 0;
+      const netUsd = Math.max(0, approvedUsd - fee);
+
+      $("dApprovedUsd").textContent = moneyUSD(approvedUsd);
+      $("dNetUsd").textContent = moneyUSD(netUsd);
+    }
+
+    ["fxReceivedAmount","fxRate","fxFee","fxCurrency"].forEach(id=>{
+      $(id).addEventListener("input", ()=>{
+        const t = getActive(); if(!t) return;
+        t.admin.receivedAmount = Number($("fxReceivedAmount").value || 0) || null;
+        t.admin.receivedCurrency = $("fxCurrency").value;
+        t.admin.fxRate = Number($("fxRate").value || 0) || null;
+        t.admin.feeUsd = Number($("fxFee").value || 0) || 0;
+        recalcTotals();
+      });
+      $(id).addEventListener("change", ()=>{
+        const t = getActive(); if(!t) return;
+        t.admin.receivedCurrency = $("fxCurrency").value;
+        recalcTotals();
+      });
+    });
+
+    $("btnApprove").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      if(t.type === "refund") return;
+
+      let netUsd = 0;
+
+      if(t.type === "crypto"){
+        const gross = Number(t.amountUsd ?? t.initialAmount ?? 0);
+        netUsd = Math.max(0, gross - Number(t.admin.feeUsd ?? 0));
+        t.amountUsd = gross;
+      }else{
+        const received = Number($("fxReceivedAmount").value || 0);
+        const rate = Number($("fxRate").value || 0);
+        const fee = Number($("fxFee").value || 0);
+        const approvedUsd = (rate > 0) ? (received * rate) : 0;
+        netUsd = Math.max(0, approvedUsd - fee);
+        t.amountUsd = approvedUsd || null;
+        t.admin.receivedAmount = received || null;
+        t.admin.fxRate = rate || null;
+        t.admin.feeUsd = fee || 0;
+      }
+
+      t.status = "approved";
+      mainWalletUsd = +(mainWalletUsd + netUsd).toFixed(2);
+
+      render();
+      openTopupDrawer(t.id);
+    });
+
+    $("declinePreset").addEventListener("change", ()=>{
+      const v = $("declinePreset").value;
+      if(!v) return;
+      const map = {
+        missing_docs: "Missing documents",
+        iban_mismatch: "IBAN mismatch",
+        wrong_amount: "Wrong amount",
+        compliance: "Compliance issue"
+      };
+      $("declineReason").value = map[v] || "";
+    });
+
+    $("btnDecline").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      const reason = ($("declineReason").value || "").trim();
+      if(!reason) return alert("Decline reason is required.");
+      t.status = "declined";
+      t.admin.declineReason = reason;
+      render();
+      openTopupDrawer(t.id);
+    });
+
+    $("btnDelete").addEventListener("click", ()=>{
+      const t = getActive(); if(!t) return;
+      if(!confirm(`Delete ${t.id}?`)) return;
+      topups = topups.filter(x=>x.id !== t.id);
+      closeDrawerById("topupDrawerModal");
+      render();
+    });
+
+    $("btnEditBilling").addEventListener("click", ()=> alert("Demo: billing edit (next step)."));
+
+    /* ==============================
+       Boot
+    ============================== */
+    render();
+  </script>
+</body>
+</html>
