@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/sidebar.css">
+  
+  <!-- Google Charts -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
   <style>
     :root{
@@ -278,6 +281,126 @@
       flex-direction: column;
       gap: 12px;
     }
+    
+    /* 3D Chart Container */
+    #feeChart {
+      filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.15));
+      transition: transform 0.3s ease;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    
+    #feeChart:hover {
+      transform: scale(1.01);
+    }
+    
+    /* Google Charts styling */
+    #feeChart svg {
+      border-radius: 12px;
+    }
+    
+    /* Animated Legend */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateX(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(1.05);
+      }
+    }
+    
+    .fee-legend{
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 600px){
+      .fee-legend{ grid-template-columns: 1fr; }
+    }
+    
+    .fee-legend-item{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 100%);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .fee-legend-item:hover{
+      transform: translateY(-4px) scale(1.02);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+      border-color: rgba(37, 99, 235, 0.3);
+      animation: pulse 1s ease infinite;
+    }
+    
+    .fee-legend-color{
+      width: 20px;
+      height: 20px;
+      border-radius: 6px;
+      flex-shrink: 0;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .fee-legend-color::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 8px;
+      background: inherit;
+      opacity: 0;
+      filter: blur(8px);
+      transition: opacity 0.3s ease;
+    }
+    
+    .fee-legend-item:hover .fee-legend-color::after {
+      opacity: 0.6;
+    }
+    
+    .fee-legend-item:hover .fee-legend-color {
+      transform: rotate(180deg) scale(1.2);
+    }
+    
+    .fee-legend-label{
+      flex: 1;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      transition: color 0.3s ease;
+    }
+    
+    .fee-legend-item:hover .fee-legend-label {
+      color: var(--blue);
+    }
+    
+    .fee-legend-value{
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--text);
+      transition: all 0.3s ease;
+    }
+    
+    .fee-legend-item:hover .fee-legend-value {
+      transform: scale(1.1);
+      color: var(--blue);
+    }
+    
     .fee-item{
       display: flex;
       align-items: center;
@@ -478,35 +601,10 @@
               <div class="card-subtitle">Revenue by fee type</div>
             </div>
             <div class="card-body">
-              <div class="fee-breakdown" id="feeBreakdown">
-                <!-- Populated by JS -->
+              <div id="feeChart" style="width: 100%; height: 400px;"></div>
+              <div class="fee-legend" id="feeLegend" style="margin-top: 20px;">
+                <!-- Legend populated by JS -->
               </div>
-            </div>
-          </div>
-
-          <!-- Client Statistics -->
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">Client Statistics</h2>
-              <div class="card-subtitle">User metrics</div>
-            </div>
-            <div class="card-body">
-              <div class="client-stats" id="clientStats">
-                <!-- Populated by JS -->
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Platform Balances -->
-        <div class="card">
-          <div class="card-header">
-            <h2 class="card-title">Platform Balances</h2>
-            <div class="card-subtitle">Current balance per platform</div>
-          </div>
-          <div class="card-body">
-            <div class="platform-stats" id="platformStats">
-              <!-- Populated by JS -->
             </div>
           </div>
         </div>
@@ -687,18 +785,111 @@
       `).join("");
     }
 
+    // Load Google Charts
+    google.charts.load('current', {'packages':['corechart']});
+    google.charts.setOnLoadCallback(function() {
+      renderFeeBreakdown();
+    });
+
     function renderFeeBreakdown(){
-      const container = document.getElementById("feeBreakdown");
+      const chartDiv = document.getElementById("feeChart");
+      const legendContainer = document.getElementById("feeLegend");
       
-      container.innerHTML = feeBreakdown.map(fee => `
-        <div class="fee-item">
-          <div class="fee-label">
-            <div class="fee-icon">${fee.icon}</div>
-            <div class="fee-name">${fee.type}</div>
+      // Calculate total
+      const total = feeBreakdown.reduce((sum, fee) => sum + fee.amount, 0);
+      
+      // Prepare data for Google Charts
+      const chartData = [['Fee Type', 'Amount']];
+      feeBreakdown.forEach(fee => {
+        chartData.push([fee.type, fee.amount]);
+      });
+      
+      const data = google.visualization.arrayToDataTable(chartData);
+      
+      // Modern vibrant colors
+      const colors = [
+        '#2563eb', // Electric Blue
+        '#10b981', // Emerald Green
+        '#f59e0b', // Amber Gold
+        '#8b5cf6', // Purple
+        '#ef4444', // Red
+        '#06b6d4'  // Cyan
+      ];
+      
+      // 3D Pie Chart Options
+      const options = {
+        title: '',
+        pieHole: 0, // Full pie (pieHole doesn't work with is3D)
+        is3D: true, // Enable 3D effect
+        pieStartAngle: 100, // Rotate the chart
+        sliceVisibilityThreshold: 0.02, // Hide slices smaller than 2%
+        pieSliceText: 'percentage',
+        pieSliceTextStyle: {
+          color: '#ffffff',
+          fontSize: 14,
+          bold: true
+        },
+        colors: colors,
+        backgroundColor: 'transparent',
+        chartArea: {
+          width: '90%',
+          height: '80%'
+        },
+        legend: {
+          position: 'none' // We'll use custom legend
+        },
+        tooltip: {
+          text: 'both',
+          showColorCode: true,
+          textStyle: {
+            fontSize: 13,
+            bold: true
+          }
+        },
+        animation: {
+          startup: true,
+          duration: 1500,
+          easing: 'out'
+        },
+        pieSliceBorderColor: '#ffffff',
+        pieResidueSliceLabel: 'Other',
+        slices: {
+          0: { offset: 0.1 }, // Explode first slice for dramatic effect
+        }
+      };
+      
+      // Create and draw the chart
+      const chart = new google.visualization.PieChart(chartDiv);
+      
+      // Add hover effect
+      google.visualization.events.addListener(chart, 'onmouseover', function(e) {
+        if (e.row !== null) {
+          chartDiv.style.cursor = 'pointer';
+        }
+      });
+      
+      google.visualization.events.addListener(chart, 'onmouseout', function(e) {
+        chartDiv.style.cursor = 'default';
+      });
+      
+      chart.draw(data, options);
+      
+      // Create animated legend with hover effects
+      legendContainer.innerHTML = feeBreakdown.map((fee, index) => {
+        const percentage = ((fee.amount / total) * 100).toFixed(1);
+        return `
+          <div class="fee-legend-item" style="animation: slideIn 0.5s ease ${index * 0.1}s both;">
+            <div class="fee-legend-color" style="background: ${colors[index]}; box-shadow: 0 4px 12px ${colors[index]}40;"></div>
+            <div class="fee-legend-label">${fee.type}</div>
+            <div class="fee-legend-value">${money(fee.amount)} <span style="color: #64748b; font-size: 12px;">(${percentage}%)</span></div>
           </div>
-          <div class="fee-amount">${money(fee.amount)}</div>
-        </div>
-      `).join("");
+        `;
+      }).join("");
+      
+      // Redraw chart on window resize
+      window.addEventListener('resize', function() {
+        chart.draw(data, options);
+      });
     }
 
     function renderClientStats(){
