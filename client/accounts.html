@@ -794,13 +794,6 @@
                     <option value="in-review">In Review</option>
                     <option value="disabled">Disabled</option>
                 </select>
-                <select id="assignedFilter" style="max-height: 200px;">
-                    <option value="assigned" selected>Assigned</option>
-                    <option value="unassigned">Unassigned</option>
-                    <option value="client-a">Client A</option>
-                    <option value="client-b">Client B</option>
-                    <option value="client-c">Client C</option>
-                </select>
                 <div class="more-filters-wrapper">
                     <button class="btn more-filters-btn" onclick="toggleMoreFilters(event)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -838,14 +831,6 @@
                                 <option value="individual">Individual</option>
                             </select>
                         </div>
-                        <div class="field-group">
-                            <label>Contract Type</label>
-                            <select id="contractFilter">
-                                <option value="">All Contracts</option>
-                                <option value="recurring">Recurring</option>
-                                <option value="one-time">One Time</option>
-                            </select>
-                        </div>
                         <div class="dropdown-actions">
                             <button class="btn apply-btn" onclick="applyMoreFilters()">Apply</button>
                             <button class="btn clear-btn" onclick="clearMoreFilters()">Clear</button>
@@ -860,7 +845,6 @@
                     Clear
                 </button>
                 </div>
-                <button class="btn" onclick="openAddAccountModal()" style="margin-left: 1rem;">+ Add Account</button>
                 <button class="btn" id="deleteSelectedBtn" onclick="deleteSelectedAccounts()" style="margin-left: 0.5rem; background: #e74c3c; color: white; display: none;">
                     🗑️ Delete Selected (<span id="selectedCount">0</span>)
                 </button>
@@ -871,13 +855,10 @@
                 <thead>
                     <tr>
                         <th style="width: 40px;"><input type="checkbox" id="selectAllAccounts" onchange="toggleSelectAll(this)"></th>
-                        <th>ID</th>
                         <th>Platform</th>
                         <th>Asset</th>
                         <th>Account Name</th>
                         <th>Status</th>
-                        <th>Pay</th>
-                        <th>Contract</th>
                         <th>Tag</th>
                         <th>Balance Type</th>
                         <th>Balance</th>
@@ -889,7 +870,6 @@
                 <tbody id="accountsTable">
                     <tr data-platform="facebook" data-status="active" data-assigned="client-a" data-asset="ad-account" data-balance="general" data-contract="recurring" data-tag="scaling-01" data-account-id="1">
                         <td><input type="checkbox" class="account-checkbox" value="1"></td>
-                        <td>1</td>
                         <td>Facebook</td>
                         <td>Ad Account</td>
                         <td>
@@ -904,8 +884,6 @@
                                 <option value="disabled">● Disabled</option>
                             </select>
                         </td>
-                        <td>CL</td>
-                        <td>Recurring</td>
                         <td>Scaling 01</td>
                         <td>General</td>
                         <td>Shared wallet</td>
@@ -921,16 +899,16 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
                                 <button class="icon-btn" onclick="openNotesModal(1)" title="View and edit notes">
-                                    📄
+                                    📝
                                 </button>
                                 <button class="icon-btn" onclick="openModal(1)" title="View account details">
-                                    🔍
+                                    👁️
                                 </button>
                             </div>
                         </td>
                     </tr>
                     <tr data-platform="google" data-status="in-review" data-assigned="client-b" data-asset="ad-account" data-balance="individual" data-contract="recurring" data-tag="brand-x">
-                        <td>2</td>
+                        <td><input type="checkbox" class="account-checkbox" value="2"></td>
                         <td>Google</td>
                         <td>Ad Account</td>
                         <td>
@@ -945,8 +923,6 @@
                                 <option value="disabled">● Disabled</option>
                             </select>
                         </td>
-                        <td>CL</td>
-                        <td>Recurring</td>
                         <td>Brand X</td>
                         <td>Individual</td>
                         <td style="font-weight: 600;">$1,080.00</td>
@@ -962,16 +938,16 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
                                 <button class="icon-btn" onclick="openNotesModal(2)" title="View and edit notes">
-                                    📄
+                                    📝
                                 </button>
                                 <button class="icon-btn" onclick="openModal(2)" title="View account details">
-                                    🔍
+                                    👁️
                                 </button>
                             </div>
                         </td>
                     </tr>
                     <tr data-platform="tiktok" data-status="active" data-assigned="client-a" data-asset="ad-account" data-balance="general" data-contract="one-time" data-tag="testing">
-                        <td>3</td>
+                        <td><input type="checkbox" class="account-checkbox" value="3"></td>
                         <td>TikTok</td>
                         <td>Ad Account</td>
                         <td>
@@ -986,8 +962,6 @@
                                 <option value="disabled">● Disabled</option>
                             </select>
                         </td>
-                        <td>CC</td>
-                        <td>One Time</td>
                         <td>Testing</td>
                         <td>General</td>
                         <td>Shared wallet</td>
@@ -1003,16 +977,16 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
                                 <button class="icon-btn" onclick="openNotesModal(3)" title="View and edit notes">
-                                    📄
+                                    📝
                                 </button>
                                 <button class="icon-btn" onclick="openModal(3)" title="View account details">
-                                    🔍
+                                    👁️
                                 </button>
                             </div>
                         </td>
                     </tr>
                     <tr data-platform="taboola" data-status="active" data-assigned="client-c" data-asset="profile" data-balance="individual" data-contract="recurring" data-tag="premium">
-                        <td>4</td>
+                        <td><input type="checkbox" class="account-checkbox" value="4"></td>
                         <td>Taboola</td>
                         <td>Profile</td>
                         <td>
@@ -1027,8 +1001,6 @@
                                 <option value="disabled">● Disabled</option>
                             </select>
                         </td>
-                        <td>CL</td>
-                        <td>Recurring</td>
                         <td>Premium</td>
                         <td>Individual</td>
                         <td style="font-weight: 600;">$5,900.00</td>
@@ -1044,16 +1016,16 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
                                 <button class="icon-btn" onclick="openNotesModal(4)" title="View and edit notes">
-                                    📄
+                                    📝
                                 </button>
                                 <button class="icon-btn" onclick="openModal(4)" title="View account details">
-                                    🔍
+                                    👁️
                                 </button>
                             </div>
                         </td>
                     </tr>
                     <tr data-platform="snapchat" data-status="restricted" data-assigned="client-b" data-asset="ad-account" data-balance="general" data-contract="one-time" data-tag="launch">
-                        <td>5</td>
+                        <td><input type="checkbox" class="account-checkbox" value="5"></td>
                         <td>Snapchat</td>
                         <td>Ad Account</td>
                         <td>
@@ -1068,8 +1040,6 @@
                                 <option value="disabled">● Disabled</option>
                             </select>
                         </td>
-                        <td>CC</td>
-                        <td>One Time</td>
                         <td>Launch</td>
                         <td>General</td>
                         <td>Shared wallet</td>
@@ -1085,16 +1055,16 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
                                 <button class="icon-btn" onclick="openNotesModal(5)" title="View and edit notes">
-                                    📄
+                                    📝
                                 </button>
                                 <button class="icon-btn" onclick="openModal(5)" title="View account details">
-                                    🔍
+                                    👁️
                                 </button>
                             </div>
                         </td>
                     </tr>
                     <tr data-platform="facebook" data-status="active" data-assigned="unassigned" data-asset="ad-account" data-balance="general" data-contract="-" data-tag="">
-                        <td>6</td>
+                        <td><input type="checkbox" class="account-checkbox" value="6"></td>
                         <td>Facebook</td>
                         <td>Ad Account</td>
                         <td>
@@ -1109,8 +1079,6 @@
                                 <option value="disabled">● Disabled</option>
                             </select>
                         </td>
-                        <td>CL</td>
-                        <td>-</td>
                         <td>-</td>
                         <td>General</td>
                         <td>Shared wallet</td>
@@ -1126,16 +1094,16 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
                                 <button class="icon-btn" onclick="openNotesModal(6)" title="View and edit notes">
-                                    📄
+                                    📝
                                 </button>
                                 <button class="icon-btn" onclick="openModal(6)" title="View account details">
-                                    🔍
+                                    👁️
                                 </button>
                             </div>
                         </td>
                     </tr>
                     <tr data-platform="google" data-status="active" data-assigned="unassigned" data-asset="ad-account" data-balance="individual" data-contract="-" data-tag="">
-                        <td>7</td>
+                        <td><input type="checkbox" class="account-checkbox" value="7"></td>
                         <td>Google</td>
                         <td>Ad Account</td>
                         <td>
@@ -1150,8 +1118,6 @@
                                 <option value="disabled">● Disabled</option>
                             </select>
                         </td>
-                        <td>CC</td>
-                        <td>-</td>
                         <td>-</td>
                         <td>Individual</td>
                         <td style="font-weight: 600;">$0.00</td>
@@ -1167,16 +1133,16 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
                                 <button class="icon-btn" onclick="openNotesModal(7)" title="View and edit notes">
-                                    📄
+                                    📝
                                 </button>
                                 <button class="icon-btn" onclick="openModal(7)" title="View account details">
-                                    🔍
+                                    👁️
                                 </button>
                             </div>
                         </td>
                     </tr>
                     <tr data-platform="tiktok" data-status="in-review" data-assigned="unassigned" data-asset="profile" data-balance="general" data-contract="-" data-tag="">
-                        <td>8</td>
+                        <td><input type="checkbox" class="account-checkbox" value="8"></td>
                         <td>TikTok</td>
                         <td>Profile</td>
                         <td>
@@ -1191,8 +1157,6 @@
                                 <option value="disabled">● Disabled</option>
                             </select>
                         </td>
-                        <td>CL</td>
-                        <td>-</td>
                         <td>-</td>
                         <td>General</td>
                         <td>Shared wallet</td>
@@ -1208,10 +1172,10 @@
                         <td>
                             <div style="display: flex; gap: 0.5rem; justify-content: center;">
                                 <button class="icon-btn" onclick="openNotesModal(8)" title="View and edit notes">
-                                    📄
+                                    📝
                                 </button>
                                 <button class="icon-btn" onclick="openModal(8)" title="View account details">
-                                    🔍
+                                    👁️
                                 </button>
                             </div>
                         </td>
@@ -1257,37 +1221,32 @@
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; row-gap: 2rem;">
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.75rem; font-weight: 500; color: #2c3e50; font-size: 0.95rem;">ID</label>
-                        <input type="text" id="modalTableId" value="1" readonly style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; font-size: 0.95rem;">
+                        <input type="text" id="modalTableId" value="1" readonly disabled style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; font-size: 0.95rem;">
                     </div>
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.75rem; font-weight: 500; color: #2c3e50; font-size: 0.95rem;">Account ID</label>
-                        <input type="text" id="modalAccountId" value="FB-12345" readonly style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; font-size: 0.95rem;">
+                        <input type="text" id="modalAccountId" value="FB-12345" readonly disabled style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; background: #f5f5f5; font-size: 0.95rem;">
                     </div>
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.75rem; font-weight: 500; color: #2c3e50; font-size: 0.95rem;">Account Name</label>
-                        <input type="text" id="modalAccountName" value="Campaign Account 1" style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem;">
+                        <input type="text" id="modalAccountName" value="Campaign Account 1" disabled style="width: 100%; padding: 0.875rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.95rem; background: #f5f5f5;">
                     </div>
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Platform</label>
-                        <input type="text" id="modalPlatform" value="Facebook" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
-                    </div>
-
-                    <div class="field-group">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Client</label>
-                        <input type="text" id="modalClient" value="Client A" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <input type="text" id="modalPlatform" value="Facebook" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                     </div>
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Client Tag</label>
-                        <input type="text" id="modalClientTag" value="Premium" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <input type="text" id="modalClientTag" value="Premium" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                     </div>
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Asset Type</label>
-                        <select id="modalAssetType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <select id="modalAssetType" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                             <option value="ad-account">Ad Account</option>
                             <option value="profile">Profile</option>
                             <option value="bm">BM</option>
@@ -1307,7 +1266,7 @@
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Balance Type</label>
-                        <select id="modalBalanceType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <select id="modalBalanceType" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                             <option value="general">General</option>
                             <option value="individual">Individual</option>
                         </select>
@@ -1315,17 +1274,17 @@
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Balance</label>
-                        <input type="text" id="modalBalance" value="$2,580.00" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <input type="text" id="modalBalance" value="$2,580.00" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                     </div>
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Primary Access</label>
-                        <input type="text" id="modalPrimaryAccess" value="Main Profile" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <input type="text" id="modalPrimaryAccess" value="Main Profile" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                     </div>
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Account Type</label>
-                        <select id="modalAccountType" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
+                        <select id="modalAccountType" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                             <option value="cc">CC (Credit Card)</option>
                             <option value="cl">CL (Credit Line)</option>
                         </select>
@@ -1333,7 +1292,7 @@
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Billing</label>
-                        <select id="modalBilling" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; cursor: not-allowed;">
+                        <select id="modalBilling" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                             <option value="one-time">One Time</option>
                             <option value="recurring">Recurring</option>
                         </select>
@@ -1341,17 +1300,7 @@
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Provider</label>
-                        <input type="text" id="modalProvider" value="Adi" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
-                    </div>
-
-                    <div class="field-group">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Created At</label>
-                        <input type="text" id="modalCreatedAt" value="-" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; cursor: not-allowed;">
-                    </div>
-
-                    <div class="field-group">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Updated At</label>
-                        <input type="text" id="modalUpdatedAt" value="-" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; cursor: not-allowed;">
+                        <input type="text" id="modalProvider" value="Adi" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5;">
                     </div>
                 </div>
             </div>
@@ -1363,7 +1312,7 @@
         <div class="profiles-list-box">
             <div class="profiles-list-header">
                 <h3>Profile List</h3>
-                <button class="btn btn-primary" onclick="addProfile()">+ Add Profile</button>
+                <button class="btn btn-primary" onclick="addProfile()" style="display: none;">+ Add Profile</button>
             </div>
 
             <table class="profiles-table">
@@ -1373,7 +1322,6 @@
                         <th>Email</th>
                         <th class="center">Tag</th>
                         <th class="center">Status</th>
-                        <th class="center">Visibility</th>
                         <th class="center">Active</th>
                     </tr>
                 </thead>
@@ -1396,14 +1344,6 @@
                             </select>
                         </td>
                         <td class="center">
-                            <span class="visibility-toggle" onclick="toggleVisibility(this)" style="cursor: pointer; transition: all 0.2s; color: #2ecc71;" data-visible="true" title="Click to toggle visibility">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </span>
-                        </td>
-                        <td class="center">
                             <input type="radio" name="activeProfile" checked onchange="switchToProfile(1, false, event)">
                         </td>
                     </tr>
@@ -1424,14 +1364,6 @@
                                 <option value="active" selected>● Active</option>
                                 <option value="suspended">● Suspended</option>
                             </select>
-                        </td>
-                        <td class="center">
-                            <span class="visibility-toggle" onclick="toggleVisibility(this)" style="cursor: pointer; transition: all 0.2s; color: #2ecc71;" data-visible="true" title="Click to toggle visibility">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                    <circle cx="12" cy="12" r="3"></circle>
-                                </svg>
-                            </span>
                         </td>
                         <td class="center">
                             <input type="radio" name="activeProfile" onchange="switchToProfile(2, false, event)">
@@ -1488,16 +1420,16 @@
                     <div class="custom-field-item">
                         <input type="text" value="Recovery Email">
                         <input type="text" value="recovery@example.com">
-                        <button class="btn btn-danger">Remove</button>
+                        <button class="btn btn-danger" style="display: none;">Remove</button>
                     </div>
 
-                    <button class="btn btn-secondary" onclick="addProfileCustomField(1)">
+                    <button class="btn btn-secondary" onclick="addProfileCustomField(1)" style="display: none;">
                         + Add Custom Field
                     </button>
                 </div>
 
-                <div class="profile-actions">
-                    <button class="btn btn-danger" onclick="deleteProfile(1)">
+                <div class="profile-actions" style="display: none;">
+                    <button class="btn btn-danger" onclick="deleteProfile(1)" style="display: none;">
                         Delete Profile
                     </button>
                 </div>
@@ -1538,16 +1470,16 @@
                 </div>
 
                 <!-- CUSTOM FIELDS -->
-                <div class="profile-custom-fields">
+                <div class="profile-custom-fields" style="display: none;">
                     <h4>Custom Fields</h4>
 
-                    <button class="btn btn-secondary" onclick="addProfileCustomField(2)">
+                    <button class="btn btn-secondary" onclick="addProfileCustomField(2)" style="display: none;">
                         + Add Custom Field
                     </button>
                 </div>
 
                 <div class="profile-actions">
-                    <button class="btn btn-danger" onclick="deleteProfile(2)">
+                    <button class="btn btn-danger" onclick="deleteProfile(2)" style="display: none;">
                         Delete Profile
                     </button>
                 </div>
@@ -1638,7 +1570,7 @@
 
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Billing</label>
-                        <select id="modalBilling" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; cursor: not-allowed;">
+                        <select id="modalBilling" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
                             <option value="one-time">One Time</option>
                             <option value="recurring">Recurring</option>
                         </select>
@@ -1647,16 +1579,6 @@
                     <div class="field-group">
                         <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Provider</label>
                         <input type="text" id="modalProvider" value="Adi" style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px;">
-                    </div>
-
-                    <div class="field-group">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Created At</label>
-                        <input type="text" id="modalCreatedAt" value="-" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; cursor: not-allowed;">
-                    </div>
-
-                    <div class="field-group">
-                        <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #2c3e50;">Updated At</label>
-                        <input type="text" id="modalUpdatedAt" value="-" disabled style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; background: #f5f5f5; cursor: not-allowed;">
                     </div>
 
                     <div class="field-group">
@@ -1700,11 +1622,11 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn" onclick="addCard()">+ Add New Card</button>
+                <button class="btn" onclick="addCard()" style="display: none;">+ Add New Card</button>
             </div>
 
             <!-- Save Button -->
-            <div style="display: flex; gap: 12px; padding: 20px 24px; border-top: 1px solid #e5e5e5; position: sticky; bottom: 0; background: white;">
+            <div style="display: none; gap: 12px; padding: 20px 24px; border-top: 1px solid #e5e5e5; position: sticky; bottom: 0; background: white;">
                 <button class="btn" onclick="saveAllChanges()" style="flex: 1; background: #27ae60; color: white; padding: 12px 24px; font-size: 14px; font-weight: 500; border: none; border-radius: 8px; cursor: pointer;">Save All Changes</button>
             </div>
         </div>
@@ -1743,74 +1665,67 @@
                 <button class="close-btn" onclick="closeAddAccountModal()">&times;</button>
             </div>
 
-            <div class="account-section">
-                <h3 class="section-title">Details</h3>
-                
-                <div class="field-group">
-                    <label>ID (Auto-generated)</label>
-                    <input type="text" id="addAccountId" readonly style="background: #f5f5f5; cursor: not-allowed;" placeholder="Will be set automatically">
-                </div>
+            <div class="field-group">
+                <label>ID (Auto-generated)</label>
+                <input type="text" id="addAccountId" readonly style="background: #f5f5f5; cursor: not-allowed;" placeholder="Will be set automatically">
+            </div>
 
-                <div class="field-group">
-                    <label>Platform</label>
-                    <select id="addAccountPlatform" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="">Select platform...</option>
-                        <option value="facebook">Facebook</option>
-                        <option value="google">Google</option>
-                        <option value="tiktok">TikTok</option>
-                        <option value="taboola">Taboola</option>
-                        <option value="outbrain">Outbrain</option>
-                        <option value="microsoft">Microsoft</option>
-                        <option value="snapchat">Snapchat</option>
-                    </select>
-                </div>
+            <div class="field-group">
+                <label>Platform</label>
+                <select id="addAccountPlatform" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select platform...</option>
+                    <option value="facebook">Facebook</option>
+                    <option value="google">Google</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="taboola">Taboola</option>
+                    <option value="outbrain">Outbrain</option>
+                    <option value="microsoft">Microsoft</option>
+                    <option value="snapchat">Snapchat</option>
+                </select>
+            </div>
 
-                <div class="field-group">
-                    <label>Account Name</label>
-                    <input type="text" id="addAccountName" placeholder="Enter account name">
-                </div>
+            <div class="field-group">
+                <label>Account Name</label>
+                <input type="text" id="addAccountName" placeholder="Enter account name">
+            </div>
 
-                <div class="field-group">
-                    <label>Assets</label>
-                    <select id="addAccountAssets" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="">Select asset type...</option>
-                        <option value="ad-account">Ad Account</option>
-                        <option value="profile">Profile</option>
-                        <option value="bm">BM (Business Manager)</option>
-                        <option value="page">Page</option>
-                    </select>
-                </div>
+            <div class="field-group">
+                <label>Assets</label>
+                <select id="addAccountAssets" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select asset type...</option>
+                    <option value="ad-account">Ad Account</option>
+                    <option value="profile">Profile</option>
+                    <option value="bm">BM (Business Manager)</option>
+                    <option value="page">Page</option>
+                </select>
+            </div>
 
-                <div class="field-group">
-                    <label>Account ID</label>
-                    <input type="text" id="addAccountAccountId" placeholder="Enter account ID">
-                </div>
+            <div class="field-group">
+                <label>Account ID</label>
+                <input type="text" id="addAccountAccountId" placeholder="Enter account ID">
+            </div>
 
-                <div class="field-group">
-                    <label>Pay</label>
-                    <select id="addAccountPay" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="cc" selected>CC (Credit Card)</option>
-                        <option value="cl">CL (Credit Line)</option>
-                    </select>
-                </div>
+            <div class="field-group">
+                <label>Pay</label>
+                <input type="text" id="addAccountPay" value="CC" readonly style="background: #f5f5f5; cursor: not-allowed;">
+            </div>
 
-                <div class="field-group">
-                    <label>Client</label>
-                    <select id="addAccountClient" onchange="toggleContractField()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="">Select client...</option>
-                        <option value="client-a">Client A</option>
-                        <option value="client-b">Client B</option>
-                        <option value="client-c">Client C</option>
-                    </select>
-                </div>
+            <div class="field-group">
+                <label>Client</label>
+                <select id="addAccountClient" onchange="toggleContractField()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="">Select client...</option>
+                    <option value="client-a">Client A</option>
+                    <option value="client-b">Client B</option>
+                    <option value="client-c">Client C</option>
+                </select>
+            </div>
 
-                <div class="field-group" id="contractField" style="display: none;">
-                    <label>Contract</label>
-                    <select id="addAccountContract" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="one-time">One Time</option>
-                        <option value="recurring">Recurring</option>
-                    </select>
-                </div>
+            <div class="field-group" id="contractField" style="display: none;">
+                <label>Contract</label>
+                <select id="addAccountContract" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                    <option value="one-time">One Time</option>
+                    <option value="recurring">Recurring</option>
+                </select>
             </div>
 
             <button class="btn" style="width: 100%;" onclick="submitAddAccount()">Create Account</button>
@@ -2187,14 +2102,6 @@
                     </select>
                 </td>
                 <td class="center">
-                    <span class="visibility-toggle" onclick="toggleVisibility(this)" style="cursor: pointer; transition: all 0.2s; color: #2ecc71;" data-visible="true" title="Click to toggle visibility">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                    </span>
-                </td>
-                <td class="center">
                     <input type="radio" name="activeProfile" onchange="switchToProfile(${newProfile.id}, false, event)">
                 </td>
             `;
@@ -2245,16 +2152,16 @@
                     </div>
                 </div>
 
-                <div class="profile-custom-fields">
+                <div class="profile-custom-fields" style="display: none;">
                     <h4>Custom Fields</h4>
                     <div class="custom-fields-list" id="customFieldsList${newProfile.id}">
                         <!-- Custom fields will be added here -->
                     </div>
-                    <button class="btn btn-secondary" onclick="addProfileCustomField(${newProfile.id})">+ Add Custom Field</button>
+                    <button class="btn btn-secondary" onclick="addProfileCustomField(${newProfile.id})" style="display: none;">+ Add Custom Field</button>
                 </div>
 
-                <div class="profile-actions">
-                    <button class="btn btn-danger" onclick="deleteProfile(${newProfile.id})">Delete Profile</button>
+                <div class="profile-actions" style="display: none;">
+                    <button class="btn btn-danger" onclick="deleteProfile(${newProfile.id})" style="display: none;">Delete Profile</button>
                 </div>
             `;
             
@@ -2786,10 +2693,6 @@
             document.getElementById('modalAccountType').value = account.accountType;
             document.getElementById('modalBilling').value = account.billing;
             document.getElementById('modalProvider').value = account.provider;
-            
-            // Populate Created At and Updated At (read-only fields)
-            document.getElementById('modalCreatedAt').value = account.createdAt || '2026-01-15 10:30:00';
-            document.getElementById('modalUpdatedAt').value = account.updatedAt || '2026-02-20 14:45:00';
 
             // Populate Profiles tab with account-specific profiles
             const profiles = accountProfiles[accountId] || [];
@@ -2830,14 +2733,6 @@
                             <option value="active" ${profile.status === 'active' ? 'selected' : ''}>● Active</option>
                             <option value="suspended" ${profile.status === 'suspended' ? 'selected' : ''}>● Suspended</option>
                         </select>
-                    </td>
-                    <td class="center">
-                        <span class="visibility-toggle" onclick="toggleVisibility(this)" style="cursor: pointer; transition: all 0.2s; color: #2ecc71;" data-visible="true" title="Click to toggle visibility">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align: middle;">
-                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                <circle cx="12" cy="12" r="3"></circle>
-                            </svg>
-                        </span>
                     </td>
                     <td class="center">
                         <input type="radio" name="activeProfile" ${isActive ? 'checked' : ''} onchange="switchToProfile(${profile.id}, false, event)">
@@ -2920,16 +2815,16 @@
                     </div>
 
                     <!-- CUSTOM FIELDS -->
-                    <div class="profile-custom-fields">
+                    <div class="profile-custom-fields" style="display: none;">
                         <h4>Custom Fields</h4>
 
-                        <button class="btn btn-secondary" onclick="addProfileCustomField(${profile.id})">
+                        <button class="btn btn-secondary" onclick="addProfileCustomField(${profile.id})" style="display: none;">
                             + Add Custom Field
                         </button>
                     </div>
 
-                    <div class="profile-actions">
-                        <button class="btn btn-danger" onclick="deleteProfile(${profile.id})">
+                    <div class="profile-actions" style="display: none;">
+                        <button class="btn btn-danger" onclick="deleteProfile(${profile.id})" style="display: none;">
                             Delete Profile
                         </button>
                     </div>
@@ -2970,12 +2865,9 @@
             account.balance = document.getElementById('modalBalance').value;
             account.primaryAccess = document.getElementById('modalPrimaryAccess').value;
             account.accountType = document.getElementById('modalAccountType').value;
-            // Billing is read-only, don't update it
+            account.billing = document.getElementById('modalBilling').value;
             account.proxy = document.getElementById('modalProxy').value;
             account.provider = document.getElementById('modalProvider').value;
-            
-            // Update the updatedAt timestamp
-            account.updatedAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
             // Save Profiles data
             const profiles = accountProfiles[currentAccountId] || [];
@@ -3153,7 +3045,7 @@
             document.getElementById('addAccountName').value = '';
             document.getElementById('addAccountAssets').value = '';
             document.getElementById('addAccountAccountId').value = '';
-            document.getElementById('addAccountPay').value = 'cc'; // Set to lowercase 'cc' to match option value
+            document.getElementById('addAccountPay').value = 'CC';
             document.getElementById('addAccountClient').value = '';
             document.getElementById('addAccountContract').value = 'one-time';
             document.getElementById('contractField').style.display = 'none';
@@ -3289,13 +3181,11 @@
             document.getElementById('tagFilter').value = '';
             document.getElementById('assetTypeFilter').value = '';
             document.getElementById('balanceTypeFilter').value = '';
-            document.getElementById('contractFilter').value = '';
             
             // Trigger change events to update the table
             document.getElementById('tagFilter').dispatchEvent(new Event('change'));
             document.getElementById('assetTypeFilter').dispatchEvent(new Event('change'));
             document.getElementById('balanceTypeFilter').dispatchEvent(new Event('change'));
-            document.getElementById('contractFilter').dispatchEvent(new Event('change'));
         }
 
         function clearAllFilters() {
@@ -3303,7 +3193,6 @@
             document.getElementById('searchInput').value = '';
             document.getElementById('platformFilter').value = '';
             document.getElementById('statusFilter').value = '';
-            document.getElementById('assignedFilter').value = '';
             
             // Clear more filters
             clearMoreFilters();
@@ -3398,19 +3287,11 @@
         });
 
         // Additional filters (from More Filters modal)
-        document.getElementById('assignedFilter').addEventListener('change', function(e) {
-            applyAllFilters();
-        });
-
         document.getElementById('assetTypeFilter').addEventListener('change', function(e) {
             applyAllFilters();
         });
 
         document.getElementById('balanceTypeFilter').addEventListener('change', function(e) {
-            applyAllFilters();
-        });
-
-        document.getElementById('contractFilter').addEventListener('change', function(e) {
             applyAllFilters();
         });
 
@@ -3423,10 +3304,8 @@
             const searchTerm = document.getElementById('searchInput').value.toLowerCase();
             const platform = document.getElementById('platformFilter').value.toLowerCase();
             const status = document.getElementById('statusFilter').value.toLowerCase();
-            const assigned = document.getElementById('assignedFilter').value.toLowerCase();
             const assetType = document.getElementById('assetTypeFilter').value.toLowerCase();
             const balanceType = document.getElementById('balanceTypeFilter').value.toLowerCase();
-            const contract = document.getElementById('contractFilter').value.toLowerCase();
             const tag = document.getElementById('tagFilter').value.toLowerCase();
 
             // Save filter preferences to sessionStorage
@@ -3451,27 +3330,6 @@
                     show = false;
                 }
 
-                // Assigned filter
-                if (assigned) {
-                    const rowAssigned = row.getAttribute('data-assigned');
-                    if (assigned === 'assigned') {
-                        // Show only assigned accounts (anything that's not 'unassigned')
-                        if (rowAssigned === 'unassigned' || !rowAssigned) {
-                            show = false;
-                        }
-                    } else if (assigned === 'unassigned') {
-                        // Show only unassigned accounts
-                        if (rowAssigned !== 'unassigned') {
-                            show = false;
-                        }
-                    } else {
-                        // Show specific client (client-a, client-b, etc.)
-                        if (rowAssigned !== assigned) {
-                            show = false;
-                        }
-                    }
-                }
-
                 // Asset type filter
                 if (assetType && row.getAttribute('data-asset') !== assetType) {
                     show = false;
@@ -3479,11 +3337,6 @@
 
                 // Balance type filter
                 if (balanceType && row.getAttribute('data-balance') !== balanceType) {
-                    show = false;
-                }
-
-                // Contract filter
-                if (contract && row.getAttribute('data-contract') !== contract) {
                     show = false;
                 }
 
@@ -3503,10 +3356,8 @@
                 searchTerm: document.getElementById('searchInput').value,
                 platform: document.getElementById('platformFilter').value,
                 status: document.getElementById('statusFilter').value,
-                assigned: document.getElementById('assignedFilter').value,
                 assetType: document.getElementById('assetTypeFilter').value,
                 balanceType: document.getElementById('balanceTypeFilter').value,
-                contract: document.getElementById('contractFilter').value,
                 tag: document.getElementById('tagFilter').value
             };
             
@@ -3535,10 +3386,8 @@
                     if (preferences.searchTerm) document.getElementById('searchInput').value = preferences.searchTerm;
                     if (preferences.platform) document.getElementById('platformFilter').value = preferences.platform;
                     if (preferences.status) document.getElementById('statusFilter').value = preferences.status;
-                    if (preferences.assigned) document.getElementById('assignedFilter').value = preferences.assigned;
                     if (preferences.assetType) document.getElementById('assetTypeFilter').value = preferences.assetType;
                     if (preferences.balanceType) document.getElementById('balanceTypeFilter').value = preferences.balanceType;
-                    if (preferences.contract) document.getElementById('contractFilter').value = preferences.contract;
                     if (preferences.tag) document.getElementById('tagFilter').value = preferences.tag;
                     
                     // Apply filters

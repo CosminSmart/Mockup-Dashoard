@@ -1,5 +1,29 @@
 // Sidebar role switcher functionality
 
+// Check client status on page load (for clients only)
+function checkClientStatus() {
+    const currentRole = getCurrentRole();
+    if (currentRole === 'client') {
+        const userEmail = localStorage.getItem('userEmail');
+        if (userEmail) {
+            const clientStatus = localStorage.getItem('clientStatus_' + userEmail);
+            if (clientStatus === 'Maintenance') {
+                window.location.href = '../maintenance.html';
+            } else if (clientStatus === 'Inactive') {
+                alert('❌ Your account has been deactivated. Please contact support.');
+                localStorage.removeItem('userRole');
+                localStorage.removeItem('userEmail');
+                window.location.href = '../login.html';
+            }
+        }
+    }
+}
+
+// Run status check on page load
+if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', checkClientStatus);
+}
+
 // Get current role from URL or localStorage
 function getCurrentRole() {
     const path = window.location.pathname;
@@ -20,7 +44,7 @@ function getCurrentPage() {
 const navigationItems = {
     admin: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
-        { name: 'Users', page: 'users', icon: '👥' },
+        { name: 'Users', page: 'clients', icon: '👥' },
         { name: 'Accounts', page: 'accounts', icon: '💳' },
         { name: 'Finance', page: 'finance', icon: '💰' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
@@ -38,6 +62,7 @@ const navigationItems = {
     ],
     client: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
+        { name: 'Accounts', page: 'accounts', icon: '💳' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
         { name: 'Transactions', page: 'transactions', icon: '💰' },
         { name: 'Teams', page: 'users', icon: '👥' },

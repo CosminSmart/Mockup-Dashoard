@@ -285,10 +285,7 @@
 
         <!-- SWITCHER -->
         <div class="um-switcher um-switcher--top" role="tablist" aria-label="Clients/Employees Switcher">
-          <button class="um-tab is-active" type="button" data-top-tab="all-clients" role="tab" aria-selected="true">
-            All Clients
-          </button>
-          <button class="um-tab" type="button" data-top-tab="clients" role="tab" aria-selected="false">
+          <button class="um-tab is-active" type="button" data-top-tab="clients" role="tab" aria-selected="true">
             Clients
           </button>
           <button class="um-tab" type="button" data-top-tab="employees" role="tab" aria-selected="false">
@@ -297,6 +294,143 @@
         </div>
 
         <h2>Platforms & Fees</h2>
+
+        <!-- Clients Dropdown Menu -->
+        <div class="um-dropdown-compact" id="clientsDropdown">
+          <button class="um-dropdown-toggle" id="clientsDropdownToggle">
+            <span class="um-dropdown-current">Platforms & Fees</span>
+            <span class="um-dropdown-arrow">▾</span>
+          </button>
+          <div class="um-dropdown-menu" id="clientsDropdownMenu" style="display: none;">
+            <button class="um-dropdown-item" data-client-view="clients">
+              <span>Clients List</span>
+              <span class="um-dropdown-desc">Manage individual clients</span>
+            </button>
+            <button class="um-dropdown-item is-active" data-client-view="all-clients">
+              <span>Platforms & Fees</span>
+              <span class="um-dropdown-desc">View all clients with platforms & fees</span>
+            </button>
+            <button class="um-dropdown-item" data-client-view="notifications">
+              <span>Clients Notifications</span>
+              <span class="um-dropdown-desc">Send notifications to clients</span>
+            </button>
+          </div>
+        </div>
+
+        <style>
+          .um-dropdown-compact {
+            position: relative;
+            margin-top: 12px;
+            margin-bottom: 16px;
+          }
+
+          .um-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a202c;
+            width: 280px;
+            transition: all 0.15s;
+          }
+
+          .um-dropdown-toggle:hover {
+            border-color: rgba(0,0,0,0.20);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          }
+
+          .um-dropdown-arrow {
+            font-size: 12px;
+            opacity: 0.6;
+            transition: transform 0.2s;
+          }
+
+          .um-dropdown-toggle.is-open .um-dropdown-arrow {
+            transform: rotate(180deg);
+          }
+
+          .um-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 100;
+            min-width: 320px;
+          }
+
+          .um-dropdown-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 12px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s;
+          }
+
+          .um-dropdown-item:hover {
+            background: rgba(0,0,0,0.04);
+          }
+
+          .um-dropdown-item.is-active {
+            background: rgba(0,0,0,0.06);
+          }
+
+          .um-dropdown-item span:first-child {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a202c;
+          }
+
+          .um-dropdown-desc {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 400;
+          }
+        </style>
+
+        <script>
+          // Toggle dropdown
+          const dropdownToggle = document.getElementById('clientsDropdownToggle');
+          const dropdownMenu = document.getElementById('clientsDropdownMenu');
+
+          dropdownToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownMenu.style.display !== 'none';
+            dropdownMenu.style.display = isOpen ? 'none' : 'block';
+            dropdownToggle.classList.toggle('is-open', !isOpen);
+          });
+
+          // Close dropdown when clicking outside
+          document.addEventListener('click', () => {
+            if (dropdownMenu) {
+              dropdownMenu.style.display = 'none';
+              dropdownToggle?.classList.remove('is-open');
+            }
+          });
+
+          // Prevent closing when clicking inside menu
+          dropdownMenu?.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+        </script>
+
         <p class="um-small">
           Global settings or client-specific overrides.
           If <b>Assigned Client</b> is empty, the row applies to <b>All Clients</b>.
@@ -579,9 +713,22 @@
     document.querySelectorAll(".um-switcher--top .um-tab").forEach(btn => {
       btn.addEventListener("click", () => {
         const t = btn.dataset.topTab;
-        if (t === "clients") window.location.href = "clients.html";
         if (t === "employees") window.location.href = "users.html";
-        if (t === "all-clients") window.location.href = "all-clients.html";
+      });
+    });
+
+    // Handle dropdown item clicks
+    document.querySelectorAll('[data-client-view]').forEach(item => {
+      item.addEventListener('click', () => {
+        const view = item.dataset.clientView;
+        
+        if (view === 'all-clients') {
+          window.location.href = 'all-clients.html';
+        } else if (view === 'clients') {
+          window.location.href = 'clients.html';
+        } else if (view === 'notifications') {
+          window.location.href = 'users.html?view=notifications';
+        }
       });
     });
   </script>

@@ -28,9 +28,6 @@
 
         <!-- SWITCHER -->
         <div class="um-switcher um-switcher--top" role="tablist" aria-label="Clients/Employees Switcher">
-            <button class="um-tab" type="button" data-top-tab="all-clients" role="tab">
-              All Clients
-            </button>
           <button class="um-tab is-active" type="button" data-tab="clients" role="tab" aria-selected="true">
             Clients
           </button>
@@ -40,6 +37,143 @@
         </div>
 
         <h2>Clients</h2>
+
+        <!-- Clients Dropdown Menu -->
+        <div class="um-dropdown-compact" id="clientsDropdown">
+          <button class="um-dropdown-toggle" id="clientsDropdownToggle">
+            <span class="um-dropdown-current">Clients List</span>
+            <span class="um-dropdown-arrow">▾</span>
+          </button>
+          <div class="um-dropdown-menu" id="clientsDropdownMenu" style="display: none;">
+            <button class="um-dropdown-item is-active" data-client-view="clients">
+              <span>Clients List</span>
+              <span class="um-dropdown-desc">Manage individual clients</span>
+            </button>
+            <button class="um-dropdown-item" data-client-view="all-clients">
+              <span>Platforms & Fees</span>
+              <span class="um-dropdown-desc">View all clients with platforms & fees</span>
+            </button>
+            <button class="um-dropdown-item" data-client-view="notifications">
+              <span>Clients Notifications</span>
+              <span class="um-dropdown-desc">Send notifications to clients</span>
+            </button>
+          </div>
+        </div>
+
+        <style>
+          .um-dropdown-compact {
+            position: relative;
+            margin-top: 12px;
+            margin-bottom: 16px;
+          }
+
+          .um-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a202c;
+            width: 280px;
+            transition: all 0.15s;
+          }
+
+          .um-dropdown-toggle:hover {
+            border-color: rgba(0,0,0,0.20);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          }
+
+          .um-dropdown-arrow {
+            font-size: 12px;
+            opacity: 0.6;
+            transition: transform 0.2s;
+          }
+
+          .um-dropdown-toggle.is-open .um-dropdown-arrow {
+            transform: rotate(180deg);
+          }
+
+          .um-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 100;
+            min-width: 320px;
+          }
+
+          .um-dropdown-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 12px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s;
+          }
+
+          .um-dropdown-item:hover {
+            background: rgba(0,0,0,0.04);
+          }
+
+          .um-dropdown-item.is-active {
+            background: rgba(0,0,0,0.06);
+          }
+
+          .um-dropdown-item span:first-child {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a202c;
+          }
+
+          .um-dropdown-desc {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 400;
+          }
+        </style>
+
+        <script>
+          // Toggle dropdown
+          const dropdownToggle = document.getElementById('clientsDropdownToggle');
+          const dropdownMenu = document.getElementById('clientsDropdownMenu');
+
+          dropdownToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownMenu.style.display !== 'none';
+            dropdownMenu.style.display = isOpen ? 'none' : 'block';
+            dropdownToggle.classList.toggle('is-open', !isOpen);
+          });
+
+          // Close dropdown when clicking outside
+          document.addEventListener('click', () => {
+            if (dropdownMenu) {
+              dropdownMenu.style.display = 'none';
+              dropdownToggle?.classList.remove('is-open');
+            }
+          });
+
+          // Prevent closing when clicking inside menu
+          dropdownMenu?.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+        </script>
+
         <p>Manage your clients list and details.</p>
 
         <section class="um-view is-active">
@@ -102,7 +236,14 @@
                   <td>TechVision Corp</td>
                   <td>@sarah_mitchell</td>
                   <td>sarah.mitchell@techvision.com</td>
-                  <td><span class="um-badge um-badge--green">Active</span></td>
+                  <td>
+                    <select class="um-select client-status-select" data-client-id="C-2001" data-client-email="sarah.mitchell@techvision.com" style="padding: 6px 10px; font-size: 13px; min-width: 130px;">
+                      <option value="Active" selected>Active</option>
+                      <option value="Pending">Pending</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Maintenance">Maintenance</option>
+                    </select>
+                  </td>
                   <td>2026-01-12</td>
                   <td style="text-align:right;">
                     <button class="um-btn um-btn--ghost" type="button" data-view>View</button>
@@ -128,7 +269,14 @@
                   <td>BrightLabs</td>
                   <td>@michael_chen</td>
                   <td>michael.chen@brightlabs.io</td>
-                  <td><span class="um-badge um-badge--gray">Pending</span></td>
+                  <td>
+                    <select class="um-select client-status-select" data-client-id="C-2002" data-client-email="michael.chen@brightlabs.io" style="padding: 6px 10px; font-size: 13px; min-width: 130px;">
+                      <option value="Active">Active</option>
+                      <option value="Pending" selected>Pending</option>
+                      <option value="Inactive">Inactive</option>
+                      <option value="Maintenance">Maintenance</option>
+                    </select>
+                  </td>
                   <td>2026-01-20</td>
                   <td style="text-align:right;">
                     <button class="um-btn um-btn--ghost" type="button" data-view>View</button>
@@ -144,13 +292,96 @@
     </main>
   </div>
 
+  <!-- Confirmation Modal for Maintenance Status -->
+  <div class="um-overlay" id="maintenanceModalOverlay" hidden></div>
+  <div class="um-modal" id="maintenanceModal" hidden>
+    <div class="um-modal__content">
+      <h3 class="um-modal__title">Set Client to Maintenance?</h3>
+      <p class="um-modal__message">
+        Client will not be able to access the platform.
+      </p>
+      <p class="um-modal__client-info" id="modalClientInfo"></p>
+      <div class="um-modal__actions">
+        <button class="um-btn um-btn--ghost" type="button" id="modalCancelBtn">Cancel</button>
+        <button class="um-btn" type="button" id="modalConfirmBtn">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .um-modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1001;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      max-width: 420px;
+      width: 90%;
+    }
+
+    .um-modal__content {
+      padding: 24px;
+    }
+
+    .um-modal__title {
+      font-size: 18px;
+      font-weight: 800;
+      color: #1a202c;
+      margin-bottom: 10px;
+    }
+
+    .um-modal__message {
+      font-size: 14px;
+      color: #64748b;
+      margin-bottom: 12px;
+    }
+
+    .um-modal__client-info {
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a202c;
+    }
+
+    .um-modal__actions {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 520px) {
+      .um-modal__content {
+        padding: 20px;
+      }
+    }
+  </style>
+
   <script>
     // Switcher redirect: Employees -> users.html
     document.querySelectorAll(".um-switcher--top .um-tab").forEach(btn => {
       btn.addEventListener("click", () => {
         if (btn.dataset.tab === "employees") window.location.href = "users.html";
-        if (btn.dataset.topTab === "all-clients") window.location.href = "all-clients.html";
+      });
+    });
 
+    // Handle dropdown item clicks
+    document.querySelectorAll('[data-client-view]').forEach(item => {
+      item.addEventListener('click', () => {
+        const view = item.dataset.clientView;
+        
+        if (view === 'all-clients') {
+          window.location.href = 'all-clients.html';
+        } else if (view === 'clients') {
+          window.location.href = 'clients.html';
+        } else if (view === 'notifications') {
+          window.location.href = 'users.html?view=notifications';
+        }
       });
     });
 
@@ -258,6 +489,157 @@
     });
 
     applyFilters();
+  </script>
+
+  <script>
+    // ===== Maintenance Modal =====
+    const maintenanceModal = document.getElementById('maintenanceModal');
+    const maintenanceModalOverlay = document.getElementById('maintenanceModalOverlay');
+    const modalClientInfo = document.getElementById('modalClientInfo');
+    const modalCancelBtn = document.getElementById('modalCancelBtn');
+    const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+    
+    let pendingStatusChange = null;
+
+    function showMaintenanceModal(clientId, clientName, onConfirm, onCancel) {
+      modalClientInfo.textContent = `Client: ${clientName} (${clientId})`;
+      maintenanceModalOverlay.hidden = false;
+      maintenanceModal.hidden = false;
+      
+      // Store callbacks
+      pendingStatusChange = { onConfirm, onCancel };
+    }
+
+    function hideMaintenanceModal() {
+      maintenanceModalOverlay.hidden = true;
+      maintenanceModal.hidden = true;
+      pendingStatusChange = null;
+    }
+
+    modalCancelBtn.addEventListener('click', () => {
+      if (pendingStatusChange && pendingStatusChange.onCancel) {
+        pendingStatusChange.onCancel();
+      }
+      hideMaintenanceModal();
+    });
+
+    modalConfirmBtn.addEventListener('click', () => {
+      if (pendingStatusChange && pendingStatusChange.onConfirm) {
+        pendingStatusChange.onConfirm();
+      }
+      hideMaintenanceModal();
+    });
+
+    maintenanceModalOverlay.addEventListener('click', () => {
+      if (pendingStatusChange && pendingStatusChange.onCancel) {
+        pendingStatusChange.onCancel();
+      }
+      hideMaintenanceModal();
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !maintenanceModal.hidden) {
+        if (pendingStatusChange && pendingStatusChange.onCancel) {
+          pendingStatusChange.onCancel();
+        }
+        hideMaintenanceModal();
+      }
+    });
+
+    // ===== Client Status Change Handler =====
+    document.querySelectorAll('.client-status-select').forEach(select => {
+      select.addEventListener('change', function() {
+        const clientId = this.dataset.clientId;
+        const clientEmail = this.dataset.clientEmail;
+        const newStatus = this.value;
+        const oldStatus = this.dataset.oldStatus || this.value;
+        
+        // Store old status for potential rollback
+        this.dataset.oldStatus = oldStatus;
+        
+        // Get client name from the row
+        const row = this.closest('tr');
+        const clientName = row ? row.children[1]?.textContent : clientId;
+        
+        // Only confirm if changing to Maintenance
+        if (newStatus === 'Maintenance') {
+          showMaintenanceModal(
+            clientId,
+            clientName,
+            // onConfirm
+            () => {
+              applyStatusChange(this, clientId, clientEmail, newStatus, row);
+            },
+            // onCancel
+            () => {
+              this.value = oldStatus;
+            }
+          );
+        } else {
+          // Apply change immediately for other statuses
+          applyStatusChange(this, clientId, clientEmail, newStatus, row);
+        }
+      });
+      
+      // Set initial styling
+      select.style.background = getStatusColor(select.value);
+      select.style.color = '#000';
+      select.style.fontWeight = '700';
+      select.dataset.oldStatus = select.value;
+    });
+    
+    function applyStatusChange(selectElement, clientId, clientEmail, newStatus, row) {
+      // Save status to localStorage
+      if (clientEmail) {
+        localStorage.setItem('clientStatus_' + clientEmail, newStatus);
+      }
+      
+      // Update the data-status attribute on the row
+      if (row) {
+        row.dataset.status = newStatus;
+      }
+      
+      // Update stored client data
+      const storedClient = localStorage.getItem('client:' + clientId);
+      if (storedClient) {
+        try {
+          const clientData = JSON.parse(storedClient);
+          clientData.status = newStatus;
+          localStorage.setItem('client:' + clientId, JSON.stringify(clientData));
+        } catch (e) {
+          console.error('Error updating client data:', e);
+        }
+      }
+      
+      // Update old status for next change
+      selectElement.dataset.oldStatus = newStatus;
+      
+      // Show success message
+      const statusMessages = {
+        'Active': '✅ Client activated successfully',
+        'Pending': '⏳ Client set to pending approval',
+        'Inactive': '❌ Client deactivated',
+        'Maintenance': '🔧 Client account set to maintenance mode'
+      };
+      
+      alert(statusMessages[newStatus] || 'Status updated');
+      
+      // Style the select based on status
+      selectElement.style.background = getStatusColor(newStatus);
+      selectElement.style.color = '#000';
+      selectElement.style.fontWeight = '700';
+    }
+    
+    function getStatusColor(status) {
+      switch(status) {
+        case 'Active': return 'rgba(0,160,120,0.15)';
+        case 'Pending': return 'rgba(0,0,0,0.06)';
+        case 'Inactive': return 'rgba(0,0,0,0.10)';
+        case 'Maintenance': return 'rgba(255,152,0,0.15)';
+        default: return '#fff';
+      }
+    }
   </script>
 
   <script src="../js/sidebar.js"></script>

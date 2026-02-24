@@ -29,9 +29,6 @@
 
         <!-- TOP SWITCHER: Clients / Employees -->
         <div class="um-switcher um-switcher--top" role="tablist" aria-label="Clients/Employees Switcher">
-            <button class="um-tab" type="button" data-top-tab="all-clients" role="tab">
-              All Clients
-            </button>
           <button class="um-tab" type="button" data-top-tab="clients" role="tab">
             Clients
           </button>
@@ -40,8 +37,119 @@
           </button>
         </div>
 
-        <h2>Employees</h2>
-        <p>Manage clients, employees, and administrators.</p>
+        <h2 id="pageTitle">Employees</h2>
+
+        <!-- Clients Dropdown Menu (hidden by default, shown for notifications) -->
+        <div class="um-dropdown-compact" id="clientsDropdown" style="display: none;">
+          <button class="um-dropdown-toggle" id="clientsDropdownToggle">
+            <span class="um-dropdown-current">Clients Notifications</span>
+            <span class="um-dropdown-arrow">▾</span>
+          </button>
+          <div class="um-dropdown-menu" id="clientsDropdownMenu" style="display: none;">
+            <button class="um-dropdown-item" data-client-view="clients">
+              <span>Clients List</span>
+              <span class="um-dropdown-desc">Manage individual clients</span>
+            </button>
+            <button class="um-dropdown-item" data-client-view="all-clients">
+              <span>Platforms & Fees</span>
+              <span class="um-dropdown-desc">View all clients with platforms & fees</span>
+            </button>
+            <button class="um-dropdown-item is-active" data-client-view="notifications">
+              <span>Clients Notifications</span>
+              <span class="um-dropdown-desc">Send notifications to clients</span>
+            </button>
+          </div>
+        </div>
+
+        <style>
+          .um-dropdown-compact {
+            position: relative;
+            margin-top: 12px;
+            margin-bottom: 16px;
+          }
+
+          .um-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a202c;
+            width: 280px;
+            transition: all 0.15s;
+          }
+
+          .um-dropdown-toggle:hover {
+            border-color: rgba(0,0,0,0.20);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          }
+
+          .um-dropdown-arrow {
+            font-size: 12px;
+            opacity: 0.6;
+            transition: transform 0.2s;
+          }
+
+          .um-dropdown-toggle.is-open .um-dropdown-arrow {
+            transform: rotate(180deg);
+          }
+
+          .um-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 100;
+            min-width: 320px;
+          }
+
+          .um-dropdown-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 12px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s;
+          }
+
+          .um-dropdown-item:hover {
+            background: rgba(0,0,0,0.04);
+          }
+
+          .um-dropdown-item.is-active {
+            background: rgba(0,0,0,0.06);
+          }
+
+          .um-dropdown-item span:first-child {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a202c;
+          }
+
+          .um-dropdown-desc {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 400;
+          }
+        </style>
+
+        <p id="pageDescription">Manage clients, employees, and administrators.</p>
 
         <!-- ACTIONS -->
         <div class="um-switcher" role="tablist" aria-label="Users Actions">
@@ -139,6 +247,127 @@
                   </td>
                 </tr>
 
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- VIEW: CLIENTS NOTIFICATIONS -->
+        <section id="tab-clients-notifications" class="um-view">
+          <div class="um-filters">
+            <div class="um-filters__left">
+              <input type="text" class="um-input" placeholder="Search by client name or notification type...">
+            </div>
+            <div class="um-filters__right">
+              <select class="um-select">
+                <option value="">All Types</option>
+                <option value="info">Info</option>
+                <option value="warning">Warning</option>
+                <option value="alert">Alert</option>
+                <option value="news">News</option>
+              </select>
+              <select class="um-select">
+                <option value="">All Status</option>
+                <option value="sent">Sent</option>
+                <option value="pending">Pending</option>
+                <option value="read">Read</option>
+              </select>
+              <button class="um-btn" type="button" id="openAddNotification" style="padding: 10px 16px; font-size: 14px; font-weight: 700; background: #0078ff; color: #fff; border-color: #0078ff; box-shadow: 0 2px 8px rgba(0,120,255,0.20);">+ Create Notification</button>
+            </div>
+          </div>
+
+          <div class="um-table-wrap">
+            <table class="um-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Client Name</th>
+                  <th>Type</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                  <th>Status</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                <tr>
+                  <td>#N-5001</td>
+                  <td>Sarah Mitchell</td>
+                  <td><span class="um-badge" style="background: rgba(0,120,255,0.10);">Info</span></td>
+                  <td>Your account has been approved and is now active</td>
+                  <td>2026-02-23 14:32</td>
+                  <td><span class="um-badge um-badge--green">Read</span></td>
+                  <td style="text-align:right;">
+                    <button class="um-btn um-btn--ghost" type="button">View</button>
+                    <button class="um-btn um-btn--ghost" type="button">Delete</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>#N-5002</td>
+                  <td>Michael Chen</td>
+                  <td><span class="um-badge" style="background: rgba(255,193,7,0.10);">Warning</span></td>
+                  <td>Your wallet balance is below 100 USD threshold</td>
+                  <td>2026-02-23 11:20</td>
+                  <td><span class="um-badge um-badge--green">Read</span></td>
+                  <td style="text-align:right;">
+                    <button class="um-btn um-btn--ghost" type="button">View</button>
+                    <button class="um-btn um-btn--ghost" type="button">Delete</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>#N-5003</td>
+                  <td>Emily Rodriguez</td>
+                  <td><span class="um-badge" style="background: rgba(156,39,176,0.10);">News</span></td>
+                  <td>Your top-up request TU-120450 has been processed</td>
+                  <td>2026-02-23 09:15</td>
+                  <td><span class="um-badge um-badge--gray">Sent</span></td>
+                  <td style="text-align:right;">
+                    <button class="um-btn um-btn--ghost" type="button">View</button>
+                    <button class="um-btn um-btn--ghost" type="button">Delete</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>#N-5004</td>
+                  <td>Sarah Mitchell</td>
+                  <td><span class="um-badge" style="background: rgba(244,67,54,0.10);">Alert</span></td>
+                  <td>Unusual activity detected on your account</td>
+                  <td>2026-02-22 16:45</td>
+                  <td><span class="um-badge um-badge--gray">Sent</span></td>
+                  <td style="text-align:right;">
+                    <button class="um-btn um-btn--ghost" type="button">View</button>
+                    <button class="um-btn um-btn--ghost" type="button">Delete</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>#N-5005</td>
+                  <td>Michael Chen</td>
+                  <td><span class="um-badge" style="background: rgba(0,120,255,0.10);">Info</span></td>
+                  <td>New marketplace service available for your account</td>
+                  <td>2026-02-22 10:30</td>
+                  <td><span class="um-badge um-badge--gray">Pending</span></td>
+                  <td style="text-align:right;">
+                    <button class="um-btn um-btn--ghost" type="button">View</button>
+                    <button class="um-btn um-btn--ghost" type="button">Delete</button>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>#N-5006</td>
+                  <td>Emily Rodriguez</td>
+                  <td><span class="um-badge" style="background: rgba(156,39,176,0.10);">News</span></td>
+                  <td>Monthly income report for February is ready</td>
+                  <td>2026-02-21 08:00</td>
+                  <td><span class="um-badge um-badge--green">Read</span></td>
+                  <td style="text-align:right;">
+                    <button class="um-btn um-btn--ghost" type="button">View</button>
+                    <button class="um-btn um-btn--ghost" type="button">Delete</button>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
@@ -378,13 +607,87 @@
   </aside>
 
   <script>
+    // ========= Dropdown functionality =========
+    const clientsDropdown = document.getElementById('clientsDropdown');
+    const dropdownToggle = document.getElementById('clientsDropdownToggle');
+    const dropdownMenu = document.getElementById('clientsDropdownMenu');
+
+    // Toggle dropdown
+    dropdownToggle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = dropdownMenu.style.display !== 'none';
+      dropdownMenu.style.display = isOpen ? 'none' : 'block';
+      dropdownToggle.classList.toggle('is-open', !isOpen);
+    });
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', () => {
+      if (dropdownMenu) {
+        dropdownMenu.style.display = 'none';
+        dropdownToggle?.classList.remove('is-open');
+      }
+    });
+
+    // Prevent closing when clicking inside menu
+    dropdownMenu?.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    // Handle dropdown item clicks
+    document.querySelectorAll('[data-client-view]').forEach(item => {
+      item.addEventListener('click', () => {
+        const view = item.dataset.clientView;
+        
+        if (view === 'all-clients') {
+          window.location.href = 'all-clients.html';
+        } else if (view === 'clients') {
+          window.location.href = 'clients.html';
+        } else if (view === 'notifications') {
+          window.location.href = 'users.html?view=notifications';
+        }
+      });
+    });
+
     // ========= Top switcher: Clients / Employees =========
     document.querySelectorAll("[data-top-tab]").forEach(btn => {
       btn.addEventListener("click", () => {
-        if (btn.dataset.topTab === "clients") window.location.href = "clients.html";
-        if (btn.dataset.topTab === "all-clients") window.location.href = "all-clients.html";
-
+        const tab = btn.dataset.topTab;
+        
+        if (tab === "clients") {
+          window.location.href = "clients.html";
+          return;
+        }
+        
+        if (tab === "employees") {
+          // Redirect to clean employees page
+          window.location.href = "users.html";
+        }
       });
+    });
+
+    // Check if we should show clients-notifications on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      
+      if (urlParams.get("view") === "notifications") {
+        // Show notifications view
+        document.querySelectorAll("[data-top-tab]").forEach(b => b.classList.remove("is-active"));
+        document.querySelector("[data-top-tab='clients']")?.classList.add("is-active");
+        
+        // Show dropdown
+        if (clientsDropdown) {
+          clientsDropdown.style.display = 'block';
+        }
+        
+        document.querySelectorAll(".um-view").forEach(v => v.classList.remove("is-active"));
+        document.getElementById("tab-clients-notifications").classList.add("is-active");
+        
+        // Update title and description
+        document.getElementById("pageTitle").textContent = "Clients Notifications";
+        document.getElementById("pageDescription").textContent = "Send and manage notifications to clients.";
+        
+        document.getElementById("openAddEmployee").parentElement.style.display = "none";
+      }
     });
   </script>
 
@@ -731,6 +1034,245 @@
     // init
     aeApplyRoleRules();
     aeValidate();
+  </script>
+
+  <!-- OVERLAY: Add Notification Drawer -->
+  <div class="um-overlay" id="notifOverlay" hidden></div>
+
+  <!-- RIGHT DRAWER: Add Notification -->
+  <aside class="um-drawer" id="notifDrawer" aria-hidden="true">
+    <div class="um-drawer__header">
+      <div>
+        <div class="um-drawer__title">Create Notification</div>
+        <div class="um-drawer__subtitle">Send notification to clients</div>
+      </div>
+
+      <div class="um-drawer__actions">
+        <button class="um-btn um-btn--icon" type="button" id="notifCloseBtn" aria-label="Close">✕</button>
+      </div>
+    </div>
+
+    <div class="um-drawer__body">
+      <div class="um-card">
+        <div class="um-card__title">Notification Details</div>
+
+        <div class="ae-grid">
+          <div class="ae-field" style="grid-column: 1 / -1;">
+            <label>Title</label>
+            <input id="notifTitle" type="text" placeholder="e.g. Important Account Update">
+          </div>
+
+          <div class="ae-field" style="grid-column: 1 / -1;">
+            <label>Description</label>
+            <textarea id="notifDescription" rows="4" style="width:100%; border:1px solid rgba(0,0,0,0.14); border-radius:12px; padding:10px 12px; outline:0; background:#fff; font-size:14px; font-family:inherit; resize:vertical;" placeholder="Enter notification description..."></textarea>
+          </div>
+
+          <div class="ae-field" style="grid-column: 1 / -1;">
+            <label>Notification Type</label>
+            <select id="notifType">
+              <option value="info">Info</option>
+              <option value="warning">Warning</option>
+              <option value="alert">Alert</option>
+              <option value="news">News</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="um-card">
+        <div class="um-card__title">Recipients</div>
+        <div class="ae-sub">Select who should receive this notification</div>
+
+        <div style="margin-top: 12px;">
+          <label style="display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid rgba(0,0,0,0.10); border-radius:12px; background:rgba(0,0,0,0.02); cursor:pointer; margin-bottom:12px;">
+            <input type="radio" name="notifRecipient" value="all" id="notifRecipientAll" checked style="width:16px; height:16px;">
+            <span style="font-weight:700; font-size:14px;">Send to All Clients</span>
+          </label>
+
+          <label style="display:flex; align-items:center; gap:8px; padding:10px 12px; border:1px solid rgba(0,0,0,0.10); border-radius:12px; background:rgba(0,0,0,0.02); cursor:pointer;">
+            <input type="radio" name="notifRecipient" value="specific" id="notifRecipientSpecific" style="width:16px; height:16px;">
+            <span style="font-weight:700; font-size:14px;">Send to Specific Clients</span>
+          </label>
+
+          <div id="notifClientSelector" style="margin-top:12px; display:none;">
+            <label style="display:block; font-size:12px; opacity:.75; font-weight:700; margin-bottom:8px;">Select Clients</label>
+            <input type="text" id="notifClientSearch" placeholder="Search clients..." style="width:100%; border:1px solid rgba(0,0,0,0.14); border-radius:12px; padding:10px 12px; outline:0; background:#fff; font-size:14px; margin-bottom:10px;">
+            <div style="border:1px solid rgba(0,0,0,0.10); border-radius:12px; padding:10px; background:#fff; max-height:200px; overflow-y:auto;" id="notifClientList">
+              <label style="display:flex; align-items:center; gap:8px; padding:8px; cursor:pointer; border-radius:8px;" class="notif-client-option" data-client-name="sarah mitchell techvision corp">
+                <input type="checkbox" class="notif-client-checkbox" value="U-1001" style="width:16px; height:16px;">
+                <span style="font-size:14px;">Sarah Mitchell (TechVision Corp)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; padding:8px; cursor:pointer; border-radius:8px;" class="notif-client-option" data-client-name="michael chen brightlabs">
+                <input type="checkbox" class="notif-client-checkbox" value="U-1002" style="width:16px; height:16px;">
+                <span style="font-size:14px;">Michael Chen (BrightLabs)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; padding:8px; cursor:pointer; border-radius:8px;" class="notif-client-option" data-client-name="emily rodriguez northpeak">
+                <input type="checkbox" class="notif-client-checkbox" value="U-1003" style="width:16px; height:16px;">
+                <span style="font-size:14px;">Emily Rodriguez (NorthPeak)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; padding:8px; cursor:pointer; border-radius:8px;" class="notif-client-option" data-client-name="alex martinez digital pro">
+                <input type="checkbox" class="notif-client-checkbox" value="U-1004" style="width:16px; height:16px;">
+                <span style="font-size:14px;">Alex Martinez (Digital Pro)</span>
+              </label>
+              <label style="display:flex; align-items:center; gap:8px; padding:8px; cursor:pointer; border-radius:8px;" class="notif-client-option" data-client-name="dana popescu marketing plus">
+                <input type="checkbox" class="notif-client-checkbox" value="U-1005" style="width:16px; height:16px;">
+                <span style="font-size:14px;">Dana Popescu (Marketing Plus)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="ae-note" style="margin-top:12px;">
+          <strong>Note:</strong> The notification will be sent immediately and appear in the recipients' notification panel.
+        </div>
+      </div>
+    </div>
+
+    <div class="ae-footer">
+      <button class="um-btn um-btn--ghost" type="button" id="notifCancel">Cancel</button>
+      <button class="um-btn" type="button" id="notifSend" disabled>Send Notification</button>
+    </div>
+  </aside>
+
+  <script>
+    // ========= Add Notification Drawer =========
+    const notifOverlay = document.getElementById("notifOverlay");
+    const notifDrawer = document.getElementById("notifDrawer");
+    const openAddNotification = document.getElementById("openAddNotification");
+    const notifCloseBtn = document.getElementById("notifCloseBtn");
+    const notifCancel = document.getElementById("notifCancel");
+    const notifSend = document.getElementById("notifSend");
+
+    const notifTitle = document.getElementById("notifTitle");
+    const notifDescription = document.getElementById("notifDescription");
+    const notifType = document.getElementById("notifType");
+    const notifRecipientAll = document.getElementById("notifRecipientAll");
+    const notifRecipientSpecific = document.getElementById("notifRecipientSpecific");
+    const notifClientSelector = document.getElementById("notifClientSelector");
+    const notifClientSearch = document.getElementById("notifClientSearch");
+
+    function notifOpen(){
+      notifOverlay.hidden = false;
+      notifDrawer.classList.add("is-open");
+      notifDrawer.setAttribute("aria-hidden", "false");
+    }
+
+    function notifClose(){
+      notifOverlay.hidden = true;
+      notifDrawer.classList.remove("is-open");
+      notifDrawer.setAttribute("aria-hidden", "true");
+      
+      // Reset form
+      notifTitle.value = "";
+      notifDescription.value = "";
+      notifType.value = "info";
+      notifRecipientAll.checked = true;
+      notifClientSelector.style.display = "none";
+      notifClientSearch.value = "";
+      document.querySelectorAll(".notif-client-checkbox").forEach(cb => cb.checked = false);
+      document.querySelectorAll(".notif-client-option").forEach(opt => opt.style.display = "flex");
+      notifValidate();
+    }
+
+    function notifValidate(){
+      const titleOk = notifTitle.value.trim().length > 0;
+      const descriptionOk = notifDescription.value.trim().length > 5;
+      
+      let recipientOk = false;
+      if (notifRecipientAll.checked) {
+        recipientOk = true;
+      } else if (notifRecipientSpecific.checked) {
+        const checkedClients = document.querySelectorAll(".notif-client-checkbox:checked");
+        recipientOk = checkedClients.length > 0;
+      }
+      
+      notifSend.disabled = !(titleOk && descriptionOk && recipientOk);
+    }
+
+    // Search functionality for clients
+    notifClientSearch?.addEventListener("input", (e) => {
+      const searchTerm = e.target.value.toLowerCase().trim();
+      const clientOptions = document.querySelectorAll(".notif-client-option");
+      
+      clientOptions.forEach(option => {
+        const clientName = option.dataset.clientName || "";
+        if (clientName.includes(searchTerm)) {
+          option.style.display = "flex";
+        } else {
+          option.style.display = "none";
+        }
+      });
+    });
+
+    // Toggle client selector visibility
+    notifRecipientAll?.addEventListener("change", () => {
+      if (notifRecipientAll.checked) {
+        notifClientSelector.style.display = "none";
+        notifValidate();
+      }
+    });
+
+    notifRecipientSpecific?.addEventListener("change", () => {
+      if (notifRecipientSpecific.checked) {
+        notifClientSelector.style.display = "block";
+        notifValidate();
+      }
+    });
+
+    // Validate when checkboxes change
+    document.querySelectorAll(".notif-client-checkbox").forEach(cb => {
+      cb.addEventListener("change", notifValidate);
+    });
+
+    // Hover effect for client options
+    document.querySelectorAll(".notif-client-option").forEach(opt => {
+      opt.addEventListener("mouseenter", () => {
+        opt.style.background = "rgba(0,0,0,0.04)";
+      });
+      opt.addEventListener("mouseleave", () => {
+        opt.style.background = "transparent";
+      });
+    });
+
+    openAddNotification?.addEventListener("click", notifOpen);
+    notifOverlay?.addEventListener("click", notifClose);
+    notifCloseBtn?.addEventListener("click", notifClose);
+    notifCancel?.addEventListener("click", notifClose);
+
+    [notifTitle, notifDescription].forEach(el => el?.addEventListener("input", notifValidate));
+
+    notifSend?.addEventListener("click", () => {
+      const recipients = notifRecipientAll.checked 
+        ? "all" 
+        : Array.from(document.querySelectorAll(".notif-client-checkbox:checked")).map(cb => cb.value);
+
+      const payload = {
+        title: notifTitle.value.trim(),
+        description: notifDescription.value.trim(),
+        type: notifType.value,
+        recipients: recipients,
+        date: new Date().toISOString()
+      };
+      
+      console.log("SEND NOTIFICATION (mock):", payload);
+      
+      const recipientText = recipients === "all" 
+        ? "all clients" 
+        : `${recipients.length} selected client(s)`;
+      
+      alert(`Notification sent to ${recipientText} (mock). Next step: persist to backend/Firebase and send to clients.`);
+      notifClose();
+    });
+
+    // Close notification drawer on Escape
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && notifDrawer.classList.contains("is-open")) {
+        notifClose();
+      }
+    });
+
+    // init
+    notifValidate();
   </script>
 
   <!-- Global Sidebar Script -->

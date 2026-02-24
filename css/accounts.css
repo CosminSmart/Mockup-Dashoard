@@ -511,7 +511,7 @@ th {
 /* ================= STATISTICS ================= */
 
 .statistics {
-    display: grid;
+    display: none;
     grid-template-columns: repeat(5, 1fr); /* 5 stat-box-uri: General Wallet, Individual Balances, Accounts, Spend, Status */
     gap: 0.75rem;
     margin-bottom: 1.5rem;

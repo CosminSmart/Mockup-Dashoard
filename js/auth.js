@@ -153,6 +153,25 @@ document.getElementById('loginForm').addEventListener('submit', function(e) {
             alert('❌ Employee account not found. Employee accounts are created by admin invitation only.');
             return;
         }
+    } else if (role === 'client') {
+        // Check client status (in real app, check against database)
+        // For demo, we'll check localStorage for a stored client status
+        const clientStatus = localStorage.getItem('clientStatus_' + email) || 'Active';
+        
+        if (clientStatus === 'Maintenance') {
+            // Store user info for maintenance page
+            localStorage.setItem('userEmail', email);
+            localStorage.setItem('userRole', role);
+            // Redirect to maintenance page
+            window.location.href = 'maintenance.html';
+            return;
+        } else if (clientStatus === 'Inactive') {
+            alert('❌ Your account is inactive. Please contact support for assistance.');
+            return;
+        } else if (clientStatus === 'Pending') {
+            alert('⏳ Your account is pending approval. Please wait for admin approval.');
+            return;
+        }
     }
     
     // Store user info

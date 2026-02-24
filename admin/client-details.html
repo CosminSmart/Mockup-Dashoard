@@ -327,6 +327,8 @@
                   <select class="um-select" id="statusInput">
                     <option value="Active">Active</option>
                     <option value="Pending">Pending</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Maintenance">Maintenance</option>
                   </select>
                 </div>
               </div>
@@ -557,8 +559,15 @@
     }
 
     function badge(status){
-      const isActive = (status || "").toLowerCase() === "active";
-      return `<span class="um-badge ${isActive ? "um-badge--green" : "um-badge--gray"}">${status || "—"}</span>`;
+      const s = (status || "").toLowerCase();
+      let badgeClass = "um-badge--gray";
+      
+      if (s === "active") badgeClass = "um-badge--green";
+      else if (s === "pending") badgeClass = "um-badge--gray";
+      else if (s === "inactive") badgeClass = "um-badge--gray";
+      else if (s === "maintenance") badgeClass = "um-badge" + ' style="background: rgba(255,152,0,0.10);"';
+      
+      return `<span class="um-badge ${badgeClass}">${status || "—"}</span>`;
     }
 
     function enabledBadge(isOn){
@@ -1033,6 +1042,11 @@
       client.phone = els.phoneInput.value.trim();
       client.country = els.countryInput.value.trim();
       client.status = els.statusInput.value;
+
+      // Save client status to localStorage for login validation
+      if (client.email) {
+        localStorage.setItem('clientStatus_' + client.email, client.status);
+      }
 
       persist();
       exitEdit(false);
