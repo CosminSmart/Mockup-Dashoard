@@ -718,6 +718,50 @@
             padding: 0.5rem;
         }
 
+        /* Statistics Section */
+        .statistics {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-box:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            transform: translateY(-2px);
+        }
+
+        .stat-box h4 {
+            font-size: 11px;
+            font-weight: 700;
+            color: #666;
+            margin: 0 0 12px 0;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .stat-description {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 8px;
+        }
+
         @media (max-width: 768px) {
             .statistics {
                 grid-template-columns: 1fr;
@@ -774,6 +818,55 @@
         <aside class="sidebar" id="sidebar"></aside>
         
         <main class="main">
+            <!-- Statistics Section -->
+            <div class="statistics">
+                <div class="stat-box">
+                    <h4>PLATFORM VAULT</h4>
+                    <div class="stat-value">$12,450.00</div>
+                    <div class="stat-description">Total platform reserves</div>
+                </div>
+                <div class="stat-box">
+                    <h4>GENERAL WALLET BALANCE</h4>
+                    <div class="stat-value">$783.04</div>
+                    <div class="stat-description">This is "Remaining balance"</div>
+                </div>
+                <div class="stat-box">
+                    <h4>INDIVIDUAL BALANCES TOTAL</h4>
+                    <div class="stat-value">$1,080.00</div>
+                    <div class="stat-description">Sum of per-account balances</div>
+                </div>
+                <div class="stat-box">
+                    <h4>ACCOUNTS</h4>
+                    <div class="stat-value">8</div>
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 15px; margin-top: 12px;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: #3498db;">5</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">Assigned</div>
+                        </div>
+                        <div style="width: 1.5px; height: 35px; background: #e0e0e0;"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: #e67700;">3</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">Unassigned</div>
+                        </div>
+                        <div style="width: 1.5px; height: 35px; background: #e0e0e0;"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: #27ae60;">5</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">Active</div>
+                        </div>
+                        <div style="width: 1.5px; height: 35px; background: #e0e0e0;"></div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 20px; font-weight: 600; color: #e74c3c;">1</div>
+                            <div style="font-size: 11px; color: #666; margin-top: 2px;">Restricted</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="stat-box">
+                    <h4>SPEND (PERIOD)</h4>
+                    <div class="stat-value">$4,776.96</div>
+                    <div class="stat-description">Includes manual spend for CL</div>
+                </div>
+            </div>
+
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                 <div class="filters" style="margin-bottom: 0; flex: 1; display: flex; gap: 0.5rem; align-items: center;">
                 <input type="text" id="searchInput" placeholder="Search accounts...">
@@ -1743,77 +1836,175 @@
                 <button class="close-btn" onclick="closeAddAccountModal()">&times;</button>
             </div>
 
-            <div class="account-section">
-                <h3 class="section-title">Details</h3>
-                
-                <div class="field-group">
-                    <label>ID (Auto-generated)</label>
-                    <input type="text" id="addAccountId" readonly style="background: #f5f5f5; cursor: not-allowed;" placeholder="Will be set automatically">
-                </div>
+            <!-- Tabs Navigation -->
+            <div style="display: flex; gap: 0; border-bottom: 2px solid #e5e5e5; margin-bottom: 1.5rem;">
+                <button class="add-account-tab active" onclick="switchAddAccountTab('details')" data-tab="details" style="flex: 1; padding: 1rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;">
+                    Details
+                </button>
+                <button class="add-account-tab" onclick="switchAddAccountTab('profile')" data-tab="profile" style="flex: 1; padding: 1rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;">
+                    Profile
+                </button>
+                <button class="add-account-tab" onclick="switchAddAccountTab('cards')" data-tab="cards" style="flex: 1; padding: 1rem; border: none; background: none; font-size: 0.95rem; font-weight: 600; color: #666; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.3s;">
+                    Cards
+                </button>
+            </div>
 
-                <div class="field-group">
-                    <label>Platform</label>
-                    <select id="addAccountPlatform" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="">Select platform...</option>
-                        <option value="facebook">Facebook</option>
-                        <option value="google">Google</option>
-                        <option value="tiktok">TikTok</option>
-                        <option value="taboola">Taboola</option>
-                        <option value="outbrain">Outbrain</option>
-                        <option value="microsoft">Microsoft</option>
-                        <option value="snapchat">Snapchat</option>
-                    </select>
-                </div>
+            <!-- Tab Content: Details -->
+            <div class="add-account-tab-content active" id="addTabDetails">
+                <div class="account-section">
+                    <div class="field-group">
+                        <label>ID (Auto-generated)</label>
+                        <input type="text" id="addAccountId" readonly style="background: #f5f5f5; cursor: not-allowed;" placeholder="Will be set automatically">
+                    </div>
 
-                <div class="field-group">
-                    <label>Account Name</label>
-                    <input type="text" id="addAccountName" placeholder="Enter account name">
-                </div>
+                    <div class="field-group">
+                        <label>Platform</label>
+                        <select id="addAccountPlatform" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Select platform...</option>
+                            <option value="facebook">Facebook</option>
+                            <option value="google">Google</option>
+                            <option value="tiktok">TikTok</option>
+                            <option value="taboola">Taboola</option>
+                            <option value="outbrain">Outbrain</option>
+                            <option value="microsoft">Microsoft</option>
+                            <option value="snapchat">Snapchat</option>
+                        </select>
+                    </div>
 
-                <div class="field-group">
-                    <label>Assets</label>
-                    <select id="addAccountAssets" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="">Select asset type...</option>
-                        <option value="ad-account">Ad Account</option>
-                        <option value="profile">Profile</option>
-                        <option value="bm">BM (Business Manager)</option>
-                        <option value="page">Page</option>
-                    </select>
-                </div>
+                    <div class="field-group">
+                        <label>Account Name</label>
+                        <input type="text" id="addAccountName" placeholder="Enter account name">
+                    </div>
 
-                <div class="field-group">
-                    <label>Account ID</label>
-                    <input type="text" id="addAccountAccountId" placeholder="Enter account ID">
-                </div>
+                    <div class="field-group">
+                        <label>Assets</label>
+                        <select id="addAccountAssets" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Select asset type...</option>
+                            <option value="ad-account">Ad Account</option>
+                            <option value="profile">Profile</option>
+                            <option value="bm">BM (Business Manager)</option>
+                            <option value="page">Page</option>
+                        </select>
+                    </div>
 
-                <div class="field-group">
-                    <label>Pay</label>
-                    <select id="addAccountPay" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="cc" selected>CC (Credit Card)</option>
-                        <option value="cl">CL (Credit Line)</option>
-                    </select>
-                </div>
+                    <div class="field-group">
+                        <label>Account ID</label>
+                        <input type="text" id="addAccountAccountId" placeholder="Enter account ID">
+                    </div>
 
-                <div class="field-group">
-                    <label>Client</label>
-                    <select id="addAccountClient" onchange="toggleContractField()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="">Select client...</option>
-                        <option value="client-a">Client A</option>
-                        <option value="client-b">Client B</option>
-                        <option value="client-c">Client C</option>
-                    </select>
-                </div>
+                    <div class="field-group">
+                        <label>Pay</label>
+                        <select id="addAccountPay" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="cc" selected>CC (Credit Card)</option>
+                            <option value="cl">CL (Credit Line)</option>
+                        </select>
+                    </div>
 
-                <div class="field-group" id="contractField" style="display: none;">
-                    <label>Contract</label>
-                    <select id="addAccountContract" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
-                        <option value="one-time">One Time</option>
-                        <option value="recurring">Recurring</option>
-                    </select>
+                    <div class="field-group">
+                        <label>Client</label>
+                        <select id="addAccountClient" onchange="toggleContractField()" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Select client...</option>
+                            <option value="client-a">Client A</option>
+                            <option value="client-b">Client B</option>
+                            <option value="client-c">Client C</option>
+                        </select>
+                    </div>
+
+                    <div class="field-group" id="contractField" style="display: none;">
+                        <label>Contract</label>
+                        <select id="addAccountContract" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="one-time">One Time</option>
+                            <option value="recurring">Recurring</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <button class="btn" style="width: 100%;" onclick="submitAddAccount()">Create Account</button>
+            <!-- Tab Content: Profile -->
+            <div class="add-account-tab-content" id="addTabProfile" style="display: none;">
+                <div class="account-section">
+                    <div class="field-group">
+                        <label>Profile Name</label>
+                        <input type="text" id="addAccountProfileName" placeholder="Enter profile name">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Email</label>
+                        <input type="email" id="addAccountProfileEmail" placeholder="Enter email">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Password</label>
+                        <input type="password" id="addAccountProfilePassword" placeholder="Enter password">
+                    </div>
+
+                    <div class="field-group">
+                        <label>2FA Code (Optional)</label>
+                        <input type="text" id="addAccountProfileTwoFA" placeholder="Enter 2FA code">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Recovery Email</label>
+                        <input type="email" id="addAccountProfileRecoveryEmail" placeholder="Enter recovery email">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Recovery Email Password</label>
+                        <input type="password" id="addAccountProfileRecoveryPassword" placeholder="Enter recovery email password">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Cards -->
+            <div class="add-account-tab-content" id="addTabCards" style="display: none;">
+                <div class="account-section">
+                    <div class="field-group">
+                        <label>Card Number</label>
+                        <input type="text" id="addAccountCardNumber" placeholder="Enter card number" maxlength="19">
+                    </div>
+
+                    <div class="field-group">
+                        <label>Cardholder Name</label>
+                        <input type="text" id="addAccountCardName" placeholder="Enter cardholder name">
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="field-group">
+                            <label>Expiry Date (MM/YY)</label>
+                            <input type="text" id="addAccountCardExpiry" placeholder="MM/YY" maxlength="5">
+                        </div>
+
+                        <div class="field-group">
+                            <label>CVV</label>
+                            <input type="text" id="addAccountCardCVV" placeholder="CVV" maxlength="4">
+                        </div>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Billing Address</label>
+                        <textarea id="addAccountCardAddress" rows="3" placeholder="Enter billing address" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; resize: vertical;"></textarea>
+                    </div>
+
+                    <div class="field-group">
+                        <label>Card Type</label>
+                        <select id="addAccountCardType" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="">Select card type...</option>
+                            <option value="visa">Visa</option>
+                            <option value="mastercard">Mastercard</option>
+                            <option value="amex">American Express</option>
+                            <option value="discover">Discover</option>
+                        </select>
+                    </div>
+
+                    <div style="padding: 12px; background: rgba(52, 152, 219, 0.05); border: 1px solid rgba(52, 152, 219, 0.15); border-radius: 8px; margin-top: 12px;">
+                        <p style="margin: 0; font-size: 13px; color: #666;">
+                            <strong>Note:</strong> Card information is optional. You can add it now or later from the account details page.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn" style="width: 100%; margin-top: 1rem;" onclick="submitAddAccount()">Create Account</button>
         </div>
     </div>
 
@@ -3158,6 +3349,22 @@
             document.getElementById('addAccountContract').value = 'one-time';
             document.getElementById('contractField').style.display = 'none';
             
+            // Reset profile fields
+            document.getElementById('addAccountProfileName').value = '';
+            document.getElementById('addAccountProfileEmail').value = '';
+            document.getElementById('addAccountProfilePassword').value = '';
+            document.getElementById('addAccountProfileTwoFA').value = '';
+            document.getElementById('addAccountProfileRecoveryEmail').value = '';
+            document.getElementById('addAccountProfileRecoveryPassword').value = '';
+            
+            // Reset card fields
+            document.getElementById('addAccountCardNumber').value = '';
+            document.getElementById('addAccountCardName').value = '';
+            document.getElementById('addAccountCardExpiry').value = '';
+            document.getElementById('addAccountCardCVV').value = '';
+            document.getElementById('addAccountCardAddress').value = '';
+            document.getElementById('addAccountCardType').value = '';
+            
             document.getElementById('addAccountModal').classList.add('active');
             document.getElementById('addAccountOverlay').classList.add('active');
         }
@@ -3165,6 +3372,36 @@
         function closeAddAccountModal() {
             document.getElementById('addAccountModal').classList.remove('active');
             document.getElementById('addAccountOverlay').classList.remove('active');
+        }
+
+        function switchAddAccountTab(tabName) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.add-account-tab').forEach(tab => {
+                tab.classList.remove('active');
+                tab.style.color = '#666';
+                tab.style.borderBottomColor = 'transparent';
+            });
+
+            // Remove active class from all tab contents
+            document.querySelectorAll('.add-account-tab-content').forEach(content => {
+                content.classList.remove('active');
+                content.style.display = 'none';
+            });
+
+            // Add active class to selected tab
+            const selectedTab = document.querySelector(`.add-account-tab[data-tab="${tabName}"]`);
+            if (selectedTab) {
+                selectedTab.classList.add('active');
+                selectedTab.style.color = '#3498db';
+                selectedTab.style.borderBottomColor = '#3498db';
+            }
+
+            // Show selected tab content
+            const selectedContent = document.getElementById(`addTab${tabName.charAt(0).toUpperCase() + tabName.slice(1)}`);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+                selectedContent.style.display = 'block';
+            }
         }
 
         function toggleContractField() {
@@ -3179,7 +3416,7 @@
         }
 
         function submitAddAccount() {
-            // Get form values
+            // Get form values - Account Details
             const platform = document.getElementById('addAccountPlatform').value;
             const accountName = document.getElementById('addAccountName').value.trim();
             const assets = document.getElementById('addAccountAssets').value;
@@ -3188,7 +3425,15 @@
             const client = document.getElementById('addAccountClient').value;
             const contract = document.getElementById('addAccountContract').value;
 
-            // Validate required fields
+            // Get form values - Profile
+            const profileName = document.getElementById('addAccountProfileName').value.trim();
+            const profileEmail = document.getElementById('addAccountProfileEmail').value.trim();
+            const profilePassword = document.getElementById('addAccountProfilePassword').value.trim();
+            const profileTwoFA = document.getElementById('addAccountProfileTwoFA').value.trim();
+            const profileRecoveryEmail = document.getElementById('addAccountProfileRecoveryEmail').value.trim();
+            const profileRecoveryPassword = document.getElementById('addAccountProfileRecoveryPassword').value.trim();
+
+            // Validate required fields - Account
             if (!platform) {
                 alert('Please select a platform');
                 return;
@@ -3206,13 +3451,28 @@
                 return;
             }
 
+            // Validate required fields - Profile
+            if (!profileName) {
+                alert('Please enter a profile name');
+                return;
+            }
+            if (!profileEmail) {
+                alert('Please enter a profile email');
+                return;
+            }
+            if (!profilePassword) {
+                alert('Please enter a profile password');
+                return;
+            }
+
             // Generate new account ID
             const maxId = Math.max(...Object.keys(accountsData).map(id => parseInt(id)), 0);
             const newId = maxId + 1;
+            const newAccountIdStr = `ACC-${String(newId).padStart(4, '0')}`;
 
             // Create new account object
             const newAccount = {
-                id: `ACC-${String(newId).padStart(4, '0')}`,
+                id: newAccountIdStr,
                 name: accountName,
                 platform: platform,
                 assetType: assets,
@@ -3220,20 +3480,44 @@
                 accountType: pay,
                 client: client || 'Unassigned',
                 clientTag: client ? 'assigned' : 'unassigned',
-                billing: client ? contract : 'one-time',
+                billing: client ? contract : '-',
                 status: 'active',
                 balanceType: 'general',
                 balance: '$0.00',
                 spend: '$0.00',
-                primaryAccess: 'Main Profile',
-                provider: 'N/A'
+                primaryAccess: profileName,
+                provider: 'N/A',
+                activeProfileId: 1,
+                createdAt: new Date().toISOString().slice(0, 19).replace('T', ' '),
+                updatedAt: new Date().toISOString().slice(0, 19).replace('T', ' ')
             };
 
             // Add to accountsData
             accountsData[newId] = newAccount;
 
+            // Create profile for this account
+            if (!accountProfiles[newId]) {
+                accountProfiles[newId] = [];
+            }
+
+            const newProfile = {
+                id: 1,
+                name: profileName,
+                email: profileEmail,
+                password: profilePassword,
+                twoFA: profileTwoFA || '',
+                recoveryEmail: profileRecoveryEmail || '',
+                recoveryPassword: profileRecoveryPassword || '',
+                tag: 'primary',
+                status: 'active',
+                visibility: 'visible'
+            };
+
+            accountProfiles[newId].push(newProfile);
+
             // Save to localStorage
             localStorage.setItem('accountsData', JSON.stringify(accountsData));
+            localStorage.setItem('accountProfiles', JSON.stringify(accountProfiles));
 
             // Add to table
             addAccountToTable(newAccount, newId);
@@ -3242,7 +3526,7 @@
             closeAddAccountModal();
 
             // Show success message
-            alert('Account created successfully!');
+            alert('Account and profile created successfully!');
         }
 
         function addAccountToTable(account, accountId) {
