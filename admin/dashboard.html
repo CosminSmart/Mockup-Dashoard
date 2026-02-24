@@ -516,6 +516,7 @@
   </div>
 
   <script src="../js/sidebar.js"></script>
+  <script src="../js/admin-dashboard.js"></script>
   <script>
     // Demo data matching finance page structure
     const LS_KEY = "admin_finance_demo_v7";
@@ -687,46 +688,7 @@
       `).join("");
     }
 
-    // Load Google Charts
-    google.charts.load('current', {'packages':['corechart']});
-    google.charts.setOnLoadCallback(drawFeeChart);
 
-    function drawFeeChart() {
-      // Prepare data for Google Charts
-      const chartData = [['Task', 'Hours per Day']];
-      feeBreakdown.forEach(fee => {
-        chartData.push([fee.type, fee.amount]);
-      });
-
-      const data = google.visualization.arrayToDataTable(chartData);
-
-      const options = {
-        title: 'Fee Breakdown',
-        pieHole: 0.4, // Creates a Donut Chart. Does not do anything when is3D is enabled
-        is3D: true, // Enables 3D view
-        pieStartAngle: 100, // Rotates the chart
-        sliceVisibilityThreshold: 0.02, // Hides slices smaller than 2%
-        legend: {
-          position: 'bottom',
-          alignment: 'center',
-          textStyle: {
-            color: '#233238',
-            fontSize: 14,
-          },
-        },
-        colors: ['#8AD1C2', '#9F8AD1', '#D18A99', '#BCD18A', '#D1C28A'],
-      };
-
-      const chart = new google.visualization.PieChart(document.getElementById('feeChart'));
-      chart.draw(data, options);
-    }
-
-    // Redraw chart on window resize
-    window.addEventListener('resize', () => {
-      if (typeof google !== 'undefined' && google.visualization) {
-        drawFeeChart();
-      }
-    });
 
     function renderClientStats(){
       const container = document.getElementById("clientStats");
@@ -794,7 +756,6 @@
       renderKPIs();
       renderPendingClients();
       renderTopups();
-      // Fee chart is drawn by Google Charts callback
       renderClientStats();
       renderPlatforms();
     });

@@ -42,16 +42,13 @@ function renderKPIs(){
   document.getElementById("kpiFees").textContent = money(kpis.fees);
 }
 
-// Load Google Charts
-google.charts.load('current', {'packages':['corechart']});
-google.charts.setOnLoadCallback(drawCharts);
-
-function drawCharts() {
-  drawFeeChart();
-  drawAccountsChart();
-}
-
 function drawFeeChart() {
+  const chartElement = document.getElementById('feeChart');
+  if (!chartElement) {
+    console.warn('feeChart element not found');
+    return;
+  }
+
   // Prepare data for Google Charts
   const chartData = [['Task', 'Hours per Day']];
   feeBreakdown.forEach(fee => {
@@ -62,10 +59,10 @@ function drawFeeChart() {
 
   const options = {
     title: 'Fee Breakdown',
-    pieHole: 0.4, // Creates a Donut Chart. Does not do anything when is3D is enabled
-    is3D: true, // Enables 3D view
-    pieStartAngle: 100, // Rotates the chart
-    sliceVisibilityThreshold: 0.02, // Hides slices smaller than 2%
+    pieHole: 0.4,
+    is3D: true,
+    pieStartAngle: 100,
+    sliceVisibilityThreshold: 0.02,
     legend: {
       position: 'bottom',
       alignment: 'center',
@@ -77,11 +74,17 @@ function drawFeeChart() {
     colors: ['#8AD1C2', '#9F8AD1', '#D18A99', '#BCD18A', '#D1C28A'],
   };
 
-  const chart = new google.visualization.PieChart(document.getElementById('feeChart'));
+  const chart = new google.visualization.PieChart(chartElement);
   chart.draw(data, options);
 }
 
 function drawAccountsChart() {
+  const chartElement = document.getElementById('accountsChart');
+  if (!chartElement) {
+    console.warn('accountsChart element not found');
+    return;
+  }
+
   const accountsData = [
     ['Status', 'Count'],
     ['Assigned', 170],
@@ -93,6 +96,7 @@ function drawAccountsChart() {
   const options = {
     title: '',
     pieHole: 0.5,
+    height: 250,
     legend: {
       position: 'bottom',
       alignment: 'center',
@@ -107,17 +111,38 @@ function drawAccountsChart() {
       text: 'both',
       showColorCode: true 
     },
-    chartArea: { width: '100%', height: '75%' },
+    chartArea: { width: '90%', height: '70%' },
   };
 
-  const chart = new google.visualization.PieChart(document.getElementById('accountsChart'));
+  const chart = new google.visualization.PieChart(chartElement);
   chart.draw(data, options);
+}
+
+function drawCharts() {
+  try {
+    drawFeeChart();
+  } catch(e) {
+    console.error('Error drawing fee chart:', e);
+  }
+  
+  try {
+    drawAccountsChart();
+  } catch(e) {
+    console.error('Error drawing accounts chart:', e);
+  }
+}
+
+// Load Google Charts
+if (typeof google !== 'undefined') {
+  google.charts.load('current', {'packages':['corechart']});
+  google.charts.setOnLoadCallback(drawCharts);
+} else {
+  console.error('Google Charts library not loaded');
 }
 
 window.addEventListener('resize', () => {
   if (typeof google !== 'undefined' && google.visualization) {
-    drawFeeChart();
-    drawAccountsChart();
+    drawCharts();
   }
 });
 

@@ -428,6 +428,34 @@
               </div>
             </div>
 
+            <!-- Notification Thresholds -->
+            <div class="um-card" id="thresholdsCard">
+              <div class="um-card__head">
+                <div class="um-card__title">Notification Thresholds</div>
+                <div class="um-card__head-actions">
+                  <button class="um-btn um-btn--ghost" type="button" id="thresholdEditBtn">Edit</button>
+                  <button class="um-btn um-btn--ghost" type="button" id="thresholdSaveBtn" hidden>Save</button>
+                  <button class="um-btn um-btn--ghost" type="button" id="thresholdCancelBtn" hidden>Cancel</button>
+                </div>
+              </div>
+
+              <div class="um-muted" style="margin-bottom:12px; font-size:13px;">
+                Set spending limits per platform. Admin will be notified when client exceeds these amounts.
+              </div>
+
+              <div class="um-table-wrap" style="padding:0; background:transparent;">
+                <table class="um-table-mini" aria-label="Notification thresholds table">
+                  <thead>
+                    <tr>
+                      <th>Platform</th>
+                      <th style="text-align:right;">Threshold Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody id="thresholdsBody"></tbody>
+                </table>
+              </div>
+            </div>
+
             <div class="um-card" id="notFound" hidden>
               <div class="um-card__title">Client not found</div>
               <p style="margin:0; opacity:.8;">
@@ -506,6 +534,12 @@
       feeEditBtn: document.getElementById("feeEditBtn"),
       feeSaveBtn: document.getElementById("feeSaveBtn"),
       feeCancelBtn: document.getElementById("feeCancelBtn"),
+
+      // notification thresholds
+      thresholdsBody: document.getElementById("thresholdsBody"),
+      thresholdEditBtn: document.getElementById("thresholdEditBtn"),
+      thresholdSaveBtn: document.getElementById("thresholdSaveBtn"),
+      thresholdCancelBtn: document.getElementById("thresholdCancelBtn"),
 
       notFound: document.getElementById("notFound"),
 
@@ -620,8 +654,10 @@
 
     let netSnap = null;
     let feeSnap = null;
+    let thresholdSnap = null;
 
     let feeEditing = false;
+    let thresholdEditing = false;
     let openDiscount = { rowIdx: null, col: null };
 
     function loadClient(){
@@ -638,6 +674,16 @@
       // ✅ default disabled
       if (client.generalBalanceEnabled === undefined || client.generalBalanceEnabled === null){
         client.generalBalanceEnabled = false;
+      }
+
+      // ✅ notification thresholds defaults
+      if (!client.notificationThresholds || typeof client.notificationThresholds !== 'object'){
+        client.notificationThresholds = {
+          facebook: 1000,
+          google: 1000,
+          tiktok: 1000,
+          instagram: 1000
+        };
       }
 
       if (!Array.isArray(client.feeTable) || client.feeTable.length === 0){
@@ -850,12 +896,91 @@
       }
     }
 
+    // ===== Notification Thresholds =====
+    function renderThresholds(){
+      els.thresholdsBody.innerHTML = "";
+
+      const platforms = [
+        { key: 'facebook', icon: '📘', name: 'Facebook' },
+        { key: 'google', icon: '🔍', name: 'Google' },
+        { key: 'tiktok', icon: '🎵', name: 'TikTok' },
+        { key: 'instagram', icon: '📷', name: 'Instagram' }
+      ];
+
+      platforms.forEach(platform => {
+        const tr = document.createElement("tr");
+        const tdPlatform = document.createElement("td");
+        const tdAmount = document.createElement("td");
+        tdAmount.style.textAlign = "right";
+
+        const currentValue = client.notificationThresholds[platform.key] || 0;
+
+        tdPlatform.innerHTML = `<span>${platform.icon} ${platform.name}</span>`;
+
+        if (thresholdEditing){
+          tdAmount.innerHTML = `
+            <input class="um-input um-inline-input" 
+              data-threshold-input 
+              data-platform="${platform.key}" 
+              value="${currentValue}" 
+              type="number" 
+              min="0" 
+              step="100"
+              style="text-align:right; max-width:150px; margin-left:auto;" />
+          `;
+        } else {
+          tdAmount.innerHTML = `<strong>$${Number(currentValue).toLocaleString()}</strong>`;
+        }
+
+        tr.appendChild(tdPlatform);
+        tr.appendChild(tdAmount);
+        els.thresholdsBody.appendChild(tr);
+      });
+    }
+
+    function enterThresholdEdit(){
+      thresholdSnap = JSON.parse(JSON.stringify(client));
+      thresholdEditing = true;
+
+      els.thresholdEditBtn.hidden = true;
+      els.thresholdSaveBtn.hidden = false;
+      els.thresholdCancelBtn.hidden = false;
+
+      renderThresholds();
+    }
+
+    function exitThresholdEdit(restore){
+      if (restore && thresholdSnap) client = thresholdSnap;
+
+      thresholdEditing = false;
+
+      els.thresholdEditBtn.hidden = false;
+      els.thresholdSaveBtn.hidden = true;
+      els.thresholdCancelBtn.hidden = true;
+
+      renderThresholds();
+    }
+
+    function saveThresholds(){
+      document.querySelectorAll("[data-threshold-input]").forEach(inp => {
+        const platform = inp.dataset.platform;
+        const value = Number(inp.value) || 0;
+        if (client.notificationThresholds) {
+          client.notificationThresholds[platform] = value;
+        }
+      });
+
+      persist();
+      exitThresholdEdit(false);
+    }
+
     function renderAll(){
       if (!client){
         els.notFound.hidden = false;
         els.editBtn.disabled = true;
         els.netEditBtn.disabled = true;
         els.feeEditBtn.disabled = true;
+        els.thresholdEditBtn.disabled = true;
         return;
       }
 
@@ -864,6 +989,7 @@
       renderEmployees();
       renderNetworkFees();
       renderFeeTable();
+      renderThresholds();
     }
 
     // ===== Profile edit =====
@@ -1122,6 +1248,11 @@
     els.feeEditBtn.addEventListener("click", enterFeeEdit);
     els.feeCancelBtn.addEventListener("click", () => exitFeeEdit(true));
     els.feeSaveBtn.addEventListener("click", saveFeeTable);
+
+    // notification thresholds events
+    els.thresholdEditBtn.addEventListener("click", enterThresholdEdit);
+    els.thresholdCancelBtn.addEventListener("click", () => exitThresholdEdit(true));
+    els.thresholdSaveBtn.addEventListener("click", saveThresholds);
   </script>
 
   <script src="../js/sidebar.js"></script>
