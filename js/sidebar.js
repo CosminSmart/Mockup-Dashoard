@@ -46,7 +46,7 @@ const navigationItems = {
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
         { name: 'Users', page: 'clients', icon: '👥' },
         { name: 'Accounts', page: 'accounts', icon: '💳' },
-        { name: 'Finance', page: 'finance', icon: '💰' },
+        { name: 'Finance', page: 'topups', icon: '💰' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
         { name: 'Platform Payments', page: 'platform-payments', icon: '💳' },
         { name: 'Settings', page: 'settings', icon: '⚙️' }
@@ -55,7 +55,7 @@ const navigationItems = {
     employee: [
         { name: 'Dashboard', page: 'dashboard', icon: '📊' },
         { name: 'Accounts', page: 'accounts', icon: '💳' },
-        { name: 'Finance', page: 'finance', icon: '💰' },
+        { name: 'Finance', page: 'topups', icon: '💰' },
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
         { name: 'Transactions', page: 'transactions', icon: '💰' },
         { name: 'Settings', page: 'settings', icon: '⚙️' }
@@ -66,7 +66,7 @@ const navigationItems = {
         { name: 'Marketplace', page: 'marketplace', icon: '🛍️' },
         { name: 'Transactions', page: 'transactions', icon: '💰' },
         { name: 'Teams', page: 'users', icon: '👥' },
-        { name: 'Finance', page: 'finance', icon: '💰' },
+        { name: 'Finance', page: 'topups', icon: '💰' },
         { name: 'Platform Payments', page: 'platform-payments', icon: '💳' },
         { name: 'Settings', page: 'settings', icon: '⚙️' }
     ]

@@ -670,9 +670,7 @@
       <div class="header-left">
         <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
           <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="false">Topups</button>
-          <button type="button" class="page-tab" data-page="finance" role="tab" aria-selected="false">Finance</button>
           <button type="button" class="page-tab" data-page="income" role="tab" aria-selected="false">Income</button>
-          <button type="button" class="page-tab" data-page="fees" role="tab" aria-selected="false">Charges</button>
           <button type="button" class="page-tab active" data-page="internal-transactions" role="tab" aria-selected="true">Internal Transactions</button>
           <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">Transactions</button>
         </div>
@@ -732,14 +730,10 @@
               style="width: 100%; padding: 8px 12px; border: 1px solid var(--line2); border-radius: 8px; background: var(--bg0); color: var(--text); font-size: 0.9rem;"
             >
               <option value="__all__">All</option>
-              <option value="topup_approval">TOPUP_APPROVAL</option>
-              <option value="topup_fee">TOPUP_FEE</option>
+              <option value="topup">TOPUP</option>
               <option value="transfer">TRANSFER</option>
-              <option value="transfer_fee">TRANSFER_FEE</option>
-              <option value="service_charge">SERVICE_CHARGE</option>
-              <option value="setup_charge">SETUP_CHARGE</option>
-              <option value="refund">REFUND</option>
-              <option value="other">OTHER</option>
+              <option value="service">SERVICE</option>
+              <option value="setup">SETUP</option>
             </select>
           </div>
 
@@ -1125,7 +1119,7 @@
           from:"external",
           to:"mainWallet",
           platform:"",
-          category:"topup_approval",
+          category:"topup",
           status:"approved",
           account:"USD",
           proof:"—",
@@ -1135,26 +1129,6 @@
           netAmount: 980.00,
           note:"Demo • Top-up approved (net USD) to Main Wallet",
           amount: 980.00
-        },
-        {
-          id: uid(),
-          topupId: "100148",
-          date: "19 februarie 2026",
-          type:"fee",
-          clientId:"100",
-          from:"topup",
-          to:"feesCollected",
-          platform:"",
-          category:"topup_fee",
-          status:"approved",
-          account:"USD",
-          proof:"—",
-          description:"Demo • Top-up fee",
-          grossAmount: 20.00,
-          feeAmount: 20.00,
-          netAmount: 20.00,
-          note:"Demo • Top-up fee",
-          amount: 20.00
         },
         {
           id: uid(),
@@ -1178,22 +1152,137 @@
         },
         {
           id: uid(),
-          date: "19 februarie 2026",
-          type:"fee",
-          clientId:"100",
+          date: "18 februarie 2026",
+          type:"service",
+          clientId:"101",
           from:"mainWallet",
           to:"feesCollected",
           platform:"",
-          category:"transfer_fee",
+          category:"service",
           status:"completed",
           account:"USD",
           proof:"—",
-          description:"Demo • Transfer fee",
-          grossAmount: 5.00,
-          feeAmount: 5.00,
-          netAmount: 5.00,
-          note:"Demo • Transfer fee",
-          amount: 5.00
+          description:"Demo • Account management service",
+          grossAmount: 50.00,
+          feeAmount: 50.00,
+          netAmount: 50.00,
+          note:"Demo • Monthly account management service",
+          amount: 50.00
+        },
+        {
+          id: uid(),
+          date: "18 februarie 2026",
+          type:"setup",
+          clientId:"102",
+          from:"mainWallet",
+          to:"feesCollected",
+          platform:"GOOGLE",
+          category:"setup",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Google Ads account setup",
+          grossAmount: 150.00,
+          feeAmount: 150.00,
+          netAmount: 150.00,
+          note:"Demo • Initial Google Ads account setup and configuration",
+          amount: 150.00
+        },
+        {
+          id: uid(),
+          topupId: "100150",
+          date: "17 februarie 2026",
+          type:"topup",
+          clientId:"101",
+          from:"external",
+          to:"mainWallet",
+          platform:"",
+          category:"topup",
+          status:"approved",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Top-up approved (net USD) to Main Wallet",
+          grossAmount: 1500.00,
+          feeAmount: 0,
+          netAmount: 1500.00,
+          note:"Demo • Top-up approved (net USD) to Main Wallet",
+          amount: 1500.00
+        },
+        {
+          id: uid(),
+          date: "17 februarie 2026",
+          type:"transfer",
+          clientId:"101",
+          from:"mainWallet",
+          to:"platformVault",
+          platform:"TIKTOK",
+          category:"transfer",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Main → TikTok Vault",
+          grossAmount: 600.00,
+          feeAmount: 0,
+          netAmount: 600.00,
+          note:"Demo • Main → TikTok Vault",
+          amount: 600.00
+        },
+        {
+          id: uid(),
+          date: "16 februarie 2026",
+          type:"setup",
+          clientId:"100",
+          from:"mainWallet",
+          to:"feesCollected",
+          platform:"FACEBOOK",
+          category:"setup",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Facebook BM setup",
+          grossAmount: 200.00,
+          feeAmount: 200.00,
+          netAmount: 200.00,
+          note:"Demo • Facebook Business Manager setup and configuration",
+          amount: 200.00
+        },
+        {
+          id: uid(),
+          date: "16 februarie 2026",
+          type:"service",
+          clientId:"102",
+          from:"mainWallet",
+          to:"feesCollected",
+          platform:"",
+          category:"service",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Premium support service",
+          grossAmount: 75.00,
+          feeAmount: 75.00,
+          netAmount: 75.00,
+          note:"Demo • Premium support and consultation service",
+          amount: 75.00
+        },
+        {
+          id: uid(),
+          date: "15 februarie 2026",
+          type:"transfer",
+          clientId:"102",
+          from:"mainWallet",
+          to:"platformVault",
+          platform:"INSTAGRAM",
+          category:"transfer",
+          status:"completed",
+          account:"USD",
+          proof:"—",
+          description:"Demo • Main → Instagram Vault",
+          grossAmount: 350.00,
+          feeAmount: 0,
+          netAmount: 350.00,
+          note:"Demo • Main → Instagram Vault",
+          amount: 350.00
         }
       ];
       save();
@@ -1236,14 +1325,10 @@
         rows = rows.filter(tx => {
           const cat = String(tx.category || tx.type || "").toLowerCase();
           
-          if(categoryFilter === "topup_approval") return cat.includes("topup") && !cat.includes("fee");
-          if(categoryFilter === "topup_fee") return cat.includes("topup") && cat.includes("fee");
-          if(categoryFilter === "transfer") return cat.includes("transfer") && !cat.includes("fee");
-          if(categoryFilter === "transfer_fee") return cat.includes("transfer") && cat.includes("fee");
-          if(categoryFilter === "service_charge") return cat.includes("service");
-          if(categoryFilter === "setup_charge") return cat.includes("setup");
-          if(categoryFilter === "refund") return cat.includes("refund");
-          if(categoryFilter === "other") return !cat.includes("topup") && !cat.includes("transfer") && !cat.includes("service") && !cat.includes("setup") && !cat.includes("refund");
+          if(categoryFilter === "topup") return cat.includes("topup");
+          if(categoryFilter === "transfer") return cat.includes("transfer");
+          if(categoryFilter === "service") return cat.includes("service");
+          if(categoryFilter === "setup") return cat.includes("setup");
           
           return cat.includes(categoryFilter);
         });
@@ -1308,38 +1393,22 @@
       let textColor = "#374151";
       let displayText = (tx.category || tx.type || "—").toUpperCase().replace(/_/g, " ");
       
-      if(cat.includes("topup") && !cat.includes("fee")){
+      if(cat.includes("topup")){
         bgColor = "#dcfce7";
         textColor = "#166534";
-        displayText = "TOPUP APPROVAL";
-      } else if(cat.includes("topup") && cat.includes("fee")){
-        bgColor = "#fef3c7";
-        textColor = "#92400e";
-        displayText = "TOPUP FEE";
-      } else if(cat.includes("transfer") && cat.includes("fee")){
-        bgColor = "#fef3c7";
-        textColor = "#92400e";
-        displayText = "TRANSFER FEE";
-      } else if(cat.includes("transfer") || cat.includes("allocation")){
+        displayText = "TOPUP";
+      } else if(cat.includes("transfer")){
         bgColor = "#dbeafe";
         textColor = "#1e40af";
         displayText = "TRANSFER";
       } else if(cat.includes("service")){
         bgColor = "#e0e7ff";
         textColor = "#4338ca";
-        displayText = "SERVICE CHARGE";
+        displayText = "SERVICE";
       } else if(cat.includes("setup")){
         bgColor = "#e0e7ff";
         textColor = "#4338ca";
-        displayText = "SETUP CHARGE";
-      } else if(cat.includes("refund")){
-        bgColor = "#fee2e2";
-        textColor = "#991b1b";
-        displayText = "REFUND";
-      } else {
-        bgColor = "#f3f4f6";
-        textColor = "#4b5563";
-        displayText = "OTHER";
+        displayText = "SETUP";
       }
       
       return `<span style="display: inline-block; padding: 4px 10px; border-radius: 6px; background: ${bgColor}; color: ${textColor}; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.3px;">${displayText}</span>`;
@@ -1368,8 +1437,8 @@
       
       if(type === "TOPUP") return `TOPUP-TN-DEMO-${id}`;
       if(type === "TRANSFER") return `TRANSFER-TE-DEMO-${id}`;
-      if(type === "ALLOCATION") return `TRANSFER-TN-DEMO-${id}`;
-      if(type === "FEE") return `TRANSFER-TE-DEMO-${id}`;
+      if(type === "SERVICE") return `SERVICE-SV-DEMO-${id}`;
+      if(type === "SETUP") return `SETUP-ST-DEMO-${id}`;
       
       return `TX-${id}`;
     }
