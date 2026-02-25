@@ -196,11 +196,12 @@
   background: rgba(255,255,255,0.3);
 }
 
-.calendar-payment-item {
+.calendar-payment-item-simple {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 3px;
-  padding: 2px 3px;
+  gap: 4px;
+  padding: 3px 4px;
   background: rgba(15,23,42,0.04);
   border-radius: 4px;
   border: 1px solid rgba(15,23,42,0.1);
@@ -208,38 +209,7 @@
   flex-shrink: 0;
 }
 
-.calendar-payment-item:hover {
-  background: rgba(37,99,235,0.08);
-  border-color: rgba(37,99,235,0.2);
-}
-
-.calendar-payment-platform {
-  width: 12px;
-  height: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #ffffff;
-  border-radius: 3px;
-  padding: 2px;
-  flex-shrink: 0;
-  box-shadow: 0 1px 3px rgba(15,23,42,0.1);
-}
-
-.calendar-payment-platform svg {
-  width: 100%;
-  height: 100%;
-}
-
-.calendar-payment-details {
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  min-width: 0;
-  flex: 1;
-}
-
-.calendar-payment-client {
+.calendar-payment-account-simple {
   font-weight: 700;
   color: #0f172a;
   white-space: nowrap;
@@ -247,18 +217,11 @@
   text-overflow: ellipsis;
   font-size: 10px;
   line-height: 1.2;
+  flex: 1;
+  min-width: 0;
 }
 
-.calendar-payment-account {
-  font-size: 9px;
-  color: #64748b;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.2;
-}
-
-.calendar-payment-amount {
+.calendar-payment-amount-simple {
   font-weight: 800;
   color: #10b981;
   font-size: 10px;
@@ -266,132 +229,195 @@
   flex-shrink: 0;
 }
 
-.calendar-day-tooltip {
-  position: absolute;
-  bottom: calc(100% + 12px);
-  left: 50%;
-  transform: translateX(-50%) translateY(10px);
-  background: linear-gradient(135deg, rgba(0,0,0,0.98) 0%, rgba(20,20,40,0.98) 100%);
-  color: white;
-  padding: 0;
-  border-radius: 14px;
-  font-size: 13px;
-  white-space: nowrap;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 100;
-  box-shadow: 0 12px 40px rgba(0,0,0,0.6);
-  border: 1px solid rgba(255,255,255,0.15);
-  min-width: 280px;
-  overflow: hidden;
+.calendar-more-payments {
+  font-size: 9px;
+  color: #64748b;
+  text-align: center;
+  margin-top: 2px;
+  font-weight: 600;
 }
 
-.calendar-day-tooltip::before {
-  content: '';
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  border: 8px solid transparent;
-  border-top-color: rgba(0,0,0,0.98);
+/* Payment Details Popup */
+.payment-details-popup {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
 }
 
-.calendar-day:hover .calendar-day-tooltip {
-  opacity: 1;
-  transform: translateX(-50%) translateY(0);
-}
-
-.tooltip-header {
-  background: linear-gradient(135deg, rgba(52, 152, 219, 0.2) 0%, rgba(155, 89, 182, 0.2) 100%);
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  font-weight: 700;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: rgba(255,255,255,0.9);
-}
-
-.tooltip-body {
-  padding: 12px 16px;
-}
-
-.tooltip-item {
+.payment-details-popup.active {
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 10px 0;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
-.tooltip-item:last-child {
-  border-bottom: none;
-  padding-bottom: 0;
+.payment-details-content {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  animation: popupSlideIn 0.3s ease;
 }
 
-.tooltip-item:first-child {
-  padding-top: 0;
+@keyframes popupSlideIn {
+  from {
+    transform: translateY(-30px) scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
 }
 
-.tooltip-item-header {
+.payment-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(15,23,42,0.1);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.05) 0%, rgba(139, 92, 246, 0.05) 100%);
+}
+
+.payment-details-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #0f172a;
+  font-weight: 700;
+}
+
+.payment-details-close {
+  background: rgba(15,23,42,0.05);
+  border: 1px solid rgba(15,23,42,0.1);
+  font-size: 24px;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0;
+  width: 36px;
+  height: 36px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
 }
 
-.tooltip-platform-icon {
-  width: 24px;
-  height: 24px;
+.payment-details-close:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.payment-details-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  max-height: calc(80vh - 140px);
+}
+
+.payment-item {
+  padding: 16px;
+  border: 1px solid rgba(15,23,42,0.1);
+  border-radius: 12px;
+  background: rgba(15,23,42,0.02);
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.payment-item:last-child {
+  margin-bottom: 0;
+}
+
+.payment-item:hover {
+  background: rgba(37,99,235,0.05);
+  border-color: rgba(37,99,235,0.2);
+}
+
+.payment-item-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.payment-platform-icon {
+  width: 32px;
+  height: 32px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.95);
-  border-radius: 6px;
-  padding: 3px;
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 4px;
   flex-shrink: 0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 8px rgba(15,23,42,0.1);
+  border: 1px solid rgba(15,23,42,0.1);
 }
 
-.tooltip-platform-icon svg {
+.payment-platform-icon svg {
   width: 100%;
   height: 100%;
 }
 
-.tooltip-client-name {
+.payment-client-name {
   font-weight: 700;
-  font-size: 14px;
-  color: white;
+  font-size: 15px;
+  color: #0f172a;
   flex: 1;
 }
 
-.tooltip-item-details {
+.payment-item-details {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-left: 34px;
+  gap: 12px;
+  padding-left: 44px;
 }
 
-.tooltip-payment-type {
-  font-size: 12px;
-  color: rgba(255,255,255,0.6);
+.payment-account {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.payment-type {
+  font-size: 13px;
+  color: #64748b;
   font-weight: 500;
 }
 
-.tooltip-amount {
-  color: #2ecc71;
+.payment-amount {
+  color: #10b981;
   font-weight: 800;
   font-size: 16px;
-  text-shadow: 0 2px 8px rgba(46, 204, 113, 0.3);
 }
 
-.tooltip-footer {
-  background: rgba(255,255,255,0.03);
-  padding: 10px 16px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-  font-size: 11px;
-  color: rgba(255,255,255,0.5);
-  text-align: center;
+.payment-details-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(15,23,42,0.1);
+  background: rgba(15,23,42,0.02);
+}
+
+.payment-total-label {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.payment-total-amount {
+  font-size: 20px;
+  font-weight: 800;
+  color: #10b981;
 }
 
 /* Modal Styles */

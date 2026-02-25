@@ -121,43 +121,17 @@ function renderMiniCalendar() {
     }, 0);
 
     html += `
-      <div class="calendar-day ${isToday ? 'today' : ''} ${payments.length > 0 ? 'has-payments' : ''}" ${payments.length > 0 ? `data-date="${dateStr}"` : ''}>
+      <div class="calendar-day ${isToday ? 'today' : ''} ${payments.length > 0 ? 'has-payments' : ''}" ${payments.length > 0 ? `data-date="${dateStr}" onclick="showPaymentDetails('${dateStr}')" style="cursor: pointer;"` : ''}>
         <div class="calendar-day-number">${day}</div>
         ${payments.length > 0 ? `
           <div class="calendar-day-content">
-            ${payments.slice(0, 3).map(p => `
-              <div class="calendar-payment-item">
-                <span class="calendar-payment-platform">${platformIcons[p.platform]}</span>
-                <div class="calendar-payment-details">
-                  <div class="calendar-payment-client">${p.client}</div>
-                  <div class="calendar-payment-account">${p.account}</div>
-                </div>
-                <div class="calendar-payment-amount">${p.amount}</div>
+            ${payments.slice(0, 2).map(p => `
+              <div class="calendar-payment-item-simple">
+                <div class="calendar-payment-account-simple">${p.account}</div>
+                <div class="calendar-payment-amount-simple">${p.amount}</div>
               </div>
             `).join('')}
-            ${payments.length > 3 ? `<div style="font-size: 9px; color: rgba(255,255,255,0.5); text-align: center; margin-top: 2px;">+${payments.length - 3} more</div>` : ''}
-          </div>
-          <div class="calendar-day-tooltip">
-            <div class="tooltip-header">
-              ${payments.length} Payment${payments.length > 1 ? 's' : ''} • Total: $${totalAmount.toFixed(2)}
-            </div>
-            <div class="tooltip-body">
-              ${payments.map(p => `
-                <div class="tooltip-item">
-                  <div class="tooltip-item-header">
-                    <span class="tooltip-platform-icon">${platformIcons[p.platform]}</span>
-                    <span class="tooltip-client-name">${p.client}</span>
-                  </div>
-                  <div class="tooltip-item-details">
-                    <span class="tooltip-payment-type">${p.account} • ${p.type}</span>
-                    <span class="tooltip-amount">${p.amount}</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-            <div class="tooltip-footer">
-              Click to view details
-            </div>
+            ${payments.length > 2 ? `<div class="calendar-more-payments">+${payments.length - 2} more</div>` : ''}
           </div>
         ` : ''}
       </div>
@@ -225,28 +199,6 @@ function renderFullCalendar() {
               </div>
             `).join('')}
           </div>
-          <div class="calendar-day-tooltip">
-            <div class="tooltip-header">
-              ${payments.length} Payment${payments.length > 1 ? 's' : ''} • Total: $${totalAmount.toFixed(2)}
-            </div>
-            <div class="tooltip-body">
-              ${payments.map(p => `
-                <div class="tooltip-item">
-                  <div class="tooltip-item-header">
-                    <span class="tooltip-platform-icon">${platformIcons[p.platform]}</span>
-                    <span class="tooltip-client-name">${p.client}</span>
-                  </div>
-                  <div class="tooltip-item-details">
-                    <span class="tooltip-payment-type">${p.account} • ${p.type}</span>
-                    <span class="tooltip-amount">${p.amount}</span>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-            <div class="tooltip-footer">
-              Click to view details
-            </div>
-          </div>
         ` : ''}
       </div>
     `;
@@ -254,6 +206,85 @@ function renderFullCalendar() {
 
   container.innerHTML = html;
   container.className = 'modern-calendar';
+}
+
+function showPaymentDetails(dateStr) {
+  const payments = recurringPayments[dateStr] || [];
+  if (payments.length === 0) return;
+
+  const date = new Date(dateStr);
+  const formattedDate = date.toLocaleDateString('en-US', { 
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric' 
+  });
+
+  const totalAmount = payments.reduce((sum, p) => {
+    const amount = parseFloat(p.amount.replace('$', ''));
+    return sum + amount;
+  }, 0);
+
+  let popup = document.getElementById('paymentDetailsPopup');
+  if (!popup) {
+    createPaymentPopup();
+    popup = document.getElementById('paymentDetailsPopup');
+  }
+
+  const popupDate = document.getElementById('popupDate');
+  const popupBody = document.getElementById('popupPaymentsList');
+  const popupTotal = document.getElementById('popupTotalAmount');
+
+  popupDate.textContent = formattedDate;
+  popupTotal.textContent = `$${totalAmount.toFixed(2)}`;
+
+  popupBody.innerHTML = payments.map(p => `
+    <div class="payment-item">
+      <div class="payment-item-header">
+        <div class="payment-platform-icon">${platformIcons[p.platform]}</div>
+        <div class="payment-client-name">${p.client}</div>
+      </div>
+      <div class="payment-item-details">
+        <span class="payment-account">${p.account}</span>
+        <span class="payment-type">${p.type}</span>
+        <span class="payment-amount">${p.amount}</span>
+      </div>
+    </div>
+  `).join('');
+
+  popup.classList.add('active');
+}
+
+function closePaymentDetails() {
+  const popup = document.getElementById('paymentDetailsPopup');
+  if (popup) {
+    popup.classList.remove('active');
+  }
+}
+
+function createPaymentPopup() {
+  if (document.getElementById('paymentDetailsPopup')) return;
+  
+  const popup = document.createElement('div');
+  popup.id = 'paymentDetailsPopup';
+  popup.className = 'payment-details-popup';
+  popup.onclick = function(e) { if(e.target === this) closePaymentDetails(); };
+  
+  popup.innerHTML = `
+    <div class="payment-details-content">
+      <div class="payment-details-header">
+        <h3 id="popupDate">Payment Details</h3>
+        <button class="payment-details-close" onclick="closePaymentDetails()">&times;</button>
+      </div>
+      <div class="payment-details-body" id="popupPaymentsList"></div>
+      <div class="payment-details-footer">
+        <span class="payment-total-label">Total Amount:</span>
+        <span class="payment-total-amount" id="popupTotalAmount">$0.00</span>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(popup);
 }
 
 function openFullCalendar() {
