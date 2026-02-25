@@ -243,29 +243,6 @@
                 <div class="um-profile__company" id="companyText">—</div>
                 <div class="um-profile__status" id="statusText">—</div>
                 <div class="um-profile__company" style="margin-top:6px;" id="idText">#—</div>
-
-                <!-- ✅ General Balance setting row -->
-                <div class="um-setting-row" aria-label="General Balance setting">
-                  <div class="um-setting-row__left">
-                    <span class="um-setting-row__label">General Balance</span>
-                    <span id="gbStatusBadge">—</span>
-                    <span class="um-setting-row__hint">Default: Disabled</span>
-                  </div>
-
-                  <div class="um-setting-row__right" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-                    <span class="um-lock" id="gbLock" hidden>
-                      <span class="um-dot"></span> Locked (Admin only)
-                    </span>
-
-                    <label class="um-switch" id="gbSwitchLabel" title="Admin only">
-                      <input type="checkbox" id="gbToggle" />
-                      <span class="um-switch__track" aria-hidden="true">
-                        <span class="um-switch__knob"></span>
-                      </span>
-                    </label>
-                  </div>
-                </div>
-                <!-- /General Balance -->
               </div>
             </div>
 
@@ -423,6 +400,8 @@
                       <th>Rec Interval</th>
                       <th>Rec Amount</th>
                       <th>Fee</th>
+                      <th>Payment Day</th>
+                      <th>General Balance</th>
                     </tr>
                   </thead>
                   <tbody id="feeBody"></tbody>
@@ -545,11 +524,7 @@
 
       notFound: document.getElementById("notFound"),
 
-      // ✅ General Balance UI
-      gbToggle: document.getElementById("gbToggle"),
-      gbStatusBadge: document.getElementById("gbStatusBadge"),
-      gbSwitchLabel: document.getElementById("gbSwitchLabel"),
-      gbLock: document.getElementById("gbLock"),
+
     };
 
     function initials(name){
@@ -680,11 +655,6 @@
       if (client.ercFee === undefined || client.ercFee === null || client.ercFee === "") client.ercFee = 5;
       if (client.trcFee === undefined || client.trcFee === null || client.trcFee === "") client.trcFee = 3;
 
-      // ✅ default disabled
-      if (client.generalBalanceEnabled === undefined || client.generalBalanceEnabled === null){
-        client.generalBalanceEnabled = false;
-      }
-
       // ✅ notification thresholds defaults
       if (!client.notificationThresholds || typeof client.notificationThresholds !== 'object'){
         client.notificationThresholds = {
@@ -697,9 +667,9 @@
 
       if (!Array.isArray(client.feeTable) || client.feeTable.length === 0){
         client.feeTable = [
-          { type: "Google Ads",   setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "5%" },
-          { type: "Facebook Ads", setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "6%" },
-          { type: "TikTok Ads",   setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "3%" },
+          { type: "Google Ads",   setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "5%", generalBalance: false, paymentDay: 1 },
+          { type: "Facebook Ads", setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "6%", generalBalance: false, paymentDay: 1 },
+          { type: "TikTok Ads",   setup: "$250", initInterval: 21, initAmount: "$30", recInterval: 30, recAmount: "$50", fee: "3%", generalBalance: false, paymentDay: 1 },
         ];
       }
 
@@ -708,6 +678,8 @@
         if (r.initAmount === undefined) r.initAmount = "$30";
         if (r.recInterval === undefined) r.recInterval = 30;
         if (r.recAmount === undefined) r.recAmount = "$50";
+        if (r.generalBalance === undefined) r.generalBalance = false;
+        if (r.paymentDay === undefined) r.paymentDay = 1;
       });
     }
 
@@ -729,26 +701,7 @@
       els.createdText.textContent = client.created || "—";
     }
 
-    // ✅ General Balance render + permissions
-    function renderGeneralBalance(){
-      const enabled = !!client.generalBalanceEnabled;
 
-      els.gbStatusBadge.innerHTML = enabledBadge(enabled);
-      els.gbToggle.checked = enabled;
-
-      // permissions
-      if (!IS_ADMIN){
-        els.gbToggle.disabled = true;
-        els.gbSwitchLabel.classList.add("um-switch--disabled");
-        els.gbLock.hidden = false;
-        els.gbSwitchLabel.title = "Locked (Admin only)";
-      } else {
-        els.gbToggle.disabled = false;
-        els.gbSwitchLabel.classList.remove("um-switch--disabled");
-        els.gbLock.hidden = true;
-        els.gbSwitchLabel.title = "Admin: you can enable/disable";
-      }
-    }
 
     function escapeHtml(s){
       return String(s ?? "")
@@ -848,13 +801,15 @@
       client.feeTable.forEach((row, idx) => {
         const tr = document.createElement("tr");
 
-        const tdType    = document.createElement("td");
-        const tdSetup   = document.createElement("td");
-        const tdInitInt = document.createElement("td");
-        const tdInitAmt = document.createElement("td");
-        const tdRecInt  = document.createElement("td");
-        const tdRecAmt  = document.createElement("td");
-        const tdFee     = document.createElement("td");
+        const tdType       = document.createElement("td");
+        const tdSetup      = document.createElement("td");
+        const tdInitInt    = document.createElement("td");
+        const tdInitAmt    = document.createElement("td");
+        const tdRecInt     = document.createElement("td");
+        const tdRecAmt     = document.createElement("td");
+        const tdFee        = document.createElement("td");
+        const tdPaymentDay = document.createElement("td");
+        const tdGB         = document.createElement("td");
 
         tdType.textContent = row.type || "—";
 
@@ -871,6 +826,19 @@
             <input class="um-input um-inline-input" data-fee-input data-idx="${idx}"
               value="${String(row.fee ?? "").replace(/"/g, "&quot;")}" />
           `;
+          tdPaymentDay.innerHTML = `
+            <input class="um-input um-inline-input" data-payment-day data-idx="${idx}" 
+              type="number" min="1" max="31" value="${String(row.paymentDay ?? 1)}" 
+              style="max-width:70px;" />
+          `;
+          tdGB.innerHTML = `
+            <label class="um-switch" style="justify-content:center;">
+              <input type="checkbox" data-gb-toggle data-idx="${idx}" ${row.generalBalance ? 'checked' : ''} />
+              <span class="um-switch__track" aria-hidden="true">
+                <span class="um-switch__knob"></span>
+              </span>
+            </label>
+          `;
         } else {
           tdSetup.innerHTML =
             (openDiscount.rowIdx === idx && openDiscount.col === "setup")
@@ -886,6 +854,9 @@
             (openDiscount.rowIdx === idx && openDiscount.col === "fee")
               ? buildDiscountInlineEditor(idx, "fee")
               : buildDiscountCellView(row.fee, idx, "fee");
+
+          tdPaymentDay.innerHTML = `<strong>Day ${row.paymentDay ?? 1}</strong>`;
+          tdGB.innerHTML = `<span class="um-badge ${row.generalBalance ? 'um-badge--green' : 'um-badge--gray'}">${row.generalBalance ? 'Enabled' : 'Disabled'}</span>`;
         }
 
         tr.appendChild(tdType);
@@ -895,6 +866,8 @@
         tr.appendChild(tdRecInt);
         tr.appendChild(tdRecAmt);
         tr.appendChild(tdFee);
+        tr.appendChild(tdPaymentDay);
+        tr.appendChild(tdGB);
 
         els.feeBody.appendChild(tr);
       });
@@ -994,7 +967,6 @@
       }
 
       renderProfile();
-      renderGeneralBalance();
       renderEmployees();
       renderNetworkFees();
       renderFeeTable();
@@ -1154,6 +1126,19 @@
         if (client.feeTable[idx]) client.feeTable[idx].fee = inp.value.trim();
       });
 
+      document.querySelectorAll("[data-payment-day]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        const day = Number(inp.value);
+        if (client.feeTable[idx]) {
+          client.feeTable[idx].paymentDay = (day >= 1 && day <= 31) ? day : 1;
+        }
+      });
+
+      document.querySelectorAll("[data-gb-toggle]").forEach(inp => {
+        const idx = Number(inp.dataset.idx);
+        if (client.feeTable[idx]) client.feeTable[idx].generalBalance = inp.checked;
+      });
+
       persist();
       exitFeeEdit(false);
     }
@@ -1224,21 +1209,7 @@
       }
     });
 
-    // ✅ General Balance toggle (Admin only)
-    els.gbToggle.addEventListener("change", () => {
-      if (!client) return;
 
-      if (!IS_ADMIN){
-        // safety (even though disabled)
-        els.gbToggle.checked = !!client.generalBalanceEnabled;
-        alert("Only Admin can enable/disable General Balance.");
-        return;
-      }
-
-      client.generalBalanceEnabled = !!els.gbToggle.checked;
-      persist();
-      renderGeneralBalance();
-    });
 
     // ===== init =====
     client = loadClient();
