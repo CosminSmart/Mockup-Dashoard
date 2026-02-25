@@ -238,6 +238,8 @@ function ensureDefaults(){
         city: "București",
         country: "Romania",
         postalCode: "010101",
+        currency: "RON",
+        iban: "RO49AAAA1B31007593840000",
         isDefault: true
       },
       {
@@ -249,6 +251,8 @@ function ensureDefaults(){
         city: "Cluj-Napoca",
         country: "Romania",
         postalCode: "400000",
+        currency: "EUR",
+        iban: "RO49AAAA1B31007593840001",
         isDefault: false
       }
     ];
@@ -344,6 +348,14 @@ function renderBillingAddresses(){
         <div class="billing-address-field">
           <div class="billing-address-label">Postal Code</div>
           <div class="billing-address-value">${escapeHtml(addr.postalCode)}</div>
+        </div>
+        <div class="billing-address-field">
+          <div class="billing-address-label">💰 Currency</div>
+          <div class="billing-address-value"><strong>${escapeHtml(addr.currency)}</strong></div>
+        </div>
+        <div class="billing-address-field">
+          <div class="billing-address-label">🏦 IBAN</div>
+          <div class="billing-address-value" style="font-family: monospace; font-size: 12px;">${escapeHtml(addr.iban)}</div>
         </div>
       </div>
     </div>
