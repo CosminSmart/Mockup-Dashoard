@@ -829,9 +829,6 @@
           </div>
         </div>
 
-        <div class="mini-hint" style="padding:0 2px;">
-          Tip for devs: Internal Transactions are the single source of truth. Fees and balances are derived from them. Backend is intentionally omitted.
-        </div>
 
       </div>
     </main>
@@ -1366,7 +1363,6 @@
       
       if(type === "TOPUP") return `TOPUP-TN-DEMO-${id}`;
       if(type === "TRANSFER") return `TRANSFER-TE-DEMO-${id}`;
-      if(type === "ALLOCATION") return `TRANSFER-TN-DEMO-${id}`;
       if(type === "FEE") return `TRANSFER-TE-DEMO-${id}`;
       
       return `TX-${id}`;
