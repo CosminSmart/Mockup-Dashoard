@@ -261,7 +261,7 @@
         /* Setting item layout */
         .setting-item {
             display: grid;
-            grid-template-columns: 1fr 2fr auto;
+            grid-template-columns: 1fr 2fr;
             gap: 1.5rem;
             align-items: start;
             padding: 1.5rem 0;
@@ -414,29 +414,32 @@
                             <div class="setting-input">
                                 <input type="email" id="email" placeholder="email@example.com">
                             </div>
-                            <button class="btn-update" onclick="updateField('email')">Update</button>
                         </div>
 
-                        <div class="setting-item">
+                        <div class="setting-item" style="grid-template-columns: 1fr 2fr;">
                             <div class="setting-label">
-                                <h4>Telegram</h4>
-                                <p>Open bot → Start → paste Chat ID.</p>
+                                <h4>Telegram Bot</h4>
+                                <p>Connect your Telegram account to receive notifications.</p>
                             </div>
-                            <div class="setting-input">
+                            <div style="display: flex; gap: 1rem; align-items: center;">
                                 <span class="status-badge connected">Connected</span>
+                                <button onclick="openTelegramBot()" style="padding: 0.65rem 1.2rem; background: #0088cc; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 0.9rem; font-weight: 500; transition: background 0.3s; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap;">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161l-1.84 8.673c-.139.623-.499.775-.999.483l-2.76-2.034-1.33 1.28c-.147.147-.27.27-.552.27l.197-2.8 5.09-4.598c.221-.197-.048-.307-.343-.11l-6.293 3.962-2.71-.847c-.59-.184-.602-.59.124-.874l10.59-4.083c.492-.184.922.11.762.874z"/>
+                                    </svg>
+                                    Open Bot
+                                </button>
                             </div>
-                            <button class="btn-update" onclick="openTelegramBot()">Open bot</button>
                         </div>
 
                         <div class="setting-item">
                             <div class="setting-label">
                                 <h4>Telegram Chat ID</h4>
-                                <p>Numeric ID (e.g. 123456789).</p>
+                                <p>Your numeric Chat ID from the bot (e.g. 123456789).</p>
                             </div>
                             <div class="setting-input">
-                                <input type="text" id="telegramChatId" placeholder="Enter Chat ID">
+                                <input type="text" id="telegramChatId" placeholder="Enter Chat ID from bot">
                             </div>
-                            <button class="btn-update" onclick="updateField('telegramChatId')">Save</button>
                         </div>
 
                         <div class="setting-item">
@@ -459,18 +462,16 @@
                                     <option value="AX">🇦🇽 Åland Islands</option>
                                 </select>
                             </div>
-                            <button class="btn-update" onclick="updateField('country')">Update</button>
                         </div>
 
                         <div class="setting-item">
                             <div class="setting-label">
                                 <h4>Telegram Username</h4>
-                                <p>Your @username (not the numeric Chat ID).</p>
+                                <p>Your @username (optional, for reference only).</p>
                             </div>
                             <div class="setting-input">
                                 <input type="text" id="telegram" placeholder="@username">
                             </div>
-                            <button class="btn-update" onclick="updateField('telegram')">Update</button>
                         </div>
 
                         <div class="setting-item">
@@ -482,92 +483,132 @@
                                 <input type="tel" id="phone" placeholder="+40 123 456 789">
                                 <small style="color: #7f8c8d; font-size: 0.8rem; display: block; margin-top: 0.25rem;">Ex: +40 712 345 678</small>
                             </div>
-                            <button class="btn-update" onclick="updateField('phone')">Update</button>
                         </div>
+                    </div>
+
+                    <!-- Save All Changes Button -->
+                    <div class="actions-bar">
+                        <button class="btn-primary" onclick="saveAccountSettings()">Save All Changes</button>
                     </div>
                 </div>
 
                 <!-- Privacy Tab -->
                 <div class="settings-content" id="privacy-content">
-                    <h2 style="font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin-bottom: 2rem;">Privacy & Security</h2>
+                    <h2 style="font-size: 1.5rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">Privacy & Security</h2>
+                    <p style="color: #7f8c8d; font-size: 0.95rem; margin-bottom: 2rem;">Manage your password and two-factor authentication settings</p>
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                        <!-- Change Password Section -->
-                        <div class="settings-section" style="margin-bottom: 0;">
-                            <h3>Change Password</h3>
+                    <!-- Change Password Card -->
+                    <div style="background: white; border-radius: 12px; padding: 2rem; margin-bottom: 1.5rem; border: 1px solid #e5e5e5; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
                             <div>
-                                <div class="form-group">
-                                    <label>Old Password <span style="color: #e74c3c;">*</span></label>
-                                    <div style="position: relative;">
-                                        <input type="password" id="oldPassword" placeholder="Enter the old password" style="padding-right: 3rem;">
-                                        <button onclick="togglePasswordVisibility('oldPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
-                                            👁️
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>New Password <span style="color: #e74c3c;">*</span></label>
-                                    <div style="position: relative;">
-                                        <input type="password" id="newPassword" placeholder="Enter the new password" style="padding-right: 3rem;">
-                                        <button onclick="togglePasswordVisibility('newPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
-                                            👁️
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Confirm Password <span style="color: #e74c3c;">*</span></label>
-                                    <div style="position: relative;">
-                                        <input type="password" id="confirmPassword" placeholder="Confirm the password" style="padding-right: 3rem;">
-                                        <button onclick="togglePasswordVisibility('confirmPassword')" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; font-size: 1.2rem;">
-                                            👁️
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <button class="btn-primary" onclick="changePassword()" style="display: flex; align-items: center; gap: 0.5rem;">
-                                    Save Changes
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
-                                </button>
+                                <h3 style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; margin: 0 0 0.25rem 0;">Change Password</h3>
+                                <p style="font-size: 0.9rem; color: #7f8c8d; margin: 0;">Update your password to keep your account secure</p>
                             </div>
                         </div>
 
-                        <!-- Two-Factor Authentication Section -->
-                        <div class="settings-section" style="margin-bottom: 0;">
-                            <h3>Enable Two-Factor Authentication</h3>
-                            <div>
-                                <div style="text-align: center; margin-bottom: 2rem;">
-                                    <div style="width: 80px; height: 80px; margin: 0 auto 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-                                            <path d="M9 12l2 2 4-4"></path>
+                        <div style="display: grid; gap: 1.25rem;">
+                            <div class="form-group" style="margin-bottom: 0;">
+                                <label style="font-size: 0.9rem; font-weight: 500; color: #555; margin-bottom: 0.5rem; display: block;">Old Password <span style="color: #e74c3c;">*</span></label>
+                                <div style="position: relative;">
+                                    <input type="password" id="oldPassword" placeholder="Enter your current password" style="width: 100%; padding: 0.75rem 3rem 0.75rem 0.75rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; transition: border-color 0.3s;">
+                                    <button onclick="togglePasswordVisibility('oldPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; padding: 0.25rem;">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
                                         </svg>
-                                    </div>
-                                    <h4 style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; margin-bottom: 0.5rem;">Enable Two-Factor Authentication</h4>
-                                    <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1.5rem;">Scan the QR code below with your 2FA app:</p>
-                                    
-                                    <!-- QR Code -->
-                                    <div style="background: white; padding: 1.5rem; border-radius: 12px; border: 2px solid #e5e5e5; display: inline-block; margin-bottom: 1.5rem;">
-                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%23fff'/%3E%3Cpath d='M0 0h40v40H0zm40 0h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40zM0 40h40v40H0zm80 40h40v40H80zm120 0h40v40h-40zM0 80h40v40H0zm40 80h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40zM0 120h40v40H0zm80 0h40v40H80zm120 0h40v40h-40zM0 160h40v40H0zm40 0h40v40H40zm80 0h40v40h-40zm120 0h40v40h-40z' fill='%23000'/%3E%3C/svg%3E" alt="QR Code" style="width: 200px; height: 200px; display: block;">
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.9rem; font-weight: 500; color: #555; margin-bottom: 0.5rem; display: block;">New Password <span style="color: #e74c3c;">*</span></label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="newPassword" placeholder="Enter new password" style="width: 100%; padding: 0.75rem 3rem 0.75rem 0.75rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; transition: border-color 0.3s;">
+                                        <button onclick="togglePasswordVisibility('newPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; padding: 0.25rem;">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Verify Two-Factor Authentication</label>
-                                    <input type="text" id="twoFactorCode" placeholder="Enter your 2FA code" maxlength="6" style="text-align: center; font-size: 1.2rem; letter-spacing: 0.5rem; font-weight: 600;">
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.9rem; font-weight: 500; color: #555; margin-bottom: 0.5rem; display: block;">Confirm Password <span style="color: #e74c3c;">*</span></label>
+                                    <div style="position: relative;">
+                                        <input type="password" id="confirmPassword" placeholder="Confirm new password" style="width: 100%; padding: 0.75rem 3rem 0.75rem 0.75rem; border: 1px solid #ddd; border-radius: 8px; font-size: 0.9rem; transition: border-color 0.3s;">
+                                        <button onclick="togglePasswordVisibility('confirmPassword')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: #7f8c8d; padding: 0.25rem;">
+                                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                        </button>
+                                    </div>
                                 </div>
+                            </div>
 
-                                <button class="btn-primary" onclick="verify2FA()" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                                    Verify 2FA
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polyline points="20 6 9 17 4 12"></polyline>
-                                    </svg>
-                                </button>
+                            <div style="background: #e3f2fd; border-left: 4px solid #3498db; padding: 0.75rem 1rem; border-radius: 6px; margin-top: 0.5rem;">
+                                <p style="margin: 0; font-size: 0.85rem; color: #555;">
+                                    <strong>Password requirements:</strong> At least 8 characters long
+                                </p>
                             </div>
                         </div>
+                    </div>
+
+                    <!-- Two-Factor Authentication Card -->
+                    <div style="background: white; border-radius: 12px; padding: 2rem; border: 1px solid #e5e5e5; box-shadow: 0 2px 8px rgba(0,0,0,0.05);">
+                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem;">
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                    <path d="M9 12l2 2 4-4"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 style="font-size: 1.1rem; font-weight: 600; color: #2c3e50; margin: 0 0 0.25rem 0;">Two-Factor Authentication</h3>
+                                <p style="font-size: 0.9rem; color: #7f8c8d; margin: 0;">Add an extra layer of security to your account</p>
+                            </div>
+                        </div>
+
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 2rem; align-items: start;">
+                            <!-- QR Code Section -->
+                            <div style="text-align: center;">
+                                <p style="font-size: 0.9rem; color: #7f8c8d; margin-bottom: 1rem;">Scan with your 2FA app</p>
+                                <div style="background: #f8f9fa; padding: 1rem; border-radius: 12px; border: 2px solid #e5e5e5; display: inline-block;">
+                                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Crect width='160' height='160' fill='%23fff'/%3E%3Cpath d='M0 0h32v32H0zm32 0h32v32H32zm64 0h32v32h-32zm96 0h32v32h-32zM0 32h32v32H0zm64 32h32v32H64zm96 0h32v32h-32zM0 64h32v32H0zm32 64h32v32H32zm64 0h32v32h-32zm96 0h32v32h-32zM0 96h32v32H0zm64 0h32v32H64zm96 0h32v32h-32zM0 128h32v32H0zm32 0h32v32H32zm64 0h32v32h-32zm96 0h32v32h-32z' fill='%23000'/%3E%3C/svg%3E" alt="QR Code" style="width: 160px; height: 160px; display: block;">
+                                </div>
+                            </div>
+
+                            <!-- Verification Section -->
+                            <div>
+                                <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 0.75rem 1rem; border-radius: 6px; margin-bottom: 1.5rem;">
+                                    <p style="margin: 0; font-size: 0.85rem; color: #856404;">
+                                        <strong>Setup Instructions:</strong><br>
+                                        1. Download a 2FA app (Google Authenticator, Authy, etc.)<br>
+                                        2. Scan the QR code with your app<br>
+                                        3. Enter the 6-digit code below to verify
+                                    </p>
+                                </div>
+
+                                <div class="form-group" style="margin-bottom: 0;">
+                                    <label style="font-size: 0.9rem; font-weight: 500; color: #555; margin-bottom: 0.5rem; display: block;">Verification Code</label>
+                                    <input type="text" id="twoFactorCode" placeholder="000000" maxlength="6" style="width: 100%; padding: 0.75rem; border: 2px solid #ddd; border-radius: 8px; font-size: 1.5rem; letter-spacing: 0.5rem; font-weight: 600; text-align: center; font-family: monospace;">
+                                    <small style="display: block; margin-top: 0.5rem; color: #7f8c8d; font-size: 0.85rem;">Enter the 6-digit code from your authenticator app</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Save All Changes Button -->
+                    <div class="actions-bar">
+                        <button class="btn-primary" onclick="savePrivacySettings()">Save All Changes</button>
                     </div>
                 </div>
 
@@ -698,43 +739,6 @@
             document.getElementById('telegramChatId').value = userTelegramChatId;
         }
 
-        function updateField(fieldName) {
-            const fieldElement = document.getElementById(fieldName);
-            const value = fieldElement.value.trim();
-
-            // Validate based on field type
-            if (fieldName === 'email') {
-                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRegex.test(value)) {
-                    alert('Please enter a valid email address!');
-                    return;
-                }
-                localStorage.setItem('userEmail', value);
-            } else if (fieldName === 'telegram') {
-                if (!value.startsWith('@')) {
-                    alert('Telegram username must start with @');
-                    return;
-                }
-                localStorage.setItem('userTelegram', value);
-            } else if (fieldName === 'telegramChatId') {
-                if (!/^\d+$/.test(value)) {
-                    alert('Telegram Chat ID must be numeric!');
-                    return;
-                }
-                localStorage.setItem('userTelegramChatId', value);
-            } else if (fieldName === 'country') {
-                if (!value) {
-                    alert('Please select a country!');
-                    return;
-                }
-                localStorage.setItem('userCountry', value);
-            } else if (fieldName === 'phone') {
-                localStorage.setItem('userPhone', value);
-            }
-
-            alert(`${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} updated successfully!`);
-        }
-
         function openTelegramBot() {
             // Open Telegram bot in new window
             window.open('https://t.me/YourBotName', '_blank');
@@ -760,116 +764,111 @@
 
         function saveAccountSettings() {
             // Get form values
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
             const email = document.getElementById('email').value.trim();
             const phone = document.getElementById('phone').value.trim();
-            const company = document.getElementById('company').value.trim();
             const country = document.getElementById('country').value;
             const telegram = document.getElementById('telegram').value.trim();
-            const language = document.getElementById('language').value;
-            const timezone = document.getElementById('timezone').value;
+            const telegramChatId = document.getElementById('telegramChatId').value.trim();
 
-            // Validate required fields
-            if (!firstName || !email || !company || !country || !telegram) {
-                alert('Please fill in all required fields!');
+            // Validate email
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert('Please enter a valid email address!');
+                    return;
+                }
+                localStorage.setItem('userEmail', email);
+            }
+
+            // Validate telegram username
+            if (telegram && !telegram.startsWith('@')) {
+                alert('Telegram username must start with @');
                 return;
             }
+            if (telegram) localStorage.setItem('userTelegram', telegram);
 
-            // Validate email format
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Please enter a valid email address!');
+            // Validate telegram chat ID
+            if (telegramChatId && !/^\d+$/.test(telegramChatId)) {
+                alert('Telegram Chat ID must be numeric!');
                 return;
             }
+            if (telegramChatId) localStorage.setItem('userTelegramChatId', telegramChatId);
 
-            // Combine first and last name
-            const fullName = `${firstName} ${lastName}`.trim();
+            // Save other fields
+            if (country) localStorage.setItem('userCountry', country);
+            if (phone) localStorage.setItem('userPhone', phone);
 
-            // Save to localStorage
-            localStorage.setItem('userName', fullName);
-            localStorage.setItem('userEmail', email);
-            localStorage.setItem('userPhone', phone);
-            localStorage.setItem('userCompany', company);
-            localStorage.setItem('userCountry', country);
-            localStorage.setItem('userTelegram', telegram);
-            localStorage.setItem('userLanguage', language);
-            localStorage.setItem('userTimezone', timezone);
-
-            // Handle password change if provided
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-
-            if (currentPassword || newPassword || confirmPassword) {
-                if (!currentPassword) {
-                    alert('Please enter your current password!');
-                    return;
-                }
-                if (newPassword !== confirmPassword) {
-                    alert('New passwords do not match!');
-                    return;
-                }
-                if (newPassword.length < 8) {
-                    alert('New password must be at least 8 characters long!');
-                    return;
-                }
-                // In a real app, you would verify current password and update
-                localStorage.setItem('userPassword', newPassword);
-                alert('Account settings and password updated successfully!');
-            } else {
-                alert('Account settings saved successfully!');
-            }
-
-            // Clear password fields
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
+            alert('Account settings saved successfully!');
         }
 
         function savePrivacySettings() {
-            alert('Privacy settings saved successfully!');
-        }
-
-        function changePassword() {
+            // Handle password change
             const oldPassword = document.getElementById('oldPassword').value.trim();
             const newPassword = document.getElementById('newPassword').value.trim();
             const confirmPassword = document.getElementById('confirmPassword').value.trim();
 
-            // Validate fields
-            if (!oldPassword || !newPassword || !confirmPassword) {
-                alert('Please fill in all password fields!');
-                return;
+            // Handle 2FA
+            const twoFactorCode = document.getElementById('twoFactorCode').value.trim();
+
+            let changesMade = false;
+
+            // Process password change if any field is filled
+            if (oldPassword || newPassword || confirmPassword) {
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    alert('Please fill in all password fields!');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    alert('New passwords do not match!');
+                    return;
+                }
+
+                if (newPassword.length < 8) {
+                    alert('New password must be at least 8 characters long!');
+                    return;
+                }
+
+                const storedPassword = localStorage.getItem('userPassword');
+                if (storedPassword && storedPassword !== oldPassword) {
+                    alert('Old password is incorrect!');
+                    return;
+                }
+
+                localStorage.setItem('userPassword', newPassword);
+                
+                // Clear password fields
+                document.getElementById('oldPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+                
+                changesMade = true;
             }
 
-            // Check if new passwords match
-            if (newPassword !== confirmPassword) {
-                alert('New passwords do not match!');
-                return;
+            // Process 2FA if code is provided
+            if (twoFactorCode) {
+                if (twoFactorCode.length !== 6) {
+                    alert('2FA code must be 6 digits!');
+                    return;
+                }
+
+                if (!/^\d+$/.test(twoFactorCode)) {
+                    alert('2FA code must contain only numbers!');
+                    return;
+                }
+
+                localStorage.setItem('user2FAEnabled', 'true');
+                localStorage.setItem('user2FACode', twoFactorCode);
+                document.getElementById('twoFactorCode').value = '';
+                
+                changesMade = true;
             }
 
-            // Check password strength
-            if (newPassword.length < 8) {
-                alert('New password must be at least 8 characters long!');
-                return;
+            if (changesMade) {
+                alert('Privacy settings saved successfully!');
+            } else {
+                alert('No changes to save!');
             }
-
-            // In a real app, you would verify the old password with the server
-            const storedPassword = localStorage.getItem('userPassword');
-            if (storedPassword && storedPassword !== oldPassword) {
-                alert('Old password is incorrect!');
-                return;
-            }
-
-            // Save new password
-            localStorage.setItem('userPassword', newPassword);
-            
-            // Clear fields
-            document.getElementById('oldPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmPassword').value = '';
-
-            alert('Password changed successfully!');
         }
 
         function togglePasswordVisibility(fieldId) {
@@ -879,33 +878,6 @@
             } else {
                 field.type = 'password';
             }
-        }
-
-        function verify2FA() {
-            const code = document.getElementById('twoFactorCode').value.trim();
-
-            if (!code) {
-                alert('Please enter the 2FA code!');
-                return;
-            }
-
-            if (code.length !== 6) {
-                alert('2FA code must be 6 digits!');
-                return;
-            }
-
-            if (!/^\d+$/.test(code)) {
-                alert('2FA code must contain only numbers!');
-                return;
-            }
-
-            // In a real app, you would verify the code with the server
-            // For demo purposes, we'll accept any 6-digit code
-            localStorage.setItem('user2FAEnabled', 'true');
-            localStorage.setItem('user2FACode', code);
-
-            alert('Two-Factor Authentication enabled successfully!');
-            document.getElementById('twoFactorCode').value = '';
         }
 
         function saveNotificationSettings() {

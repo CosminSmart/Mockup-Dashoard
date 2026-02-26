@@ -211,15 +211,24 @@
     .dropdown-item-icon{
       width: 20px;
       height: 20px;
+      flex-shrink: 0;
     }
 
     .dropdown-item.has-submenu{
       justify-content: space-between;
     }
 
+    .dropdown-item-text-wrapper{
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex: 1;
+    }
+
     .dropdown-item-arrow{
       margin-left: auto;
       color: var(--muted);
+      flex-shrink: 0;
     }
 
     .submenu{
@@ -1155,56 +1164,66 @@
               <div class="dropdown-menu" id="fromDropdown">
                 <!-- Main Wallet -->
                 <div class="dropdown-item" onclick="selectFrom('main', 'Main Wallet', '../assets/icons/wallet.svg')">
-                  <img src="../assets/icons/wallet.svg" alt="Main Wallet" class="dropdown-item-icon" onerror="this.style.display='none';">
-                  <span>Main Wallet</span>
+                  <div class="dropdown-item-text-wrapper">
+                    <img src="../assets/icons/wallet.svg" alt="Main Wallet" class="dropdown-item-icon" onerror="this.style.display='none';">
+                    <span>Main Wallet</span>
+                  </div>
                 </div>
 
                 <!-- Facebook -->
-                <div class="dropdown-item has-submenu" onclick="toggleSubmenu('facebook')">
-                  <img src="../assets/icons/facebook.svg" alt="Facebook" class="dropdown-item-icon" onerror="this.style.display='none';">
-                  <span>Facebook</span>
+                <div class="dropdown-item has-submenu" onclick="handlePlatformClick('facebook', 'Facebook')">
+                  <div class="dropdown-item-text-wrapper">
+                    <img src="../assets/icons/facebook.svg" alt="Facebook" class="dropdown-item-icon" onerror="this.style.display='none';">
+                    <span>Facebook</span>
+                  </div>
                   <span class="dropdown-item-arrow">›</span>
                 </div>
                 <div class="submenu" id="submenu-facebook">
-                  <div class="dropdown-subitem" onclick="selectFrom('facebook_vault', 'Facebook Vault', '../assets/icons/facebook.svg')">Vault</div>
+                  <div class="dropdown-subitem vault-option" onclick="selectFrom('facebook_vault', 'Facebook Vault', '../assets/icons/facebook.svg')">Vault</div>
                   <div class="dropdown-subitem general-option" data-platform="facebook" onclick="selectFrom('facebook_general', 'Facebook General', '../assets/icons/facebook.svg')">General</div>
-                  <div class="dropdown-subitem" onclick="selectFrom('facebook_individual', 'Facebook Individual', '../assets/icons/facebook.svg')">Individual</div>
+                  <div class="dropdown-subitem individual-option" onclick="selectFrom('facebook_individual', 'Facebook Individual', '../assets/icons/facebook.svg')">Individual</div>
                 </div>
 
                 <!-- Google -->
-                <div class="dropdown-item has-submenu" onclick="toggleSubmenu('google')">
-                  <img src="../assets/icons/google.svg" alt="Google" class="dropdown-item-icon" onerror="this.style.display='none';">
-                  <span>Google</span>
+                <div class="dropdown-item has-submenu" onclick="handlePlatformClick('google', 'Google')">
+                  <div class="dropdown-item-text-wrapper">
+                    <img src="../assets/icons/google.svg" alt="Google" class="dropdown-item-icon" onerror="this.style.display='none';">
+                    <span>Google</span>
+                  </div>
                   <span class="dropdown-item-arrow">›</span>
                 </div>
                 <div class="submenu" id="submenu-google">
-                  <div class="dropdown-subitem" onclick="selectFrom('google_vault', 'Google Vault', '../assets/icons/google.svg')">Vault</div>
+                  <div class="dropdown-subitem vault-option" onclick="selectFrom('google_vault', 'Google Vault', '../assets/icons/google.svg')">Vault</div>
                   <div class="dropdown-subitem general-option" data-platform="google" onclick="selectFrom('google_general', 'Google General', '../assets/icons/google.svg')">General</div>
-                  <div class="dropdown-subitem" onclick="selectFrom('google_individual', 'Google Individual', '../assets/icons/google.svg')">Individual</div>
+                  <div class="dropdown-subitem individual-option" onclick="selectFrom('google_individual', 'Google Individual', '../assets/icons/google.svg')">Individual</div>
                 </div>
 
                 <!-- TikTok -->
-                <div class="dropdown-item has-submenu" onclick="toggleSubmenu('tiktok')">
-                  <img src="../assets/icons/tiktok.svg" alt="TikTok" class="dropdown-item-icon" onerror="this.style.display='none';">
-                  <span>TikTok</span>
+                <div class="dropdown-item has-submenu" onclick="handlePlatformClick('tiktok', 'TikTok')">
+                  <div class="dropdown-item-text-wrapper">
+                    <img src="../assets/icons/tiktok.svg" alt="TikTok" class="dropdown-item-icon" onerror="this.style.display='none';">
+                    <span>TikTok</span>
+                  </div>
                   <span class="dropdown-item-arrow">›</span>
                 </div>
                 <div class="submenu" id="submenu-tiktok">
-                  <div class="dropdown-subitem" onclick="selectFrom('tiktok_vault', 'TikTok Vault', '../assets/icons/tiktok.svg')">Vault</div>
+                  <div class="dropdown-subitem vault-option" onclick="selectFrom('tiktok_vault', 'TikTok Vault', '../assets/icons/tiktok.svg')">Vault</div>
                   <div class="dropdown-subitem general-option" data-platform="tiktok" onclick="selectFrom('tiktok_general', 'TikTok General', '../assets/icons/tiktok.svg')">General</div>
-                  <div class="dropdown-subitem" onclick="selectFrom('tiktok_individual', 'TikTok Individual', '../assets/icons/tiktok.svg')">Individual</div>
+                  <div class="dropdown-subitem individual-option" onclick="selectFrom('tiktok_individual', 'TikTok Individual', '../assets/icons/tiktok.svg')">Individual</div>
                 </div>
 
                 <!-- Instagram -->
-                <div class="dropdown-item has-submenu" onclick="toggleSubmenu('instagram')">
-                  <img src="../assets/icons/instagram.svg" alt="Instagram" class="dropdown-item-icon" onerror="this.style.display='none';">
-                  <span>Instagram</span>
+                <div class="dropdown-item has-submenu" onclick="handlePlatformClick('instagram', 'Instagram')">
+                  <div class="dropdown-item-text-wrapper">
+                    <img src="../assets/icons/instagram.svg" alt="Instagram" class="dropdown-item-icon" onerror="this.style.display='none';">
+                    <span>Instagram</span>
+                  </div>
                   <span class="dropdown-item-arrow">›</span>
                 </div>
                 <div class="submenu" id="submenu-instagram">
-                  <div class="dropdown-subitem" onclick="selectFrom('instagram_vault', 'Instagram Vault', '../assets/icons/instagram.svg')">Vault</div>
+                  <div class="dropdown-subitem vault-option" onclick="selectFrom('instagram_vault', 'Instagram Vault', '../assets/icons/instagram.svg')">Vault</div>
                   <div class="dropdown-subitem general-option" data-platform="instagram" onclick="selectFrom('instagram_general', 'Instagram General', '../assets/icons/instagram.svg')">General</div>
-                  <div class="dropdown-subitem" onclick="selectFrom('instagram_individual', 'Instagram Individual', '../assets/icons/instagram.svg')">Individual</div>
+                  <div class="dropdown-subitem individual-option" onclick="selectFrom('instagram_individual', 'Instagram Individual', '../assets/icons/instagram.svg')">Individual</div>
                 </div>
               </div>
             </div>
@@ -1224,18 +1243,22 @@
           <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px;">
             Platform Balances
           </div>
-          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+          <div id="platform_balance_grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
             <div>
               <div style="font-size: 11px; color: var(--muted);">Vault</div>
               <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="platform_vault_balance">$0.00</div>
             </div>
-            <div>
+            <div id="platform_general_box">
               <div style="font-size: 11px; color: var(--muted);">General</div>
               <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="platform_general_balance">$0.00</div>
             </div>
-            <div>
+            <div id="platform_individual_box">
               <div style="font-size: 11px; color: var(--muted);">Individual</div>
               <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="platform_individual_balance">$0.00</div>
+            </div>
+            <div id="platform_main_wallet_box" style="display: none;">
+              <div style="font-size: 11px; color: var(--muted);">Main Wallet</div>
+              <div style="font-size: 16px; font-weight: 900; color: var(--text);" id="platform_main_wallet_balance">$0.00</div>
             </div>
           </div>
         </div>
@@ -1574,15 +1597,44 @@
 
     function updateGeneralAccessUI() {
       const generalOptions = document.querySelectorAll('.general-option');
-      generalOptions.forEach(option => {
-        if (!hasGeneralAccess) {
-          option.classList.add('disabled');
-          option.onclick = (e) => {
-            e.stopPropagation();
-            showErrorModal('You don\'t have permission to use General Balance. Contact admin for access.');
-          };
-        }
-      });
+      const vaultOptions = document.querySelectorAll('.vault-option');
+      const individualOptions = document.querySelectorAll('.individual-option');
+      
+      if (!hasGeneralAccess) {
+        // Hide all submenu options (Vault, General, Individual)
+        generalOptions.forEach(option => {
+          option.style.display = 'none';
+        });
+        vaultOptions.forEach(option => {
+          option.style.display = 'none';
+        });
+        individualOptions.forEach(option => {
+          option.style.display = 'none';
+        });
+        
+        // Hide arrows from platform items
+        document.querySelectorAll('.dropdown-item.has-submenu').forEach(item => {
+          const arrow = item.querySelector('.dropdown-item-arrow');
+          if (arrow) arrow.style.display = 'none';
+        });
+      } else {
+        // Show all options for clients with general access
+        generalOptions.forEach(option => {
+          option.style.display = 'block';
+        });
+        vaultOptions.forEach(option => {
+          option.style.display = 'block';
+        });
+        individualOptions.forEach(option => {
+          option.style.display = 'block';
+        });
+        
+        // Show arrows
+        document.querySelectorAll('.dropdown-item.has-submenu').forEach(item => {
+          const arrow = item.querySelector('.dropdown-item-arrow');
+          if (arrow) arrow.style.display = 'block';
+        });
+      }
     }
 
     function calculateFee(platform, amount) {
@@ -1626,6 +1678,20 @@
       event.stopPropagation();
       const submenu = document.getElementById(`submenu-${platform}`);
       submenu.classList.toggle('show');
+    }
+
+    // Handle platform click - either show submenu or directly select platform
+    function handlePlatformClick(platform, platformName) {
+      event.stopPropagation();
+      
+      // If client has no general access, directly select the platform (as Individual)
+      if (!hasGeneralAccess) {
+        const iconPath = `../assets/icons/${platform}.svg`;
+        selectFrom(`${platform}_individual`, platformName, iconPath);
+      } else {
+        // Otherwise, show the submenu
+        toggleSubmenu(platform);
+      }
     }
 
     function selectFrom(value, label, iconPath) {
@@ -1700,7 +1766,14 @@
             toSelect.innerHTML += `<option value="${platform}_vault">${platformName} Vault</option>`;
           }
         } else if (type === 'individual') {
-          toSelect.innerHTML += `<option value="${platform}_vault">${platformName} Vault</option>`;
+          // From Individual → behavior depends on client permissions
+          if (!hasGeneralAccess) {
+            // Client without general access: can ONLY go to Main Wallet
+            toSelect.innerHTML += `<option value="main">Main Wallet</option>`;
+          } else {
+            // Client with general access: can go to Vault (same platform)
+            toSelect.innerHTML += `<option value="${platform}_vault">${platformName} Vault</option>`;
+          }
         }
         
         fromInfo.style.display = 'none';
@@ -2098,6 +2171,25 @@
       document.getElementById('platform_vault_balance').textContent = `$${vaultBalance.toFixed(2)}`;
       document.getElementById('platform_general_balance').textContent = `$${generalBalance.toFixed(2)}`;
       document.getElementById('platform_individual_balance').textContent = `$${individualBalance.toFixed(2)}`;
+      
+      // Hide General and Individual if client has no general access
+      const generalBox = document.getElementById('platform_general_box');
+      const individualBox = document.getElementById('platform_individual_box');
+      const mainWalletBox = document.getElementById('platform_main_wallet_box');
+      const balanceGrid = document.getElementById('platform_balance_grid');
+      
+      if (!hasGeneralAccess) {
+        generalBox.style.display = 'none';
+        individualBox.style.display = 'none';
+        mainWalletBox.style.display = 'block';
+        document.getElementById('platform_main_wallet_balance').textContent = `$${mainWalletBalance.toFixed(2)}`;
+        balanceGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+      } else {
+        generalBox.style.display = 'block';
+        individualBox.style.display = 'block';
+        mainWalletBox.style.display = 'none';
+        balanceGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      }
     }
 
 
