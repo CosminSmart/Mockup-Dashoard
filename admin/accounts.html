@@ -868,7 +868,7 @@
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <div class="filters" style="margin-bottom: 0; flex: 1; display: flex; gap: 0.5rem; align-items: center;">
+                <div class="filters" style="margin-bottom: 0; flex: 1; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
                 <input type="text" id="searchInput" placeholder="Search accounts...">
                 <select id="platformFilter">
                     <option value="">All Platforms</option>
@@ -894,6 +894,7 @@
                     <option value="client-b">Client B</option>
                     <option value="client-c">Client C</option>
                 </select>
+                <input type="date" id="dateFilter" placeholder="Select Date" style="padding: 0.6rem; border: 1px solid #ddd; border-radius: 8px; font-size: 14px;">
                 <div class="more-filters-wrapper">
                     <button class="btn more-filters-btn" onclick="toggleMoreFilters(event)">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -3572,6 +3573,9 @@
             document.getElementById('platformFilter').value = '';
             document.getElementById('statusFilter').value = '';
             document.getElementById('assignedFilter').value = '';
+            
+            // Clear date filter
+            document.getElementById('dateFilter').value = '';
             
             // Clear more filters
             clearMoreFilters();
