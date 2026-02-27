@@ -94,6 +94,14 @@
                 </button>
               </div>
               <div id="miniCalendar" class="modern-calendar"></div>
+              
+              <!-- Monthly Income Info -->
+              <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 16px; padding: 12px 16px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 10px; border: 1px solid #667eea30;">
+                <div style="text-align: right;">
+                  <div style="font-size: 11px; color: #666; font-weight: 600; margin-bottom: 4px;" id="monthlyIncomeLabel">Monthly Income</div>
+                  <div style="font-size: 20px; font-weight: 900; color: #667eea;" id="monthlyIncomeDisplay">$0.00</div>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -303,6 +311,56 @@
 
         <!-- Third Row -->
         <div class="content-row">
+          <!-- Section Removed -->
+          <div class="card" style="display: none; grid-column: 1 / -1;">
+            <div class="card-header">
+              <h2 class="card-title">� Total Revenue per Team - Timeline</h2>
+              <div class="card-subtitle">Revenue comparison across different teams over time</div>
+            </div>
+            <div class="card-body">
+              <div>Chart removed</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fourth Row -->
+        <div class="content-row">
+          <!-- Weekly Topups Status -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">📊 Weekly Topups Status</h2>
+              <div class="card-subtitle">Topup requests breakdown for this week</div>
+            </div>
+            <div class="card-body">
+              <div id="weeklyTopupsChart" style="height: 300px;"></div>
+            </div>
+          </div>
+
+          <!-- Platform Profitability -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">� Platform Profitability</h2>
+              <div class="card-subtitle">Top performing platforms by profit margin</div>
+            </div>
+            <div class="card-body">
+              <div id="platformProfitChart" style="height: 300px;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fifth Row -->
+        <div class="content-row">
+          <!-- Daily Fees Wave Chart -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Daily Fees </h2>
+              <div class="card-subtitle">Fees trend for current month</div>
+            </div>
+            <div class="card-body">
+              <div id="dailyFeesChart" style="height: 300px;"></div>
+            </div>
+          </div>
+
           <!-- Accounts Overview -->
           <div class="card">
             <div class="card-header">
@@ -446,70 +504,6 @@
               </table>
             </div>
           </div>
-        </div>
-
-        <!-- Fourth Row -->
-        <div class="content-row">
-          <!-- Low Balance Alerts -->
-          <div class="card">
-            <div class="card-header">
-              <h2 class="card-title">⚠️ Low Balance Alerts</h2>
-              <div class="card-subtitle">Clients with main wallet below threshold</div>
-            </div>
-            <div class="card-body" style="padding: 0;">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Client</th>
-                    <th style="text-align: right;">Main Wallet</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody id="lowBalanceTable">
-                  <tr>
-                    <td>
-                      <div class="name">Tom B.</div>
-                      <div class="email">tom@example.com</div>
-                    </td>
-                    <td style="text-align: right; font-weight: 700; color: var(--red);">$15.00</td>
-                    <td><span class="badge suspended"><span class="dot"></span>Critical</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="name">Emily R.</div>
-                      <div class="email">emily@example.com</div>
-                    </td>
-                    <td style="text-align: right; font-weight: 700; color: var(--red);">$45.00</td>
-                    <td><span class="badge suspended"><span class="dot"></span>Critical</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="name">Anna K.</div>
-                      <div class="email">anna@example.com</div>
-                    </td>
-                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$65.25</td>
-                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="name">David L.</div>
-                      <div class="email">david@example.com</div>
-                    </td>
-                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$78.50</td>
-                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <div class="name">Lisa M.</div>
-                      <div class="email">lisa@example.com</div>
-                    </td>
-                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$92.00</td>
-                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
 
           <!-- Most Requested Marketplace Items -->
           <div class="card">
@@ -566,6 +560,7 @@
 
   <script src="../js/sidebar.js"></script>
   <script src="../js/admin-dashboard.js"></script>
+  <script src="../js/daily-fees-chart.js"></script>
   <script src="../js/calendar.js"></script>
   <script>
     // Demo data matching finance page structure
@@ -814,6 +809,7 @@
 
   <script>
     // Platform SVG Icons
+    const platformIcons = {
       facebook: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877f2">
         <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
       </svg>`,
@@ -960,6 +956,23 @@
           showPaymentDetails(dateStr);
         });
       });
+
+      // Calculate and display monthly income
+      let monthlyIncome = 0;
+      
+      Object.keys(recurringPayments).forEach(dateKey => {
+        const paymentDate = new Date(dateKey);
+        if (paymentDate.getMonth() === month && paymentDate.getFullYear() === year) {
+          recurringPayments[dateKey].forEach(payment => {
+            const amount = parseFloat(payment.amount.replace('$', ''));
+            monthlyIncome += amount;
+          });
+        }
+      });
+      
+      const monthName = currentMiniMonth.toLocaleDateString('en-US', { month: 'long' });
+      document.getElementById('monthlyIncomeLabel').textContent = `${monthName} Income`;
+      document.getElementById('monthlyIncomeDisplay').textContent = `$${monthlyIncome.toFixed(2)}`;
     }
 
     function showPaymentDetails(dateStr) {
@@ -1017,6 +1030,13 @@
       document.getElementById('paymentDetailsPopup').classList.remove('active');
     }
 
+    // Initialize calendar immediately after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderMiniCalendar);
+    } else {
+      renderMiniCalendar();
+    }
+
   </script>
 
   <!-- Payment Details Popup -->
@@ -1035,6 +1055,9 @@
       </div>
     </div>
   </div>
+
+  <script>
+  </script>
 
 </body>
 </html>

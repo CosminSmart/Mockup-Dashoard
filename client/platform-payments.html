@@ -1769,7 +1769,7 @@
           // From Individual → behavior depends on client permissions
           if (!hasGeneralAccess) {
             // Client without general access: can ONLY go to Main Wallet
-            toSelect.innerHTML += `<option value="main">Main Wallet</option>`;
+            toSelect.innerHTML += `<option value="main">Main Wallet ($${mainWalletBalance.toFixed(2)})</option>`;
           } else {
             // Client with general access: can go to Vault (same platform)
             toSelect.innerHTML += `<option value="${platform}_vault">${platformName} Vault</option>`;

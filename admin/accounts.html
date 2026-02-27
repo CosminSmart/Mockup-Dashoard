@@ -1970,11 +1970,6 @@
                     </div>
 
                     <div class="field-group">
-                        <label>Spend</label>
-                        <input type="number" id="addAccountCardSpend" placeholder="$0" min="0" step="0.01">
-                    </div>
-
-                    <div class="field-group">
                         <label>Type</label>
                         <select id="addAccountCardType" style="width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
                             <option value="">Select type...</option>
@@ -3347,7 +3342,6 @@
             // Reset card fields
             document.getElementById('addAccountCardMask').value = '';
             document.getElementById('addAccountCardName').value = '';
-            document.getElementById('addAccountCardSpend').value = '';
             document.getElementById('addAccountCardType').value = '';
             
             document.getElementById('addAccountModal').classList.add('active');
@@ -3644,7 +3638,6 @@
             newCard.innerHTML = `
                 <div><strong>Card Mask:</strong> <input type="text" placeholder="**** **** **** 0000" style="width: 150px;"></div>
                 <div><strong>Name:</strong> <input type="text" placeholder="Name on card" style="width: 150px;"></div>
-                <div><strong>Spend:</strong> <input type="text" placeholder="$0" style="width: 100px;"></div>
                 <div><strong>Type:</strong> <select style="width: 120px; padding: 0.3rem;">
                     <option value="wallester">Wallester</option>
                     <option value="tdx">TDX</option>

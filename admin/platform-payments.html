@@ -1846,7 +1846,7 @@
           if (client && !hasGeneralAccess(client)) {
             // Client without general access: can ONLY go to Main Wallet
             toSelect.innerHTML += `
-              <option value="main">Main Wallet</option>
+              <option value="main">Main Wallet ($${mainWalletBalance.toFixed(2)})</option>
             `;
           } else {
             // Client with general access: can go to Vault (same platform)
