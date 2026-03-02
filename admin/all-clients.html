@@ -42,10 +42,6 @@
     .um-table th:first-child, .um-table td:first-child{ width:46px; }
     .um-table td:last-child, .um-table th:last-child{ width:170px; }
 
-    /* NEW: icon column sizing */
-    .um-table th[data-col="icon"],
-    .um-table td[data-col="icon"]{ width:56px; text-align:center; }
-
     .pf-icon{
       width:28px; height:28px;
       display:inline-flex; align-items:center; justify-content:center;
@@ -265,6 +261,394 @@
       display:none;
     }
     .pf-error.is-show{ display:block; }
+
+    /* Professional Bulk Edit Styles */
+    .bulk-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .bulk-section {
+      background: #fafbfc;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .bulk-section:hover {
+      border-color: rgba(15,23,42,.12);
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+    }
+
+    .bulk-section__header {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+
+    .bulk-section__header h4 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .bulk-section__desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .bulk-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bulk-field label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin: 0;
+    }
+
+    .bulk-field input,
+    .bulk-field select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+      color: #0f172a;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .bulk-field input:focus,
+    .bulk-field select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+
+    .bulk-field input::placeholder {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .bulk-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 520px) {
+      .bulk-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .bulk-info {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+
+    .bulk-info__icon {
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .bulk-info__content {
+      font-size: 13px;
+      color: #1e40af;
+      line-height: 1.5;
+    }
+
+    .bulk-info__content strong {
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+
+    /* Enhanced button styles */
+    .um-btn--primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border: 1px solid #2563eb;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(59,130,246,.2);
+    }
+
+    .um-btn--primary:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border-color: #1d4ed8;
+      box-shadow: 0 4px 8px rgba(59,130,246,.3);
+      transform: translateY(-1px);
+    }
+
+    .um-btn--ghost:hover {
+      background: rgba(15,23,42,.04);
+      transform: translateY(-1px);
+    }
+
+    /* Professional Platform Form Styles */
+    .platform-form {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .form-section {
+      background: #fafbfc;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s ease;
+    }
+
+    .form-section:hover {
+      border-color: rgba(15,23,42,.12);
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+    }
+
+    .form-section__header {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+
+    .form-section__header h4 {
+      margin: 0 0 6px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .form-section__desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-field label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin: 0;
+    }
+
+    .form-field input,
+    .form-field select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+      color: #0f172a;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 520px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Icon Upload Styles */
+    .icon-upload-area {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .icon-preview-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: #fff;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 10px;
+    }
+
+    .icon-preview-box {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 2px dashed rgba(15,23,42,.12);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .icon-preview-box .pf-icon {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+    }
+
+    .icon-preview-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .icon-preview-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .icon-preview-note {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .icon-upload-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .upload-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 8px;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-btn:hover {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-color: rgba(15,23,42,.18);
+      transform: translateY(-1px);
+    }
+
+    .upload-btn__icon {
+      font-size: 16px;
+    }
+
+    .um-btn--sm {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .upload-requirements {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+    }
+
+    .requirement-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #0369a1;
+    }
+
+    .requirement-icon {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0ea5e9;
+      color: white;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    /* Billing Subsections */
+    .billing-subsection {
+      margin-bottom: 20px;
+    }
+
+    .billing-subsection:last-child {
+      margin-bottom: 0;
+    }
+
+    .billing-subsection h5 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #4b5563;
+      padding-left: 12px;
+      border-left: 3px solid #e5e7eb;
+    }
+
+    /* Info Box */
+    .form-info {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background: linear-gradient(135deg, #fef3c7 0%, #fef7cd 100%);
+      border: 1px solid #fbbf24;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+
+    .form-info__icon {
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .form-info__content {
+      font-size: 13px;
+      color: #92400e;
+      line-height: 1.5;
+    }
+
+    .form-info__content strong {
+      color: #78350f;
+      font-weight: 600;
+    }
   </style>
 </head>
 
@@ -459,7 +843,6 @@
               <thead>
                 <tr>
                   <th><input type="checkbox" id="selectAll" aria-label="Select all rows"></th>
-                  <th data-col="icon" aria-label="Platform Icon"></th>
                   <th>Platform</th>
                   <th>Setup</th>
                   <th>Fee</th>
@@ -492,219 +875,271 @@
     </div>
 
     <div class="pf-drawer__body">
-      <div class="pf-grid">
+      <div class="platform-form">
 
-        <!-- Platform dropdown -->
-        <div class="pf-field">
-          <label>Platform</label>
-
-          <input type="hidden" id="pfPlatformKey" value="google">
-
-          <div class="pf-select" id="pfPlatformSelect">
-            <button class="pf-select__btn" type="button" id="pfPlatformBtn" aria-haspopup="listbox" aria-expanded="false">
-              <span class="pf-select__left">
-                <span class="pf-icon" id="pfPlatformIcon"></span>
-                <span class="pf-select__label" id="pfPlatformLabel">Google Ads</span>
-              </span>
-              <span class="pf-select__chev">▾</span>
-            </button>
-            <div class="pf-select__menu" id="pfPlatformMenu" role="listbox" tabindex="-1" hidden></div>
+        <!-- Platform Information Section -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Platform Information</h4>
+            <span class="form-section__desc">Basic platform details and identification</span>
+          </div>
+          
+          <div class="form-field">
+            <label>Platform Name *</label>
+            <input type="text" id="pfPlatformName" placeholder="e.g. Google Ads, Facebook Marketing" />
           </div>
         </div>
 
-        <!-- NEW: Icon settings (separate from platform) -->
-        <div class="pf-field">
-          <label>Icon (independent)</label>
-
-          <div class="pf-iconbox">
-            <div class="pf-iconbox__top">
-              <div class="pf-icon-preview">
+        <!-- Icon Section -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Platform Icon</h4>
+            <span class="form-section__desc">Upload SVG icon to represent this platform</span>
+          </div>
+          
+          <div class="icon-upload-area">
+            <div class="icon-preview-container">
+              <div class="icon-preview-box">
                 <span class="pf-icon" id="pfIconPreview"></span>
-                <span id="pfIconPreviewLabel">Current icon</span>
               </div>
-
-              <div class="pf-actions-inline">
-                <button class="um-btn um-btn--ghost" type="button" id="pfIconUsePlatformDefault">Use platform default</button>
+              <div class="icon-preview-info">
+                <span class="icon-preview-label" id="pfIconPreviewLabel">No icon uploaded</span>
+                <span class="icon-preview-note">SVG format required</span>
               </div>
             </div>
-
-            <div class="pf-chiprow" role="radiogroup" aria-label="Icon source">
-              <label class="pf-chip is-active" id="chipPreset">
-                <input type="radio" name="pfIconMode" value="preset" checked>
-                Preset dropdown
-              </label>
-              <label class="pf-chip" id="chipUpload">
-                <input type="radio" name="pfIconMode" value="upload">
-                Upload SVG
-              </label>
-              <label class="pf-chip" id="chipPaste" style="display: none;">
-                <input type="radio" name="pfIconMode" value="paste">
-                Paste SVG
-              </label>
+            
+            <div class="icon-upload-controls">
+              <input id="pfIconFile" type="file" accept=".svg,image/svg+xml" required style="display: none;">
+              <button type="button" class="upload-btn" onclick="document.getElementById('pfIconFile').click()">
+                <span class="upload-btn__icon">📁</span>
+                <span>Choose SVG File</span>
+              </button>
+              <button class="um-btn um-btn--ghost um-btn--sm" type="button" id="pfIconClearUpload">Clear</button>
             </div>
-
-            <!-- Preset dropdown -->
-            <div id="pfIconPresetWrap">
-              <input type="hidden" id="pfIconPresetKey" value="google">
-              <div class="pf-select" id="pfIconSelect">
-                <button class="pf-select__btn" type="button" id="pfIconBtn" aria-haspopup="listbox" aria-expanded="false">
-                  <span class="pf-select__left">
-                    <span class="pf-icon" id="pfIconPresetIcon"></span>
-                    <span class="pf-select__label" id="pfIconPresetLabel">Google</span>
-                  </span>
-                  <span class="pf-select__chev">▾</span>
-                </button>
-                <div class="pf-select__menu" id="pfIconMenu" role="listbox" tabindex="-1" hidden></div>
+            
+            <div class="upload-requirements">
+              <div class="requirement-item">
+                <span class="requirement-icon">✓</span>
+                <span>SVG format only</span>
               </div>
-              <div class="pf-note">Alegi din setul de iconuri preset (poate fi diferit de platform).</div>
-            </div>
-
-            <!-- Upload -->
-            <div id="pfIconUploadWrap" hidden>
-              <div class="pf-file">
-                <input id="pfIconFile" type="file" accept=".svg,image/svg+xml">
-                <button class="um-btn um-btn--ghost" type="button" id="pfIconClearUpload">Clear</button>
+              <div class="requirement-item">
+                <span class="requirement-icon">✓</span>
+                <span>Recommended size: 24x24px</span>
               </div>
-              <div class="pf-note">Upload doar SVG. Noi citim fișierul și îl salvăm ca text SVG în rând.</div>
+              <div class="requirement-item">
+                <span class="requirement-icon">✓</span>
+                <span>File size under 50KB</span>
+              </div>
             </div>
+            
+            <div class="pf-error" id="pfIconError">Invalid SVG file. Please upload a valid SVG.</div>
+          </div>
+        </div>
 
-            <!-- Paste -->
-            <div id="pfIconPasteWrap" hidden>
-              <textarea id="pfIconSvg" placeholder='<svg viewBox="0 0 24 24">...</svg>'></textarea>
-              <div class="pf-note">Paste SVG complet. Se salvează exact ce pui aici.</div>
+        <!-- Assignment Section -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Client Assignment</h4>
+            <span class="form-section__desc">Assign to specific client or keep global</span>
+          </div>
+          
+          <div class="form-field">
+            <label>Assigned Client</label>
+            <select id="pfAssigned">
+              <option value="">All Clients (Global)</option>
+              <option value="C-2001">Sarah Mitchell • TechVision</option>
+              <option value="C-2002">Michael Chen • BrightLabs</option>
+              <option value="C-2003">Emily Rodriguez • NorthPeak</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Pricing Configuration -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Pricing Configuration</h4>
+            <span class="form-section__desc">Setup costs and fee structure</span>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label>Setup Cost ($)</label>
+              <input id="pfPageSetup" type="number" min="0" step="0.01" placeholder="250" />
             </div>
-
-            <div class="pf-error" id="pfIconError">SVG invalid. Trebuie să conțină tag-ul &lt;svg ...&gt;.</div>
+            <div class="form-field">
+              <label>Fee Percentage (%)</label>
+              <input id="pfFee" type="number" min="0" step="0.01" placeholder="5" />
+            </div>
           </div>
         </div>
 
-        <div class="pf-field">
-          <label>Assigned Client (optional)</label>
-          <select id="pfAssigned">
-            <option value="">All Clients (default)</option>
-            <option value="C-2001">Sarah Mitchell • TechVision</option>
-            <option value="C-2002">Michael Chen • BrightLabs</option>
-            <option value="C-2003">Emily Rodriguez • NorthPeak</option>
-          </select>
-        </div>
+        <!-- Billing Periods -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Billing Periods</h4>
+            <span class="form-section__desc">Configure initial and recurring billing cycles</span>
+          </div>
+          
+          <div class="billing-subsection">
+            <h5>Initial Period</h5>
+            <div class="form-row">
+              <div class="form-field">
+                <label>Interval (days)</label>
+                <input id="pfInitInterval" type="number" min="0" step="1" placeholder="21" />
+              </div>
+              <div class="form-field">
+                <label>Amount ($)</label>
+                <input id="pfInitAmount" type="number" min="0" step="0.01" placeholder="30" />
+              </div>
+            </div>
+          </div>
 
-        <!-- Fee moved next to Setup -->
-        <div class="pf-row">
-          <div class="pf-field">
-            <label>Setup ($)</label>
-            <input id="pfPageSetup" type="number" min="0" step="0.01" placeholder="250">
-          </div>
-          <div class="pf-field">
-            <label>Fee (%)</label>
-            <input id="pfFee" type="number" min="0" step="0.01" placeholder="5">
-          </div>
-        </div>
-
-        <div class="pf-row">
-          <div class="pf-field">
-            <label>Init Interval (days)</label>
-            <input id="pfInitInterval" type="number" min="0" step="1" placeholder="21">
-          </div>
-          <div class="pf-field">
-            <label>Init Amount ($)</label>
-            <input id="pfInitAmount" type="number" min="0" step="0.01" placeholder="30">
-          </div>
-        </div>
-
-        <div class="pf-row">
-          <div class="pf-field">
-            <label>Rec Interval (days)</label>
-            <input id="pfRecInterval" type="number" min="0" step="1" placeholder="30">
-          </div>
-          <div class="pf-field">
-            <label>Rec Amount ($)</label>
-            <input id="pfRecAmount" type="number" min="0" step="0.01" placeholder="50">
+          <div class="billing-subsection">
+            <h5>Recurring Period</h5>
+            <div class="form-row">
+              <div class="form-field">
+                <label>Interval (days)</label>
+                <input id="pfRecInterval" type="number" min="0" step="1" placeholder="30" />
+              </div>
+              <div class="form-field">
+                <label>Amount ($)</label>
+                <input id="pfRecAmount" type="number" min="0" step="0.01" placeholder="50" />
+              </div>
+            </div>
           </div>
         </div>
 
-        <div class="pf-hint">
-          <b>Rule:</b> if assigned to a client → override. If not assigned → applies to <b>All Clients</b>.
+        <!-- Info Box -->
+        <div class="form-info">
+          <div class="form-info__icon">💡</div>
+          <div class="form-info__content">
+            <strong>Assignment Rules:</strong> If assigned to a specific client, these settings will override global defaults. 
+            If left unassigned, the configuration applies to all clients.
+          </div>
         </div>
+
       </div>
     </div>
 
     <div class="pf-drawer__footer">
       <button class="um-btn um-btn--ghost" type="button" id="pfCancelBtn">Cancel</button>
-      <button class="um-btn" type="button" id="pfSaveBtn">Save</button>
+      <button class="um-btn um-btn--primary" type="button" id="pfSaveBtn">Create Platform</button>
     </div>
   </aside>
 
-  <!-- ===== Bulk Drawer (unchanged) ===== -->
+  <!-- ===== Bulk Drawer (redesigned) ===== -->
   <div class="pf-overlay" id="bulkOverlay" hidden></div>
-  <aside class="pf-drawer" id="bulkDrawer" aria-hidden="true">
+  <aside class="pf-drawer" id="bulkDrawer" aria-hidden="true" style="width: min(480px, 92vw);">
     <div class="pf-drawer__header">
       <div>
-        <div class="pf-drawer__title">Bulk Modify</div>
-        <div class="pf-drawer__sub">Only fields you fill will be applied to all selected rows.</div>
+        <div class="pf-drawer__title">Bulk Edit Platforms</div>
+        <div class="pf-drawer__sub">Modify multiple platforms at once. Only filled fields will be updated.</div>
       </div>
       <button class="um-btn um-btn--icon" type="button" id="bulkCloseBtn" aria-label="Close">✕</button>
     </div>
 
     <div class="pf-drawer__body">
-      <div class="pf-grid">
-        <div class="pf-field">
-          <label>Platform (optional)</label>
-          <input id="bName" type="text" placeholder="leave empty to keep">
-        </div>
-
-        <div class="pf-field">
-          <label>Assigned Client (optional)</label>
-          <select id="bAssigned">
-            <option value="">(No change)</option>
-            <option value="__ALL__">Set to All Clients</option>
-            <option value="C-2001">Sarah Mitchell • TechVision</option>
-            <option value="C-2002">Michael Chen • BrightLabs</option>
-            <option value="C-2003">Emily Rodriguez • NorthPeak</option>
-          </select>
-        </div>
-
-        <div class="pf-row">
-          <div class="pf-field">
-            <label>Setup ($) (optional)</label>
-            <input id="bPageSetup" type="number" min="0" step="0.01" placeholder="leave empty to keep">
+      <div class="bulk-form">
+        
+        <!-- Platform Name Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Platform Information</h4>
+            <span class="bulk-section__desc">Update platform name for selected items</span>
           </div>
-          <div class="pf-field">
-            <label>Fee (%) (optional)</label>
-            <input id="bFee" type="number" min="0" step="0.01" placeholder="leave empty to keep">
+          <div class="bulk-field">
+            <label>Platform Name</label>
+            <input id="bName" type="text" placeholder="Leave empty to keep current values">
           </div>
         </div>
 
-        <div class="pf-row">
-          <div class="pf-field">
-            <label>Init Interval (days) (optional)</label>
-            <input id="bInitInterval" type="number" min="0" step="1" placeholder="leave empty to keep">
+        <!-- Assignment Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Client Assignment</h4>
+            <span class="bulk-section__desc">Change client assignment for selected platforms</span>
           </div>
-          <div class="pf-field">
-            <label>Init Amount ($) (optional)</label>
-            <input id="bInitAmount" type="number" min="0" step="0.01" placeholder="leave empty to keep">
-          </div>
-        </div>
-
-        <div class="pf-row">
-          <div class="pf-field">
-            <label>Rec Interval (days) (optional)</label>
-            <input id="bRecInterval" type="number" min="0" step="1" placeholder="leave empty to keep">
-          </div>
-          <div class="pf-field">
-            <label>Rec Amount ($) (optional)</label>
-            <input id="bRecAmount" type="number" min="0" step="0.01" placeholder="leave empty to keep">
+          <div class="bulk-field">
+            <label>Assigned Client</label>
+            <select id="bAssigned">
+              <option value="">No change</option>
+              <option value="__ALL__">All Clients (Global)</option>
+              <option value="C-2001">Sarah Mitchell • TechVision</option>
+              <option value="C-2002">Michael Chen • BrightLabs</option>
+              <option value="C-2003">Emily Rodriguez • NorthPeak</option>
+            </select>
           </div>
         </div>
 
-        <div class="pf-hint">
-          Completezi doar ce vrei să modifici în masă. Restul rămâne neschimbat.
+        <!-- Pricing Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Pricing Configuration</h4>
+            <span class="bulk-section__desc">Update setup costs and fee percentages</span>
+          </div>
+          <div class="bulk-row">
+            <div class="bulk-field">
+              <label>Setup Cost ($)</label>
+              <input id="bPageSetup" type="number" min="0" step="0.01" placeholder="Current">
+            </div>
+            <div class="bulk-field">
+              <label>Fee Percentage (%)</label>
+              <input id="bFee" type="number" min="0" step="0.01" placeholder="Current">
+            </div>
+          </div>
         </div>
+
+        <!-- Initial Settings Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Initial Period Settings</h4>
+            <span class="bulk-section__desc">Configure initial billing period parameters</span>
+          </div>
+          <div class="bulk-row">
+            <div class="bulk-field">
+              <label>Initial Interval (days)</label>
+              <input id="bInitInterval" type="number" min="0" step="1" placeholder="Current">
+            </div>
+            <div class="bulk-field">
+              <label>Initial Amount ($)</label>
+              <input id="bInitAmount" type="number" min="0" step="0.01" placeholder="Current">
+            </div>
+          </div>
+        </div>
+
+        <!-- Recurring Settings Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Recurring Period Settings</h4>
+            <span class="bulk-section__desc">Configure recurring billing period parameters</span>
+          </div>
+          <div class="bulk-row">
+            <div class="bulk-field">
+              <label>Recurring Interval (days)</label>
+              <input id="bRecInterval" type="number" min="0" step="1" placeholder="Current">
+            </div>
+            <div class="bulk-field">
+              <label>Recurring Amount ($)</label>
+              <input id="bRecAmount" type="number" min="0" step="0.01" placeholder="Current">
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="bulk-info">
+          <div class="bulk-info__icon">ℹ️</div>
+          <div class="bulk-info__content">
+            <strong>How it works:</strong> Only fields with values will be applied to selected platforms. 
+            Empty fields will preserve existing values for each platform.
+          </div>
+        </div>
+
       </div>
     </div>
 
     <div class="pf-drawer__footer">
       <button class="um-btn um-btn--ghost" type="button" id="bulkCancelBtn">Cancel</button>
-      <button class="um-btn" type="button" id="bulkApplyBtn">Apply Changes</button>
+      <button class="um-btn um-btn--primary" type="button" id="bulkApplyBtn">Apply Changes</button>
     </div>
   </aside>
 
@@ -775,22 +1210,68 @@
       google: {
         label: "Google Ads",
         svg: `
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21.8 10.2H12v3.9h5.6c-.3 1.7-2 4-5.6 4-3.4 0-6.1-2.8-6.1-6.1S8.6 5.9 12 5.9c1.9 0 3.1.8 3.9 1.5l2.7-2.6C16.9 3.2 14.7 2 12 2 6.9 2 2.7 6.1 2.7 12S6.9 22 12 22c5.7 0 9.5-4 9.5-9.7 0-.7-.1-1.2-.2-1.7z"></path>
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
           </svg>`
       },
       facebook: {
         label: "Facebook Ads",
         svg: `
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M13.6 22v-8.4h2.8l.4-3.3h-3.2V8.2c0-1 .3-1.6 1.7-1.6h1.7V3.7c-.3 0-1.4-.1-2.8-.1-2.8 0-4.7 1.7-4.7 4.9v1.8H6.7v3.3h2.8V22h4.1z"></path>
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#1877f2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
           </svg>`
       },
       tiktok: {
         label: "TikTok Ads",
         svg: `
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M16.6 3c.4 2.4 1.8 3.9 4.1 4.1v3.2c-1.5.1-2.8-.4-4-1.2v6.2c0 4.2-4.5 6.9-8.4 5.1-2.6-1.2-3.9-4.3-2.9-7.1.9-2.6 3.9-4.4 6.8-3.6v3.4c-1.1-.3-2.3.2-2.9 1.2-.8 1.2-.2 2.9 1.1 3.4 1.7.7 3.4-.5 3.4-2.2V3h2.8z"></path>
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#000000">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+          </svg>`
+      },
+      instagram: {
+        label: "Instagram Ads",
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+            <defs>
+              <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#f09433;stop-opacity:1" />
+                <stop offset="25%" style="stop-color:#e6683c;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#dc2743;stop-opacity:1" />
+                <stop offset="75%" style="stop-color:#cc2366;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#bc1888;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>`
+      },
+      microsoft: {
+        label: "Microsoft Ads",
+        svg: `
+          <svg width="80" height="80" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#f25022" d="M0 0h11.377v11.372H0z"/>
+            <path fill="#00a4ef" d="M12.623 0H24v11.372H12.623z"/>
+            <path fill="#7fba00" d="M0 12.628h11.377V24H0z"/>
+            <path fill="#ffb900" d="M12.623 12.628H24V24H12.623z"/>
+          </svg>`
+      },
+      outbrain: {
+        label: "Outbrain Ads",
+        svg: `
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120.57 22.67" width="80" height="80">
+            <path fill="#EE6513" d="M17.0905,19.0766 C16.4425,19.7126 15.6835,20.2096 14.8125,20.5716 C13.9415,20.9306 12.9945,21.1106 11.9735,21.1106 C10.9515,21.1106 10.0055,20.9306 9.1355,20.5716 C8.2635,20.2096 7.5035,19.7126 6.8555,19.0766 C6.2075,18.4426 5.6995,17.6926 5.3335,16.8276 C4.9795,15.9926 4.7975,15.0896 4.7845,14.1206 L6.5075,14.1206 C6.5255,14.4186 6.5895,14.6976 6.7005,14.9596 C6.8335,15.2746 7.0185,15.5466 7.2525,15.7766 C7.4875,16.0076 7.7645,16.1886 8.0805,16.3176 C8.3965,16.4496 8.7405,16.5156 9.1115,16.5156 C9.4825,16.5156 9.8245,16.4496 10.1415,16.3176 C10.4575,16.1886 10.7345,16.0076 10.9695,15.7766 C11.2045,15.5466 11.3895,15.2746 11.5215,14.9596 C11.6105,14.7526 11.6685,14.5326 11.6975,14.3026 L12.2495,14.3026 C12.2785,14.5326 12.3365,14.7526 12.4255,14.9596 C12.5595,15.2746 12.7425,15.5466 12.9785,15.7766 C13.2125,16.0076 13.4895,16.1886 13.8055,16.3176 C14.1215,16.4496 14.4655,16.5156 14.8355,16.5156 C15.2075,16.5156 15.5505,16.4496 15.8665,16.3176 C16.1825,16.1886 16.4595,16.0076 16.6945,15.7766 C16.9295,15.5466 17.1145,15.2746 17.2475,14.9596 C17.3585,14.6976 17.4225,14.4186 17.4415,14.1206 L19.1605,14.1206 C19.1505,15.0896 18.9675,15.9926 18.6135,16.8276 C18.2465,17.6926 17.7385,18.4426 17.0905,19.0766"/>
+          </svg>`
+      },
+      taboola: {
+        label: "Taboola Ads",
+        svg: `
+          <svg version="1.1" viewBox="0 0 723.02 175.14" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+            <g fill="#054164">
+              <path d="m42.27 38.82h-42.27v-38.58h130.94v38.58h-42.32l0.02 113.06h-46.34l-0.03-113.06z"/>
+              <path d="m169.5 102.33c-5.09 2.51-10.82 3.96-16.52 5.2-9.33 2.07-14.21 4.36-14.24 11.76-0.03 5.09 5.44 10.19 13.05 10.24 9.52 0.05 16.95-5.61 17.66-17.04l0.05-10.16zm40.06 25c-0.06 8.25 0.31 17.56 4.92 24.57l-42.73-0.25c-1.04-2.97-1.65-7.42-1.41-10.37h-0.43c-8.94 10.1-21.86 12.98-35.41 12.91-21.15-0.13-38.65-10.38-38.52-33.44 0.21-34.7 40.83-33.19 62.21-37.08 5.72-1.03 11.44-2.69 11.47-9.67 0.05-7.41-6.91-10.21-13.68-10.24-12.9-0.06-15.49 6.47-15.72 11.12l-38.93-0.22c1.44-30.88 30.66-35.79 56.69-35.64 52.46 0.31 51.92 22.1 51.78 43.25l-0.24 45.06z"/>
+            </g>
           </svg>`
       }
     };
@@ -798,11 +1279,73 @@
     // ========= Preset icons list (for "Icon" dropdown) =========
     // You can add many here (Meta, Taboola etc.)
     const ICON_PRESETS = {
-      google: { label: "Google", svg: PLATFORM_MAP.google.svg },
-      facebook: { label: "Facebook", svg: PLATFORM_MAP.facebook.svg },
-      tiktok: { label: "TikTok", svg: PLATFORM_MAP.tiktok.svg },
-      bolt: { label: "Bolt", svg: `<svg viewBox="0 0 24 24"><path d="M13 2 3 14h7l-1 8 10-12h-7l1-8z"/></svg>` },
-      star: { label: "Star", svg: `<svg viewBox="0 0 24 24"><path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.9 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>` }
+      google: { 
+        label: "Google", 
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>`
+      },
+      facebook: { 
+        label: "Facebook", 
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#1877f2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>`
+      },
+      tiktok: { 
+        label: "TikTok", 
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#000000">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+          </svg>`
+      },
+      instagram: { 
+        label: "Instagram", 
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+            <defs>
+              <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#f09433;stop-opacity:1" />
+                <stop offset="25%" style="stop-color:#e6683c;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#dc2743;stop-opacity:1" />
+                <stop offset="75%" style="stop-color:#cc2366;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#bc1888;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>`
+      },
+      microsoft: { 
+        label: "Microsoft", 
+        svg: `
+          <svg width="80" height="80" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#f25022" d="M0 0h11.377v11.372H0z"/>
+            <path fill="#00a4ef" d="M12.623 0H24v11.372H12.623z"/>
+            <path fill="#7fba00" d="M0 12.628h11.377V24H0z"/>
+            <path fill="#ffb900" d="M12.623 12.628H24V24H12.623z"/>
+          </svg>`
+      },
+      outbrain: { 
+        label: "Outbrain", 
+        svg: `
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120.57 22.67" width="80" height="80">
+            <path fill="#EE6513" d="M17.0905,19.0766 C16.4425,19.7126 15.6835,20.2096 14.8125,20.5716 C13.9415,20.9306 12.9945,21.1106 11.9735,21.1106 C10.9515,21.1106 10.0055,20.9306 9.1355,20.5716 C8.2635,20.2096 7.5035,19.7126 6.8555,19.0766 C6.2075,18.4426 5.6995,17.6926 5.3335,16.8276 C4.9795,15.9926 4.7975,15.0896 4.7845,14.1206 L6.5075,14.1206 C6.5255,14.4186 6.5895,14.6976 6.7005,14.9596 C6.8335,15.2746 7.0185,15.5466 7.2525,15.7766 C7.4875,16.0076 7.7645,16.1886 8.0805,16.3176 C8.3965,16.4496 8.7405,16.5156 9.1115,16.5156 C9.4825,16.5156 9.8245,16.4496 10.1415,16.3176 C10.4575,16.1886 10.7345,16.0076 10.9695,15.7766 C11.2045,15.5466 11.3895,15.2746 11.5215,14.9596 C11.6105,14.7526 11.6685,14.5326 11.6975,14.3026 L12.2495,14.3026 C12.2785,14.5326 12.3365,14.7526 12.4255,14.9596 C12.5595,15.2746 12.7425,15.5466 12.9785,15.7766 C13.2125,16.0076 13.4895,16.1886 13.8055,16.3176 C14.1215,16.4496 14.4655,16.5156 14.8355,16.5156 C15.2075,16.5156 15.5505,16.4496 15.8665,16.3176 C16.1825,16.1886 16.4595,16.0076 16.6945,15.7766 C16.9295,15.5466 17.1145,15.2746 17.2475,14.9596 C17.3585,14.6976 17.4225,14.4186 17.4415,14.1206 L19.1605,14.1206 C19.1505,15.0896 18.9675,15.9926 18.6135,16.8276 C18.2465,17.6926 17.7385,18.4426 17.0905,19.0766"/>
+          </svg>`
+      },
+      taboola: { 
+        label: "Taboola", 
+        svg: `
+          <svg version="1.1" viewBox="0 0 723.02 175.14" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+            <g fill="#054164">
+              <path d="m42.27 38.82h-42.27v-38.58h130.94v38.58h-42.32l0.02 113.06h-46.34l-0.03-113.06z"/>
+              <path d="m169.5 102.33c-5.09 2.51-10.82 3.96-16.52 5.2-9.33 2.07-14.21 4.36-14.24 11.76-0.03 5.09 5.44 10.19 13.05 10.24 9.52 0.05 16.95-5.61 17.66-17.04l0.05-10.16zm40.06 25c-0.06 8.25 0.31 17.56 4.92 24.57l-42.73-0.25c-1.04-2.97-1.65-7.42-1.41-10.37h-0.43c-8.94 10.1-21.86 12.98-35.41 12.91-21.15-0.13-38.65-10.38-38.52-33.44 0.21-34.7 40.83-33.19 62.21-37.08 5.72-1.03 11.44-2.69 11.47-9.67 0.05-7.41-6.91-10.21-13.68-10.24-12.9-0.06-15.49 6.47-15.72 11.12l-38.93-0.22c1.44-30.88 30.66-35.79 56.69-35.64 52.46 0.31 51.92 22.1 51.78 43.25l-0.24 45.06z"/>
+            </g>
+          </svg>`
+      }
     };
 
     // ========= Mock Data =========
@@ -821,26 +1364,23 @@
      * - iconSvg: when iconType="custom" (raw svg text)
      */
     let rows = [
-      { id:"p1", platformKey:"google",   iconType:"platform", iconKey:"", iconSvg:"", pageSetup:250, fee:5, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"" },
-      { id:"p2", platformKey:"facebook", iconType:"preset",   iconKey:"star", iconSvg:"", pageSetup:250, fee:6, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"" },
-      { id:"p3", platformKey:"tiktok",   iconType:"custom",   iconKey:"", iconSvg:`<svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm1 5v6l5 3-1 2-6-4V7h2z"/></svg>`, pageSetup:250, fee:3, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"C-2002" },
+      { id:"p1", platformName:"Google Ads",   iconSvg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`, pageSetup:250, fee:5, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"" },
+      { id:"p2", platformName:"Facebook Ads", iconSvg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`, pageSetup:250, fee:6, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"" },
+      { id:"p3", platformName:"TikTok Ads",   iconSvg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000000"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>`, pageSetup:250, fee:3, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"C-2002" },
     ];
 
     // ========= Icon resolver =========
     function resolveRowIcon(row){
-      if (!row) return ICON_PRESETS.star.svg;
+      if (!row) return `<svg viewBox="0 0 24 24" fill="#ccc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
 
-      if (row.iconType === "custom") {
+      // If custom SVG uploaded, use it
+      if (row.iconSvg) {
         const ok = safeSvgOrNull(row.iconSvg);
         if (ok) return ok;
       }
-      if (row.iconType === "preset") {
-        const p = ICON_PRESETS[row.iconKey];
-        if (p?.svg) return p.svg;
-      }
-      // default: platform
-      const pl = PLATFORM_MAP[row.platformKey];
-      return pl?.svg || ICON_PRESETS.star.svg;
+
+      // No icon uploaded - show placeholder
+      return `<svg viewBox="0 0 24 24" fill="#ccc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
     }
 
     // ========= Table refs =========
@@ -878,17 +1418,18 @@
 
     function render(){
       tbody.innerHTML = rows.map(r => {
-        const p = PLATFORM_MAP[r.platformKey] || PLATFORM_MAP.google;
         const iconSvg = resolveRowIcon(r);
         return `
           <tr data-row-id="${escapeHtml(r.id)}">
             <td><input type="checkbox" class="rowCheck" aria-label="Select row"></td>
 
-            <td data-col="icon">
-              <span class="pf-icon" title="Icon">${iconSvg}</span>
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="pf-icon" title="Platform Icon">${iconSvg}</span>
+                <b>${escapeHtml(r.platformName || "Unknown Platform")}</b>
+              </div>
             </td>
 
-            <td><b>${escapeHtml(p.label)}</b></td>
             <td>${money(r.pageSetup)}</td>
             <td>${pct(r.fee)}</td>
             <td>${escapeHtml(String(r.initInterval ?? ""))}</td>
@@ -969,38 +1510,14 @@
     const pfSaveBtn   = document.getElementById("pfSaveBtn");
     const openAddPlatform = document.getElementById("openAddPlatform");
 
-    // platform dropdown elements
-    const pfPlatformKey = document.getElementById("pfPlatformKey");
-    const pfPlatformSelect = document.getElementById("pfPlatformSelect");
-    const pfPlatformBtn = document.getElementById("pfPlatformBtn");
-    const pfPlatformMenu = document.getElementById("pfPlatformMenu");
-    const pfPlatformIcon = document.getElementById("pfPlatformIcon");
-    const pfPlatformLabel = document.getElementById("pfPlatformLabel");
+    // platform input field
+    const pfPlatformName = document.getElementById("pfPlatformName");
 
     // icon controls
-    const chipPreset = document.getElementById("chipPreset");
-    const chipUpload = document.getElementById("chipUpload");
-    const chipPaste  = document.getElementById("chipPaste");
-
-    const pfIconUsePlatformDefault = document.getElementById("pfIconUsePlatformDefault");
-
     const pfIconPreview = document.getElementById("pfIconPreview");
     const pfIconPreviewLabel = document.getElementById("pfIconPreviewLabel");
-
-    const pfIconPresetWrap = document.getElementById("pfIconPresetWrap");
-    const pfIconUploadWrap = document.getElementById("pfIconUploadWrap");
-    const pfIconPasteWrap  = document.getElementById("pfIconPasteWrap");
-
-    const pfIconPresetKey = document.getElementById("pfIconPresetKey");
-    const pfIconSelect = document.getElementById("pfIconSelect");
-    const pfIconBtn = document.getElementById("pfIconBtn");
-    const pfIconMenu = document.getElementById("pfIconMenu");
-    const pfIconPresetIcon = document.getElementById("pfIconPresetIcon");
-    const pfIconPresetLabel = document.getElementById("pfIconPresetLabel");
-
     const pfIconFile = document.getElementById("pfIconFile");
     const pfIconClearUpload = document.getElementById("pfIconClearUpload");
-    const pfIconSvg = document.getElementById("pfIconSvg");
     const pfIconError = document.getElementById("pfIconError");
 
     // fields
@@ -1014,223 +1531,67 @@
 
     let pfMode = "add";
     let pfEditingId = null;
+    let uploadedIconSvg = ""; // stores the uploaded SVG content
 
-    // -------- platform dropdown
-    function setPlatformSelection(key){
-      const p = PLATFORM_MAP[key] || PLATFORM_MAP.google;
-      pfPlatformKey.value = key;
-      pfPlatformIcon.innerHTML = p.svg;
-      pfPlatformLabel.textContent = p.label;
-
-      // if icon mode is "platform", preview should update instantly
-      updateIconPreview();
-      // keep menu selection state
-      pfPlatformMenu.querySelectorAll(".pf-opt").forEach(b => {
-        b.setAttribute("aria-selected", b.dataset.value === key ? "true" : "false");
-      });
-    }
-
-    function buildPlatformMenu(){
-      pfPlatformMenu.innerHTML = Object.entries(PLATFORM_MAP).map(([key, p]) => `
-        <button type="button"
-          class="pf-opt"
-          role="option"
-          data-value="${escapeHtml(key)}"
-          aria-selected="${key === pfPlatformKey.value ? "true" : "false"}">
-          <span class="pf-icon">${p.svg}</span>
-          <span>${escapeHtml(p.label)}</span>
-        </button>
-      `).join("");
-
-      pfPlatformMenu.querySelectorAll(".pf-opt").forEach(btn => {
-        btn.addEventListener("click", () => {
-          setPlatformSelection(btn.dataset.value);
-          closePlatformMenu();
-        });
-      });
-    }
-
-    function openPlatformMenu(){
-      pfPlatformMenu.hidden = false;
-      pfPlatformBtn.setAttribute("aria-expanded", "true");
-      buildPlatformMenu();
-    }
-    function closePlatformMenu(){
-      pfPlatformMenu.hidden = true;
-      pfPlatformBtn.setAttribute("aria-expanded", "false");
-    }
-    function togglePlatformMenu(){
-      if (pfPlatformMenu.hidden) openPlatformMenu();
-      else closePlatformMenu();
-    }
-    pfPlatformBtn.addEventListener("click", togglePlatformMenu);
-
-    // -------- icon preset dropdown
-    function setIconPresetSelection(key){
-      const p = ICON_PRESETS[key] || ICON_PRESETS.google;
-      pfIconPresetKey.value = key;
-      pfIconPresetIcon.innerHTML = p.svg;
-      pfIconPresetLabel.textContent = p.label;
-
-      updateIconPreview();
-
-      pfIconMenu.querySelectorAll(".pf-opt").forEach(b => {
-        b.setAttribute("aria-selected", b.dataset.value === key ? "true" : "false");
-      });
-    }
-
-    function buildIconMenu(){
-      pfIconMenu.innerHTML = Object.entries(ICON_PRESETS).map(([key, p]) => `
-        <button type="button"
-          class="pf-opt"
-          role="option"
-          data-value="${escapeHtml(key)}"
-          aria-selected="${key === pfIconPresetKey.value ? "true" : "false"}">
-          <span class="pf-icon">${p.svg}</span>
-          <span>${escapeHtml(p.label)}</span>
-        </button>
-      `).join("");
-
-      pfIconMenu.querySelectorAll(".pf-opt").forEach(btn => {
-        btn.addEventListener("click", () => {
-          setIconPresetSelection(btn.dataset.value);
-          closeIconMenu();
-        });
-      });
-    }
-
-    function openIconMenu(){
-      pfIconMenu.hidden = false;
-      pfIconBtn.setAttribute("aria-expanded", "true");
-      buildIconMenu();
-    }
-    function closeIconMenu(){
-      pfIconMenu.hidden = true;
-      pfIconBtn.setAttribute("aria-expanded", "false");
-    }
-    function toggleIconMenu(){
-      if (pfIconMenu.hidden) openIconMenu();
-      else closeIconMenu();
-    }
-    pfIconBtn.addEventListener("click", toggleIconMenu);
-
-    // close dropdowns outside click
-    document.addEventListener("click", (e) => {
-      if (!pfPlatformSelect.contains(e.target)) closePlatformMenu();
-      if (!pfIconSelect.contains(e.target)) closeIconMenu();
-    });
-
-    // -------- icon mode switching
-    function setIconMode(mode){
-      // chips UI
-      [chipPreset, chipUpload, chipPaste].forEach(c => c.classList.remove("is-active"));
-      if (mode === "preset") chipPreset.classList.add("is-active");
-      if (mode === "upload") chipUpload.classList.add("is-active");
-      if (mode === "paste")  chipPaste.classList.add("is-active");
-
-      // panels
-      pfIconPresetWrap.hidden = (mode !== "preset");
-      pfIconUploadWrap.hidden = (mode !== "upload");
-      pfIconPasteWrap.hidden  = (mode !== "paste");
-
-      // clear error on switch
+    // -------- simple icon upload logic
+    function updateIconPreview(){
+      // Check if elements exist (drawer might not be open)
+      if (!pfIconPreview || !pfIconPreviewLabel || !pfIconError) return;
+      
       pfIconError.classList.remove("is-show");
 
-      updateIconPreview();
+      if (uploadedIconSvg) {
+        pfIconPreview.innerHTML = uploadedIconSvg;
+        pfIconPreviewLabel.textContent = "Custom SVG uploaded";
+      } else {
+        // No default icon - show placeholder
+        pfIconPreview.innerHTML = `<svg viewBox="0 0 24 24" fill="#ccc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+        pfIconPreviewLabel.textContent = "No icon uploaded (required)";
+      }
     }
-
-    function getIconMode(){
-      const checked = document.querySelector('input[name="pfIconMode"]:checked');
-      return checked?.value || "preset";
-    }
-
-    // clicking chips toggles radio
-    [chipPreset, chipUpload, chipPaste].forEach(chip => {
-      chip.addEventListener("click", () => {
-        chip.querySelector("input").checked = true;
-        setIconMode(getIconMode());
-      });
-    });
-
-    // use platform default button
-    pfIconUsePlatformDefault.addEventListener("click", () => {
-      // set to "platform" virtual mode (we store this in row as iconType="platform")
-      // UI: select preset tab but show preview from platform + mark internally using a hidden flag
-      _iconTypeOverride = "platform";
-      pfIconError.classList.remove("is-show");
-      updateIconPreview();
-      pfIconPreviewLabel.textContent = "Platform default icon";
-    });
-
-    // we keep an internal override while editing
-    let _iconTypeOverride = "preset"; // "platform" | "preset" | "custom(upload/paste)"
-
-    function setInternalIconType(t){
-      _iconTypeOverride = t;
-      updateIconPreview();
-    }
-
-    // Any interaction with preset/upload/paste sets override away from platform
-    pfIconBtn.addEventListener("click", () => setInternalIconType("preset"));
-    pfIconSvg.addEventListener("input", () => setInternalIconType("custom"));
-    pfIconFile.addEventListener("change", () => setInternalIconType("custom"));
 
     // upload svg file -> read text
-    pfIconFile.addEventListener("change", async () => {
-      const file = pfIconFile.files?.[0];
-      if (!file) { updateIconPreview(); return; }
-      const text = await file.text();
-      pfIconSvg.value = text; // store it in textarea too (handy)
-      setIconMode("upload");
-      setInternalIconType("custom");
-      updateIconPreview();
-    });
+    if (pfIconFile) {
+      pfIconFile.addEventListener("change", async () => {
+        const file = pfIconFile.files?.[0];
+        if (!file) { 
+          uploadedIconSvg = "";
+          updateIconPreview(); 
+          return; 
+        }
+        
+        try {
+          const text = await file.text();
+          const ok = safeSvgOrNull(text);
+          if (!ok) {
+            pfIconError.classList.add("is-show");
+            uploadedIconSvg = "";
+          } else {
+            uploadedIconSvg = ok;
+            pfIconError.classList.remove("is-show");
+          }
+          updateIconPreview();
+        } catch (error) {
+          pfIconError.classList.add("is-show");
+          uploadedIconSvg = "";
+          updateIconPreview();
+        }
+      });
+    }
 
-    pfIconClearUpload.addEventListener("click", () => {
-      pfIconFile.value = "";
-      if (getIconMode() === "upload") {
-        // don't destroy pasted content, but clear if it came from upload
-        // we'll just keep textarea as is; user can decide
-      }
-      updateIconPreview();
-    });
+    if (pfIconClearUpload) {
+      pfIconClearUpload.addEventListener("click", () => {
+        pfIconFile.value = "";
+        uploadedIconSvg = "";
+        updateIconPreview();
+      });
+    }
 
-    // preview logic
-    function updateIconPreview(){
-      pfIconError.classList.remove("is-show");
-
-      const platformKey = pfPlatformKey.value || "google";
-      const platformSvg = PLATFORM_MAP[platformKey]?.svg || ICON_PRESETS.star.svg;
-
-      // if user forced platform default
-      if (_iconTypeOverride === "platform") {
-        pfIconPreview.innerHTML = platformSvg;
-        pfIconPreviewLabel.textContent = "Platform default icon";
-        return;
-      }
-
-      const mode = getIconMode();
-
-      if (mode === "preset") {
-        const k = pfIconPresetKey.value || "google";
-        const presetSvg = ICON_PRESETS[k]?.svg || ICON_PRESETS.star.svg;
-        pfIconPreview.innerHTML = presetSvg;
-        pfIconPreviewLabel.textContent = `Preset: ${ICON_PRESETS[k]?.label || k}`;
-        return;
-      }
-
-      // upload/paste -> use textarea content
-      const svgText = pfIconSvg.value;
-      const ok = safeSvgOrNull(svgText);
-      if (!ok) {
-        pfIconPreview.innerHTML = platformSvg; // fallback visual
-        pfIconPreviewLabel.textContent = "Invalid SVG (fallback shown)";
-        if (svgText.trim().length) pfIconError.classList.add("is-show");
-        return;
-      }
-
-      pfIconPreview.innerHTML = ok;
-      pfIconPreviewLabel.textContent = (mode === "upload") ? "Custom: uploaded SVG" : "Custom: pasted SVG";
+    // Update icon preview when platform name changes
+    if (pfPlatformName) {
+      pfPlatformName.addEventListener("input", () => {
+        updateIconPreview();
+      });
     }
 
     // ========= open drawer + fill =========
@@ -1246,8 +1607,12 @@
         pfSub.textContent = "Create global row or assign to a specific client.";
       }
 
-      // Platform
-      setPlatformSelection(row?.platformKey ?? "google");
+      // Platform name
+      pfPlatformName.value = row?.platformName ?? "";
+
+      // Icon - set uploaded SVG if exists
+      uploadedIconSvg = row?.iconSvg ?? "";
+      pfIconFile.value = ""; // reset file input
 
       // Assigned + numbers
       pfAssigned.value = row?.assigned ?? "";
@@ -1258,74 +1623,27 @@
       pfRecInterval.value = (row?.recInterval ?? "");
       pfRecAmount.value = (row?.recAmount ?? "");
 
-      // Icon state
-      // default internal override based on row.iconType
-      if (!row || row.iconType === "platform") {
-        _iconTypeOverride = "platform";
-      } else if (row.iconType === "preset") {
-        _iconTypeOverride = "preset";
-      } else {
-        _iconTypeOverride = "custom";
-      }
-
-      // reset UI panels
-      pfIconFile.value = "";
-
-      // preset key
-      pfIconPresetKey.value = row?.iconKey || "google";
-      setIconPresetSelection(pfIconPresetKey.value);
-
-      // custom svg
-      pfIconSvg.value = row?.iconSvg || "";
-
-      // mode tab selection
-      if (!row || row.iconType === "platform" || row.iconType === "preset") {
-        // show preset by default (even if platform forced, preview will show platform)
-        document.querySelector('input[name="pfIconMode"][value="preset"]').checked = true;
-        setIconMode("preset");
-      } else {
-        // custom
-        document.querySelector('input[name="pfIconMode"][value="paste"]').checked = true;
-        setIconMode("paste");
-      }
-
-      // set preview correct
+      // Update preview
       updateIconPreview();
 
-      closePlatformMenu();
-      closeIconMenu();
       openDrawer(pfOverlay, pfDrawer);
     }
 
     function readPlatformForm(){
-      // Decide iconType + data:
-      // - if override is platform => iconType="platform"
-      // - else if mode preset => iconType="preset", iconKey = chosen
-      // - else => iconType="custom", iconSvg = textarea (validated)
-      const platformKey = pfPlatformKey.value || "google";
-      const mode = getIconMode();
+      const platformName = pfPlatformName.value.trim();
 
-      let iconType = "platform";
-      let iconKey = "";
-      let iconSvg = "";
-
-      if (_iconTypeOverride === "platform") {
-        iconType = "platform";
-      } else if (mode === "preset") {
-        iconType = "preset";
-        iconKey = pfIconPresetKey.value || "google";
-      } else {
-        iconType = "custom";
-        const ok = safeSvgOrNull(pfIconSvg.value);
-        if (!ok) return { __error: "Invalid SVG. Please paste/upload a valid <svg>...</svg>." };
-        iconSvg = ok;
+      // Validate required fields
+      if (!platformName) {
+        return { __error: "Platform name is required." };
+      }
+      
+      if (!uploadedIconSvg) {
+        return { __error: "Icon is required. Please upload an SVG file." };
       }
 
       return {
-        platformKey,
-        iconType,
-        iconKey,
-        iconSvg,
+        platformName,
+        iconSvg: uploadedIconSvg,
         assigned: pfAssigned.value || "",
         pageSetup: numberOrNull(pfPageSetup.value),
         fee: numberOrNull(pfFee.value),
@@ -1345,8 +1663,10 @@
 
     pfSaveBtn.addEventListener("click", () => {
       const data = readPlatformForm();
-      if (data.__error) { alert(data.__error); return; }
-      if (!data.platformKey) { alert("Platform is required."); return; }
+      if (data.__error) { 
+        alert(data.__error); 
+        return; 
+      }
 
       if (pfMode === "add") {
         rows.unshift({ id: "p_" + Math.random().toString(16).slice(2), ...data });
@@ -1415,27 +1735,38 @@
         recAmount: numberOrNull(bRecAmount.value),
       };
 
+      // Count how many fields will be updated
+      const fieldsToUpdate = Object.values(patch).filter(v => v !== null && v !== "").length;
+      
+      if (fieldsToUpdate === 0) {
+        alert("Please fill at least one field to update.");
+        return;
+      }
+
+      // Confirm the bulk operation
+      if (!confirm(`Apply changes to ${sel.length} selected platform(s)?\n\n${fieldsToUpdate} field(s) will be updated.`)) {
+        return;
+      }
+
       rows = rows.map(r => {
         if (!sel.includes(r.id)) return r;
         const next = { ...r };
 
-        // map typed platform label -> platformKey if matches
+        // Update platform name
         if (patch.name) {
-          const target = patch.name.toLowerCase();
-          const foundKey = Object.entries(PLATFORM_MAP).find(([k,v]) =>
-            v.label.toLowerCase() === target || k === target
-          )?.[0];
-          if (foundKey) next.platformKey = foundKey;
+          next.platformName = patch.name;
         }
 
-        if (patch.assigned) next.assigned = (patch.assigned === "__ALL__") ? "" : patch.assigned;
+        // Update assignment
+        if (patch.assigned) {
+          next.assigned = (patch.assigned === "__ALL__") ? "" : patch.assigned;
+        }
 
+        // Update numeric fields
         if (patch.pageSetup !== null) next.pageSetup = patch.pageSetup;
         if (patch.fee !== null) next.fee = patch.fee;
-
         if (patch.initInterval !== null) next.initInterval = patch.initInterval;
         if (patch.initAmount !== null) next.initAmount = patch.initAmount;
-
         if (patch.recInterval !== null) next.recInterval = patch.recInterval;
         if (patch.recAmount !== null) next.recAmount = patch.recAmount;
 
@@ -1444,29 +1775,25 @@
 
       closeDrawer(bulkOverlayEl, bulkDrawerEl);
       render();
+      
+      // Show success message
+      setTimeout(() => {
+        alert(`Successfully updated ${sel.length} platform(s).`);
+      }, 100);
     });
 
-    // ESC closes any open drawer + dropdowns
+    // ESC closes any open drawer
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      closePlatformMenu();
-      closeIconMenu();
       closeDrawer(pfOverlay, pfDrawer);
       closeDrawer(bulkOverlayEl, bulkDrawerEl);
     });
 
-    // ========= init dropdown defaults =========
-    (function initDropdownDefaults(){
-      // Platform default
-      setPlatformSelection("google");
-
-      // Icon preset default
-      setIconPresetSelection("google");
-
-      // Default icon type is platform for fresh add (but UI shows preset tab)
-      _iconTypeOverride = "platform";
-      updateIconPreview();
-
+    // ========= init defaults =========
+    (function initDefaults(){
+      // Initialize with empty uploaded icon
+      uploadedIconSvg = "";
+      // Don't call updateIconPreview at init since drawer elements don't exist yet
       render();
     })();
   </script>
