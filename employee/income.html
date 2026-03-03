@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Income</title>
+
+  <link rel="stylesheet" href="../css/layout.css" />
+  <link rel="stylesheet" href="../css/dashboard.css" />
+  <link rel="stylesheet" href="../css/sidebar.css" />
+  <link rel="stylesheet" href="../css/accounts.css" />
+
+   <style>
+    /* =========================================================
+       LIQUID GLASS (WHITE) – READY UI OVERLAY
+       - Works with your existing HTML + JS
+       - Adds modern spacing, sticky filters, glass panels, chips
+       - Includes Light/Dark switch (optional)
+    ========================================================= */
+
+    :root{
+      --bg0:#f7f8fb;
+      --bg1:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+
+      --line: rgba(15,23,42,.10);
+      --line2: rgba(15,23,42,.07);
+
+      --glass: rgba(255,255,255,.72);
+      --glass2: rgba(255,255,255,.58);
+
+      --shadow: 0 18px 50px rgba(15,23,42,.12);
+      --shadow2: 0 12px 28px rgba(15,23,42,.10);
+
+      --r-xl: 18px;
+      --r-lg: 14px;
+      --r-md: 12px;
+
+      --good:#16a34a;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --info:#2563eb;
+
+      --focus: rgba(37,99,235,.25);
+    }
+
+    /* Dark theme (optional, toggled by JS) */
+    [data-theme="dark"]{
+      --bg0:#0b1220;
+      --bg1:#0f172a;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+
+      --line: rgba(255,255,255,.12);
+      --line2: rgba(255,255,255,.08);
+
+      --glass: rgba(17,24,39,.58);
+      --glass2: rgba(17,24,39,.45);
+
+      --shadow: 0 18px 50px rgba(0,0,0,.45);
+      --shadow2: 0 12px 28px rgba(0,0,0,.35);
+
+      --focus: rgba(96,165,250,.25);
+    }
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; }
+
+    body{
+      color: var(--text);
+      background:
+        radial-gradient(900px 500px at 15% 10%, rgba(37,99,235,.14), transparent 60%),
+        radial-gradient(900px 520px at 90% 20%, rgba(99,102,241,.14), transparent 55%),
+        radial-gradient(900px 600px at 35% 95%, rgba(16,185,129,.12), transparent 60%),
+        linear-gradient(180deg, var(--bg0) 0%, color-mix(in srgb, var(--bg0) 55%, var(--bg1)) 100%);
+    }
+
+    /* Subtle noise overlay (very light) */
+    body:before{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.06;
+      background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+    }
+
+    /* ============ Helpers ============ */
+    .glass{
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: var(--r-xl);
+    }
+
+    .muted{ color: var(--muted); }
+    .mini-hint{
+      font-size:.9rem;
+      color: var(--muted);
+      line-height:1.35;
+      margin-top:.2rem;
+    }
+
+    /* Inputs */
+    input, select, textarea{
+      width:100%;
+      padding:.7rem .8rem;
+      border:1px solid var(--line2);
+      border-radius: 12px;
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      outline:none;
+      transition: box-shadow .15s ease, border-color .15s ease, transform .08s ease;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color: color-mix(in srgb, var(--info) 45%, var(--line2));
+      box-shadow: 0 0 0 4px var(--focus);
+    }
+    input::placeholder, textarea::placeholder{ color: color-mix(in srgb, var(--muted) 78%, transparent); }
+
+    /* Buttons */
+    .btn{
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 78%, var(--bg1));
+      color: var(--text);
+      padding: .7rem .95rem;
+      border-radius: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+      user-select:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:.55rem;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: var(--shadow2); }
+    .btn:active{ transform: translateY(0px); }
+
+    /* Header polish (keeps your .header but makes it glassy) */
+    .header{
+      background: rgba(255,255,255,.55);
+      border-bottom: 1px solid var(--line2);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    [data-theme="dark"] .header{
+      background: rgba(15,23,42,.55);
+    }
+
+    /* Theme toggle */
+    .header-right{ display:flex; align-items:center; gap:14px; }
+    .theme-toggle{
+      display:flex;
+      gap:8px;
+      padding:6px;
+      border-radius: 999px;
+      border: 1px solid var(--line2);
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(12px);
+    }
+    .theme-btn{
+      border:1px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 900;
+      cursor:pointer;
+      transition: background .12s ease, color .12s ease, border-color .12s ease;
+    }
+    .theme-btn.active{
+      background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+      border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+      color: var(--text);
+    }
+
+    /* Make main area nicer */
+    .main{ padding: 18px; }
+    @media (max-width: 720px){ .main{ padding: 14px; } }
+
+    /* ============ KPI Cards ============ */
+    .statistics{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+      margin-bottom: 1.5rem;
+    }
+    @media (max-width: 1200px){
+      .statistics{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 620px){
+      .statistics{ grid-template-columns: 1fr; }
+    }
+
+    .stat-box{
+      padding: 14px 14px;
+      border-radius: var(--r-xl);
+      background: var(--glass);
+      border: 1px solid var(--line2);
+      box-shadow: var(--shadow2);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      min-height: 108px;
+    }
+    .stat-box h4{
+      margin:0;
+      font-size: 11px;
+      letter-spacing: .10em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 950;
+    }
+    .stat-value{
+      font-size: 28px;
+      font-weight: 950;
+      margin-top: 6px;
+      letter-spacing: .2px;
+    }
+    .stat-description{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+
+    /* Tags + amounts */
+    .amount-pos{ font-weight: 950; color: color-mix(in srgb, var(--good) 92%, var(--text)); }
+    .amount-neg{ font-weight: 950; color: color-mix(in srgb, var(--bad) 92%, var(--text)); }
+
+    /* Topups table */
+    .topups-table-wrap{
+      border:1px solid var(--line2);
+      border-radius: var(--r-xl);
+      overflow:auto;
+      background: color-mix(in srgb, var(--glass) 70%, transparent);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow2);
+    }
+    .topups-table{
+      width:100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      font-size: .92rem;
+      min-width: 980px;
+    }
+    .topups-table th, .topups-table td{
+      padding: .85rem .75rem;
+      border-bottom: 1px solid color-mix(in srgb, var(--line2) 70%, transparent);
+      text-align:left;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .topups-table th{
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      font-size: .78rem;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: color-mix(in srgb, var(--glass) 88%, var(--bg1));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+    .topups-row{
+      cursor:pointer;
+      transition: background .12s ease;
+    }
+    .topups-row:hover{
+      background: color-mix(in srgb, rgba(37,99,235,.10) 60%, transparent);
+    }
+    .td-muted{ color: var(--muted); }
+
+    /* Fix "layout.css/dashboard.css" sometimes set section backgrounds to pure white */
+    .wallet-section{
+      background: var(--glass) !important;
+      border: 1px solid var(--line2) !important;
+      box-shadow: var(--shadow2) !important;
+      backdrop-filter: blur(14px) !important;
+      -webkit-backdrop-filter: blur(14px) !important;
+      border-radius: var(--r-xl) !important;
+    }
+
+/* ===== Header Tabs (Finance / Transactions / Ledger) ===== */
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding: 12px 18px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255,255,255,.85);
+  border-bottom: 1px solid var(--line2);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.header-left{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  min-width: 280px;
+}
+
+.page-tabs{
+  display:flex;
+  gap:8px;
+  padding: 6px;
+  border-radius: 999px;
+  border: 1px solid var(--line2);
+  background: color-mix(in srgb, var(--glass) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  width: fit-content;
+}
+
+.page-tab{
+  border:1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 950;
+  cursor:pointer;
+  transition: background .12s ease, color .12s ease, border-color .12s ease, transform .12s ease;
+  letter-spacing: .2px;
+  user-select:none;
+}
+
+.page-tab:hover{ transform: translateY(-1px); }
+
+.page-tab.active{
+  background: color-mix(in srgb, rgba(37,99,235,.18) 60%, var(--glass));
+  border-color: color-mix(in srgb, rgba(37,99,235,.25) 60%, var(--line2));
+  color: var(--text);
+}
+
+/* Mobile */
+@media (max-width: 820px){
+  .header{ flex-wrap:wrap; align-items:flex-start; }
+  .header-left{ width:100%; }
+  .page-tabs{ width:100%; justify-content:space-between; }
+  .page-tab{ flex:1; text-align:center; }
+}
+
+  </style>
+</head>
+
+<body>
+    <div class="layout">
+<header class="header">
+  <div class="page-tabs" id="pageTabs" role="tablist" aria-label="Finance tabs">
+    <button type="button" class="page-tab" data-page="topups" role="tab" aria-selected="false">
+      Topups
+    </button>
+    <button type="button" class="page-tab active" data-page="income" role="tab" aria-selected="true">
+      Income
+    </button>
+    <button type="button" class="page-tab" data-page="internal-transactions" role="tab" aria-selected="false">
+      Internal Transactions
+    </button>
+    <button type="button" class="page-tab" data-page="transactions" role="tab" aria-selected="false">
+      Transactions
+    </button>
+  </div>
+
+  <div class="header-right">
+    <div class="theme-toggle" id="themeToggle">
+      <button class="theme-btn active" data-theme="light" type="button">Light</button>
+      <button class="theme-btn" data-theme="dark" type="button">Dark</button>
+    </div>
+  </div>
+</header>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <!-- Filters -->
+      <div class="wallet-section" style="margin-top: 1.5rem; padding: 14px;">
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <div class="form-group" style="min-width: 200px; margin: 0;">
+            <label>Filter by Year</label>
+            <select id="yearFilter">
+              <option value="all">All Years</option>
+              <option value="2024" selected>2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+            </select>
+          </div>
+          
+          <div class="form-group" style="min-width: 200px; margin: 0;">
+            <label>Filter by Platform</label>
+            <select id="platformFilter">
+              <option value="all">All Platforms</option>
+              <option value="facebook">Facebook</option>
+              <option value="google">Google</option>
+              <option value="tiktok">TikTok</option>
+              <option value="instagram">Instagram</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="min-width: 200px; margin: 0;">
+            <label>Filter by Client</label>
+            <select id="clientFilter">
+              <option value="all">All Clients</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="wallet-section" style="margin-top: 1.5rem;">
+        <div class="widget-title">
+          <div>
+            <h2>💰 Monthly Income Overview</h2>
+          </div>
+        </div>
+
+        <!-- Income KPIs -->
+        <div class="statistics">
+          <div class="stat-box">
+            <h4>Total Topup Fees</h4>
+            <div class="stat-value" id="income_topup_fees">$5,880.00</div>
+            <div class="stat-description">
+              <span class="muted">All topup fees collected</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Total Transfer Fees</h4>
+            <div class="stat-value" id="income_transfer_fees">$3,920.00</div>
+            <div class="stat-description">
+              <span class="muted">All transfer fees collected</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Total Setup + Services Fees</h4>
+            <div class="stat-value" id="income_setup_services">$2,380.00</div>
+            <div class="stat-description">
+              <span class="muted">Setup and service charges</span>
+            </div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Total Income</h4>
+            <div class="stat-value" id="income_total">$12,180.00</div>
+            <div class="stat-description">
+              <span class="muted">All revenue generated</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monthly Income Table -->
+        <div class="topups-table-wrap">
+          <table class="topups-table">
+            <thead>
+              <tr>
+                <th>Month</th>
+                <th style="text-align:right;">Topup Fees</th>
+                <th style="text-align:right;">Transfer Fees</th>
+                <th style="text-align:right;">Setup + Services</th>
+                <th style="text-align:right;">Total Income</th>
+              </tr>
+            </thead>
+            <tbody id="incomeTableBody">
+              <!-- Mockup data -->
+              <tr class="topups-row">
+                <td><strong>December 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$1,250.00</td>
+                <td style="text-align:right;" class="amount-pos">$850.00</td>
+                <td style="text-align:right;" class="amount-pos">$500.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,600.00</strong></td>
+              </tr>
+              <tr class="topups-row">
+                <td><strong>November 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$1,100.00</td>
+                <td style="text-align:right;" class="amount-pos">$720.00</td>
+                <td style="text-align:right;" class="amount-pos">$450.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,270.00</strong></td>
+              </tr>
+              <tr class="topups-row">
+                <td><strong>October 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$980.00</td>
+                <td style="text-align:right;" class="amount-pos">$650.00</td>
+                <td style="text-align:right;" class="amount-pos">$400.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,030.00</strong></td>
+              </tr>
+              <tr class="topups-row">
+                <td><strong>September 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$1,350.00</td>
+                <td style="text-align:right;" class="amount-pos">$900.00</td>
+                <td style="text-align:right;" class="amount-pos">$550.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,800.00</strong></td>
+              </tr>
+              <tr class="topups-row">
+                <td><strong>August 2024</strong></td>
+                <td style="text-align:right;" class="amount-pos">$1,200.00</td>
+                <td style="text-align:right;" class="amount-pos">$800.00</td>
+                <td style="text-align:right;" class="amount-pos">$480.00</td>
+                <td style="text-align:right;"><strong class="amount-pos">$2,480.00</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Charges Section -->
+      <div class="wallet-section" style="margin-top: 1.5rem;">
+        <div class="widget-title">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2>💳 Charges</h2>
+            <button class="btn" onclick="openAddServiceFeeModal()" style="background: #3498db; color: white; border-color: #3498db;">+ Add Service Fee</button>
+          </div>
+        </div>
+
+        <!-- Fee Statistics -->
+        <div class="statistics">
+          <div class="stat-box">
+            <h4>Total Fees</h4>
+            <div class="stat-value">$ 25.00</div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Top-Up Fees</h4>
+            <div class="stat-value">$ 20.00</div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Transfer Fees</h4>
+            <div class="stat-value">$ 5.00</div>
+          </div>
+
+          <div class="stat-box">
+            <h4>Setup + Services</h4>
+            <div class="stat-value">$ 0.00</div>
+          </div>
+        </div>
+
+        <!-- Charges Table -->
+        <div class="topups-table-wrap">
+          <table class="topups-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th style="text-align:right;">Amount</th>
+                <th>Fee Code</th>
+                <th>Link</th>
+                <th>Description</th>
+                <th style="text-align: center;">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="topups-row">
+                <td>19 februarie 2026</td>
+                <td>
+                  <span style="display: inline-block; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; background: rgba(245, 158, 11, 0.15); color: #f59e0b;">TOPUP</span>
+                </td>
+                <td style="text-align:right; font-weight: 700;">$ 20.00</td>
+                <td style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: var(--muted);">TOPUP_WIRE</td>
+                <td>
+                  <a href="#" style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #3498db; text-decoration: none;">TOPUPTU-DEMO-1</a>
+                </td>
+                <td>Demo > Top-up fee</td>
+                <td style="text-align: center;">
+                  <button class="btn" onclick="openFeeDetailsModal('TOPUP', '$ 20.00', 'TOPUP_WIRE', 'TOPUPTU-DEMO-1', 'Demo > Top-up fee', '19 februarie 2026')">Details</button>
+                </td>
+              </tr>
+
+              <tr class="topups-row">
+                <td>19 februarie 2026</td>
+                <td>
+                  <span style="display: inline-block; padding: 0.35rem 0.75rem; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; background: rgba(16, 185, 129, 0.15); color: #10b981;">TRANSFER</span>
+                </td>
+                <td style="text-align:right; font-weight: 700;">$ 5.00</td>
+                <td style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: var(--muted);">TRANSFER_MAIN_TO_VAULT</td>
+                <td>
+                  <a href="#" style="font-family: 'Courier New', monospace; font-size: 0.85rem; color: #3498db; text-decoration: none;">TRANSFERTR-DEMO-1</a>
+                </td>
+                <td>Demo > Transfer fee</td>
+                <td style="text-align: center;">
+                  <button class="btn" onclick="openFeeDetailsModal('TRANSFER', '$ 5.00', 'TRANSFER_MAIN_TO_VAULT', 'TRANSFERTR-DEMO-1', 'Demo > Transfer fee', '19 februarie 2026')">Details</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Fee Details Modal (Right Side Panel) -->
+  <div id="feeDetailsModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(4px);" onclick="closeFeeDetailsModal()">
+    <div id="feeDetailsPanel" style="position: absolute; top: 0; right: -600px; width: 600px; height: 100%; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.2); transition: right 0.3s ease; overflow-y: auto;" onclick="event.stopPropagation()">
+      
+      <!-- Header -->
+      <div style="padding: 2rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 10;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 id="detailTitle" style="margin: 0; font-size: 1.1rem; font-weight: 600; color: #1f2937;">Fee entry • 25d6e69b-c1e1-4fad-8bab-77d23436199e</h3>
+          <button onclick="closeFeeDetailsModal()" style="background: none; border: none; font-size: 1rem; color: #6b7280; cursor: pointer; padding: 0.5rem 1rem; font-weight: 500; transition: all 0.15s;" onmouseover="this.style.color='#1f2937'" onmouseout="this.style.color='#6b7280'">Close</button>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div style="padding: 2rem;">
+        
+        <!-- Field: Created -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Created</span>
+          <span id="detailCreated" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">19 februarie 2026</span>
+        </div>
+
+        <!-- Field: Category -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Category</span>
+          <span id="detailCategory" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">TOPUP_FEE</span>
+        </div>
+
+        <!-- Field: Amount -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Amount</span>
+          <span id="detailAmount" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">$ 20.00</span>
+        </div>
+
+        <!-- Field: From -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">From</span>
+          <span id="detailFrom" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">Top-up</span>
+        </div>
+
+        <!-- Field: To -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">To</span>
+          <span id="detailTo" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">Fees</span>
+        </div>
+
+        <!-- Field: Fee code -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Fee code</span>
+          <span id="detailFeeCode" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">TOPUP_WIRE</span>
+        </div>
+
+        <!-- Field: Link -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Link</span>
+          <span id="detailLink" style="color: #1f2937; font-weight: 600; font-size: 0.95rem;">TOPUP:TU-DEMO-1</span>
+        </div>
+
+        <!-- Field: Description -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; border-bottom: 1px solid #f3f4f6;">
+          <span style="color: #9ca3af; font-size: 0.95rem;">Description</span>
+          <span id="detailDescription" style="color: #1f2937; font-weight: 600; font-size: 0.95rem; text-align: right;">Demo • Top-up fee</span>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Add Service Fee Modal (Right Side Panel) -->
+  <div id="addServiceFeeModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; backdrop-filter: blur(4px);" onclick="closeAddServiceFeeModal()">
+    <div id="addServiceFeePanel" style="position: absolute; top: 0; right: -600px; width: 600px; height: 100%; background: white; box-shadow: -4px 0 20px rgba(0,0,0,0.2); transition: right 0.3s ease; overflow-y: auto;" onclick="event.stopPropagation()">
+      
+      <!-- Header -->
+      <div style="padding: 2rem; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; background: white; z-index: 10;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="margin: 0; font-size: 1.3rem; font-weight: 700; color: #1f2937;">Add service fee</h3>
+          <button onclick="closeAddServiceFeeModal()" style="background: none; border: none; font-size: 1.5rem; color: #6b7280; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 6px; transition: all 0.15s;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">×</button>
+        </div>
+      </div>
+
+      <!-- Form Content -->
+      <div style="padding: 2rem;">
+        
+        <!-- Row 1: Client, Service name, Amount, Fee code -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+          <div>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Client</label>
+            <select id="feeClient" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
+              <option value="100">Alex M.</option>
+              <option value="101">Maria S.</option>
+              <option value="102">John D.</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Service name</label>
+            <input type="text" id="feeServiceName" placeholder="Service" value="Service" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Amount ($)</label>
+            <input type="number" id="feeAmount" placeholder="50" value="50" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Fee code</label>
+            <input type="text" id="feeFeeCode" placeholder="SERVICE" value="SERVICE" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem;">
+          </div>
+        </div>
+
+        <!-- Note (optional) -->
+        <div style="margin-bottom: 2rem;">
+          <label style="display: block; font-size: 0.875rem; color: #6b7280; margin-bottom: 0.5rem; font-weight: 500;">Note (optional)</label>
+          <textarea id="feeNote" placeholder="Optional..." rows="3" style="width: 100%; padding: 10px 12px; border: 1px solid #d1d5db; border-radius: 8px; background: white; color: #1f2937; font-size: 0.95rem; resize: vertical;"></textarea>
+        </div>
+
+        <!-- Summary Section -->
+        <div style="background: #f9fafb; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span style="color: #6b7280; font-size: 0.95rem;">From</span>
+            <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">Main Wallet</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span style="color: #6b7280; font-size: 0.95rem;">To</span>
+            <span style="color: #1f2937; font-weight: 700; font-size: 1rem;">Fees</span>
+          </div>
+
+          <div style="height: 1px; background: #e5e7eb; margin: 1rem 0;"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="color: #6b7280; font-size: 0.95rem;">Total</span>
+            <span style="color: #1f2937; font-weight: 700; font-size: 1.25rem;">$ <span id="feeTotalAmount">50.00</span></span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 1rem;">
+          <button onclick="submitAddServiceFee()" style="flex: 1; background: #3b82f6; color: white; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#2563eb'" onmouseout="this.style.background='#3b82f6'">Add fee</button>
+          <button onclick="closeAddServiceFeeModal()" style="flex: 0.5; background: #f3f4f6; color: #6b7280; padding: 12px 24px; border: none; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">Cancel</button>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="../js/employee-selector.js"></script>`n  <script src="../js/permissions-check.js"></script>`n  <script src="../js/data-filter.js"></script>`n  <script src="../js/sidebar.js"></script>
+  <script>
+    /* ==============================
+       PAGE NAVIGATION
+    ============================== */
+    const PAGE_ROUTES = {
+      topups: "topups.html",
+      finance: "finance.html",
+      income: "income.html",
+      fees: "fees.html",
+      "internal-transactions": "internal-transactions.html",
+      transactions: "transactions.html"
+    };
+
+    document.getElementById("pageTabs")?.addEventListener("click", (e) => {
+      const btn = e.target.closest(".page-tab");
+      if(!btn) return;
+      const key = btn.dataset.page;
+      if(!PAGE_ROUTES[key]) return;
+      window.location.href = PAGE_ROUTES[key];
+    });
+
+    /* =========================
+       THEME
+    ========================= */
+    (function initTheme(){
+      const root = document.documentElement;
+      const saved = localStorage.getItem("ui_theme") || "light";
+      if(saved === "dark") root.setAttribute("data-theme","dark");
+
+      const buttons = document.querySelectorAll("#themeToggle .theme-btn");
+      buttons.forEach(btn => {
+        if(btn.dataset.theme === saved) btn.classList.add("active");
+        else btn.classList.remove("active");
+
+        btn.addEventListener("click", () => {
+          const theme = btn.dataset.theme;
+          root.setAttribute("data-theme", theme);
+          localStorage.setItem("ui_theme", theme);
+          buttons.forEach(b => b.classList.toggle("active", b === btn));
+        });
+      });
+    })();
+
+    /* =========================
+       STATE & STORAGE
+    ========================= */
+    var state = {
+      ledger: [],
+      clients: [],
+      selectedYear: "2024",
+      selectedPlatform: "all",
+      selectedClient: "all"
+    };
+
+    function load(){
+      try {
+        var raw = localStorage.getItem("financeState");
+        if(raw){
+          var parsed = JSON.parse(raw);
+          if(parsed.ledger) state.ledger = parsed.ledger;
+          if(parsed.clients) state.clients = parsed.clients;
+        }
+      } catch(e) {
+        console.error("Error loading state:", e);
+      }
+      
+      // Populate client filter
+      populateClientFilter();
+    }
+
+    function populateClientFilter(){
+      var select = document.getElementById("clientFilter");
+      if(!select) return;
+      
+      // Keep "All Clients" option
+      select.innerHTML = '<option value="all">All Clients</option>';
+      
+      // Add clients from state
+      if(state.clients && Array.isArray(state.clients)){
+        state.clients.forEach(function(client){
+          var option = document.createElement("option");
+          option.value = client.id;
+          option.textContent = client.name || client.id;
+          select.appendChild(option);
+        });
+      }
+    }
+
+    function money(val){
+      var num = parseFloat(val) || 0;
+      return "$" + num.toFixed(2);
+    }
+
+    /* =========================
+       FILTERS
+    ========================= */
+    document.getElementById("yearFilter")?.addEventListener("change", function(e){
+      state.selectedYear = e.target.value;
+      renderIncomePage();
+    });
+
+    document.getElementById("platformFilter")?.addEventListener("change", function(e){
+      state.selectedPlatform = e.target.value;
+      renderIncomePage();
+    });
+
+    document.getElementById("clientFilter")?.addEventListener("change", function(e){
+      state.selectedClient = e.target.value;
+      renderIncomePage();
+    });
+
+    /* =========================
+       RENDER INCOME PAGE
+    ========================= */
+    function renderIncomePage(){
+      try {
+        // Filter ledger by year, platform, and client
+        var filteredLedger = state.ledger;
+        
+        if(state.selectedYear !== "all"){
+          filteredLedger = filteredLedger.filter(function(tx){
+            if(!tx.date) return false;
+            var year = new Date(tx.date).getFullYear();
+            return year.toString() === state.selectedYear;
+          });
+        }
+        
+        if(state.selectedPlatform !== "all"){
+          filteredLedger = filteredLedger.filter(function(tx){
+            return tx.platform && tx.platform.toLowerCase() === state.selectedPlatform.toLowerCase();
+          });
+        }
+        
+        if(state.selectedClient !== "all"){
+          filteredLedger = filteredLedger.filter(function(tx){
+            return tx.clientId === state.selectedClient;
+          });
+        }
+
+        // Calculate totals by fee type
+        var totalTopupFees = 0;
+        var totalTransferFees = 0;
+        var totalSetupServices = 0;
+        
+        var monthlyData = {};
+        
+        // Process all ledger entries for fees
+        if(filteredLedger && Array.isArray(filteredLedger)){
+          filteredLedger.forEach(function(tx){
+            if(!tx || !tx.date) return;
+            
+            try {
+              var date = new Date(tx.date);
+              if(isNaN(date.getTime())) return; // Invalid date
+              
+              var month = date.getMonth() + 1;
+              var monthStr = month < 10 ? "0" + month : "" + month;
+              var monthKey = date.getFullYear() + "-" + monthStr;
+              
+              if(!monthlyData[monthKey]){
+                monthlyData[monthKey] = {
+                  topupFees: 0,
+                  transferFees: 0,
+                  setupServices: 0,
+                  total: 0
+                };
+              }
+              
+              var amount = parseFloat(tx.amount) || 0;
+              
+              // Categorize fees
+              if(tx.category === "TOPUP_FEE"){
+                monthlyData[monthKey].topupFees += amount;
+                totalTopupFees += amount;
+              } else if(tx.category === "TRANSFER_FEE"){
+                monthlyData[monthKey].transferFees += amount;
+                totalTransferFees += amount;
+              } else if(tx.category === "SETUP_CHARGE" || tx.category === "SERVICE_CHARGE"){
+                monthlyData[monthKey].setupServices += amount;
+                totalSetupServices += amount;
+              }
+            } catch(e) {
+              console.error("Error processing transaction:", e, tx);
+            }
+          });
+        }
+        
+        // Calculate totals
+        Object.keys(monthlyData).forEach(function(month){
+          var data = monthlyData[month];
+          data.total = data.topupFees + data.transferFees + data.setupServices;
+        });
+        
+        var totalIncome = totalTopupFees + totalTransferFees + totalSetupServices;
+        
+        // Update KPIs (only if we have real data, otherwise keep mockup values)
+        if(filteredLedger.length > 0){
+          var topupFeesEl = document.getElementById("income_topup_fees");
+          var transferFeesEl = document.getElementById("income_transfer_fees");
+          var setupServicesEl = document.getElementById("income_setup_services");
+          var totalEl = document.getElementById("income_total");
+          
+          if(topupFeesEl) topupFeesEl.textContent = money(totalTopupFees);
+          if(transferFeesEl) transferFeesEl.textContent = money(totalTransferFees);
+          if(setupServicesEl) setupServicesEl.textContent = money(totalSetupServices);
+          if(totalEl) totalEl.textContent = money(totalIncome);
+        }
+        
+        // Sort months descending
+        var sortedMonths = Object.keys(monthlyData).sort().reverse();
+        
+        // Render table
+        var tbody = document.getElementById("incomeTableBody");
+        if(!tbody) return;
+        
+        if(sortedMonths.length === 0){
+          // Keep mockup data if no real data
+          return;
+        }
+        
+        var rows = sortedMonths.map(function(month){
+          var data = monthlyData[month];
+          try {
+            var monthDate = new Date(month + "-01");
+            var monthName = monthDate.toLocaleDateString("en-US", { year: "numeric", month: "long" });
+            
+            return "<tr class=\"topups-row\">" +
+              "<td><strong>" + monthName + "</strong></td>" +
+              "<td style=\"text-align:right;\" class=\"amount-pos\">" + money(data.topupFees) + "</td>" +
+              "<td style=\"text-align:right;\" class=\"amount-pos\">" + money(data.transferFees) + "</td>" +
+              "<td style=\"text-align:right;\" class=\"amount-pos\">" + money(data.setupServices) + "</td>" +
+              "<td style=\"text-align:right;\"><strong class=\"amount-pos\">" + money(data.total) + "</strong></td>" +
+              "</tr>";
+          } catch(e) {
+            console.error("Error rendering month:", e, month);
+            return "";
+          }
+        });
+        
+        tbody.innerHTML = rows.join("");
+      } catch(e) {
+        console.error("Error in renderIncomePage:", e);
+        var tbody = document.getElementById("incomeTableBody");
+        if(tbody) {
+          tbody.innerHTML = "<tr><td colspan=\"5\" class=\"td-muted\" style=\"text-align:center; padding:2rem;\">Error loading income data. Please refresh the page.</td></tr>";
+        }
+      }
+    }
+
+    /* =========================
+       INIT
+    ========================= */
+    load();
+    renderIncomePage();
+
+    /* ==============================
+       Fee Details Modal Functions
+    ============================== */
+    function openFeeDetailsModal(type, amount, feeCode, link, description, date){
+      const modal = document.getElementById("feeDetailsModal");
+      const panel = document.getElementById("feeDetailsPanel");
+      
+      // Generate a random ID for the title
+      const randomId = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      
+      // Populate data
+      document.getElementById("detailTitle").textContent = `Fee entry • ${randomId}`;
+      document.getElementById("detailCreated").textContent = date;
+      document.getElementById("detailCategory").textContent = type + "_FEE";
+      document.getElementById("detailAmount").textContent = amount;
+      document.getElementById("detailFrom").textContent = type === "TOPUP" ? "Top-up" : "Transfer";
+      document.getElementById("detailTo").textContent = "Fees";
+      document.getElementById("detailFeeCode").textContent = feeCode;
+      document.getElementById("detailLink").textContent = link;
+      document.getElementById("detailDescription").textContent = description;
+      
+      modal.style.display = "block";
+      
+      // Trigger animation after display
+      setTimeout(() => {
+        panel.style.right = "0";
+      }, 10);
+    }
+
+    function closeFeeDetailsModal(){
+      const modal = document.getElementById("feeDetailsModal");
+      const panel = document.getElementById("feeDetailsPanel");
+      
+      // Animate out
+      panel.style.right = "-600px";
+      
+      // Hide after animation
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 300);
+    }
+
+    /* ==============================
+       Add Service Fee Modal Functions
+    ============================== */
+    function openAddServiceFeeModal(){
+      const modal = document.getElementById("addServiceFeeModal");
+      const panel = document.getElementById("addServiceFeePanel");
+      modal.style.display = "block";
+      
+      // Trigger animation after display
+      setTimeout(() => {
+        panel.style.right = "0";
+      }, 10);
+    }
+
+    function closeAddServiceFeeModal(){
+      const modal = document.getElementById("addServiceFeeModal");
+      const panel = document.getElementById("addServiceFeePanel");
+      
+      // Animate out
+      panel.style.right = "-600px";
+      
+      // Hide after animation
+      setTimeout(() => {
+        modal.style.display = "none";
+      }, 300);
+    }
+
+    function submitAddServiceFee(){
+      const client = document.getElementById("feeClient").value;
+      const serviceName = document.getElementById("feeServiceName").value;
+      const amount = document.getElementById("feeAmount").value;
+      const feeCode = document.getElementById("feeFeeCode").value;
+      const note = document.getElementById("feeNote").value;
+
+      // Here you would normally send this data to your backend
+      console.log("Adding service fee:", { client, serviceName, amount, feeCode, note });
+      
+      alert(`Service fee added successfully!\nClient: ${client}\nAmount: $ ${amount}\nFee Code: ${feeCode}`);
+      
+      closeAddServiceFeeModal();
+    }
+
+    // Update total amount when amount field changes
+    document.getElementById("feeAmount")?.addEventListener("input", (e) => {
+      const amount = parseFloat(e.target.value) || 0;
+      document.getElementById("feeTotalAmount").textContent = amount.toFixed(2);
+    });
+  </script>
+  <!-- Employee Selector Modal -->
+  <div id="employeeSelectorModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; max-width: 500px; width: 90%; max-height: 80vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <div style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
+        <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 900; color: #0f172a;">Select Employee Profile</h2>
+        <p style="margin: 0; font-size: 14px; color: #64748b;">Choose which employee profile you want to use</p>
+      </div>
+      <div id="employeeProfilesList" style="padding: 16px; max-height: 400px; overflow-y: auto;"></div>
+    </div>
+  </div>
+  <style>
+    .employee-profile-item { display: flex; align-items: center; gap: 16px; padding: 16px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
+    .employee-profile-item:hover { border-color: #3b82f6; background: rgba(59,130,246,0.05); transform: translateX(4px); }
+    .employee-profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: white; flex-shrink: 0; }
+    .employee-profile-info { flex: 1; }
+    .employee-profile-name { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .employee-profile-email { font-size: 13px; color: #64748b; }
+    .employee-profile-arrow { font-size: 24px; color: #cbd5e1; transition: all 0.2s; }
+    .employee-profile-item:hover .employee-profile-arrow { color: #3b82f6; transform: translateX(4px); }
+  </style>
+</body>
+</html>

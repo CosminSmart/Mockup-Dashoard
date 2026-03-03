@@ -5,1441 +5,1172 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Dashboard</title>
 
-  <!-- KEEP YOUR EXISTING GLOBALS -->
   <link rel="stylesheet" href="../css/layout.css">
   <link rel="stylesheet" href="../css/dashboard.css">
   <link rel="stylesheet" href="../css/sidebar.css">
-
-  <style>
-    :root{
-      --bg: #f6f7fb;
-      --panel: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --border: rgba(15,23,42,.10);
-      --shadow: 0 12px 30px rgba(15,23,42,.08);
-
-      --green: #10b981;
-      --red: #ef4444;
-      --blue: #2563eb;
-      --cyan: #06b6d4;
-      --amber: #f59e0b;
-      --violet: #8b5cf6;
-      --slate: #334155;
-
-      --r: 16px;
-      --r2: 18px;
-      --gap: 14px;
-      --gap2: 18px;
-    }
-
-    body{ background: var(--bg) !important; }
-
-    .header{
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      background: rgba(255,255,255,.92);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      box-shadow: 0 8px 20px rgba(15,23,42,.06);
-    }
-    .main{ padding: 18px 18px 28px !important; }
-
-    .adm-wrap{ display:grid; gap: var(--gap2); }
-
-    /* KPI grid */
-    .adm-kpis{
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--gap2);
-    }
-    @media (max-width: 1100px){ .adm-kpis{ grid-template-columns: repeat(2, 1fr); } }
-    @media (max-width: 720px){ .adm-kpis{ grid-template-columns: 1fr; } }
-
-    /* charts row: chart + accounts overview */
-    .adm-charts{
-      display:grid;
-      grid-template-columns: 1.4fr .9fr;
-      gap: var(--gap2);
-      align-items: stretch;
-    }
-    @media (max-width: 1100px){ .adm-charts{ grid-template-columns: 1fr; } }
-
-    /* bottom row: clients overview + activity */
-    .adm-bottom{
-      display:grid;
-      grid-template-columns: 1.6fr .9fr;
-      gap: var(--gap2);
-      align-items: start;
-    }
-    @media (max-width: 1100px){ .adm-bottom{ grid-template-columns: 1fr; } }
-
-    /* Generic card */
-    .adm-card{
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--r2);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-    }
-    .adm-card .hd{
-      padding: 14px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-      border-bottom: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(15,23,42,.02), rgba(15,23,42,0));
-    }
-    .adm-card .hd .title{
-      display:flex;
-      flex-direction: column;
-      gap: 4px;
-      min-width: 0;
-    }
-    .adm-card .hd h3{
-      margin:0;
-      font-size: 15px;
-      letter-spacing:.2px;
-      color: var(--text);
-    }
-    .adm-card .hd p{
-      margin:0;
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.35;
-    }
-    .adm-card .bd{ padding: 16px; }
-    .adm-card .ft{
-      padding: 12px 16px;
-      border-top: 1px solid var(--border);
-      display:flex;
-      justify-content:space-between;
-      gap: 10px;
-      font-size: 12px;
-      color: var(--muted);
-      background: rgba(15,23,42,.01);
-    }
-
-    .btn{
-      appearance:none;
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--text);
-      padding: 9px 12px;
-      border-radius: 12px;
-      font-size: 13px;
-      cursor: pointer;
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      white-space: nowrap;
-      box-shadow: 0 6px 18px rgba(15,23,42,.06);
-    }
-    .btn:hover{ filter: brightness(.98); }
-    .btn.primary{
-      border-color: rgba(37,99,235,.25);
-      background: linear-gradient(180deg, rgba(37,99,235,.95), rgba(37,99,235,.82));
-      color:#fff;
-    }
-    .btn.link{
-      box-shadow:none;
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,.02);
-    }
-
-    /* KPI style */
-    .metric{
-      padding: 18px 18px 16px;
-      display:flex;
-      justify-content: space-between;
-      gap: 14px;
-    }
-    .metric .left{ display:flex; flex-direction:column; gap: 8px; min-width:0; }
-    .metric .k{ font-size: 13px; color: rgba(100,116,139,.9); margin:0; }
-    .metric .v{ font-size: 30px; font-weight: 800; letter-spacing:.2px; margin:0; color: var(--text); }
-    .metric .delta{ display:flex; align-items:center; gap: 8px; font-size: 13px; margin-top: 4px; }
-    .delta .pos{ color: var(--green); font-weight: 800; }
-    .delta .neg{ color: var(--red); font-weight: 800; }
-
-    .spark{
-      width: 150px;
-      height: 44px;
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      opacity: .9;
-    }
-    .icoBox{
-      width: 34px; height: 34px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,.02);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex:0 0 auto;
-    }
-
-    /* Controls for chart */
-    .controls{
-      display:flex;
-      gap: 10px;
-      align-items:center;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-    .ctrl{
-      display:flex;
-      gap: 8px;
-      align-items:center;
-      background: rgba(15,23,42,.02);
-      border: 1px solid var(--border);
-      padding: 8px 10px;
-      border-radius: 14px;
-    }
-    .ctrl label{
-      font-size: 12px;
-      color: var(--muted);
-      font-weight: 800;
-      letter-spacing: .2px;
-    }
-    select{
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--text);
-      border-radius: 12px;
-      padding: 8px 10px;
-      font-size: 13px;
-      outline: none;
-    }
-    .pill{
-      font-size: 12px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,.02);
-      cursor:pointer;
-      color: rgba(15,23,42,.80);
-      user-select:none;
-      font-weight: 700;
-    }
-    .pill.active{
-      border-color: rgba(16,185,129,.30);
-      background: rgba(16,185,129,.12);
-      color: #065f46;
-    }
-
-    .chartWrap{
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, rgba(15,23,42,.02), rgba(15,23,42,0));
-      overflow:hidden;
-      position: relative;
-    }
-    .chartCanvas{
-      width: 100%;
-      height: 330px;
-      display:block;
-    }
-    .chartLegend{
-      display:flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      padding: 10px 12px 12px;
-      border-top: 1px solid var(--border);
-      background: rgba(255,255,255,.65);
-      backdrop-filter: blur(8px);
-    }
-    .leg{
-      display:flex; align-items:center; gap: 8px;
-      font-size: 12px;
-      color: rgba(15,23,42,.8);
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,.02);
-      padding: 7px 10px;
-      border-radius: 999px;
-    }
-    .sw{
-      width:10px; height:10px; border-radius: 999px;
-      background: #94a3b8;
-      border: 1px solid rgba(15,23,42,.18);
-    }
-
-    /* Quick Actions mock tasks */
-    .qa{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-    }
-    .task{
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      background: rgba(15,23,42,.02);
-      padding: 12px;
-      display:flex;
-      gap: 12px;
-      align-items:flex-start;
-      justify-content: space-between;
-    }
-    .task:hover{ background: rgba(37,99,235,.05); border-color: rgba(37,99,235,.18); }
-    .task .l{
-      display:flex; gap: 12px; align-items:flex-start;
-      min-width: 0;
-      flex: 1;
-    }
-    .tIco{
-      width: 40px; height: 40px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: #fff;
-      display:flex; align-items:center; justify-content:center;
-      flex: 0 0 auto;
-      font-size: 18px;
-    }
-    .tTxt{ min-width:0; }
-    .tTxt .t{ margin:0; font-weight: 900; font-size: 13px; color: var(--text); }
-    .tTxt .d{ margin:6px 0 0; font-size: 12px; color: var(--muted); line-height: 1.35; }
-    .tRight{
-      display:flex;
-      gap: 8px;
-      align-items:center;
-      flex:0 0 auto;
-    }
-    .count{
-      font-size: 12px;
-      font-weight: 900;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,.02);
-      color: rgba(15,23,42,.85);
-      white-space: nowrap;
-    }
-    .count.warn{ border-color: rgba(245,158,11,.30); background: rgba(245,158,11,.12); color:#92400e; }
-    .count.ok{ border-color: rgba(16,185,129,.28); background: rgba(16,185,129,.10); color:#065f46; }
-    .count.bad{ border-color: rgba(239,68,68,.28); background: rgba(239,68,68,.10); color:#991b1b; }
-
-    /* Table */
-    table{
-      width:100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow:hidden;
-      background: #fff;
-    }
-    thead th{
-      text-align:left;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 12px 12px;
-      background: rgba(15,23,42,.02);
-      border-bottom: 1px solid var(--border);
-      font-weight: 900;
-      letter-spacing:.2px;
-      white-space: nowrap;
-    }
-    tbody td{
-      padding: 12px;
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-      vertical-align: middle;
-    }
-    tbody tr:hover td{ background: rgba(37,99,235,.04); }
-    tbody tr:last-child td{ border-bottom:none; }
-
-    .name{ font-weight: 900; color: var(--text); }
-    .sub{ font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-    .status{
-      display:inline-flex; align-items:center; gap:7px;
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,.02);
-      white-space: nowrap;
-      font-weight: 800;
-    }
-    .dot{ width:8px; height:8px; border-radius:999px; background: #94a3b8; }
-
-    .st-active{ border-color: rgba(16,185,129,.30); background: rgba(16,185,129,.10); color:#065f46; }
-    .st-active .dot{ background: var(--green); }
-
-    .st-susp{ border-color: rgba(239,68,68,.28); background: rgba(239,68,68,.10); color:#991b1b; }
-    .st-susp .dot{ background: var(--red); }
-
-    .st-prog{ border-color: rgba(245,158,11,.30); background: rgba(245,158,11,.12); color:#92400e; }
-    .st-prog .dot{ background: var(--amber); }
-
-    .st-appeal{ border-color: rgba(37,99,235,.25); background: rgba(37,99,235,.10); color:#1e40af; }
-    .st-appeal .dot{ background: var(--blue); }
-
-    .st-need{ border-color: rgba(139,92,246,.25); background: rgba(139,92,246,.10); color:#5b21b6; }
-    .st-need .dot{ background: var(--violet); }
-
-    .actBtn{
-      display:inline-flex;
-      align-items:center;
-      gap: 8px;
-      font-size: 12px;
-      padding: 7px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #fff;
-      cursor: pointer;
-    }
-
-    /* Activity list */
-    .activity{ display:grid; gap: 12px; }
-    .aItem{
-      display:flex;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,.02);
-      align-items:flex-start;
-    }
-    .aItem:hover{ background: rgba(37,99,235,.05); border-color: rgba(37,99,235,.18); }
-    .aIco{
-      width: 38px; height: 38px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      background: #fff;
-      display:flex; align-items:center; justify-content:center;
-      flex:0 0 auto;
-      font-size: 16px;
-    }
-    .aTxt{ min-width:0; flex:1; }
-    .aTxt .t{ margin:0; font-weight: 900; font-size: 13px; color: var(--text); }
-    .aTxt .d{ margin:6px 0 0; font-size: 12px; color: var(--muted); line-height: 1.35; }
-    .aRight{
-      display:flex; flex-direction:column; gap: 8px;
-      align-items:flex-end;
-      flex:0 0 auto;
-    }
-    .time{ font-size: 12px; color: var(--muted); }
-
-    /* small note */
-    .note{
-      font-size: 12px;
-      color: rgba(100,116,139,.75);
-    }
-
-    .user-info span{ color: rgba(15,23,42,.8); font-weight: 700; }
-
-    /* Platforms Status Overview */
-.statusTableWrap{
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  overflow: hidden;
-  background: #fff;
-}
-
-.statusTable{
-  width:100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  border: 0;
-  border-radius: 0;
-}
-
-.statusTable thead th{
-  background: rgba(15,23,42,.02);
-  border-bottom: 1px solid var(--border);
-  font-weight: 900;
-  letter-spacing: .2px;
-}
-
-.statusTable tbody td{
-  border-bottom: 1px solid var(--border);
-  background: #fff;
-}
-
-.statusTable tbody tr:hover td{
-  background: rgba(37,99,235,.04);
-}
-
-.platHead{
-  display:inline-flex;
-  width: 30px;
-  height: 30px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: rgba(15,23,42,.02);
-  align-items:center;
-  justify-content:center;
-  font-weight: 900;
-  color: rgba(15,23,42,.80);
-}
-
-.sRow{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-}
-
-.sDot{
-  width: 9px;
-  height: 9px;
-  border-radius: 999px;
-  background: #94a3b8;
-  border: 1px solid rgba(15,23,42,.12);
-}
-
-.sDot.active{ background: var(--green); }
-.sDot.suspended{ background: var(--red); }
-.sDot.need_appeal{ background: var(--violet); }
-.sDot.in_appeal{ background: var(--blue); }
-.sDot.in_progress{ background: var(--amber); }
-
-.sName{
-  font-weight: 900;
-  color: var(--text);
-  font-size: 13px;
-}
-
-.num{
-  display:inline-flex;
-  min-width: 38px;
-  justify-content:center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: rgba(15,23,42,.02);
-  font-weight: 900;
-  font-size: 12px;
-  color: rgba(15,23,42,.85);
-}
-
-.num.zero{
-  opacity: .55;
-}
-
-.onlyColNote{
-  font-size: 12px;
-  color: var(--muted);
-}
-
-
-
-/* Tabs (Transactions card) */
-.tabs{
-  display:flex;
-  gap: 8px;
-  align-items:center;
-  background: rgba(15,23,42,.02);
-  border: 1px solid var(--border);
-  padding: 6px;
-  border-radius: 14px;
-}
-.tabBtn{
-  border: 1px solid transparent;
-  background: transparent;
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 900;
-  color: rgba(15,23,42,.70);
-  cursor: pointer;
-}
-.tabBtn:hover{ background: rgba(37,99,235,.06); }
-.tabBtn.active{
-  background: #fff;
-  border-color: rgba(37,99,235,.22);
-  box-shadow: 0 8px 18px rgba(15,23,42,.08);
-  color: rgba(15,23,42,.92);
-}
-
-.tableWrap{
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  overflow: hidden;
-  background: #fff;
-}
-
-.txLink{
-  color: rgba(37,99,235,.95);
-  text-decoration: none;
-  font-weight: 800;
-}
-.txLink:hover{ text-decoration: underline; }
-
-/* Make tables a bit tighter for admin */
-#txTabsCard table thead th{ padding: 11px 12px; }
-#txTabsCard table tbody td{ padding: 11px 12px; }
-
-
-/* Pending Users card (dashboard) */
-#pendingUsersCard .bd{ padding: 16px; }
-
-.pendingEmpty{
-  height: 220px;               /* ca in screenshot */
-  border-radius: 16px;
-  border: 1px solid var(--border);
-  background: rgba(15,23,42,.02);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.pendingEmpty__text{
-  color: rgba(100,116,139,.85);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.pendingList{
-  display:grid;
-  gap: 10px;
-}
-
-.pendingItem{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: rgba(15,23,42,.02);
-  padding: 12px;
-}
-
-.pendingName{
-  font-weight: 900;
-  color: var(--text);
-  font-size: 13px;
-}
-.pendingSub{
-  margin-top: 4px;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.pendingActions{
-  display:flex;
-  gap: 8px;
-  align-items:center;
-}
-
-#pendingUsersCard .bd{
-  display:flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-
-/* My Team (client dashboard) */
-.teamList{ display:grid; gap: 10px; }
-.teamItem{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  gap: 12px;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  background: rgba(15,23,42,.02);
-  padding: 12px;
-}
-.teamItem:hover{ background: rgba(37,99,235,.04); border-color: rgba(37,99,235,.16); }
-.teamName{ font-weight: 900; color: var(--text); font-size: 13px; }
-.teamSub{ margin-top: 4px; font-size: 12px; color: var(--muted); }
-.teamRole{ margin-top: 6px; font-size: 12px; color: rgba(15,23,42,.70); }
-.teamActions{ display:flex; align-items:center; gap: 8px; }
-
-
-
-
-  </style>
+  <link rel="stylesheet" href="../css/admin-dashboard.css">
+  <link rel="stylesheet" href="../css/calendar.css">
+  
+  <!-- Google Charts -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 </head>
 
 <body>
   <div class="layout">
+    <aside class="sidebar" id="sidebar"></aside>
+
     <header class="header">
-      <h1 style="font-size:20px; letter-spacing:.2px;">Admin Dashboard</h1>
-      <div class="user-info">
-        <span>Admin User</span>
-        <div class="user-avatar">AU</div>
+      <div>
+        <h1>📊 Dashboard</h1>
+      </div>
+      <div class="header-right">
+        <div class="user-info">
+          <span>Admin User</span>
+          <div class="user-avatar">AU</div>
+        </div>
       </div>
     </header>
 
-    <!-- SIDEBAR (DO NOT TOUCH) -->
-    <aside class="sidebar"></aside>
-
     <main class="main">
-      <div class="adm-wrap">
-
-        <!-- KPI -->
-        <section class="adm-kpis">
-          <article class="adm-card">
-            <div class="metric">
-              <div class="left">
-                <p class="k">Total Deposited</p>
-                <p class="v">$2,847,500</p>
-                <div class="delta"><span class="pos">↗ +12.5%</span><span class="note">vs last 30d</span></div>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
-                <div class="icoBox">$</div>
-                <div class="spark">
-                  <svg viewBox="0 0 140 40" width="140" height="40">
-                    <path d="M2 30 C 20 20, 35 22, 48 24 S 80 28, 98 18 S 120 22, 138 12"
-                          fill="none" stroke="rgba(16,185,129,.95)" stroke-width="2.6" stroke-linecap="round"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="adm-card">
-            <div class="metric">
-              <div class="left">
-                <p class="k">Credit Allocation</p>
-                <p class="v">$2,456,200</p>
-                <div class="delta"><span class="pos">↗ +8.3%</span><span class="note">this month</span></div>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
-                <div class="icoBox">💳</div>
-                <div class="spark">
-                  <svg viewBox="0 0 140 40" width="140" height="40">
-                    <path d="M2 26 C 18 26, 34 24, 50 22 S 86 20, 104 18 S 124 18, 138 14"
-                          fill="none" stroke="rgba(16,185,129,.95)" stroke-width="2.6" stroke-linecap="round"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="adm-card">
-            <div class="metric">
-              <div class="left">
-                <p class="k">Active Spending</p>
-                <p class="v">$1,923,400</p>
-                <div class="delta"><span class="pos">↗ +15.7%</span><span class="note">vs last 7d</span></div>
-              </div>
-              <div style="display:flex; flex-direction:column; gap:10px; align-items:flex-end;">
-                <div class="icoBox">📈</div>
-                <div class="spark">
-                  <svg viewBox="0 0 140 40" width="140" height="40">
-                    <path d="M2 28 C 18 24, 34 26, 50 20 S 86 18, 104 16 S 124 16, 138 12"
-                          fill="none" stroke="rgba(16,185,129,.95)" stroke-width="2.6" stroke-linecap="round"/>
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </article>
-        </section>
-
-        <!-- CHART + RIGHT CARD (Quick Actions instead of Status Distribution) -->
-        <section class="adm-charts">
-          <!-- Spending Trends -->
-          <article class="adm-card">
-            <div class="hd">
-              <div class="title">
-                <h3>Spending Trends</h3>
-                <p>Animated chart example • filter by platform • Line/Bar toggle.</p>
-              </div>
-
-              <div class="controls">
-                <div class="ctrl">
-                  <label for="platformSel">Platform</label>
-                  <select id="platformSel">
-                    <option value="all" selected>All platforms</option>
-                    <option value="google">Google Ads</option>
-                    <option value="facebook">Facebook Ads</option>
-                    <option value="tiktok">TikTok Ads</option>
-                    <option value="microsoft">Microsoft Ads</option>
-                  </select>
-                </div>
-
-                <div class="ctrl">
-                  <span id="modeLine" class="pill active">Line</span>
-                  <span id="modeBar" class="pill">Bar</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="bd">
-              <div class="chartWrap">
-                <canvas id="trendCanvas" class="chartCanvas"></canvas>
-                <div class="chartLegend" id="trendLegend">
-                  <span class="leg"><span class="sw" style="background:rgba(37,99,235,.95)"></span>Google Ads</span>
-                  <span class="leg"><span class="sw" style="background:rgba(6,182,212,.95)"></span>Facebook Ads</span>
-                  <span class="leg"><span class="sw" style="background:rgba(15,23,42,.80)"></span>TikTok Ads</span>
-                  <span class="leg"><span class="sw" style="background:rgba(16,185,129,.95)"></span>Microsoft Ads</span>
-                </div>
-              </div>
-            </div>
-
-            <div class="ft">
-              <span>Tip: schimbă platforma → re-render animat (mock).</span>
-              <span id="trendMeta"><b>Last 7 days</b></span>
-            </div>
-          </article>
-
-          <!-- Accounts Overview moved here (in place of status distribution) -->
-<article class="adm-card" id="platformStatusCard">
-  <div class="hd">
-    <div class="title">
-      <h3>Platforms Status Overview</h3>
-      <p>Status counts across platforms • filter by platform.</p>
-    </div>
-
-    <div class="controls">
-      <div class="ctrl">
-        <label for="statusPlatformSel">Select Platform</label>
-        <select id="statusPlatformSel">
-          <option value="all" selected>All Platforms</option>
-          <option value="facebook">Facebook</option>
-          <option value="google">Google</option>
-          <option value="tiktok">TikTok</option>
-          <option value="microsoft">Microsoft</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <div class="bd" style="padding-top:12px;">
-    <div class="statusTableWrap">
-      <table class="statusTable">
-        <thead>
-          <tr>
-            <th style="width:40%;">Status</th>
-            <th class="platCol" data-plat="facebook" style="width:15%; text-align:center;">
-              <span class="platHead">f</span>
-            </th>
-            <th class="platCol" data-plat="google" style="width:15%; text-align:center;">
-              <span class="platHead">G</span>
-            </th>
-            <th class="platCol" data-plat="tiktok" style="width:15%; text-align:center;">
-              <span class="platHead">T</span>
-            </th>
-            <th class="platCol" data-plat="microsoft" style="width:15%; text-align:center;">
-              <span class="platHead">M</span>
-            </th>
-          </tr>
-        </thead>
-        <tbody id="statusBody">
-          <!-- rows generated by JS -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  <div class="ft">
-    <span class="note">Tip: choose a platform → table collapses to one column.</span>
-    <span id="statusMeta">Updated: <b>just now</b></span>
-  </div>
-</article>
-
-        </section>
-
+      <div class="dash-grid">
         
+        <!-- KPI Cards -->
+        <div class="kpi-row">
+          <div class="kpi-card blue">
+            <div class="kpi-label">Main Wallet</div>
+            <div class="kpi-value" id="kpiMainWallet">$2,450.00</div>
+            <div class="kpi-sub">Available balance</div>
+          </div>
 
-        <!-- Bottom: Clients Overview (instead of Accounts Overview) + Activity -->
-        <section class="adm-bottom">
-<article class="adm-card" id="txTabsCard">
-  <div class="hd">
-    <div class="title">
-      <h3>Transactions</h3>
-      <p>Quick admin view: latest top-ups & internal transfers (mock).</p>
-    </div>
+          <div class="kpi-card green">
+            <div class="kpi-label">Total Topups</div>
+            <div class="kpi-value" id="kpiTopups">$4,500.00</div>
+            <div class="kpi-sub">All time deposits</div>
+          </div>
 
-    <div class="tabs">
-      <button class="tabBtn active" type="button" data-tab="topups">Recent Top-Ups</button>
-      <button class="tabBtn" type="button" data-tab="internal">Internal Transactions</button>
-    </div>
-  </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Platform Spend</div>
+            <div class="kpi-value" id="kpiSpend">$3,211.25</div>
+            <div class="kpi-sub">Allocated to platforms</div>
+          </div>
 
-  <div class="bd" style="padding-top:12px;">
-    <!-- TAB: Topups -->
-    <div class="tabPanel" data-panel="topups">
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:16%;">ID</th>
-              <th style="width:18%;">Date</th>
-              <th style="width:16%;">Amount</th>
-              <th style="width:20%;">Type</th>
-              <th style="width:18%;">Proof</th>
-              <th style="width:12%;">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>750</b></td>
-              <td>16 Feb 2026</td>
-              <td>$5,880.00</td>
-              <td>Crypto TRC-20</td>
-              <td><a class="txLink" href="#" onclick="return false;">https://tr...</a></td>
-              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
-            </tr>
-            <tr>
-              <td><b>749</b></td>
-              <td>15 Feb 2026</td>
-              <td>$3,479.98</td>
-              <td>Crypto TRC-20</td>
-              <td><a class="txLink" href="#" onclick="return false;">85b2144c2c...</a></td>
-              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
-            </tr>
-            <tr>
-              <td><b>748</b></td>
-              <td>15 Feb 2026</td>
-              <td>$14,700.00</td>
-              <td>Crypto TRC-20</td>
-              <td><a class="txLink" href="#" onclick="return false;">29202231cb...</a></td>
-              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
-            </tr>
-            <tr>
-              <td><b>747</b></td>
-              <td>14 Feb 2026</td>
-              <td>$1,200.00</td>
-              <td>Wire Transfer</td>
-              <td><a class="txLink" href="#" onclick="return false;">invoice_0047</a></td>
-              <td><span class="status st-prog"><span class="dot"></span>Approved</span></td>
-            </tr>
-            <tr>
-              <td><b>746</b></td>
-              <td>14 Feb 2026</td>
-              <td>$9,990.00</td>
-              <td>USDT ERC-20</td>
-              <td><a class="txLink" href="#" onclick="return false;">0x9d3a...a1f</a></td>
-              <td><span class="status st-appeal"><span class="dot"></span>Pending</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-
-    <!-- TAB: Internal -->
-    <div class="tabPanel" data-panel="internal" hidden>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:16%;">ID</th>
-              <th style="width:18%;">Date</th>
-              <th style="width:16%;">Amount</th>
-              <th style="width:18%;">From</th>
-              <th style="width:20%;">To</th>
-              <th style="width:12%;">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><b>1086</b></td>
-              <td>16 Feb 2026</td>
-              <td>$5,880.00</td>
-              <td>Main Balance</td>
-              <td>Google</td>
-              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
-            </tr>
-            <tr>
-              <td><b>1085</b></td>
-              <td>16 Feb 2026</td>
-              <td>$3,479.98</td>
-              <td>Main Balance</td>
-              <td>FB Business Manager</td>
-              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
-            </tr>
-            <tr>
-              <td><b>1084</b></td>
-              <td>15 Feb 2026</td>
-              <td>$14,700.00</td>
-              <td>Main Balance</td>
-              <td>FB Business Manager</td>
-              <td><span class="status st-active"><span class="dot"></span>Approved</span></td>
-            </tr>
-            <tr>
-              <td><b>1083</b></td>
-              <td>15 Feb 2026</td>
-              <td>$1,250.00</td>
-              <td>Main Balance</td>
-              <td>TikTok</td>
-              <td><span class="status st-prog"><span class="dot"></span>Approved</span></td>
-            </tr>
-            <tr>
-              <td><b>1082</b></td>
-              <td>14 Feb 2026</td>
-              <td>$900.00</td>
-              <td>Main Balance</td>
-              <td>Microsoft</td>
-              <td><span class="status st-appeal"><span class="dot"></span>Pending</span></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <div class="ft">
-    <span class="note">Next: click row → open right drawer with details + actions.</span>
-    <span>Showing: <b>5</b></span>
-  </div>
-</article>
-
-
-       <article class="adm-card" id="myTeamCard">
-  <div class="hd">
-    <div class="title">
-      <h3>My Team</h3>
-      <p>Employees under your buyer account.</p>
-    </div>
-    <!-- no View All for client -->
-  </div>
-
-  <div class="bd" id="teamListWrap">
-    <div class="teamList" id="teamList">
-      <div class="teamItem">
-        <div class="teamMeta">
-          <div class="teamName">Sarah Mitchell</div>
-          <div class="teamSub">@sarah_mitchell • sarah.mitchell@techvision.com</div>
-          <div class="teamRole">Role: <b>Editor</b></div>
+          <div class="kpi-card violet">
+            <div class="kpi-label">Total Fees</div>
+            <div class="kpi-value" id="kpiFees">$125.00</div>
+            <div class="kpi-sub">Collected fees</div>
+          </div>
         </div>
-        <div class="teamActions">
-          <button class="btn link" type="button" onclick="location.href='./users.html#U-1001'">View</button>
+
+        <!-- Calendar Row -->
+        <div class="content-row">
+          <!-- Recurring Payments Calendar -->
+          <div class="card calendar-card">
+            <div class="card-header">
+              <div>
+                <h2 class="card-title">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align: middle; margin-right: 8px;">
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Recurring Payments
+                </h2>
+                <div class="card-subtitle">Click on a day to view details</div>
+              </div>
+            </div>
+            <div class="card-body calendar-body">
+              <div class="calendar-navigation">
+                <button class="calendar-nav-btn" onclick="changeMiniMonth(-1)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                  </svg>
+                </button>
+                <h3 id="miniMonthYear" class="calendar-month-title"></h3>
+                <button class="calendar-nav-btn" onclick="changeMiniMonth(1)">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </button>
+              </div>
+              <div id="miniCalendar" class="modern-calendar"></div>
+              
+              <!-- Monthly Income Info -->
+              <div style="display: flex; justify-content: flex-end; align-items: center; margin-top: 16px; padding: 12px 16px; background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%); border-radius: 10px; border: 1px solid #667eea30;">
+                <div style="text-align: right;">
+                  <div style="font-size: 11px; color: #666; font-weight: 600; margin-bottom: 4px;" id="monthlyIncomeLabel">Monthly Income</div>
+                  <div style="font-size: 20px; font-weight: 900; color: #667eea;" id="monthlyIncomeDisplay">$0.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Placeholder for another card -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Quick Stats</h2>
+              <div class="card-subtitle">Overview</div>
+            </div>
+            <div class="card-body">
+              <p style="color: var(--muted);">Additional content can go here</p>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="teamItem">
-        <div class="teamMeta">
-          <div class="teamName">Michael Chen</div>
-          <div class="teamSub">@michael_chen • michael.chen@brightlabs.io</div>
-          <div class="teamRole">Role: <b>Viewer</b></div>
+        <!-- Content Row -->
+        <div class="content-row">
+          <!-- Pending Clients -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Pending Clients</h2>
+              <div class="card-subtitle">Awaiting approval</div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th>Registered</th>
+                    <th>Type</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="pendingClientsTable">
+                  <tr>
+                    <td>
+                      <div class="name">John D.</div>
+                      <div class="email">john@example.com</div>
+                    </td>
+                    <td>2 days ago</td>
+                    <td>
+                      <span class="badge pending">
+                        <span class="dot"></span>
+                        Client
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; gap: 8px;">
+                        <button class="action-btn approve" onclick="alert('Approved: John D.')">✓ Approve</button>
+                        <button class="action-btn reject" onclick="alert('Rejected: John D.')">✗ Reject</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Sarah K.</div>
+                      <div class="email">sarah@example.com</div>
+                    </td>
+                    <td>3 days ago</td>
+                    <td>
+                      <span class="badge pending">
+                        <span class="dot"></span>
+                        Employee
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; gap: 8px;">
+                        <button class="action-btn approve" onclick="alert('Approved: Sarah K.')">✓ Approve</button>
+                        <button class="action-btn reject" onclick="alert('Rejected: Sarah K.')">✗ Reject</button>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Mike R.</div>
+                      <div class="email">mike@example.com</div>
+                    </td>
+                    <td>5 days ago</td>
+                    <td>
+                      <span class="badge pending">
+                        <span class="dot"></span>
+                        Client
+                      </span>
+                    </td>
+                    <td>
+                      <div style="display: flex; gap: 8px;">
+                        <button class="action-btn approve" onclick="alert('Approved: Mike R.')">✓ Approve</button>
+                        <button class="action-btn reject" onclick="alert('Rejected: Mike R.')">✗ Reject</button>
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Pending Topups -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Pending Topups</h2>
+              <div class="card-subtitle">Awaiting approval</div>
+            </div>
+            <div class="card-body">
+              <div class="topup-list" id="topupList">
+                <div class="topup-item">
+                  <div class="topup-info">
+                    <div class="topup-client">Alex M.</div>
+                    <div class="topup-details">Wire • Today</div>
+                  </div>
+                  <div class="topup-amount">$1,500.00</div>
+                </div>
+                <div class="topup-item">
+                  <div class="topup-info">
+                    <div class="topup-client">Maria P.</div>
+                    <div class="topup-details">Wire • Today</div>
+                  </div>
+                  <div class="topup-amount">$1,200.00</div>
+                </div>
+                <div class="topup-item">
+                  <div class="topup-info">
+                    <div class="topup-client">John D.</div>
+                    <div class="topup-details">Crypto USDT • Yesterday</div>
+                  </div>
+                  <div class="topup-amount">$1,000.00</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="teamActions">
-          <button class="btn link" type="button" onclick="location.href='./users.html#U-1002'">View</button>
+
+        <!-- Second Row -->
+        <div class="content-row">
+          <!-- Fee Breakdown -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Fee Breakdown</h2>
+              <div class="card-subtitle">Revenue by fee type</div>
+            </div>
+            <div class="card-body">
+              <div class="fee-breakdown">
+                <div id="feeChart"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Top Clients Last Month -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Top Clients Last Month</h2>
+              <div class="card-subtitle">Highest charges in previous month</div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Client</th>
+                    <th style="text-align: right;">Total Charges</th>
+                  </tr>
+                </thead>
+                <tbody id="topClientsTable">
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">🥇</td>
+                    <td>
+                      <div class="name">Alex M.</div>
+                      <div class="email">alex@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$1,250.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">🥈</td>
+                    <td>
+                      <div class="name">Maria P.</div>
+                      <div class="email">maria@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$980.50</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">🥉</td>
+                    <td>
+                      <div class="name">John D.</div>
+                      <div class="email">john@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$750.00</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">4</td>
+                    <td>
+                      <div class="name">Sarah K.</div>
+                      <div class="email">sarah@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$620.75</td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 18px; font-weight: 700;">5</td>
+                    <td>
+                      <div class="name">Mike R.</div>
+                      <div class="email">mike@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$450.00</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div class="teamItem">
-        <div class="teamMeta">
-          <div class="teamName">Emily Rodriguez</div>
-          <div class="teamSub">@emily_rodriguez • emily@northpeak.co</div>
-          <div class="teamRole">Role: <b>Admin</b></div>
+        <!-- Third Row -->
+        <div class="content-row">
+          <!-- Section Removed -->
+          <div class="card" style="display: none; grid-column: 1 / -1;">
+            <div class="card-header">
+              <h2 class="card-title">� Total Revenue per Team - Timeline</h2>
+              <div class="card-subtitle">Revenue comparison across different teams over time</div>
+            </div>
+            <div class="card-body">
+              <div>Chart removed</div>
+            </div>
+          </div>
         </div>
-        <div class="teamActions">
-          <button class="btn link" type="button" onclick="location.href='./users.html#U-1003'">View</button>
+
+        <!-- Fourth Row -->
+        <div class="content-row">
+          <!-- Weekly Topups Status -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"> Weekly Topups Status</h2>
+              <div class="card-subtitle">Topup requests breakdown for this week</div>
+            </div>
+            <div class="card-body">
+              <div id="weeklyTopupsChart" style="height: 300px;"></div>
+            </div>
+          </div>
+
+          <!-- Platform Profitability -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"> Platform Profitability</h2>
+              <div class="card-subtitle">Top performing platforms by profit margin</div>
+            </div>
+            <div class="card-body">
+              <div id="platformProfitChart" style="height: 300px;"></div>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- optional empty state (dacă n-are echipă) -->
-    <div class="pendingEmpty" id="teamEmpty" hidden>
-      <div class="pendingEmpty__text">No team members</div>
-    </div>
-  </div>
+        <!-- Fifth Row -->
+        <div class="content-row">
+          <!-- Daily Fees Wave Chart -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Daily Fees </h2>
+              <div class="card-subtitle">Fees trend for current month</div>
+            </div>
+            <div class="card-body">
+              <div id="dailyFeesChart" style="height: 300px;"></div>
+            </div>
+          </div>
 
-  <div class="ft">
-    <span class="note">Tip: View → opens employee details.</span>
-    <span>Updated <b>today</b></span>
-  </div>
-</article>
+          <!-- Accounts Overview -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"> Accounts Overview</h2>
+              <div class="card-subtitle">Distribution across platforms</div>
+            </div>
+            <div class="card-body">
+              <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 24px; align-items: center;">
+                <!-- Donut Chart -->
+                <div>
+                  <div id="accountsChart" style="height: 250px;"></div>
+                </div>
+                
+                <!-- Platform Breakdown -->
+                <div class="platform-accounts">
+                  <div class="platform-account-item">
+                    <div class="platform-account-header">
+                      <span class="platform-account-icon">📘</span>
+                      <span class="platform-account-name">Facebook</span>
+                      <span class="platform-account-count">100</span>
+                    </div>
+                    <div class="platform-account-bar">
+                      <div class="platform-account-fill assigned" style="width: 80%;" data-tooltip="80 Assigned"></div>
+                      <div class="platform-account-fill unassigned" style="width: 20%;" data-tooltip="20 Unassigned"></div>
+                    </div>
+                    <div class="platform-account-stats">
+                      <span class="stat-assigned">✓ 80 Assigned</span>
+                      <span class="stat-unassigned">○ 20 Available</span>
+                    </div>
+                  </div>
 
+                  <div class="platform-account-item">
+                    <div class="platform-account-header">
+                      <span class="platform-account-icon">🔍</span>
+                      <span class="platform-account-name">Google</span>
+                      <span class="platform-account-count">50</span>
+                    </div>
+                    <div class="platform-account-bar">
+                      <div class="platform-account-fill assigned" style="width: 90%;"></div>
+                      <div class="platform-account-fill unassigned" style="width: 10%;"></div>
+                    </div>
+                    <div class="platform-account-stats">
+                      <span class="stat-assigned">✓ 45 Assigned</span>
+                      <span class="stat-unassigned">○ 5 Available</span>
+                    </div>
+                  </div>
 
-        </section>
+                  <div class="platform-account-item">
+                    <div class="platform-account-header">
+                      <span class="platform-account-icon">🎵</span>
+                      <span class="platform-account-name">TikTok</span>
+                      <span class="platform-account-count">50</span>
+                    </div>
+                    <div class="platform-account-bar">
+                      <div class="platform-account-fill assigned" style="width: 60%;"></div>
+                      <div class="platform-account-fill unassigned" style="width: 40%;"></div>
+                    </div>
+                    <div class="platform-account-stats">
+                      <span class="stat-assigned">✓ 30 Assigned</span>
+                      <span class="stat-unassigned">○ 20 Available</span>
+                    </div>
+                  </div>
+
+                  <div class="platform-account-item">
+                    <div class="platform-account-header">
+                      <span class="platform-account-icon">📷</span>
+                      <span class="platform-account-name">Instagram</span>
+                      <span class="platform-account-count">50</span>
+                    </div>
+                    <div class="platform-account-bar">
+                      <div class="platform-account-fill assigned" style="width: 30%;"></div>
+                      <div class="platform-account-fill unassigned" style="width: 70%;"></div>
+                    </div>
+                    <div class="platform-account-stats">
+                      <span class="stat-assigned">✓ 15 Assigned</span>
+                      <span class="stat-unassigned">○ 35 Available</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Low Balance Alerts -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">Low Balance Alerts</h2>
+              <div class="card-subtitle">Clients with main wallet below threshold</div>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Client</th>
+                    <th style="text-align: right;">Main Wallet</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="lowBalanceTable">
+                  <tr>
+                    <td>
+                      <div class="name">Tom B.</div>
+                      <div class="email">tom@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--red);">$15.00</td>
+                    <td><span class="badge suspended"><span class="dot"></span>Critical</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Emily R.</div>
+                      <div class="email">emily@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--red);">$45.00</td>
+                    <td><span class="badge suspended"><span class="dot"></span>Critical</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Anna K.</div>
+                      <div class="email">anna@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$65.25</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">David L.</div>
+                      <div class="email">david@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$78.50</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="name">Lisa M.</div>
+                      <div class="email">lisa@example.com</div>
+                    </td>
+                    <td style="text-align: right; font-weight: 700; color: var(--amber);">$92.00</td>
+                    <td><span class="badge pending"><span class="dot"></span>Low</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Most Requested Marketplace Items -->
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title"> Most Requested Items</h2>
+              <div class="card-subtitle">Top 3 marketplace requests this month</div>
+            </div>
+            <div class="card-body">
+              <div id="hotItemsList" style="display: flex; flex-direction: column; gap: 12px;">
+                <div class="hot-item">
+                  <div class="hot-item-rank">🥇</div>
+                  <div class="hot-item-icon">📘</div>
+                  <div class="hot-item-info">
+                    <div class="hot-item-name">Facebook Account + BM</div>
+                    <div class="hot-item-subtitle">3 Ad Acc • $250 Limit</div>
+                  </div>
+                  <div class="hot-item-stats">
+                    <div class="hot-item-requests">24</div>
+                    <span class="hot-item-trend up">↗ Trending</span>
+                  </div>
+                </div>
+                <div class="hot-item">
+                  <div class="hot-item-rank">🥈</div>
+                  <div class="hot-item-icon">🎵</div>
+                  <div class="hot-item-info">
+                    <div class="hot-item-name">Premium TikTok Ads</div>
+                    <div class="hot-item-subtitle">No Spending Limits</div>
+                  </div>
+                  <div class="hot-item-stats">
+                    <div class="hot-item-requests">18</div>
+                    <span class="hot-item-trend up">↗ Trending</span>
+                  </div>
+                </div>
+                <div class="hot-item">
+                  <div class="hot-item-rank">🥉</div>
+                  <div class="hot-item-icon">G</div>
+                  <div class="hot-item-info">
+                    <div class="hot-item-name">Google Agency</div>
+                    <div class="hot-item-subtitle">Premium Tier</div>
+                  </div>
+                  <div class="hot-item-stats">
+                    <div class="hot-item-requests">15</div>
+                    <span class="hot-item-trend stable">→ Stable</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
 
       </div>
     </main>
   </div>
 
+  <script src="../js/employee-selector.js"></script>
+  <script src="../js/permissions-check.js"></script>`n  <script src="../js/data-filter.js"></script>
   <script src="../js/sidebar.js"></script>
-
+  <script src="../js/admin-dashboard.js"></script>
+  <script src="../js/daily-fees-chart.js"></script>
+  <script src="../js/calendar.js"></script>
   <script>
-    // ===== Animated Spending Trends (Canvas) =====
-    // Mock data (7 days). Values are "k$" style for readability.
-    const trendData = {
-      labels: ["02/04","02/05","02/06","02/07","02/08","02/09","02/10"],
-      series: {
-        google:   { name: "Google Ads",    color: "rgba(37,99,235,.95)",   values: [45,52,48,61,58,67,71] },
-        facebook: { name: "Facebook Ads",  color: "rgba(6,182,212,.95)",  values: [32,38,35,42,40,46,49] },
-        tiktok:   { name: "TikTok Ads",    color: "rgba(15,23,42,.80)",   values: [18,21,19,24,22,26,28] },
-        microsoft:{ name: "Microsoft Ads", color: "rgba(16,185,129,.95)", values: [12,15,13,17,16,19,21] }
+    // Demo data matching finance page structure
+    const LS_KEY = "admin_finance_demo_v7";
+
+    const pendingClients = [
+      { name: "John D.", email: "john@example.com", registered: "2 days ago", type: "Client" },
+      { name: "Sarah K.", email: "sarah@example.com", registered: "3 days ago", type: "Employee" },
+      { name: "Mike R.", email: "mike@example.com", registered: "5 days ago", type: "Client" }
+    ];
+
+    const clients = [
+      { id: "100", name: "Alex M.", email: "alex@example.com", role: "Client", status: "active", balance: 2450.00 },
+      { id: "101", name: "Maria P.", email: "maria@example.com", role: "Client", status: "active", balance: 1890.50 },
+      { id: "102", name: "John D.", email: "john@example.com", role: "Client", status: "pending", balance: 0 },
+      { id: "103", name: "Sarah K.", email: "sarah@example.com", role: "Employee", status: "active", balance: 0 },
+    ];
+
+    const platforms = [
+      { 
+        name: "Facebook", 
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#1877f2">
+          <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+        </svg>`, 
+        balance: 1250.00 
+      },
+      { 
+        name: "Google", 
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24">
+          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+        </svg>`, 
+        balance: 890.50 
+      },
+      { 
+        name: "TikTok", 
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="#000000">
+          <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+        </svg>`, 
+        balance: 650.00 
+      },
+      { 
+        name: "Instagram", 
+        icon: `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="url(#instagram-gradient-dashboard)">
+          <defs>
+            <linearGradient id="instagram-gradient-dashboard" x1="0%" y1="100%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#f09433;stop-opacity:1" />
+              <stop offset="25%" style="stop-color:#e6683c;stop-opacity:1" />
+              <stop offset="50%" style="stop-color:#dc2743;stop-opacity:1" />
+              <stop offset="75%" style="stop-color:#cc2366;stop-opacity:1" />
+              <stop offset="100%" style="stop-color:#bc1888;stop-opacity:1" />
+            </linearGradient>
+          </defs>
+          <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+        </svg>`, 
+        balance: 420.75 
       }
+    ];
+
+    const pendingTopups = [
+      { client: "Alex M.", amount: 1500.00, type: "Wire", date: "Today" },
+      { client: "Maria P.", amount: 1200.00, type: "Wire", date: "Today" },
+      { client: "John D.", amount: 1000.00, type: "Crypto USDT", date: "Yesterday" }
+    ];
+
+    const feeBreakdown = [
+      { type: "Topup Fees", icon: "💰", amount: 20.00 },
+      { type: "Transfer Fees", icon: "🔄", amount: 5.00 },
+      { type: "Service Charges", icon: "⚙️", amount: 0.00 },
+      { type: "Setup Charges", icon: "🔧", amount: 0.00 }
+    ];
+
+    const clientStatistics = {
+      totalClients: 12,
+      activeClients: 9,
+      pendingApproval: 2,
+      suspended: 1
     };
 
-    const canvas = document.getElementById("trendCanvas");
-    const ctx = canvas.getContext("2d");
-    const platformSel = document.getElementById("platformSel");
-    const modeLine = document.getElementById("modeLine");
-    const modeBar = document.getElementById("modeBar");
-
-    let mode = "line"; // "line" | "bar"
-    let platform = "all";
-    let animReq = null;
-
-    function dprResize() {
-      const dpr = window.devicePixelRatio || 1;
-      const rect = canvas.getBoundingClientRect();
-      canvas.width = Math.round(rect.width * dpr);
-      canvas.height = Math.round(rect.height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    function money(n){
+      const v = Number(n || 0);
+      return v.toLocaleString(undefined, { style:"currency", currency:"USD" });
     }
 
-    function getActiveSeries() {
-      const s = trendData.series;
-      if (platform === "all") return [s.google, s.facebook, s.tiktok, s.microsoft];
-      return [s[platform]];
-    }
-
-    function niceMax(values){
-      const max = Math.max(...values);
-      // Round up to nearest 10
-      return Math.ceil(max / 10) * 10;
-    }
-
-    function easeOutCubic(t){ return 1 - Math.pow(1 - t, 3); }
-
-    function drawAxes(pad, w, h, yMax){
-      // grid + axes labels
-      ctx.save();
-      ctx.clearRect(0,0,w,h);
-
-      // background subtle
-      ctx.fillStyle = "rgba(255,255,255,0)";
-      ctx.fillRect(0,0,w,h);
-
-      const gridColor = "rgba(15,23,42,.08)";
-      const textColor = "rgba(100,116,139,.85)";
-
-      // horizontal grid lines (0..yMax)
-      const steps = 4;
-      ctx.strokeStyle = gridColor;
-      ctx.lineWidth = 1;
-
-      for(let i=0;i<=steps;i++){
-        const y = pad.top + (h - pad.top - pad.bottom) * (i/steps);
-        ctx.beginPath();
-        ctx.moveTo(pad.left, y);
-        ctx.lineTo(w - pad.right, y);
-        ctx.stroke();
-
-        // y labels (reverse)
-        const val = Math.round(yMax * (1 - i/steps));
-        ctx.fillStyle = textColor;
-        ctx.font = "12px ui-sans-serif, system-ui";
-        ctx.fillText(`$${val}k`, 10, y + 4);
+    function loadFinanceData(){
+      const raw = localStorage.getItem(LS_KEY);
+      if(!raw) return null;
+      try{
+        return JSON.parse(raw);
+      }catch(e){
+        return null;
       }
+    }
 
-      // x labels
-      const labels = trendData.labels;
-      const plotW = (w - pad.left - pad.right);
-      const plotH = (h - pad.top - pad.bottom);
-      ctx.fillStyle = textColor;
-      ctx.font = "12px ui-sans-serif, system-ui";
+    function calculateKPIs(){
+      const data = loadFinanceData();
+      if(!data || !data.ledger) return { mainWallet: 2450, topups: 980, spend: 700, fees: 25 };
 
-      labels.forEach((lab, i) => {
-        const x = pad.left + plotW * (i/(labels.length-1));
-        ctx.fillText(lab, x - 18, pad.top + plotH + 24);
+      let mainWallet = 0;
+      let topups = 0;
+      let spend = 0;
+      let fees = 0;
+
+      data.ledger.forEach(tx => {
+        const amt = Number(tx.amount || 0);
+        
+        if(tx.type === "topup") topups += amt;
+        if(tx.to === "mainWallet") mainWallet += amt;
+        if(tx.from === "mainWallet") mainWallet -= amt;
+        if(tx.type === "transfer" && tx.from === "mainWallet") spend += amt;
+        if(tx.type === "fee" || tx.category?.includes("fee")) fees += amt;
       });
 
-      ctx.restore();
+      return { mainWallet, topups, spend, fees };
     }
 
-    function mapPoint(i, value, pad, w, h, yMax){
-      const labels = trendData.labels;
-      const plotW = (w - pad.left - pad.right);
-      const plotH = (h - pad.top - pad.bottom);
-      const x = pad.left + plotW * (i/(labels.length-1));
-      const y = pad.top + plotH * (1 - (value / yMax));
-      return {x, y};
+    function renderKPIs(){
+      const kpis = calculateKPIs();
+      
+      document.getElementById("kpiMainWallet").textContent = money(kpis.mainWallet);
+      document.getElementById("kpiTopups").textContent = money(kpis.topups);
+      document.getElementById("kpiSpend").textContent = money(kpis.spend);
+      document.getElementById("kpiFees").textContent = money(kpis.fees);
     }
 
-    function drawLineSeries(series, t, pad, w, h, yMax){
-      const vals = series.values;
-      // progress-based reveal: draw up to index + interpolate
-      const n = vals.length;
-      const prog = (n - 1) * t;
-      const full = Math.floor(prog);
-      const frac = prog - full;
-
-      ctx.save();
-      ctx.lineWidth = 2.6;
-      ctx.strokeStyle = series.color;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-
-      // soft fill under line
-      ctx.beginPath();
-      for(let i=0;i<=full;i++){
-        const p = mapPoint(i, vals[i], pad, w, h, yMax);
-        if(i===0) ctx.moveTo(p.x, p.y);
-        else ctx.lineTo(p.x, p.y);
+    function renderPendingClients(){
+      const tbody = document.getElementById("pendingClientsTable");
+      
+      if(pendingClients.length === 0){
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: var(--muted);">No pending clients</td></tr>';
+        return;
       }
-      if(full < n-1){
-        const v = vals[full] + (vals[full+1] - vals[full]) * frac;
-        const p = mapPoint(full+1, v, pad, w, h, yMax);
-        ctx.lineTo(p.x, p.y);
-      }
-      ctx.stroke();
-
-      // dots
-      for(let i=0;i<=full;i++){
-        const p = mapPoint(i, vals[i], pad, w, h, yMax);
-        ctx.fillStyle = series.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
-        ctx.fill();
-      }
-      if(full < n-1){
-        const v = vals[full] + (vals[full+1] - vals[full]) * frac;
-        const p = mapPoint(full+1, v, pad, w, h, yMax);
-        ctx.fillStyle = series.color;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 3.5, 0, Math.PI*2);
-        ctx.fill();
-      }
-
-      ctx.restore();
+      
+      tbody.innerHTML = pendingClients.map(client => `
+        <tr>
+          <td>
+            <div class="name">${client.name}</div>
+            <div class="email">${client.email}</div>
+          </td>
+          <td>${client.registered}</td>
+          <td>
+            <span class="badge pending">
+              <span class="dot"></span>
+              ${client.type}
+            </span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button class="action-btn approve" onclick="approveClient('${client.name}')">✓ Approve</button>
+              <button class="action-btn reject" onclick="rejectClient('${client.name}')">✗ Reject</button>
+            </div>
+          </td>
+        </tr>
+      `).join("");
     }
 
-    function drawBarSeries(series, t, pad, w, h, yMax){
-      const vals = series.values;
-      const n = vals.length;
-      const plotW = (w - pad.left - pad.right);
-      const plotH = (h - pad.top - pad.bottom);
-
-      // bar width
-      const groupW = plotW / n;
-      const barW = Math.min(18, groupW * 0.45);
-
-      ctx.save();
-      for(let i=0;i<n;i++){
-        const x = pad.left + groupW * i + (groupW - barW)/2;
-        const targetH = plotH * (vals[i]/yMax);
-        const currH = targetH * t;
-        const y = pad.top + plotH - currH;
-
-        // rounded bars
-        const r = 6;
-        ctx.fillStyle = series.color;
-        ctx.beginPath();
-        ctx.moveTo(x, y + r);
-        ctx.arcTo(x, y, x + r, y, r);
-        ctx.arcTo(x + barW, y, x + barW, y + r, r);
-        ctx.lineTo(x + barW, pad.top + plotH);
-        ctx.lineTo(x, pad.top + plotH);
-        ctx.closePath();
-        ctx.globalAlpha = 0.9;
-        ctx.fill();
-      }
-      ctx.restore();
+    function approveClient(name){
+      alert(`Approved: ${name}`);
+      // Here you would call your API to approve the client
     }
 
-    function renderAnimated(){
-      cancelAnimationFrame(animReq);
-      dprResize();
-
-      const w = canvas.clientWidth;
-      const h = canvas.clientHeight;
-
-      const pad = { left: 64, right: 18, top: 16, bottom: 40 };
-
-      const activeSeries = getActiveSeries();
-      const allVals = activeSeries.flatMap(s => s.values);
-      const yMax = niceMax(allVals);
-
-      const start = performance.now();
-      const dur = 900;
-
-      function frame(now){
-        const raw = (now - start) / dur;
-        const tt = Math.max(0, Math.min(1, raw));
-        const t = easeOutCubic(tt);
-
-        drawAxes(pad, w, h, yMax);
-
-        if(mode === "line"){
-          activeSeries.forEach(s => drawLineSeries(s, t, pad, w, h, yMax));
-        } else {
-          // if all platforms, draw stacked-ish? keep simple: draw only selected platform in bar mode
-          const bars = (platform === "all") ? [trendData.series.google] : activeSeries;
-          bars.forEach(s => drawBarSeries(s, t, pad, w, h, yMax));
-        }
-
-        if(tt < 1) animReq = requestAnimationFrame(frame);
-      }
-      animReq = requestAnimationFrame(frame);
-
-      // legend visibility: hide others if filtered
-      const legend = document.getElementById("trendLegend");
-      const showAll = (platform === "all");
-      [...legend.querySelectorAll(".leg")].forEach((el) => {
-        const txt = el.textContent.toLowerCase();
-        if(showAll) el.style.display = "inline-flex";
-        else {
-          const ok =
-            (platform==="google" && txt.includes("google")) ||
-            (platform==="facebook" && txt.includes("facebook")) ||
-            (platform==="tiktok" && txt.includes("tiktok")) ||
-            (platform==="microsoft" && txt.includes("microsoft"));
-          el.style.display = ok ? "inline-flex" : "none";
-        }
-      });
+    function rejectClient(name){
+      alert(`Rejected: ${name}`);
+      // Here you would call your API to reject the client
     }
 
-    // events
-    platformSel.addEventListener("change", () => {
-      platform = platformSel.value;
-      renderAnimated();
+    function renderClients(){
+      const tbody = document.getElementById("clientsTable");
+      
+      tbody.innerHTML = clients.map(client => `
+        <tr>
+          <td>
+            <div class="name">${client.name}</div>
+            <div class="email">${client.email}</div>
+          </td>
+          <td>${client.role}</td>
+          <td>
+            <span class="badge ${client.status}">
+              <span class="dot"></span>
+              ${client.status.charAt(0).toUpperCase() + client.status.slice(1)}
+            </span>
+          </td>
+          <td style="font-weight: 700;">${money(client.balance)}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderTopups(){
+      const list = document.getElementById("topupList");
+      
+      if(pendingTopups.length === 0){
+        list.innerHTML = '<div style="text-align: center; color: var(--muted); padding: 20px;">No pending topups</div>';
+        return;
+      }
+      
+      list.innerHTML = pendingTopups.map(topup => `
+        <div class="topup-item">
+          <div class="topup-info">
+            <div class="topup-client">${topup.client}</div>
+            <div class="topup-details">${topup.type} • ${topup.date}</div>
+          </div>
+          <div class="topup-amount">${money(topup.amount)}</div>
+        </div>
+      `).join("");
+    }
+
+
+
+    function renderClientStats(){
+      const container = document.getElementById("clientStats");
+      const total = clientStatistics.totalClients;
+      
+      container.innerHTML = `
+        <div class="stat-item">
+          <div>
+            <div class="stat-label">Total Clients</div>
+            <div class="stat-bar">
+              <div class="stat-bar-fill" style="width: 100%;"></div>
+            </div>
+          </div>
+          <div class="stat-value">${clientStatistics.totalClients}</div>
+        </div>
+        
+        <div class="stat-item">
+          <div>
+            <div class="stat-label">Active Clients</div>
+            <div class="stat-bar">
+              <div class="stat-bar-fill green" style="width: ${(clientStatistics.activeClients / total * 100).toFixed(0)}%;"></div>
+            </div>
+          </div>
+          <div class="stat-value">${clientStatistics.activeClients}</div>
+        </div>
+        
+        <div class="stat-item">
+          <div>
+            <div class="stat-label">Pending Approval</div>
+            <div class="stat-bar">
+              <div class="stat-bar-fill amber" style="width: ${(clientStatistics.pendingApproval / total * 100).toFixed(0)}%;"></div>
+            </div>
+          </div>
+          <div class="stat-value">${clientStatistics.pendingApproval}</div>
+        </div>
+        
+        <div class="stat-item">
+          <div>
+            <div class="stat-label">Suspended</div>
+            <div class="stat-bar">
+              <div class="stat-bar-fill red" style="width: ${(clientStatistics.suspended / total * 100).toFixed(0)}%;"></div>
+            </div>
+          </div>
+          <div class="stat-value">${clientStatistics.suspended}</div>
+        </div>
+      `;
+    }
+
+    function renderPlatforms(){
+      const container = document.getElementById("platformStats");
+      
+      container.innerHTML = platforms.map(platform => `
+        <div class="platform-item">
+          <div class="platform-info">
+            <span class="platform-icon">${platform.icon}</span>
+            <span class="platform-name">${platform.name}</span>
+          </div>
+          <div class="platform-balance">${money(platform.balance)}</div>
+        </div>
+      `).join("");
+    }
+
+    // Initialize dashboard
+    document.addEventListener("DOMContentLoaded", function(){
+      renderKPIs();
+      renderPendingClients();
+      renderTopups();
+      renderClientStats();
+      renderPlatforms();
     });
 
-    modeLine.addEventListener("click", () => {
-      mode = "line";
-      modeLine.classList.add("active");
-      modeBar.classList.remove("active");
-      renderAnimated();
-    });
-    modeBar.addEventListener("click", () => {
-      mode = "bar";
-      modeBar.classList.add("active");
-      modeLine.classList.remove("active");
-      renderAnimated();
-    });
-
-    window.addEventListener("resize", () => {
-      renderAnimated();
-    });
-
-    // init
-    // ensure canvas has height (CSS sets it, but some layouts need a tick)
-    requestAnimationFrame(() => renderAnimated());
   </script>
 
   <script>
-  // ===== Platforms Status Overview (table + filter) =====
-  const statusPlatformSel = document.getElementById("statusPlatformSel");
-  const statusBody = document.getElementById("statusBody");
+    // Platform SVG Icons
+    const platformIcons = {
+      facebook: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877f2">
+        <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+      </svg>`,
+      google: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+      </svg>`,
+      tiktok: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000000">
+        <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+      </svg>`,
+      instagram: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+        <defs>
+          <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:#f09433;stop-opacity:1" />
+            <stop offset="25%" style="stop-color:#e6683c;stop-opacity:1" />
+            <stop offset="50%" style="stop-color:#dc2743;stop-opacity:1" />
+            <stop offset="75%" style="stop-color:#cc2366;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#bc1888;stop-opacity:1" />
+          </linearGradient>
+        </defs>
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+      </svg>`,
+      microsoft: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+        <path fill="#f25022" d="M0 0h11.377v11.372H0z"/>
+        <path fill="#00a4ef" d="M12.623 0H24v11.372H12.623z"/>
+        <path fill="#7fba00" d="M0 12.623h11.377V24H0z"/>
+        <path fill="#ffb900" d="M12.623 12.623H24V24H12.623z"/>
+      </svg>`
+    };
 
-  // mock counts (adjust anytime)
-  const platformStatusData = {
-    facebook:  { active: 1577, suspended: 100, need_appeal: 0, in_appeal: 0, in_progress: 0 },
-    google:    { active: 197,  suspended: 1019, need_appeal: 0, in_appeal: 0, in_progress: 0 },
-    tiktok:    { active: 88,   suspended: 22,   need_appeal: 4, in_appeal: 9, in_progress: 18 },
-    microsoft: { active: 210,  suspended: 11,   need_appeal: 2, in_appeal: 6, in_progress: 14 }
-  };
+    // Calendar Data - Recurring payments mockup
+    const recurringPayments = {
+      '2026-02-05': [
+        { platform: 'facebook', client: 'TechVision Inc.', type: 'Setup Fee', amount: '$50' },
+        { platform: 'google', client: 'BrightLabs Co.', type: 'Recurring Fee', amount: '$30' }
+      ],
+      '2026-02-10': [
+        { platform: 'tiktok', client: 'NorthPeak Digital', type: 'Setup Fee', amount: '$50' }
+      ],
+      '2026-02-15': [
+        { platform: 'facebook', client: 'Quantum Media', type: 'Recurring Fee', amount: '$50' },
+        { platform: 'instagram', client: 'Stellar Brands', type: 'Setup Fee', amount: '$40' }
+      ],
+      '2026-02-20': [
+        { platform: 'google', client: 'Apex Marketing', type: 'Recurring Fee', amount: '$30' }
+      ],
+      '2026-02-25': [
+        { platform: 'facebook', client: 'Fusion Ads', type: 'Setup Fee', amount: '$50' },
+        { platform: 'tiktok', client: 'Velocity Group', type: 'Recurring Fee', amount: '$50' },
+        { platform: 'google', client: 'Zenith Corp', type: 'Setup Fee', amount: '$30' }
+      ],
+      '2026-02-28': [
+        { platform: 'instagram', client: 'Horizon Media', type: 'Recurring Fee', amount: '$40' }
+      ],
+      '2026-03-05': [
+        { platform: 'facebook', client: 'TechVision Inc.', type: 'Recurring Fee', amount: '$50' },
+        { platform: 'google', client: 'BrightLabs Co.', type: 'Recurring Fee', amount: '$30' }
+      ],
+      '2026-03-10': [
+        { platform: 'tiktok', client: 'NorthPeak Digital', type: 'Recurring Fee', amount: '$50' }
+      ],
+      '2026-03-15': [
+        { platform: 'facebook', client: 'Quantum Media', type: 'Recurring Fee', amount: '$50' }
+      ],
+      '2026-03-20': [
+        { platform: 'microsoft', client: 'Summit Solutions', type: 'Setup Fee', amount: '$45' }
+      ]
+    };
 
-  const statusRows = [
-    { key: "active",       label: "Active",       dot: "active" },
-    { key: "suspended",    label: "Suspended",    dot: "suspended" },
-    { key: "need_appeal",  label: "Need Appeal",  dot: "need_appeal" },
-    { key: "in_appeal",    label: "In Appeal",    dot: "in_appeal" },
-    { key: "in_progress",  label: "In Progress",  dot: "in_progress" }
-  ];
+    let currentMiniMonth = new Date();
+    let currentCalendarMonth = new Date();
 
-  function renderStatusTable(selected){
-    // show/hide platform columns in header + body
-    const cols = document.querySelectorAll(".platCol");
-    cols.forEach(c => {
-      const plat = c.getAttribute("data-plat");
-      c.style.display = (selected === "all" || selected === plat) ? "" : "none";
-    });
-
-    // build rows
-    statusBody.innerHTML = "";
-    statusRows.forEach(r => {
-      const tr = document.createElement("tr");
-
-      const tdStatus = document.createElement("td");
-      tdStatus.innerHTML = `
-        <div class="sRow">
-          <span class="sDot ${r.dot}"></span>
-          <span class="sName">${r.label}</span>
-        </div>
-      `;
-      tr.appendChild(tdStatus);
-
-      const platforms = ["facebook","google","tiktok","microsoft"];
-      platforms.forEach(p => {
-        if(selected !== "all" && selected !== p) return;
-
-        const td = document.createElement("td");
-        td.style.textAlign = "center";
-
-        const val = platformStatusData[p]?.[r.key] ?? 0;
-        td.innerHTML = `<span class="num ${val===0 ? "zero": ""}">${val}</span>`;
-        tr.appendChild(td);
-      });
-
-      statusBody.appendChild(tr);
-    });
-  }
-
-  statusPlatformSel?.addEventListener("change", () => {
-    renderStatusTable(statusPlatformSel.value);
-  });
-
-  // init
-  renderStatusTable("all");
-</script>
-
-<script>
-  // ===== Transactions Tabs =====
-  (function(){
-    const card = document.getElementById("txTabsCard");
-    if(!card) return;
-
-    const btns = card.querySelectorAll(".tabBtn");
-    const panels = card.querySelectorAll(".tabPanel");
-
-    function show(tab){
-      btns.forEach(b => b.classList.toggle("active", b.dataset.tab === tab));
-      panels.forEach(p => {
-        const on = p.dataset.panel === tab;
-        p.hidden = !on;
-      });
+    function changeMiniMonth(delta) {
+      currentMiniMonth.setMonth(currentMiniMonth.getMonth() + delta);
+      renderMiniCalendar();
     }
 
-    btns.forEach(b => {
-      b.addEventListener("click", () => show(b.dataset.tab));
-    });
+    function renderMiniCalendar() {
+      const container = document.getElementById('miniCalendar');
+      const monthTitle = document.getElementById('miniMonthYear');
+      const year = currentMiniMonth.getFullYear();
+      const month = currentMiniMonth.getMonth();
+      
+      monthTitle.textContent = currentMiniMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
-    show("topups");
-  })();
-</script>
+      const firstDay = new Date(year, month, 1);
+      const lastDay = new Date(year, month + 1, 0);
+      const daysInMonth = lastDay.getDate();
+      const startingDayOfWeek = firstDay.getDay();
 
+      let html = '';
+      
+      // Day headers
+      const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      dayNames.forEach(day => {
+        html += `<div class="calendar-day-header">${day}</div>`;
+      });
 
-<script>
-  // Pending Users: show either empty OR list (not both)
-  (function(){
-    const empty = document.getElementById("pendingEmpty");
-    const list = document.getElementById("pendingList");
-    if(!empty || !list) return;
+      // Empty cells before first day
+      for (let i = 0; i < startingDayOfWeek; i++) {
+        html += `<div class="calendar-day empty"></div>`;
+      }
 
-    const hasItems = list.querySelectorAll(".pendingItem").length > 0;
-    empty.style.display = hasItems ? "none" : "flex";
-    list.style.display  = hasItems ? "grid" : "none";
-  })();
-</script>
+      const today = new Date();
+      // Days of month
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const payments = recurringPayments[dateStr] || [];
+        const isToday = day === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+        
+        const totalAmount = payments.reduce((sum, p) => {
+          const amount = parseFloat(p.amount.replace('$', ''));
+          return sum + amount;
+        }, 0);
 
+        html += `
+          <div class="calendar-day ${isToday ? 'today' : ''} ${payments.length > 0 ? 'has-payments' : ''}" 
+               data-date="${dateStr}">
+            <div class="calendar-day-number">${day}</div>
+            ${payments.length > 0 ? `
+              <div class="calendar-day-icons">
+                ${payments.map(p => `<span class="calendar-platform-icon">${platformIcons[p.platform]}</span>`).join('')}
+              </div>
+              <div class="calendar-day-tooltip">
+                <div class="tooltip-simple">
+                  <span>${payments.length} payment${payments.length > 1 ? 's' : ''}</span>
+                  <span class="tooltip-total">$${totalAmount.toFixed(2)}</span>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
 
-<script>
-  // My Team: show either empty OR list (not both)
-  (function(){
-    const empty = document.getElementById("teamEmpty");
-    const list  = document.getElementById("teamList");
-    if(!empty || !list) return;
+      container.innerHTML = html;
 
-    const hasItems = list.querySelectorAll(".teamItem").length > 0;
+      // Add click event listeners to all days with payments
+      container.querySelectorAll('.calendar-day.has-payments').forEach(dayEl => {
+        dayEl.addEventListener('click', function() {
+          const dateStr = this.getAttribute('data-date');
+          console.log('Day clicked:', dateStr);
+          showPaymentDetails(dateStr);
+        });
+      });
 
-    // Varianta 1: cu hidden (recomandat)
-    empty.hidden = hasItems;
-    // dacă vrei să ascunzi și containerul listei complet când nu sunt membri:
-    list.style.display = hasItems ? "grid" : "none";
+      // Calculate and display monthly income
+      let monthlyIncome = 0;
+      
+      Object.keys(recurringPayments).forEach(dateKey => {
+        const paymentDate = new Date(dateKey);
+        if (paymentDate.getMonth() === month && paymentDate.getFullYear() === year) {
+          recurringPayments[dateKey].forEach(payment => {
+            const amount = parseFloat(payment.amount.replace('$', ''));
+            monthlyIncome += amount;
+          });
+        }
+      });
+      
+      const monthName = currentMiniMonth.toLocaleDateString('en-US', { month: 'long' });
+      document.getElementById('monthlyIncomeLabel').textContent = `${monthName} Income`;
+      document.getElementById('monthlyIncomeDisplay').textContent = `$${monthlyIncome.toFixed(2)}`;
+    }
 
-    // (opțional) dacă vrei să te asiguri că empty are flex:
-    empty.style.display = hasItems ? "none" : "flex";
-  })();
-</script>
+    function showPaymentDetails(dateStr) {
+      console.log('showPaymentDetails called with:', dateStr);
+      const payments = recurringPayments[dateStr] || [];
+      console.log('Payments found:', payments);
+      if (payments.length === 0) return;
 
+      const date = new Date(dateStr);
+      const formattedDate = date.toLocaleDateString('en-US', { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
 
+      const totalAmount = payments.reduce((sum, p) => {
+        const amount = parseFloat(p.amount.replace('$', ''));
+        return sum + amount;
+      }, 0);
 
+      const popup = document.getElementById('paymentDetailsPopup');
+      const popupDate = document.getElementById('popupDate');
+      const popupBody = document.getElementById('popupPaymentsList');
+      const popupTotal = document.getElementById('popupTotalAmount');
 
+      console.log('Popup element:', popup);
 
+      if (!popup) {
+        console.error('Popup element not found!');
+        return;
+      }
+
+      popupDate.textContent = formattedDate;
+      popupTotal.textContent = `$${totalAmount.toFixed(2)}`;
+
+      popupBody.innerHTML = payments.map(p => `
+        <div class="payment-item">
+          <div class="payment-item-header">
+            <div class="payment-platform-icon">${platformIcons[p.platform]}</div>
+            <div class="payment-client-name">${p.client}</div>
+          </div>
+          <div class="payment-item-details">
+            <span class="payment-type">${p.type}</span>
+            <span class="payment-amount">${p.amount}</span>
+          </div>
+        </div>
+      `).join('');
+
+      popup.classList.add('active');
+      console.log('Popup should be visible now');
+    }
+
+    function closePaymentDetails() {
+      document.getElementById('paymentDetailsPopup').classList.remove('active');
+    }
+
+    // Initialize calendar immediately after DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', renderMiniCalendar);
+    } else {
+      renderMiniCalendar();
+    }
+
+  </script>
+
+  <!-- Payment Details Popup -->
+  <div id="paymentDetailsPopup" class="payment-details-popup" onclick="if(event.target === this) closePaymentDetails()">
+    <div class="payment-details-content">
+      <div class="payment-details-header">
+        <h3 id="popupDate">Payment Details</h3>
+        <button class="payment-details-close" onclick="closePaymentDetails()">&times;</button>
+      </div>
+      <div class="payment-details-body" id="popupPaymentsList">
+        <!-- Payments will be rendered here -->
+      </div>
+      <div class="payment-details-footer">
+        <span class="payment-total-label">Total Amount:</span>
+        <span class="payment-total-amount" id="popupTotalAmount">$0.00</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Employee Selector Modal -->
+  <div id="employeeSelectorModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; max-width: 500px; width: 90%; max-height: 80vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <div style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
+        <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 900; color: #0f172a;">Select Employee Profile</h2>
+        <p style="margin: 0; font-size: 14px; color: #64748b;">Choose which employee profile you want to use</p>
+      </div>
+      
+      <div id="employeeProfilesList" style="padding: 16px; max-height: 400px; overflow-y: auto;">
+        <!-- Will be populated by JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <style>
+    .employee-profile-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .employee-profile-item:hover {
+      border-color: #3b82f6;
+      background: rgba(59,130,246,0.05);
+      transform: translateX(4px);
+    }
+    
+    .employee-profile-avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: 900;
+      color: white;
+      flex-shrink: 0;
+    }
+    
+    .employee-profile-info {
+      flex: 1;
+    }
+    
+    .employee-profile-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+    
+    .employee-profile-email {
+      font-size: 13px;
+      color: #64748b;
+    }
+    
+    .employee-profile-arrow {
+      font-size: 24px;
+      color: #cbd5e1;
+      transition: all 0.2s;
+    }
+    
+    .employee-profile-item:hover .employee-profile-arrow {
+      color: #3b82f6;
+      transform: translateX(4px);
+    }
+  </style>
+
+  <script>
+  </script>
 
 </body>
 </html>

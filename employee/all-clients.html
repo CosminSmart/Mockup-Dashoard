@@ -1,0 +1,1823 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>All Clients • Platforms & Fees</title>
+
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/users.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+
+  <style>
+    /* Actions bar */
+    .um-actionsbar{
+      display:flex; align-items:center; justify-content:space-between;
+      gap:12px; flex-wrap:wrap; margin:14px 0 12px;
+    }
+    .um-actionsbar__left{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .um-actionsbar__right{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+
+    .um-bulk{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+      padding:10px 12px;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:12px;
+      background:#fff;
+    }
+    .um-bulk__count{ color:#64748b; font-size:13px; }
+
+    .um-small{ font-size:13px; color:#64748b; }
+    .um-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      font-size:13px;
+      color:#0f172a;
+    }
+
+    .um-table th:first-child, .um-table td:first-child{ width:46px; }
+    .um-table td:last-child, .um-table th:last-child{ width:170px; }
+
+    .pf-icon{
+      width:28px; height:28px;
+      display:inline-flex; align-items:center; justify-content:center;
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:10px;
+      background: rgba(246,247,251,.75);
+      overflow:hidden;
+    }
+    .pf-icon svg{ width:18px; height:18px; display:block; }
+    .pf-icon img{ width:18px; height:18px; display:block; object-fit:contain; }
+
+    /* Right Drawer */
+    .pf-overlay{
+      position:fixed; inset:0;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(6px);
+      z-index: 9998;
+    }
+    .pf-overlay[hidden]{ display:none; }
+
+    .pf-drawer{
+      position:fixed; top:0; right:0; height:100vh;
+      width: min(560px, 92vw);
+      background:#fff;
+      border-left:1px solid rgba(15,23,42,.10);
+      box-shadow: -20px 0 60px rgba(15,23,42,.20);
+      z-index: 9999;
+      transform: translateX(110%);
+      transition: transform .22s ease;
+      display:flex; flex-direction:column;
+    }
+    .pf-drawer.is-open{ transform: translateX(0); }
+
+    .pf-drawer__header{
+      padding:16px;
+      border-bottom:1px solid rgba(15,23,42,.10);
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+    }
+    .pf-drawer__title{ font-size:16px; font-weight:700; color:#0f172a; }
+    .pf-drawer__sub{ margin-top:4px; color:#64748b; font-size:13px; }
+    .pf-drawer__body{
+      padding:14px 16px;
+      overflow:auto;
+      flex:1;
+    }
+    .pf-drawer__footer{
+      padding:12px 16px;
+      border-top:1px solid rgba(15,23,42,.10);
+      background: rgba(246,247,251,.65);
+      display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;
+    }
+
+    .pf-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+    .pf-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    @media (max-width:520px){ .pf-row{ grid-template-columns:1fr; } }
+
+    .pf-field{ display:flex; flex-direction:column; gap:6px; }
+    .pf-field label{ font-size:12px; color:#64748b; }
+    .pf-field input, .pf-field select, .pf-field textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      outline:none;
+      font: inherit;
+    }
+    .pf-field textarea{ min-height: 120px; resize: vertical; }
+
+    .pf-hint{
+      margin-top:10px;
+      padding:10px 12px;
+      border:1px dashed rgba(15,23,42,.18);
+      border-radius:12px;
+      background: rgba(246,247,251,.55);
+      color:#64748b;
+      font-size:13px;
+      line-height: 1.35;
+    }
+
+    /* Custom dropdown (platform + icon preset) */
+    .pf-select{ position:relative; }
+    .pf-select__btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pf-select__btn:focus{
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+      border-color: rgba(37,99,235,.35);
+    }
+    .pf-select__left{
+      display:flex; align-items:center; gap:10px;
+      min-width:0;
+    }
+    .pf-select__label{
+      font-size:14px;
+      color:#0f172a;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .pf-select__chev{ color:#64748b; font-size:14px; }
+    .pf-select__menu{
+      position:absolute;
+      top: calc(100% + 8px);
+      left:0;
+      right:0;
+      z-index: 50;
+      background:#fff;
+      border:1px solid rgba(15,23,42,.12);
+      border-radius:14px;
+      box-shadow: 0 18px 45px rgba(15,23,42,.14);
+      padding:6px;
+      max-height: 240px;
+      overflow:auto;
+    }
+    .pf-select__menu[hidden]{ display:none; }
+    .pf-opt{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 10px;
+      border-radius:12px;
+      border:0;
+      background:transparent;
+      cursor:pointer;
+      text-align:left;
+    }
+    .pf-opt:hover{ background: rgba(246,247,251,.9); }
+    .pf-opt[aria-selected="true"]{
+      background: rgba(37,99,235,.08);
+      outline: 1px solid rgba(37,99,235,.18);
+    }
+
+    /* Icon controls */
+    .pf-iconbox{
+      border:1px solid rgba(15,23,42,.10);
+      border-radius:14px;
+      padding:12px;
+      background: rgba(246,247,251,.35);
+      display:grid;
+      gap:10px;
+    }
+    .pf-iconbox__top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pf-icon-preview{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#0f172a;
+      font-size:13px;
+    }
+    .pf-icon-preview .pf-icon{
+      width:34px; height:34px; border-radius:12px;
+      background:#fff;
+    }
+    .pf-chiprow{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+    .pf-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      font-size:13px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .pf-chip input{ display:none; }
+    .pf-chip.is-active{
+      background: rgba(37,99,235,.08);
+      border-color: rgba(37,99,235,.25);
+    }
+    .pf-actions-inline{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .pf-file{
+      display:flex; align-items:center; gap:10px; flex-wrap:wrap;
+    }
+    .pf-file input[type="file"]{
+      padding:8px;
+      border-radius:12px;
+      border:1px solid rgba(15,23,42,.12);
+      background:#fff;
+      width:auto;
+      max-width: 100%;
+    }
+    .pf-note{
+      font-size:12px;
+      color:#64748b;
+      line-height:1.35;
+    }
+    .pf-error{
+      font-size:12px;
+      color:#b91c1c;
+      display:none;
+    }
+    .pf-error.is-show{ display:block; }
+
+    /* Professional Bulk Edit Styles */
+    .bulk-form {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .bulk-section {
+      background: #fafbfc;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .bulk-section:hover {
+      border-color: rgba(15,23,42,.12);
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+    }
+
+    .bulk-section__header {
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+
+    .bulk-section__header h4 {
+      margin: 0 0 4px 0;
+      font-size: 15px;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .bulk-section__desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .bulk-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .bulk-field label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin: 0;
+    }
+
+    .bulk-field input,
+    .bulk-field select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+      color: #0f172a;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .bulk-field input:focus,
+    .bulk-field select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+
+    .bulk-field input::placeholder {
+      color: #9ca3af;
+      font-style: italic;
+    }
+
+    .bulk-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 520px) {
+      .bulk-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .bulk-info {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+      border: 1px solid #bfdbfe;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+
+    .bulk-info__icon {
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .bulk-info__content {
+      font-size: 13px;
+      color: #1e40af;
+      line-height: 1.5;
+    }
+
+    .bulk-info__content strong {
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+
+    /* Enhanced button styles */
+    .um-btn--primary {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      color: white;
+      border: 1px solid #2563eb;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(59,130,246,.2);
+    }
+
+    .um-btn--primary:hover {
+      background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+      border-color: #1d4ed8;
+      box-shadow: 0 4px 8px rgba(59,130,246,.3);
+      transform: translateY(-1px);
+    }
+
+    .um-btn--ghost:hover {
+      background: rgba(15,23,42,.04);
+      transform: translateY(-1px);
+    }
+
+    /* Professional Platform Form Styles */
+    .platform-form {
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .form-section {
+      background: #fafbfc;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 12px;
+      padding: 24px;
+      transition: all 0.2s ease;
+    }
+
+    .form-section:hover {
+      border-color: rgba(15,23,42,.12);
+      box-shadow: 0 2px 8px rgba(15,23,42,.04);
+    }
+
+    .form-section__header {
+      margin-bottom: 20px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid rgba(15,23,42,.08);
+    }
+
+    .form-section__header h4 {
+      margin: 0 0 6px 0;
+      font-size: 16px;
+      font-weight: 600;
+      color: #0f172a;
+      line-height: 1.3;
+    }
+
+    .form-section__desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-field label {
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      margin: 0;
+    }
+
+    .form-field input,
+    .form-field select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 14px;
+      color: #0f172a;
+      transition: all 0.2s ease;
+      outline: none;
+    }
+
+    .form-field input:focus,
+    .form-field select:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    @media (max-width: 520px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Icon Upload Styles */
+    .icon-upload-area {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .icon-preview-container {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      background: #fff;
+      border: 1px solid rgba(15,23,42,.08);
+      border-radius: 10px;
+    }
+
+    .icon-preview-box {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8fafc;
+      border: 2px dashed rgba(15,23,42,.12);
+      border-radius: 8px;
+      flex-shrink: 0;
+    }
+
+    .icon-preview-box .pf-icon {
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: transparent;
+    }
+
+    .icon-preview-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .icon-preview-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #374151;
+    }
+
+    .icon-preview-note {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .icon-upload-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .upload-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+      border: 1px solid rgba(15,23,42,.12);
+      border-radius: 8px;
+      color: #374151;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .upload-btn:hover {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      border-color: rgba(15,23,42,.18);
+      transform: translateY(-1px);
+    }
+
+    .upload-btn__icon {
+      font-size: 16px;
+    }
+
+    .um-btn--sm {
+      padding: 8px 12px;
+      font-size: 12px;
+    }
+
+    .upload-requirements {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 12px;
+      background: #f0f9ff;
+      border: 1px solid #bae6fd;
+      border-radius: 8px;
+    }
+
+    .requirement-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #0369a1;
+    }
+
+    .requirement-icon {
+      width: 16px;
+      height: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0ea5e9;
+      color: white;
+      border-radius: 50%;
+      font-size: 10px;
+      font-weight: bold;
+      flex-shrink: 0;
+    }
+
+    /* Billing Subsections */
+    .billing-subsection {
+      margin-bottom: 20px;
+    }
+
+    .billing-subsection:last-child {
+      margin-bottom: 0;
+    }
+
+    .billing-subsection h5 {
+      margin: 0 0 12px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #4b5563;
+      padding-left: 12px;
+      border-left: 3px solid #e5e7eb;
+    }
+
+    /* Info Box */
+    .form-info {
+      display: flex;
+      gap: 12px;
+      padding: 16px;
+      background: linear-gradient(135deg, #fef3c7 0%, #fef7cd 100%);
+      border: 1px solid #fbbf24;
+      border-radius: 10px;
+      margin-top: 8px;
+    }
+
+    .form-info__icon {
+      font-size: 18px;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .form-info__content {
+      font-size: 13px;
+      color: #92400e;
+      line-height: 1.5;
+    }
+
+    .form-info__content strong {
+      color: #78350f;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>User Management</h1>
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">AU</div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div class="content-section">
+
+        <!-- SWITCHER -->
+        <div class="um-switcher um-switcher--top" role="tablist" aria-label="Clients/Employees Switcher">
+          <button class="um-tab is-active" type="button" data-top-tab="clients" role="tab" aria-selected="true">
+            Clients
+          </button>
+          <button class="um-tab" type="button" data-top-tab="employees" role="tab" aria-selected="false">
+            Employees
+          </button>
+        </div>
+
+        <h2>Platforms & Fees</h2>
+
+        <!-- Clients Dropdown Menu -->
+        <div class="um-dropdown-compact" id="clientsDropdown">
+          <button class="um-dropdown-toggle" id="clientsDropdownToggle">
+            <span class="um-dropdown-current">Platforms & Fees</span>
+            <span class="um-dropdown-arrow">▾</span>
+          </button>
+          <div class="um-dropdown-menu" id="clientsDropdownMenu" style="display: none;">
+            <button class="um-dropdown-item" data-client-view="clients">
+              <span>Clients List</span>
+              <span class="um-dropdown-desc">Manage individual clients</span>
+            </button>
+            <button class="um-dropdown-item is-active" data-client-view="all-clients">
+              <span>Platforms & Fees</span>
+              <span class="um-dropdown-desc">View all clients with platforms & fees</span>
+            </button>
+            <button class="um-dropdown-item" data-client-view="notifications">
+              <span>Clients Notifications</span>
+              <span class="um-dropdown-desc">Send notifications to clients</span>
+            </button>
+          </div>
+        </div>
+
+        <style>
+          .um-dropdown-compact {
+            position: relative;
+            margin-top: 12px;
+            margin-bottom: 16px;
+          }
+
+          .um-dropdown-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a202c;
+            width: 280px;
+            transition: all 0.15s;
+          }
+
+          .um-dropdown-toggle:hover {
+            border-color: rgba(0,0,0,0.20);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+          }
+
+          .um-dropdown-arrow {
+            font-size: 12px;
+            opacity: 0.6;
+            transition: transform 0.2s;
+          }
+
+          .um-dropdown-toggle.is-open .um-dropdown-arrow {
+            transform: rotate(180deg);
+          }
+
+          .um-dropdown-menu {
+            position: absolute;
+            top: calc(100% + 4px);
+            left: 0;
+            background: #fff;
+            border: 1px solid rgba(0,0,0,0.10);
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            z-index: 100;
+            min-width: 320px;
+          }
+
+          .um-dropdown-item {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 12px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: background 0.15s;
+          }
+
+          .um-dropdown-item:hover {
+            background: rgba(0,0,0,0.04);
+          }
+
+          .um-dropdown-item.is-active {
+            background: rgba(0,0,0,0.06);
+          }
+
+          .um-dropdown-item span:first-child {
+            font-weight: 700;
+            font-size: 14px;
+            color: #1a202c;
+          }
+
+          .um-dropdown-desc {
+            font-size: 12px;
+            color: #64748b;
+            font-weight: 400;
+          }
+        </style>
+
+        <script>
+          // Toggle dropdown
+          const dropdownToggle = document.getElementById('clientsDropdownToggle');
+          const dropdownMenu = document.getElementById('clientsDropdownMenu');
+
+          dropdownToggle?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = dropdownMenu.style.display !== 'none';
+            dropdownMenu.style.display = isOpen ? 'none' : 'block';
+            dropdownToggle.classList.toggle('is-open', !isOpen);
+          });
+
+          // Close dropdown when clicking outside
+          document.addEventListener('click', () => {
+            if (dropdownMenu) {
+              dropdownMenu.style.display = 'none';
+              dropdownToggle?.classList.remove('is-open');
+            }
+          });
+
+          // Prevent closing when clicking inside menu
+          dropdownMenu?.addEventListener('click', (e) => {
+            e.stopPropagation();
+          });
+        </script>
+
+        <p class="um-small">
+          Global settings or client-specific overrides.
+          If <b>Assigned Client</b> is empty, the row applies to <b>All Clients</b>.
+        </p>
+
+        <!-- ACTIONS BAR -->
+        <div class="um-actionsbar">
+          <div class="um-actionsbar__left">
+            <div class="um-bulk">
+              <span class="um-pill">Selected: <b id="selCount">0</b></span>
+              <span class="um-bulk__count" id="selHint">Select rows to enable bulk actions</span>
+              <button class="um-btn um-btn--ghost" type="button" id="bulkModify" disabled>Modify</button>
+              <button class="um-btn um-btn--ghost" type="button" id="bulkDelete" disabled>Delete</button>
+            </div>
+          </div>
+
+          <div class="um-actionsbar__right">
+            <button class="um-btn" type="button" id="openAddPlatform">Add New Platform</button>
+          </div>
+        </div>
+
+        <!-- TABLE -->
+        <section class="um-view is-active">
+          <div class="um-table-wrap">
+            <table class="um-table" id="pfTable">
+              <thead>
+                <tr>
+                  <th><input type="checkbox" id="selectAll" aria-label="Select all rows"></th>
+                  <th>Platform</th>
+                  <th>Setup</th>
+                  <th>Fee</th>
+                  <th>Init Interval</th>
+                  <th>Init Amount</th>
+                  <th>Rec Interval</th>
+                  <th>Rec Amount</th>
+                  <th>Assigned Client</th>
+                  <th style="text-align:right;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="pfTbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== Platform Drawer (Add/Edit) ===== -->
+  <div class="pf-overlay" id="pfOverlay" hidden></div>
+  <aside class="pf-drawer" id="pfDrawer" aria-hidden="true">
+    <div class="pf-drawer__header">
+      <div>
+        <div class="pf-drawer__title" id="pfTitle">Add New Platform</div>
+        <div class="pf-drawer__sub" id="pfSub">Create global row or assign to a specific client.</div>
+      </div>
+      <button class="um-btn um-btn--icon" type="button" id="pfCloseBtn" aria-label="Close">✕</button>
+    </div>
+
+    <div class="pf-drawer__body">
+      <div class="platform-form">
+
+        <!-- Platform Information Section -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Platform Information</h4>
+            <span class="form-section__desc">Basic platform details and identification</span>
+          </div>
+          
+          <div class="form-field">
+            <label>Platform Name *</label>
+            <input type="text" id="pfPlatformName" placeholder="e.g. Google Ads, Facebook Marketing" />
+          </div>
+        </div>
+
+        <!-- Icon Section -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Platform Icon</h4>
+            <span class="form-section__desc">Upload SVG icon to represent this platform</span>
+          </div>
+          
+          <div class="icon-upload-area">
+            <div class="icon-preview-container">
+              <div class="icon-preview-box">
+                <span class="pf-icon" id="pfIconPreview"></span>
+              </div>
+              <div class="icon-preview-info">
+                <span class="icon-preview-label" id="pfIconPreviewLabel">No icon uploaded</span>
+                <span class="icon-preview-note">SVG format required</span>
+              </div>
+            </div>
+            
+            <div class="icon-upload-controls">
+              <input id="pfIconFile" type="file" accept=".svg,image/svg+xml" required style="display: none;">
+              <button type="button" class="upload-btn" onclick="document.getElementById('pfIconFile').click()">
+                <span class="upload-btn__icon">📁</span>
+                <span>Choose SVG File</span>
+              </button>
+              <button class="um-btn um-btn--ghost um-btn--sm" type="button" id="pfIconClearUpload">Clear</button>
+            </div>
+            
+            <div class="upload-requirements">
+              <div class="requirement-item">
+                <span class="requirement-icon">✓</span>
+                <span>SVG format only</span>
+              </div>
+              <div class="requirement-item">
+                <span class="requirement-icon">✓</span>
+                <span>Recommended size: 24x24px</span>
+              </div>
+              <div class="requirement-item">
+                <span class="requirement-icon">✓</span>
+                <span>File size under 50KB</span>
+              </div>
+            </div>
+            
+            <div class="pf-error" id="pfIconError">Invalid SVG file. Please upload a valid SVG.</div>
+          </div>
+        </div>
+
+        <!-- Assignment Section -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Client Assignment</h4>
+            <span class="form-section__desc">Assign to specific client or keep global</span>
+          </div>
+          
+          <div class="form-field">
+            <label>Assigned Client</label>
+            <select id="pfAssigned">
+              <option value="">All Clients (Global)</option>
+              <option value="C-2001">Sarah Mitchell • TechVision</option>
+              <option value="C-2002">Michael Chen • BrightLabs</option>
+              <option value="C-2003">Emily Rodriguez • NorthPeak</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Pricing Configuration -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Pricing Configuration</h4>
+            <span class="form-section__desc">Setup costs and fee structure</span>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-field">
+              <label>Setup Cost ($)</label>
+              <input id="pfPageSetup" type="number" min="0" step="0.01" placeholder="250" />
+            </div>
+            <div class="form-field">
+              <label>Fee Percentage (%)</label>
+              <input id="pfFee" type="number" min="0" step="0.01" placeholder="5" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing Periods -->
+        <div class="form-section">
+          <div class="form-section__header">
+            <h4>Billing Periods</h4>
+            <span class="form-section__desc">Configure initial and recurring billing cycles</span>
+          </div>
+          
+          <div class="billing-subsection">
+            <h5>Initial Period</h5>
+            <div class="form-row">
+              <div class="form-field">
+                <label>Interval (days)</label>
+                <input id="pfInitInterval" type="number" min="0" step="1" placeholder="21" />
+              </div>
+              <div class="form-field">
+                <label>Amount ($)</label>
+                <input id="pfInitAmount" type="number" min="0" step="0.01" placeholder="30" />
+              </div>
+            </div>
+          </div>
+
+          <div class="billing-subsection">
+            <h5>Recurring Period</h5>
+            <div class="form-row">
+              <div class="form-field">
+                <label>Interval (days)</label>
+                <input id="pfRecInterval" type="number" min="0" step="1" placeholder="30" />
+              </div>
+              <div class="form-field">
+                <label>Amount ($)</label>
+                <input id="pfRecAmount" type="number" min="0" step="0.01" placeholder="50" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="form-info">
+          <div class="form-info__icon">💡</div>
+          <div class="form-info__content">
+            <strong>Assignment Rules:</strong> If assigned to a specific client, these settings will override global defaults. 
+            If left unassigned, the configuration applies to all clients.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="pf-drawer__footer">
+      <button class="um-btn um-btn--ghost" type="button" id="pfCancelBtn">Cancel</button>
+      <button class="um-btn um-btn--primary" type="button" id="pfSaveBtn">Create Platform</button>
+    </div>
+  </aside>
+
+  <!-- ===== Bulk Drawer (redesigned) ===== -->
+  <div class="pf-overlay" id="bulkOverlay" hidden></div>
+  <aside class="pf-drawer" id="bulkDrawer" aria-hidden="true" style="width: min(480px, 92vw);">
+    <div class="pf-drawer__header">
+      <div>
+        <div class="pf-drawer__title">Bulk Edit Platforms</div>
+        <div class="pf-drawer__sub">Modify multiple platforms at once. Only filled fields will be updated.</div>
+      </div>
+      <button class="um-btn um-btn--icon" type="button" id="bulkCloseBtn" aria-label="Close">✕</button>
+    </div>
+
+    <div class="pf-drawer__body">
+      <div class="bulk-form">
+        
+        <!-- Platform Name Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Platform Information</h4>
+            <span class="bulk-section__desc">Update platform name for selected items</span>
+          </div>
+          <div class="bulk-field">
+            <label>Platform Name</label>
+            <input id="bName" type="text" placeholder="Leave empty to keep current values">
+          </div>
+        </div>
+
+        <!-- Assignment Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Client Assignment</h4>
+            <span class="bulk-section__desc">Change client assignment for selected platforms</span>
+          </div>
+          <div class="bulk-field">
+            <label>Assigned Client</label>
+            <select id="bAssigned">
+              <option value="">No change</option>
+              <option value="__ALL__">All Clients (Global)</option>
+              <option value="C-2001">Sarah Mitchell • TechVision</option>
+              <option value="C-2002">Michael Chen • BrightLabs</option>
+              <option value="C-2003">Emily Rodriguez • NorthPeak</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Pricing Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Pricing Configuration</h4>
+            <span class="bulk-section__desc">Update setup costs and fee percentages</span>
+          </div>
+          <div class="bulk-row">
+            <div class="bulk-field">
+              <label>Setup Cost ($)</label>
+              <input id="bPageSetup" type="number" min="0" step="0.01" placeholder="Current">
+            </div>
+            <div class="bulk-field">
+              <label>Fee Percentage (%)</label>
+              <input id="bFee" type="number" min="0" step="0.01" placeholder="Current">
+            </div>
+          </div>
+        </div>
+
+        <!-- Initial Settings Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Initial Period Settings</h4>
+            <span class="bulk-section__desc">Configure initial billing period parameters</span>
+          </div>
+          <div class="bulk-row">
+            <div class="bulk-field">
+              <label>Initial Interval (days)</label>
+              <input id="bInitInterval" type="number" min="0" step="1" placeholder="Current">
+            </div>
+            <div class="bulk-field">
+              <label>Initial Amount ($)</label>
+              <input id="bInitAmount" type="number" min="0" step="0.01" placeholder="Current">
+            </div>
+          </div>
+        </div>
+
+        <!-- Recurring Settings Section -->
+        <div class="bulk-section">
+          <div class="bulk-section__header">
+            <h4>Recurring Period Settings</h4>
+            <span class="bulk-section__desc">Configure recurring billing period parameters</span>
+          </div>
+          <div class="bulk-row">
+            <div class="bulk-field">
+              <label>Recurring Interval (days)</label>
+              <input id="bRecInterval" type="number" min="0" step="1" placeholder="Current">
+            </div>
+            <div class="bulk-field">
+              <label>Recurring Amount ($)</label>
+              <input id="bRecAmount" type="number" min="0" step="0.01" placeholder="Current">
+            </div>
+          </div>
+        </div>
+
+        <!-- Info Box -->
+        <div class="bulk-info">
+          <div class="bulk-info__icon">ℹ️</div>
+          <div class="bulk-info__content">
+            <strong>How it works:</strong> Only fields with values will be applied to selected platforms. 
+            Empty fields will preserve existing values for each platform.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="pf-drawer__footer">
+      <button class="um-btn um-btn--ghost" type="button" id="bulkCancelBtn">Cancel</button>
+      <button class="um-btn um-btn--primary" type="button" id="bulkApplyBtn">Apply Changes</button>
+    </div>
+  </aside>
+
+  <script>
+    // ========= Switcher redirect =========
+    document.querySelectorAll(".um-switcher--top .um-tab").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const t = btn.dataset.topTab;
+        if (t === "employees") window.location.href = "users.html";
+      });
+    });
+
+    // Handle dropdown item clicks
+    document.querySelectorAll('[data-client-view]').forEach(item => {
+      item.addEventListener('click', () => {
+        const view = item.dataset.clientView;
+        
+        if (view === 'all-clients') {
+          window.location.href = 'all-clients.html';
+        } else if (view === 'clients') {
+          window.location.href = 'clients.html';
+        } else if (view === 'notifications') {
+          window.location.href = 'users.html?view=notifications';
+        }
+      });
+    });
+  </script>
+
+  <script>
+    // ========= Helpers =========
+    function escapeHtml(str){
+      return (str ?? "").toString()
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function numberOrNull(v){
+      const s = (v ?? "").toString().trim();
+      if (!s) return null;
+      const n = Number(s);
+      return Number.isFinite(n) ? n : null;
+    }
+    function money(n){
+      const num = Number(n);
+      if (!Number.isFinite(num)) return "—";
+      return `$${num.toFixed(2).replace(/\.00$/, "")}`;
+    }
+    function pct(n){
+      const num = Number(n);
+      if (!Number.isFinite(num)) return "—";
+      return `${num}%`;
+    }
+    function isSvgText(s){
+      const t = (s ?? "").toString().trim();
+      return t.toLowerCase().includes("<svg") && t.toLowerCase().includes("</svg>");
+    }
+    function safeSvgOrNull(s){
+      // minimal sanity; in production you'd sanitize stronger server-side
+      const t = (s ?? "").toString().trim();
+      if (!isSvgText(t)) return null;
+      return t;
+    }
+
+    // ========= Platform list (for "Platform" dropdown only) =========
+    const PLATFORM_MAP = {
+      google: {
+        label: "Google Ads",
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>`
+      },
+      facebook: {
+        label: "Facebook Ads",
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#1877f2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>`
+      },
+      tiktok: {
+        label: "TikTok Ads",
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#000000">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+          </svg>`
+      },
+      instagram: {
+        label: "Instagram Ads",
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+            <defs>
+              <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#f09433;stop-opacity:1" />
+                <stop offset="25%" style="stop-color:#e6683c;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#dc2743;stop-opacity:1" />
+                <stop offset="75%" style="stop-color:#cc2366;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#bc1888;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>`
+      },
+      microsoft: {
+        label: "Microsoft Ads",
+        svg: `
+          <svg width="80" height="80" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#f25022" d="M0 0h11.377v11.372H0z"/>
+            <path fill="#00a4ef" d="M12.623 0H24v11.372H12.623z"/>
+            <path fill="#7fba00" d="M0 12.628h11.377V24H0z"/>
+            <path fill="#ffb900" d="M12.623 12.628H24V24H12.623z"/>
+          </svg>`
+      },
+      outbrain: {
+        label: "Outbrain Ads",
+        svg: `
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120.57 22.67" width="80" height="80">
+            <path fill="#EE6513" d="M17.0905,19.0766 C16.4425,19.7126 15.6835,20.2096 14.8125,20.5716 C13.9415,20.9306 12.9945,21.1106 11.9735,21.1106 C10.9515,21.1106 10.0055,20.9306 9.1355,20.5716 C8.2635,20.2096 7.5035,19.7126 6.8555,19.0766 C6.2075,18.4426 5.6995,17.6926 5.3335,16.8276 C4.9795,15.9926 4.7975,15.0896 4.7845,14.1206 L6.5075,14.1206 C6.5255,14.4186 6.5895,14.6976 6.7005,14.9596 C6.8335,15.2746 7.0185,15.5466 7.2525,15.7766 C7.4875,16.0076 7.7645,16.1886 8.0805,16.3176 C8.3965,16.4496 8.7405,16.5156 9.1115,16.5156 C9.4825,16.5156 9.8245,16.4496 10.1415,16.3176 C10.4575,16.1886 10.7345,16.0076 10.9695,15.7766 C11.2045,15.5466 11.3895,15.2746 11.5215,14.9596 C11.6105,14.7526 11.6685,14.5326 11.6975,14.3026 L12.2495,14.3026 C12.2785,14.5326 12.3365,14.7526 12.4255,14.9596 C12.5595,15.2746 12.7425,15.5466 12.9785,15.7766 C13.2125,16.0076 13.4895,16.1886 13.8055,16.3176 C14.1215,16.4496 14.4655,16.5156 14.8355,16.5156 C15.2075,16.5156 15.5505,16.4496 15.8665,16.3176 C16.1825,16.1886 16.4595,16.0076 16.6945,15.7766 C16.9295,15.5466 17.1145,15.2746 17.2475,14.9596 C17.3585,14.6976 17.4225,14.4186 17.4415,14.1206 L19.1605,14.1206 C19.1505,15.0896 18.9675,15.9926 18.6135,16.8276 C18.2465,17.6926 17.7385,18.4426 17.0905,19.0766"/>
+          </svg>`
+      },
+      taboola: {
+        label: "Taboola Ads",
+        svg: `
+          <svg version="1.1" viewBox="0 0 723.02 175.14" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+            <g fill="#054164">
+              <path d="m42.27 38.82h-42.27v-38.58h130.94v38.58h-42.32l0.02 113.06h-46.34l-0.03-113.06z"/>
+              <path d="m169.5 102.33c-5.09 2.51-10.82 3.96-16.52 5.2-9.33 2.07-14.21 4.36-14.24 11.76-0.03 5.09 5.44 10.19 13.05 10.24 9.52 0.05 16.95-5.61 17.66-17.04l0.05-10.16zm40.06 25c-0.06 8.25 0.31 17.56 4.92 24.57l-42.73-0.25c-1.04-2.97-1.65-7.42-1.41-10.37h-0.43c-8.94 10.1-21.86 12.98-35.41 12.91-21.15-0.13-38.65-10.38-38.52-33.44 0.21-34.7 40.83-33.19 62.21-37.08 5.72-1.03 11.44-2.69 11.47-9.67 0.05-7.41-6.91-10.21-13.68-10.24-12.9-0.06-15.49 6.47-15.72 11.12l-38.93-0.22c1.44-30.88 30.66-35.79 56.69-35.64 52.46 0.31 51.92 22.1 51.78 43.25l-0.24 45.06z"/>
+            </g>
+          </svg>`
+      }
+    };
+
+    // ========= Preset icons list (for "Icon" dropdown) =========
+    // You can add many here (Meta, Taboola etc.)
+    const ICON_PRESETS = {
+      google: { 
+        label: "Google", 
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>`
+      },
+      facebook: { 
+        label: "Facebook", 
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#1877f2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>`
+      },
+      tiktok: { 
+        label: "TikTok", 
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="#000000">
+            <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/>
+          </svg>`
+      },
+      instagram: { 
+        label: "Instagram", 
+        svg: `
+          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+            <defs>
+              <linearGradient id="instagram-gradient" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#f09433;stop-opacity:1" />
+                <stop offset="25%" style="stop-color:#e6683c;stop-opacity:1" />
+                <stop offset="50%" style="stop-color:#dc2743;stop-opacity:1" />
+                <stop offset="75%" style="stop-color:#cc2366;stop-opacity:1" />
+                <stop offset="100%" style="stop-color:#bc1888;stop-opacity:1" />
+              </linearGradient>
+            </defs>
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>`
+      },
+      microsoft: { 
+        label: "Microsoft", 
+        svg: `
+          <svg width="80" height="80" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#f25022" d="M0 0h11.377v11.372H0z"/>
+            <path fill="#00a4ef" d="M12.623 0H24v11.372H12.623z"/>
+            <path fill="#7fba00" d="M0 12.628h11.377V24H0z"/>
+            <path fill="#ffb900" d="M12.623 12.628H24V24H12.623z"/>
+          </svg>`
+      },
+      outbrain: { 
+        label: "Outbrain", 
+        svg: `
+          <svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120.57 22.67" width="80" height="80">
+            <path fill="#EE6513" d="M17.0905,19.0766 C16.4425,19.7126 15.6835,20.2096 14.8125,20.5716 C13.9415,20.9306 12.9945,21.1106 11.9735,21.1106 C10.9515,21.1106 10.0055,20.9306 9.1355,20.5716 C8.2635,20.2096 7.5035,19.7126 6.8555,19.0766 C6.2075,18.4426 5.6995,17.6926 5.3335,16.8276 C4.9795,15.9926 4.7975,15.0896 4.7845,14.1206 L6.5075,14.1206 C6.5255,14.4186 6.5895,14.6976 6.7005,14.9596 C6.8335,15.2746 7.0185,15.5466 7.2525,15.7766 C7.4875,16.0076 7.7645,16.1886 8.0805,16.3176 C8.3965,16.4496 8.7405,16.5156 9.1115,16.5156 C9.4825,16.5156 9.8245,16.4496 10.1415,16.3176 C10.4575,16.1886 10.7345,16.0076 10.9695,15.7766 C11.2045,15.5466 11.3895,15.2746 11.5215,14.9596 C11.6105,14.7526 11.6685,14.5326 11.6975,14.3026 L12.2495,14.3026 C12.2785,14.5326 12.3365,14.7526 12.4255,14.9596 C12.5595,15.2746 12.7425,15.5466 12.9785,15.7766 C13.2125,16.0076 13.4895,16.1886 13.8055,16.3176 C14.1215,16.4496 14.4655,16.5156 14.8355,16.5156 C15.2075,16.5156 15.5505,16.4496 15.8665,16.3176 C16.1825,16.1886 16.4595,16.0076 16.6945,15.7766 C16.9295,15.5466 17.1145,15.2746 17.2475,14.9596 C17.3585,14.6976 17.4225,14.4186 17.4415,14.1206 L19.1605,14.1206 C19.1505,15.0896 18.9675,15.9926 18.6135,16.8276 C18.2465,17.6926 17.7385,18.4426 17.0905,19.0766"/>
+          </svg>`
+      },
+      taboola: { 
+        label: "Taboola", 
+        svg: `
+          <svg version="1.1" viewBox="0 0 723.02 175.14" xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+            <g fill="#054164">
+              <path d="m42.27 38.82h-42.27v-38.58h130.94v38.58h-42.32l0.02 113.06h-46.34l-0.03-113.06z"/>
+              <path d="m169.5 102.33c-5.09 2.51-10.82 3.96-16.52 5.2-9.33 2.07-14.21 4.36-14.24 11.76-0.03 5.09 5.44 10.19 13.05 10.24 9.52 0.05 16.95-5.61 17.66-17.04l0.05-10.16zm40.06 25c-0.06 8.25 0.31 17.56 4.92 24.57l-42.73-0.25c-1.04-2.97-1.65-7.42-1.41-10.37h-0.43c-8.94 10.1-21.86 12.98-35.41 12.91-21.15-0.13-38.65-10.38-38.52-33.44 0.21-34.7 40.83-33.19 62.21-37.08 5.72-1.03 11.44-2.69 11.47-9.67 0.05-7.41-6.91-10.21-13.68-10.24-12.9-0.06-15.49 6.47-15.72 11.12l-38.93-0.22c1.44-30.88 30.66-35.79 56.69-35.64 52.46 0.31 51.92 22.1 51.78 43.25l-0.24 45.06z"/>
+            </g>
+          </svg>`
+      }
+    };
+
+    // ========= Mock Data =========
+    const clientMap = {
+      "": "All Clients",
+      "C-2001": "Sarah Mitchell • TechVision",
+      "C-2002": "Michael Chen • BrightLabs",
+      "C-2003": "Emily Rodriguez • NorthPeak",
+    };
+
+    /**
+     * row fields:
+     * - platformKey: for Platform label dropdown
+     * - iconType: "platform" | "preset" | "custom"
+     * - iconKey: when iconType="preset" (key in ICON_PRESETS)
+     * - iconSvg: when iconType="custom" (raw svg text)
+     */
+    let rows = [
+      { id:"p1", platformName:"Google Ads",   iconSvg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>`, pageSetup:250, fee:5, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"" },
+      { id:"p2", platformName:"Facebook Ads", iconSvg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#1877f2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>`, pageSetup:250, fee:6, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"" },
+      { id:"p3", platformName:"TikTok Ads",   iconSvg:`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="#000000"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg>`, pageSetup:250, fee:3, initInterval:21, initAmount:30, recInterval:30, recAmount:50, assigned:"C-2002" },
+    ];
+
+    // ========= Icon resolver =========
+    function resolveRowIcon(row){
+      if (!row) return `<svg viewBox="0 0 24 24" fill="#ccc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+
+      // If custom SVG uploaded, use it
+      if (row.iconSvg) {
+        const ok = safeSvgOrNull(row.iconSvg);
+        if (ok) return ok;
+      }
+
+      // No icon uploaded - show placeholder
+      return `<svg viewBox="0 0 24 24" fill="#ccc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+    }
+
+    // ========= Table refs =========
+    const tbody = document.getElementById("pfTbody");
+    const selectAll = document.getElementById("selectAll");
+
+    const selCount = document.getElementById("selCount");
+    const selHint  = document.getElementById("selHint");
+    const bulkModify = document.getElementById("bulkModify");
+    const bulkDelete = document.getElementById("bulkDelete");
+
+    function getSelectedRowIds(){
+      return Array.from(document.querySelectorAll(".rowCheck"))
+        .filter(ch => ch.checked)
+        .map(ch => ch.closest("tr")?.dataset.rowId)
+        .filter(Boolean);
+    }
+
+    function syncBulkState(){
+      const selected = getSelectedRowIds();
+      const enabled = selected.length > 0;
+
+      selCount.textContent = String(selected.length);
+      selHint.textContent = enabled ? "Bulk actions enabled" : "Select rows to enable bulk actions";
+      bulkModify.disabled = !enabled;
+      bulkDelete.disabled = !enabled;
+
+      const checks = Array.from(document.querySelectorAll(".rowCheck"));
+      const allChecked = checks.length && checks.every(c => c.checked);
+      const noneChecked = checks.every(c => !c.checked);
+
+      selectAll.indeterminate = !allChecked && !noneChecked;
+      selectAll.checked = allChecked;
+    }
+
+    function render(){
+      tbody.innerHTML = rows.map(r => {
+        const iconSvg = resolveRowIcon(r);
+        return `
+          <tr data-row-id="${escapeHtml(r.id)}">
+            <td><input type="checkbox" class="rowCheck" aria-label="Select row"></td>
+
+            <td>
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="pf-icon" title="Platform Icon">${iconSvg}</span>
+                <b>${escapeHtml(r.platformName || "Unknown Platform")}</b>
+              </div>
+            </td>
+
+            <td>${money(r.pageSetup)}</td>
+            <td>${pct(r.fee)}</td>
+            <td>${escapeHtml(String(r.initInterval ?? ""))}</td>
+            <td><b>${money(r.initAmount)}</b></td>
+            <td>${escapeHtml(String(r.recInterval ?? ""))}</td>
+            <td><b>${money(r.recAmount)}</b></td>
+            <td>${escapeHtml(clientMap[r.assigned] ?? "All Clients")}</td>
+            <td style="text-align:right;">
+              <button class="um-btn um-btn--ghost" type="button" data-edit-one>Edit</button>
+              <button class="um-btn um-btn--ghost" type="button" data-del-one>Delete</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+      wireRowHandlers();
+      syncBulkState();
+    }
+
+    function wireRowHandlers(){
+      document.querySelectorAll(".rowCheck").forEach(ch => {
+        ch.addEventListener("change", syncBulkState);
+      });
+
+      document.querySelectorAll("[data-del-one]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tr = btn.closest("tr");
+          const id = tr?.dataset.rowId;
+          if (!id) return;
+
+          if (!confirm("Delete this platform row?")) return;
+          rows = rows.filter(x => x.id !== id);
+          render();
+        });
+      });
+
+      document.querySelectorAll("[data-edit-one]").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const tr = btn.closest("tr");
+          const id = tr?.dataset.rowId;
+          const row = rows.find(x => x.id === id);
+          if (!row) return;
+
+          openPlatformDrawer("edit", row);
+        });
+      });
+    }
+
+    selectAll.addEventListener("change", () => {
+      const checked = selectAll.checked;
+      document.querySelectorAll(".rowCheck").forEach(ch => ch.checked = checked);
+      syncBulkState();
+    });
+
+    // ========= Drawer helpers =========
+    function openDrawer(overlayEl, drawerEl){
+      overlayEl.hidden = false;
+      drawerEl.classList.add("is-open");
+      drawerEl.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+    function closeDrawer(overlayEl, drawerEl){
+      overlayEl.hidden = true;
+      drawerEl.classList.remove("is-open");
+      drawerEl.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    // ========= Platform Drawer (Add/Edit) =========
+    const pfOverlay = document.getElementById("pfOverlay");
+    const pfDrawer  = document.getElementById("pfDrawer");
+
+    const pfTitle = document.getElementById("pfTitle");
+    const pfSub   = document.getElementById("pfSub");
+
+    const pfCloseBtn  = document.getElementById("pfCloseBtn");
+    const pfCancelBtn = document.getElementById("pfCancelBtn");
+    const pfSaveBtn   = document.getElementById("pfSaveBtn");
+    const openAddPlatform = document.getElementById("openAddPlatform");
+
+    // platform input field
+    const pfPlatformName = document.getElementById("pfPlatformName");
+
+    // icon controls
+    const pfIconPreview = document.getElementById("pfIconPreview");
+    const pfIconPreviewLabel = document.getElementById("pfIconPreviewLabel");
+    const pfIconFile = document.getElementById("pfIconFile");
+    const pfIconClearUpload = document.getElementById("pfIconClearUpload");
+    const pfIconError = document.getElementById("pfIconError");
+
+    // fields
+    const pfAssigned = document.getElementById("pfAssigned");
+    const pfPageSetup = document.getElementById("pfPageSetup");
+    const pfFee = document.getElementById("pfFee");
+    const pfInitInterval = document.getElementById("pfInitInterval");
+    const pfInitAmount = document.getElementById("pfInitAmount");
+    const pfRecInterval = document.getElementById("pfRecInterval");
+    const pfRecAmount = document.getElementById("pfRecAmount");
+
+    let pfMode = "add";
+    let pfEditingId = null;
+    let uploadedIconSvg = ""; // stores the uploaded SVG content
+
+    // -------- simple icon upload logic
+    function updateIconPreview(){
+      // Check if elements exist (drawer might not be open)
+      if (!pfIconPreview || !pfIconPreviewLabel || !pfIconError) return;
+      
+      pfIconError.classList.remove("is-show");
+
+      if (uploadedIconSvg) {
+        pfIconPreview.innerHTML = uploadedIconSvg;
+        pfIconPreviewLabel.textContent = "Custom SVG uploaded";
+      } else {
+        // No default icon - show placeholder
+        pfIconPreview.innerHTML = `<svg viewBox="0 0 24 24" fill="#ccc"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>`;
+        pfIconPreviewLabel.textContent = "No icon uploaded (required)";
+      }
+    }
+
+    // upload svg file -> read text
+    if (pfIconFile) {
+      pfIconFile.addEventListener("change", async () => {
+        const file = pfIconFile.files?.[0];
+        if (!file) { 
+          uploadedIconSvg = "";
+          updateIconPreview(); 
+          return; 
+        }
+        
+        try {
+          const text = await file.text();
+          const ok = safeSvgOrNull(text);
+          if (!ok) {
+            pfIconError.classList.add("is-show");
+            uploadedIconSvg = "";
+          } else {
+            uploadedIconSvg = ok;
+            pfIconError.classList.remove("is-show");
+          }
+          updateIconPreview();
+        } catch (error) {
+          pfIconError.classList.add("is-show");
+          uploadedIconSvg = "";
+          updateIconPreview();
+        }
+      });
+    }
+
+    if (pfIconClearUpload) {
+      pfIconClearUpload.addEventListener("click", () => {
+        pfIconFile.value = "";
+        uploadedIconSvg = "";
+        updateIconPreview();
+      });
+    }
+
+    // Update icon preview when platform name changes
+    if (pfPlatformName) {
+      pfPlatformName.addEventListener("input", () => {
+        updateIconPreview();
+      });
+    }
+
+    // ========= open drawer + fill =========
+    function openPlatformDrawer(mode, row){
+      pfMode = mode;
+      pfEditingId = row?.id ?? null;
+
+      if (mode === "edit") {
+        pfTitle.textContent = "Edit Platform";
+        pfSub.textContent = "Update values for this row.";
+      } else {
+        pfTitle.textContent = "Add New Platform";
+        pfSub.textContent = "Create global row or assign to a specific client.";
+      }
+
+      // Platform name
+      pfPlatformName.value = row?.platformName ?? "";
+
+      // Icon - set uploaded SVG if exists
+      uploadedIconSvg = row?.iconSvg ?? "";
+      pfIconFile.value = ""; // reset file input
+
+      // Assigned + numbers
+      pfAssigned.value = row?.assigned ?? "";
+      pfPageSetup.value = (row?.pageSetup ?? "");
+      pfFee.value = (row?.fee ?? "");
+      pfInitInterval.value = (row?.initInterval ?? "");
+      pfInitAmount.value = (row?.initAmount ?? "");
+      pfRecInterval.value = (row?.recInterval ?? "");
+      pfRecAmount.value = (row?.recAmount ?? "");
+
+      // Update preview
+      updateIconPreview();
+
+      openDrawer(pfOverlay, pfDrawer);
+    }
+
+    function readPlatformForm(){
+      const platformName = pfPlatformName.value.trim();
+
+      // Validate required fields
+      if (!platformName) {
+        return { __error: "Platform name is required." };
+      }
+      
+      if (!uploadedIconSvg) {
+        return { __error: "Icon is required. Please upload an SVG file." };
+      }
+
+      return {
+        platformName,
+        iconSvg: uploadedIconSvg,
+        assigned: pfAssigned.value || "",
+        pageSetup: numberOrNull(pfPageSetup.value),
+        fee: numberOrNull(pfFee.value),
+        initInterval: numberOrNull(pfInitInterval.value),
+        initAmount: numberOrNull(pfInitAmount.value),
+        recInterval: numberOrNull(pfRecInterval.value),
+        recAmount: numberOrNull(pfRecAmount.value),
+      };
+    }
+
+    // ========= drawer buttons =========
+    openAddPlatform.addEventListener("click", () => openPlatformDrawer("add", null));
+
+    pfOverlay.addEventListener("click", () => closeDrawer(pfOverlay, pfDrawer));
+    pfCloseBtn.addEventListener("click", () => closeDrawer(pfOverlay, pfDrawer));
+    pfCancelBtn.addEventListener("click", () => closeDrawer(pfOverlay, pfDrawer));
+
+    pfSaveBtn.addEventListener("click", () => {
+      const data = readPlatformForm();
+      if (data.__error) { 
+        alert(data.__error); 
+        return; 
+      }
+
+      if (pfMode === "add") {
+        rows.unshift({ id: "p_" + Math.random().toString(16).slice(2), ...data });
+      } else {
+        rows = rows.map(r => r.id === pfEditingId ? { ...r, ...data } : r);
+      }
+
+      closeDrawer(pfOverlay, pfDrawer);
+      render();
+    });
+
+    // ========= Bulk Drawer (unchanged) =========
+    const bulkOverlayEl = document.getElementById("bulkOverlay");
+    const bulkDrawerEl  = document.getElementById("bulkDrawer");
+
+    const bulkCloseBtn  = document.getElementById("bulkCloseBtn");
+    const bulkCancelBtn = document.getElementById("bulkCancelBtn");
+    const bulkApplyBtn  = document.getElementById("bulkApplyBtn");
+
+    const bName = document.getElementById("bName");
+    const bAssigned = document.getElementById("bAssigned");
+    const bPageSetup = document.getElementById("bPageSetup");
+    const bFee = document.getElementById("bFee");
+    const bInitInterval = document.getElementById("bInitInterval");
+    const bInitAmount = document.getElementById("bInitAmount");
+    const bRecInterval = document.getElementById("bRecInterval");
+    const bRecAmount = document.getElementById("bRecAmount");
+
+    function resetBulk(){
+      [bName,bPageSetup,bFee,bInitInterval,bInitAmount,bRecInterval,bRecAmount].forEach(i => i.value = "");
+      bAssigned.value = "";
+    }
+
+    bulkModify.addEventListener("click", () => {
+      const sel = getSelectedRowIds();
+      if (!sel.length) return;
+      resetBulk();
+      openDrawer(bulkOverlayEl, bulkDrawerEl);
+    });
+
+    bulkDelete.addEventListener("click", () => {
+      const sel = getSelectedRowIds();
+      if (!sel.length) return;
+
+      if (!confirm(`Delete ${sel.length} selected row(s)?`)) return;
+      rows = rows.filter(r => !sel.includes(r.id));
+      render();
+    });
+
+    bulkOverlayEl.addEventListener("click", () => closeDrawer(bulkOverlayEl, bulkDrawerEl));
+    bulkCloseBtn.addEventListener("click", () => closeDrawer(bulkOverlayEl, bulkDrawerEl));
+    bulkCancelBtn.addEventListener("click", () => closeDrawer(bulkOverlayEl, bulkDrawerEl));
+
+    bulkApplyBtn.addEventListener("click", () => {
+      const sel = getSelectedRowIds();
+      if (!sel.length) return;
+
+      const patch = {
+        name: bName.value.trim(),
+        assigned: bAssigned.value,
+        pageSetup: numberOrNull(bPageSetup.value),
+        fee: numberOrNull(bFee.value),
+        initInterval: numberOrNull(bInitInterval.value),
+        initAmount: numberOrNull(bInitAmount.value),
+        recInterval: numberOrNull(bRecInterval.value),
+        recAmount: numberOrNull(bRecAmount.value),
+      };
+
+      // Count how many fields will be updated
+      const fieldsToUpdate = Object.values(patch).filter(v => v !== null && v !== "").length;
+      
+      if (fieldsToUpdate === 0) {
+        alert("Please fill at least one field to update.");
+        return;
+      }
+
+      // Confirm the bulk operation
+      if (!confirm(`Apply changes to ${sel.length} selected platform(s)?\n\n${fieldsToUpdate} field(s) will be updated.`)) {
+        return;
+      }
+
+      rows = rows.map(r => {
+        if (!sel.includes(r.id)) return r;
+        const next = { ...r };
+
+        // Update platform name
+        if (patch.name) {
+          next.platformName = patch.name;
+        }
+
+        // Update assignment
+        if (patch.assigned) {
+          next.assigned = (patch.assigned === "__ALL__") ? "" : patch.assigned;
+        }
+
+        // Update numeric fields
+        if (patch.pageSetup !== null) next.pageSetup = patch.pageSetup;
+        if (patch.fee !== null) next.fee = patch.fee;
+        if (patch.initInterval !== null) next.initInterval = patch.initInterval;
+        if (patch.initAmount !== null) next.initAmount = patch.initAmount;
+        if (patch.recInterval !== null) next.recInterval = patch.recInterval;
+        if (patch.recAmount !== null) next.recAmount = patch.recAmount;
+
+        return next;
+      });
+
+      closeDrawer(bulkOverlayEl, bulkDrawerEl);
+      render();
+      
+      // Show success message
+      setTimeout(() => {
+        alert(`Successfully updated ${sel.length} platform(s).`);
+      }, 100);
+    });
+
+    // ESC closes any open drawer
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      closeDrawer(pfOverlay, pfDrawer);
+      closeDrawer(bulkOverlayEl, bulkDrawerEl);
+    });
+
+    // ========= init defaults =========
+    (function initDefaults(){
+      // Initialize with empty uploaded icon
+      uploadedIconSvg = "";
+      // Don't call updateIconPreview at init since drawer elements don't exist yet
+      render();
+    })();
+  </script>
+
+  <script src="../js/employee-selector.js"></script>`n  <script src="../js/permissions-check.js"></script>`n  <script src="../js/data-filter.js"></script>`n  <script src="../js/sidebar.js"></script>
+  <!-- Employee Selector Modal -->
+  <div id="employeeSelectorModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; max-width: 500px; width: 90%; max-height: 80vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <div style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
+        <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 900; color: #0f172a;">Select Employee Profile</h2>
+        <p style="margin: 0; font-size: 14px; color: #64748b;">Choose which employee profile you want to use</p>
+      </div>
+      <div id="employeeProfilesList" style="padding: 16px; max-height: 400px; overflow-y: auto;"></div>
+    </div>
+  </div>
+  <style>
+    .employee-profile-item { display: flex; align-items: center; gap: 16px; padding: 16px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
+    .employee-profile-item:hover { border-color: #3b82f6; background: rgba(59,130,246,0.05); transform: translateX(4px); }
+    .employee-profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: white; flex-shrink: 0; }
+    .employee-profile-info { flex: 1; }
+    .employee-profile-name { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .employee-profile-email { font-size: 13px; color: #64748b; }
+    .employee-profile-arrow { font-size: 24px; color: #cbd5e1; transition: all 0.2s; }
+    .employee-profile-item:hover .employee-profile-arrow { color: #3b82f6; transform: translateX(4px); }
+  </style>
+</body>
+</html>

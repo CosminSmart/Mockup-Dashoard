@@ -1368,7 +1368,7 @@
     </div>
   </div>
 
-  <script src="../js/sidebar.js"></script>
+  <script src="../js/employee-selector.js"></script>`n  <script src="../js/permissions-check.js"></script>`n  <script src="../js/data-filter.js"></script>`n  <script src="../js/sidebar.js"></script>
   <script>
     const LS_KEY = "admin_finance_demo_v7";
 
@@ -2419,5 +2419,25 @@
 
     refreshAll();
   </script>
+  <!-- Employee Selector Modal -->
+  <div id="employeeSelectorModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 10000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 16px; max-width: 500px; width: 90%; max-height: 80vh; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <div style="padding: 24px; border-bottom: 1px solid #e2e8f0;">
+        <h2 style="margin: 0 0 8px 0; font-size: 24px; font-weight: 900; color: #0f172a;">Select Employee Profile</h2>
+        <p style="margin: 0; font-size: 14px; color: #64748b;">Choose which employee profile you want to use</p>
+      </div>
+      <div id="employeeProfilesList" style="padding: 16px; max-height: 400px; overflow-y: auto;"></div>
+    </div>
+  </div>
+  <style>
+    .employee-profile-item { display: flex; align-items: center; gap: 16px; padding: 16px; border: 2px solid #e2e8f0; border-radius: 12px; margin-bottom: 12px; cursor: pointer; transition: all 0.2s; }
+    .employee-profile-item:hover { border-color: #3b82f6; background: rgba(59,130,246,0.05); transform: translateX(4px); }
+    .employee-profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900; color: white; flex-shrink: 0; }
+    .employee-profile-info { flex: 1; }
+    .employee-profile-name { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .employee-profile-email { font-size: 13px; color: #64748b; }
+    .employee-profile-arrow { font-size: 24px; color: #cbd5e1; transition: all 0.2s; }
+    .employee-profile-item:hover .employee-profile-arrow { color: #3b82f6; transform: translateX(4px); }
+  </style>
 </body>
 </html>

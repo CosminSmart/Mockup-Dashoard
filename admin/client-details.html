@@ -239,7 +239,7 @@
     .um-info__row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      gap: 16px;
       padding: 16px 0;
       border-bottom: 1px solid var(--gray-100);
     }
@@ -261,6 +261,8 @@
       font-size: 14px;
       font-weight: 600;
       color: var(--gray-900);
+      text-align: left !important;
+      margin-left: 0 !important;
     }
 
     /* Modern Form Fields */
@@ -627,17 +629,17 @@
 
             <!-- view mode -->
             <div class="um-info" id="viewBlock">
-              <div class="um-info__row">
-                <span class="um-info__label">📱 Telegram</span>
-                <span class="um-info__value" id="telegramText">—</span>
+              <div style="padding: 16px 0; border-bottom: 1px solid var(--gray-100);">
+                <span style="font-size: 14px; font-weight: 500; color: var(--gray-600);">📱 Telegram: </span>
+                <span style="font-size: 14px; font-weight: 600; color: var(--gray-900);" id="telegramText">—</span>
               </div>
-              <div class="um-info__row">
-                <span class="um-info__label">✉️ Email</span>
-                <span class="um-info__value" id="emailText">—</span>
+              <div style="padding: 16px 0; border-bottom: 1px solid var(--gray-100);">
+                <span style="font-size: 14px; font-weight: 500; color: var(--gray-600);">✉️ Email: </span>
+                <span style="font-size: 14px; font-weight: 600; color: var(--gray-900);" id="emailText">—</span>
               </div>
-              <div class="um-info__row">
-                <span class="um-info__label">📞 Phone</span>
-                <span class="um-info__value" id="phoneText">—</span>
+              <div style="padding: 16px 0;">
+                <span style="font-size: 14px; font-weight: 500; color: var(--gray-600);">📞 Phone: </span>
+                <span style="font-size: 14px; font-weight: 600; color: var(--gray-900);" id="phoneText">—</span>
               </div>
             </div>
 

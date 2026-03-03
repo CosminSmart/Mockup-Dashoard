@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Permissions Management</title>
+
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/dashboard.css">
+  <link rel="stylesheet" href="../css/users.css">
+  <link rel="stylesheet" href="../css/sidebar.css">
+
+  <style>
+    :root{
+      --bg: #f6f7fb;
+      --panel: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --border: rgba(15,23,42,.10);
+      --shadow: 0 12px 30px rgba(15,23,42,.08);
+      --primary: #3b82f6;
+      --success: #10b981;
+      --warning: #f59e0b;
+    }
+
+    body{ background: var(--bg) !important; color: var(--text); }
+
+    .header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,.92);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      box-shadow: 0 8px 20px rgba(15,23,42,.06);
+      padding: 16px 24px;
+    }
+    .header h1{
+      margin: 0;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    .main{ 
+      padding: 24px 20px !important; 
+      max-width: 100%; 
+      margin: 0;
+    }
+
+    .permissions-layout{
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .employees-sidebar{
+      flex: 0 0 auto;
+      width: 280px;
+    }
+
+    .permissions-content{
+      flex: 1;
+    }
+
+    @media (max-width: 1200px) {
+      .permissions-layout{
+        flex-direction: column;
+      }
+      .employees-sidebar{
+        width: 100%;
+      }
+    }
+
+    /* Employee Card */
+    .employee-card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .employee-card-title{
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* Module Card */
+    .module-card{
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .module-card::before{
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--primary);
+    }
+
+    .module-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .module-title{
+      font-size: 16px;
+      font-weight: 900;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .module-icon{
+      font-size: 20px;
+    }
+
+    .module-badge{
+      display: inline-block;
+      padding: 2px 8px;
+      background: rgba(59,130,246,.1);
+      color: var(--primary);
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      margin-left: 8px;
+    }
+
+    /* Toggle Switch */
+    .toggle-wrapper{
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toggle-label{
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .toggle-switch{
+      position: relative;
+      width: 44px;
+      height: 24px;
+      background: #cbd5e1;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: background .3s;
+    }
+
+    .toggle-switch.active{
+      background: var(--primary);
+    }
+
+    .toggle-switch::after{
+      content: '';
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      transition: transform .3s;
+      box-shadow: 0 2px 4px rgba(0,0,0,.2);
+    }
+
+    .toggle-switch.active::after{
+      transform: translateX(20px);
+    }
+
+    /* Subsection */
+    .subsection-item{
+      padding: 16px;
+      border-radius: 8px;
+      background: rgba(15,23,42,.02);
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      position: relative;
+    }
+
+    .subsection-name{
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    /* Actions */
+    .actions-row{
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .action-item{
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .action-item input[type="checkbox"]{
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: var(--primary);
+    }
+
+    /* Filters */
+    .filters-section{
+      background: rgba(59,130,246,.03);
+      border: 1px solid rgba(59,130,246,.1);
+      border-radius: 8px;
+      padding: 12px;
+      margin-top: 12px;
+    }
+
+    .filters-header{
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      padding: 4px 0;
+    }
+
+    .filters-title{
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .filters-arrow{
+      font-size: 10px;
+      color: var(--primary);
+      transition: transform .2s;
+    }
+
+    .filters-arrow.open{
+      transform: rotate(180deg);
+    }
+
+    .filters-content{
+      display: none;
+      padding-top: 12px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .filters-content.open{
+      display: block;
+    }
+
+    .filter-group{
+      margin-bottom: 12px;
+      position: relative;
+      z-index: auto;
+    }
+    
+    .filter-group:last-child{
+      margin-bottom: 0;
+    }
+
+    .filter-label{
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .3px;
+    }
+
+    .filter-select{
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      background: white;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .filter-select[multiple]{
+      min-height: 80px;
+    }
+
+    /* Custom Dropdown */
+    .custom-dropdown{
+      position: relative;
+      width: 100%;
+    }
+
+    .dropdown-trigger{
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: white;
+      color: var(--text);
+      font-size: 13px;
+      font-weight: 600;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      transition: all .2s;
+    }
+
+    .dropdown-trigger:hover{
+      border-color: var(--primary);
+    }
+
+    .dropdown-trigger.active{
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+    }
+
+    .dropdown-trigger-text{
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .dropdown-trigger-arrow{
+      font-size: 10px;
+      color: var(--muted);
+      transition: transform .2s;
+      flex-shrink: 0;
+    }
+
+    .dropdown-trigger.active .dropdown-trigger-arrow{
+      transform: rotate(180deg);
+    }
+
+    .dropdown-menu{
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      max-height: 300px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+    }
+    
+    /* Fix for last dropdown being cut off */
+    .filter-group:last-child .dropdown-menu{
+      top: auto;
+      bottom: calc(100% + 4px);
+    }
+
+    .dropdown-menu.show{
+      display: block;
+    }
+
+    .dropdown-search{
+      position: sticky;
+      top: 0;
+      background: white;
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .dropdown-search input{
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .dropdown-search input:focus{
+      border-color: var(--primary);
+    }
+
+    .dropdown-item{
+      padding: 10px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      transition: background .2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dropdown-item:hover{
+      background: rgba(59,130,246,.05);
+    }
+
+    .dropdown-item.selected{
+      background: rgba(59,130,246,.1);
+      color: var(--primary);
+    }
+
+    .dropdown-item-checkbox{
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+    }
+
+    .dropdown-item.selected .dropdown-item-checkbox{
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .dropdown-item-checkbox::after{
+      content: '✓';
+      color: white;
+      font-size: 11px;
+      font-weight: 900;
+      display: none;
+    }
+
+    .dropdown-item.selected .dropdown-item-checkbox::after{
+      display: block;
+    }
+
+    .dropdown-empty{
+      padding: 20px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    /* Save Button */
+    .save-btn{
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 900;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all .2s;
+      text-transform: uppercase;
+      letter-spacing: .5px;
+    }
+
+    .save-btn:hover{
+      background: #2563eb;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(59,130,246,.3);
+    }
+
+    /* Empty State */
+    .empty-state{
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    .empty-icon{
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: .5;
+    }
+
+    .empty-title{
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .empty-text{
+      font-size: 14px;
+      color: var(--muted);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="layout">
+    <header class="header">
+      <h1>Permissions Management</h1>
+      <div class="user-info">
+        <span>Admin User</span>
+        <div class="user-avatar">AU</div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+          <h2 style="margin: 0; font-size: 20px; font-weight: 900; color: var(--text);">Employee Permissions</h2>
+          <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--muted);">Manage granular access control</p>
+        </div>
+        <button class="save-btn" id="savePermissionsBtn">
+          💾 Save Changes
+        </button>
+      </div>
+
+      <div class="permissions-layout">
+        
+        <!-- Employees Sidebar -->
+        <div class="employees-sidebar">
+          <div class="employee-card">
+            <div class="employee-card-title">👥 Select Employee</div>
+            <div class="custom-dropdown">
+              <div class="dropdown-trigger" id="employeeDropdownTrigger" onclick="toggleEmployeeDropdown()">
+                <span class="dropdown-trigger-text">Select an employee...</span>
+                <span class="dropdown-trigger-arrow">▼</span>
+              </div>
+              <div class="dropdown-menu" id="employeeDropdown">
+                <div class="dropdown-search">
+                  <input type="text" placeholder="Search employees..." id="employeeSearch" oninput="filterEmployees()">
+                </div>
+                <div id="employeeList">
+                  <!-- Will be populated by JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Permissions Content -->
+        <div class="permissions-content">
+          <div id="permissionsContent">
+            <div class="module-card">
+              <div class="empty-state">
+                <div class="empty-icon">👈</div>
+                <div class="empty-title">Select an employee</div>
+                <div class="empty-text">Choose an employee to configure their permissions</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </div>
+
+  <script src="../js/sidebar.js"></script>
+  <script src="permissions.js"></script>
+</body>
+</html>
