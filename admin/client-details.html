@@ -764,6 +764,7 @@
             <button class="um-btn um-btn--ghost" type="button" id="feeEditBtn">Edit</button>
             <button class="um-btn um-btn--ghost" type="button" id="feeSaveBtn" hidden>Save</button>
             <button class="um-btn um-btn--ghost" type="button" id="feeCancelBtn" hidden>Cancel</button>
+            <button class="um-btn um-btn--primary" type="button" id="simulatePaymentBtn" style="margin-left: auto;">Simulate Payment Day</button>
           </div>
 
           <!-- Fee Table -->
@@ -837,6 +838,928 @@
       </div>
     </main>
   </div>
+
+  <!-- Payment Notification Modal -->
+  <div id="paymentNotificationModal" class="payment-notification-modal" style="display: none;">
+    <div class="payment-notification-overlay" onclick="closePaymentNotification()"></div>
+    <div class="payment-notification-sidebar">
+      <div class="payment-notification-header">
+        <h3>💰 Payment Processing</h3>
+        <button class="payment-notification-close" onclick="closePaymentNotification()">✕</button>
+      </div>
+      <div id="paymentNotificationBody" class="payment-notification-scroll">
+        <!-- Payment details will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Payment Simulation Modal -->
+  <div id="paymentSimulationModal" class="simulation-modal" style="display: none;">
+    <div class="simulation-overlay" onclick="closePaymentSimulation()"></div>
+    <div class="simulation-content">
+      <div class="simulation-header">
+        <h2>💰 Payment Day Simulation</h2>
+        <button class="simulation-close" onclick="closePaymentSimulation()">✕</button>
+      </div>
+      
+      <div class="simulation-body">
+        <!-- Configuration Form -->
+        <div class="simulation-config">
+          <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 16px;">Simulation Parameters</h3>
+          <div class="simulation-config-grid">
+            <div class="simulation-input-group">
+              <label>Account Creation Date</label>
+              <input type="date" id="simAccountCreated" />
+            </div>
+            <div class="simulation-input-group">
+              <label>Payment Day (1-31)</label>
+              <input type="number" id="simPaymentDay" min="1" max="31" value="4" />
+            </div>
+            <div class="simulation-input-group">
+              <label>Recurring Interval (days)</label>
+              <input type="number" id="simRecInterval" min="1" value="30" />
+            </div>
+            <div class="simulation-input-group">
+              <label>Recurring Amount ($)</label>
+              <input type="number" id="simRecAmount" min="0" step="0.01" value="50" />
+            </div>
+            <div class="simulation-input-group">
+              <label>Fee (%)</label>
+              <input type="number" id="simFeePercent" min="0" max="100" step="0.1" value="5" />
+            </div>
+            <div class="simulation-input-group">
+              <label>Platform Name</label>
+              <input type="text" id="simPlatformName" value="Google Ads" />
+            </div>
+          </div>
+          <button class="um-btn um-btn--primary" onclick="runSimulation()" style="width: 100%; margin-top: 16px;">
+             Run Simulation (Next 5 Months)
+          </button>
+        </div>
+
+        <!-- Results Container -->
+        <div id="simulationResults" style="display: none;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h3 style="margin: 0; color: #374151; font-size: 16px;">Simulation Results</h3>
+            <button class="um-btn um-btn--ghost" onclick="resetSimulation()" style="padding: 6px 12px; font-size: 13px;">
+              ← Back to Config
+            </button>
+          </div>
+          
+          <!-- Summary Stats -->
+          <div class="simulation-summary-stats" id="summaryStats"></div>
+          
+          <!-- Split Layout: Calendar + Payment List -->
+          <div class="simulation-split-layout">
+            <!-- Left: Calendar -->
+            <div class="simulation-calendar-section">
+              <h4 style="margin: 0 0 12px 0; color: #374151; font-size: 14px; font-weight: 600;">📅 Select Date</h4>
+              
+              <!-- Date Picker -->
+              <div style="margin-bottom: 16px;">
+                <input type="date" id="simulationCurrentDate" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;" />
+              </div>
+              
+              <!-- Calendar for current month -->
+              <div id="simulationCalendar"></div>
+            </div>
+            
+            <!-- Right: Payment Details -->
+            <div class="simulation-payments-section">
+              <h4 style="margin: 0 0 12px 0; color: #374151; font-size: 14px; font-weight: 600;">💰 Payment Details</h4>
+              <div id="simulationPaymentDetails">
+                <div style="text-align: center; padding: 40px; color: #9ca3af;">
+                  Select a date to see payment details
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculation Details Modal -->
+  <div id="calculationDetailsModal" class="calculation-modal" style="display: none;">
+    <div class="calculation-overlay" onclick="closeCalculationDetails()"></div>
+    <div class="calculation-modal-content">
+      <div class="calculation-modal-header">
+        <h3 style="margin: 0; color: #374151; font-size: 18px; font-weight: 700;"> Payment Calculation Details</h3>
+        <button class="calculation-close" onclick="closeCalculationDetails()">✕</button>
+      </div>
+      <div id="calculationDetailsBody" class="calculation-modal-body">
+        <!-- Calculation details will be inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <style>
+    /* Payment Notification Sidebar */
+    .payment-notification-modal {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 10001;
+      pointer-events: none;
+    }
+
+    .payment-notification-overlay {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      pointer-events: auto;
+    }
+
+    .payment-notification-sidebar {
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 420px;
+      background: white;
+      box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+      display: flex;
+      flex-direction: column;
+      z-index: 10002;
+      pointer-events: auto;
+    }
+
+    .payment-notification-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .payment-notification-header h3 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .payment-notification-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 20px;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .payment-notification-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .payment-notification-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .payment-notification-platform-section {
+      margin-bottom: 24px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+    }
+
+    .payment-notification-platform-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .payment-notification-platform-icon {
+      font-size: 24px;
+    }
+
+    .payment-notification-platform-name {
+      flex: 1;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .payment-notification-current {
+      background: white;
+      border: 2px solid #10b981;
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .payment-notification-current-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #059669;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .payment-notification-current-amount {
+      font-size: 28px;
+      font-weight: 800;
+      color: #059669;
+      margin-bottom: 8px;
+    }
+
+    .payment-notification-current-details {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.5;
+    }
+
+    .payment-notification-history {
+      margin-top: 12px;
+    }
+
+    .payment-notification-history-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+
+    .payment-notification-history-item {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .payment-notification-history-date {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .payment-notification-history-amount {
+      font-size: 14px;
+      font-weight: 700;
+      color: #6b7280;
+    }
+
+    .simulation-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .simulation-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+    }
+
+    .simulation-content {
+      position: relative;
+      background: #fff;
+      border-radius: 16px;
+      width: 95%;
+      max-width: 1200px;
+      max-height: 90vh;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .simulation-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .simulation-header h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .simulation-close {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      font-size: 24px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .simulation-close:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+
+    .simulation-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    .simulation-config {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      border: 2px solid #e5e7eb;
+    }
+
+    .simulation-config-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .simulation-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .simulation-input-group label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .simulation-input-group input {
+      padding: 10px 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .simulation-input-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .simulation-summary-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .simulation-stat-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 16px;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .simulation-stat-label {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .simulation-stat-value {
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .simulation-months-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .simulation-split-layout {
+      display: grid;
+      grid-template-columns: 400px 1fr;
+      gap: 24px;
+      margin-top: 16px;
+    }
+
+    .simulation-calendar-section {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      height: fit-content;
+      position: sticky;
+      top: 20px;
+    }
+
+    .simulation-payments-section {
+      overflow-y: auto;
+      max-height: 600px;
+    }
+
+    .simulation-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .simulation-calendar-day-header {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      padding: 8px 4px;
+      text-transform: uppercase;
+    }
+
+    .simulation-calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #374151;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      cursor: default;
+      transition: all 0.2s;
+    }
+
+    .simulation-calendar-day.empty {
+      background: transparent;
+      border: none;
+    }
+
+    .simulation-calendar-day.payment-day {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .simulation-calendar-day.payment-day:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    }
+
+    .simulation-calendar-month-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .simulation-calendar-month-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .simulation-months-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .simulation-month-card {
+      background: white;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s;
+    }
+
+    .simulation-month-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .simulation-month-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .simulation-month-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #1f2937;
+    }
+
+    .simulation-month-total {
+      font-size: 20px;
+      font-weight: 800;
+      color: #667eea;
+    }
+
+    .simulation-payment-item {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .simulation-payment-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .simulation-payment-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .simulation-payment-date {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .simulation-payment-amount {
+      font-size: 18px;
+      font-weight: 800;
+      color: #10b981;
+    }
+
+    .simulation-payment-details {
+      font-size: 13px;
+      color: #6b7280;
+      line-height: 1.6;
+    }
+
+    .simulation-date-selector {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: #f8f9fa;
+      border-radius: 12px;
+      flex-wrap: wrap;
+    }
+
+    .simulation-date-selector label {
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .simulation-date-selector input {
+      padding: 8px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 8px;
+      font-size: 14px;
+    }
+
+    .simulation-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 24px;
+      padding: 16px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 12px;
+      color: white;
+    }
+
+    .simulation-current-month {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .payment-history {
+      background: #f8f9fa;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .payment-history-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .payment-history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .history-item {
+      background: white;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+
+    .history-item:hover {
+      border-color: #667eea;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.1);
+    }
+
+    .history-item-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .history-item-month {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .history-item-platforms {
+      font-size: 12px;
+      color: #6b7280;
+    }
+
+    .history-item-amount {
+      font-size: 18px;
+      font-weight: 700;
+      color: #059669;
+    }
+
+    .simulation-months {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .month-card {
+      background: #fff;
+      border: 2px solid rgba(0, 0, 0, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      transition: all 0.2s;
+    }
+
+    .month-card:hover {
+      border-color: #667eea;
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+
+    .month-card.current-month {
+      border-color: #667eea;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
+    }
+
+    .month-header {
+      font-size: 16px;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .month-calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      margin-bottom: 12px;
+    }
+
+    .calendar-day-header {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 600;
+      color: #6b7280;
+      padding: 4px;
+    }
+
+    .calendar-day {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .calendar-day.empty {
+      cursor: default;
+    }
+
+    .calendar-day.today {
+      background: #fef3c7;
+      border: 2px solid #f59e0b;
+      font-weight: 700;
+    }
+
+    .calendar-day.payment-day {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    }
+
+    .calendar-day.payment-day:hover {
+      transform: scale(1.1);
+    }
+
+    .calendar-day.payment-day::after {
+      content: '💰';
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      font-size: 10px;
+    }
+
+    .month-payments {
+      margin-top: 12px;
+    }
+
+    .payment-item {
+      padding: 8px 12px;
+      background: #f0fdf4;
+      border-left: 3px solid #10b981;
+      border-radius: 6px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .payment-item.prorata {
+      background: #fef3c7;
+      border-left-color: #f59e0b;
+    }
+
+    .payment-platform {
+      font-weight: 600;
+      color: #1f2937;
+      margin-bottom: 4px;
+    }
+
+    .payment-amount {
+      color: #059669;
+      font-weight: 700;
+    }
+
+    .payment-details {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+
+    .simulation-summary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-top: 24px;
+    }
+
+    .summary-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .summary-item {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 12px;
+      border-radius: 8px;
+    }
+
+    .summary-label {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-bottom: 4px;
+    }
+
+    .summary-value {
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    /* Calculation Details Modal */
+    .calculation-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10002;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .calculation-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    .calculation-modal-content {
+      position: relative;
+      background: white;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .calculation-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    .calculation-close {
+      background: #f3f4f6;
+      border: none;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      font-size: 20px;
+      color: #6b7280;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .calculation-close:hover {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .calculation-modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+  </style>
 
   <script src="../js/admin-client-details.js"></script>
   <script src="../js/sidebar.js"></script>

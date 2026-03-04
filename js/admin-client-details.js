@@ -70,6 +70,7 @@ const els = {
   feeEditBtn: document.getElementById("feeEditBtn"),
   feeSaveBtn: document.getElementById("feeSaveBtn"),
   feeCancelBtn: document.getElementById("feeCancelBtn"),
+  simulatePaymentBtn: document.getElementById("simulatePaymentBtn"),
 
   thresholdsBody: document.getElementById("thresholdsBody"),
   thresholdEditBtn: document.getElementById("thresholdEditBtn"),
@@ -899,6 +900,1171 @@ function saveThresholds(){
   exitThresholdEdit(false);
 }
 
+// ===== Payment Day Simulation =====
+let simulationState = {
+  currentDate: new Date(),
+  accountCreationDate: null,
+  paymentHistory: [] // Track all payments made
+};
+
+function simulatePaymentDay() {
+  // Reset and show modal with config form
+  document.getElementById('paymentSimulationModal').style.display = 'flex';
+  document.getElementById('simulationResults').style.display = 'none';
+  document.querySelector('.simulation-config').style.display = 'block';
+  
+  // Set default values
+  const today = new Date();
+  document.getElementById('simAccountCreated').valueAsDate = new Date(today.getFullYear(), today.getMonth() - 1, 1);
+  document.getElementById('simPaymentDay').value = 4;
+  document.getElementById('simRecInterval').value = 30;
+  document.getElementById('simRecAmount').value = 50;
+  document.getElementById('simFeePercent').value = 5;
+  document.getElementById('simPlatformName').value = 'Google Ads';
+}
+
+function runSimulation() {
+  // Get input values
+  const accountCreated = new Date(document.getElementById('simAccountCreated').value);
+  const paymentDay = parseInt(document.getElementById('simPaymentDay').value);
+  const recInterval = parseInt(document.getElementById('simRecInterval').value);
+  const recAmount = parseFloat(document.getElementById('simRecAmount').value);
+  const feePercent = parseFloat(document.getElementById('simFeePercent').value);
+  const platformName = document.getElementById('simPlatformName').value || 'Platform';
+  
+  // Validate inputs
+  if (!accountCreated || isNaN(paymentDay) || isNaN(recInterval) || isNaN(recAmount) || isNaN(feePercent)) {
+    alert('Please fill in all fields with valid values');
+    return;
+  }
+  
+  // Calculate simulation for next 5 months
+  const today = new Date();
+  const endDate = new Date(today.getFullYear(), today.getMonth() + 5, today.getDate());
+  
+  simulationState.accountCreationDate = accountCreated;
+  simulationState.currentDate = today;
+  simulationState.paymentHistory = [];
+  
+  // Calculate payments
+  calculateSimulationPayments(accountCreated, endDate, paymentDay, recInterval, recAmount, feePercent, platformName);
+  
+  // Show results
+  document.querySelector('.simulation-config').style.display = 'none';
+  document.getElementById('simulationResults').style.display = 'block';
+  
+  renderSimulationResults();
+}
+
+function calculateSimulationPayments(startDate, endDate, paymentDay, recInterval, recAmount, feePercent, platformName) {
+  simulationState.paymentHistory = [];
+  
+  // First payment is taken IMMEDIATELY on account creation (in advance)
+  let currentPaymentDate = new Date(startDate); // First payment = account creation date
+  let lastPaymentDate = new Date(startDate);
+  let isFirstPayment = true;
+  let daysInAdvance = 0;
+  
+  // Calculate when the next payment day would be
+  let nextPaymentDay = new Date(startDate);
+  nextPaymentDay.setDate(paymentDay);
+  if (nextPaymentDay <= startDate) {
+    nextPaymentDay.setMonth(nextPaymentDay.getMonth() + 1);
+  }
+  
+  while (currentPaymentDate <= endDate) {
+    const daysSinceLastPayment = Math.floor((currentPaymentDate - lastPaymentDate) / (1000 * 60 * 60 * 24));
+    
+    let actualAmount = recAmount;
+    let paymentType = 'regular';
+    let daysToPay = recInterval;
+    let paymentForMonth = new Date(currentPaymentDate);
+    paymentForMonth.setMonth(paymentForMonth.getMonth() + 1); // Payment is for NEXT month
+    
+    if (isFirstPayment) {
+      // First payment on account creation date (full price for recInterval days)
+      actualAmount = recAmount;
+      paymentType = 'first';
+      daysToPay = recInterval;
+      
+      // Calculate days in advance
+      // We pay for recInterval (30) days, but only daysUntilNextPayment will pass
+      const daysUntilNextPayment = Math.floor((nextPaymentDay - startDate) / (1000 * 60 * 60 * 24));
+      daysInAdvance = recInterval - daysUntilNextPayment;
+      
+      isFirstPayment = false;
+    } else {
+      // Subsequent payments
+      // If we have days in advance from previous payment, deduct them
+      
+      if (daysInAdvance > 0) {
+        // We have credit from previous payment
+        // Pay full amount minus the advance days
+        const advanceAmount = (recAmount / recInterval) * daysInAdvance;
+        actualAmount = recAmount - advanceAmount;
+        paymentType = 'adjusted';
+        daysToPay = recInterval - daysInAdvance;
+      } else if (daysInAdvance < 0) {
+        // We owe days from previous payment
+        // Pay full amount plus the owed days
+        const owedAmount = (recAmount / recInterval) * Math.abs(daysInAdvance);
+        actualAmount = recAmount + owedAmount;
+        paymentType = 'overdue';
+        daysToPay = recInterval + Math.abs(daysInAdvance);
+      } else {
+        // Exactly on schedule
+        actualAmount = recAmount;
+        paymentType = 'regular';
+        daysToPay = recInterval;
+      }
+      
+      // Calculate new advance for next payment
+      // Calculate days until next payment
+      const nextPayment = new Date(currentPaymentDate);
+      nextPayment.setMonth(nextPayment.getMonth() + 1);
+      const daysUntilNextPayment = Math.floor((nextPayment - currentPaymentDate) / (1000 * 60 * 60 * 24));
+      daysInAdvance = recInterval - daysUntilNextPayment;
+    }
+    
+    const feeAmount = (recAmount * feePercent) / 100;
+    const totalAmount = actualAmount + feeAmount;
+    
+    simulationState.paymentHistory.push({
+      date: new Date(currentPaymentDate),
+      paymentForMonth: paymentForMonth,
+      platform: platformName,
+      paymentDay: paymentDay,
+      recAmount: recAmount,
+      actualAmount: actualAmount,
+      feeAmount: feeAmount,
+      feePercent: feePercent,
+      totalAmount: totalAmount,
+      paymentType: paymentType,
+      daysCovered: daysSinceLastPayment,
+      daysToPay: daysToPay,
+      daysInAdvance: daysInAdvance,
+      recInterval: recInterval
+    });
+    
+    // Move to next payment date
+    if (paymentType === 'first') {
+      // After first payment, jump to the payment day
+      lastPaymentDate = new Date(currentPaymentDate);
+      currentPaymentDate = new Date(nextPaymentDay);
+    } else {
+      // Regular monthly increment
+      lastPaymentDate = new Date(currentPaymentDate);
+      currentPaymentDate.setMonth(currentPaymentDate.getMonth() + 1);
+    }
+  }
+}
+
+function renderSimulationResults() {
+  const payments = simulationState.paymentHistory;
+
+  // Calculate summary stats
+  const totalPayments = payments.length;
+  const totalAmount = payments.reduce((sum, p) => sum + p.totalAmount, 0);
+  const avgPayment = totalPayments > 0 ? totalAmount / totalPayments : 0;
+  const adjustedPayments = payments.filter(p => p.paymentType === 'adjusted').length;
+
+  // Render summary stats
+  document.getElementById('summaryStats').innerHTML = `
+    <div class="simulation-stat-card">
+      <div class="simulation-stat-label">Total Payments</div>
+      <div class="simulation-stat-value">${totalPayments}</div>
+    </div>
+    <div class="simulation-stat-card">
+      <div class="simulation-stat-label">Total Amount</div>
+      <div class="simulation-stat-value">$${totalAmount.toFixed(2)}</div>
+    </div>
+    <div class="simulation-stat-card">
+      <div class="simulation-stat-label">Average Payment</div>
+      <div class="simulation-stat-value">$${avgPayment.toFixed(2)}</div>
+    </div>
+    <div class="simulation-stat-card">
+      <div class="simulation-stat-label">Adjusted Payments</div>
+      <div class="simulation-stat-value">${adjustedPayments}</div>
+    </div>
+  `;
+
+  // Set current date to today
+  const today = new Date();
+  document.getElementById('simulationCurrentDate').valueAsDate = today;
+
+  // Render calendar for current month
+  renderSimulationCalendar(today);
+
+  // Check if today has payment
+  checkDateForPayment(today);
+
+  // Add event listener for date change
+  document.getElementById('simulationCurrentDate').addEventListener('change', function() {
+    const selectedDate = new Date(this.value);
+    renderSimulationCalendar(selectedDate);
+    checkDateForPayment(selectedDate);
+  });
+}
+
+
+function renderSimulationCalendar(currentDate) {
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const monthName = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startDayOfWeek = firstDay.getDay();
+  
+  // Create payment days map for this month
+  const paymentDaysMap = {};
+  simulationState.paymentHistory.forEach(p => {
+    if (p.date.getFullYear() === year && p.date.getMonth() === month) {
+      paymentDaysMap[p.date.getDate()] = p;
+    }
+  });
+  
+  const calendarHTML = `
+    <div class="simulation-calendar-month-nav">
+      <div class="simulation-calendar-month-title">${monthName}</div>
+    </div>
+    <div class="simulation-calendar">
+      ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => 
+        `<div class="simulation-calendar-day-header">${day}</div>`
+      ).join('')}
+      ${Array(startDayOfWeek).fill(0).map(() => 
+        `<div class="simulation-calendar-day empty"></div>`
+      ).join('')}
+      ${Array(daysInMonth).fill(0).map((_, i) => {
+        const day = i + 1;
+        const isPaymentDay = paymentDaysMap[day];
+        const isSelected = day === currentDate.getDate();
+        return `<div class="simulation-calendar-day ${isPaymentDay ? 'payment-day' : ''} ${isSelected ? 'selected' : ''}" 
+                     onclick="selectCalendarDay(${year}, ${month}, ${day})">${day}</div>`;
+      }).join('')}
+    </div>
+  `;
+  
+  document.getElementById('simulationCalendar').innerHTML = calendarHTML;
+}
+
+function selectCalendarDay(year, month, day) {
+  const selectedDate = new Date(year, month, day);
+  document.getElementById('simulationCurrentDate').valueAsDate = selectedDate;
+  renderSimulationCalendar(selectedDate);
+  checkDateForPayment(selectedDate);
+}
+
+function checkDateForPayment(date) {
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+  
+  // Find payment for this date
+  const payment = simulationState.paymentHistory.find(p => 
+    p.date.getFullYear() === year && 
+    p.date.getMonth() === month && 
+    p.date.getDate() === day
+  );
+  
+  if (payment) {
+    // Show payment details
+    showPaymentDetails(payment);
+  } else {
+    // No payment on this date
+    document.getElementById('simulationPaymentDetails').innerHTML = `
+      <div style="text-align: center; padding: 40px; color: #9ca3af;">
+        <div style="font-size: 48px; margin-bottom: 16px;">📅</div>
+        <div style="font-size: 16px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">No Payment on This Date</div>
+        <div style="font-size: 14px;">Select a date with a payment (highlighted in purple)</div>
+      </div>
+    `;
+  }
+}
+
+function showPaymentDetails(payment, showHistory = false) {
+  let statusBadge = '';
+  let statusColor = '#10b981';
+
+  if (payment.paymentType === 'first') {
+    statusBadge = '<span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">FIRST PAYMENT</span>';
+  } else if (payment.paymentType === 'adjusted') {
+    statusBadge = '<span style="background: #f59e0b; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">ADJUSTED</span>';
+    statusColor = '#f59e0b';
+  } else if (payment.paymentType === 'overdue') {
+    statusBadge = '<span style="background: #ef4444; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">OVERDUE</span>';
+    statusColor = '#ef4444';
+  } else {
+    statusBadge = '<span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">REGULAR</span>';
+  }
+
+  // Get payment history (all payments from account creation to current date)
+  const history = simulationState.paymentHistory.filter(p => p.date <= payment.date);
+
+  let html = `
+    <div class="simulation-payment-card" style="background: white; border: 2px solid ${statusColor}; border-radius: 12px; padding: 24px; margin-bottom: 16px;">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+        <div>
+          <div style="font-size: 18px; font-weight: 700; color: #1f2937; margin-bottom: 8px;">
+            ${payment.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </div>
+          <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
+            Payment for ${payment.paymentForMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </div>
+          ${statusBadge}
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 32px; font-weight: 800; color: ${statusColor};">
+            $${payment.totalAmount.toFixed(2)}
+          </div>
+          <div style="font-size: 12px; color: #6b7280;">Total Amount</div>
+        </div>
+      </div>
+
+      <div style="background: #f9fafb; border-radius: 8px; padding: 16px; font-size: 13px; color: #374151; line-height: 1.8;">
+        <div style="font-weight: 700; color: #667eea; margin-bottom: 12px; font-size: 14px;"> Calculation Logic</div>
+        ${payment.paymentType === 'first' ? `
+          <div style="margin-bottom: 8px;"><strong> First Payment (Full Price)</strong></div>
+          <div style="padding-left: 16px; border-left: 3px solid #10b981;">
+            • Account created: ${simulationState.accountCreationDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}<br>
+            • Payment day set to: ${payment.paymentDay}<br>
+            • Days until next payment day: ${payment.daysCovered} days<br>
+            • Recurring interval: ${payment.recInterval} days<br>
+            <br>
+            <strong>Calculation:</strong><br>
+            • Base amount: $${payment.recAmount.toFixed(2)} (for ${payment.recInterval} days)<br>
+            • Fee (${payment.feePercent}%): $${payment.feeAmount.toFixed(2)}<br>
+            • <strong>Total: $${payment.totalAmount.toFixed(2)}</strong><br>
+            <br>
+            <strong>Days in advance:</strong> ${payment.recInterval} - ${payment.daysCovered} = <strong>${payment.daysInAdvance} days</strong><br>
+            <span style="color: #6b7280; font-size: 12px;">→ Next payment will be adjusted by ${payment.daysInAdvance} days</span>
+          </div>
+        ` : `
+          <div style="margin-bottom: 8px;"><strong>${payment.paymentType === 'adjusted' ? ' Adjusted Payment' : payment.paymentType === 'overdue' ? '⚠️ Overdue Payment' : '✓ Regular Payment'}</strong></div>
+          <div style="padding-left: 16px; border-left: 3px solid ${payment.paymentType === 'adjusted' ? '#f59e0b' : payment.paymentType === 'overdue' ? '#ef4444' : '#10b981'};">
+            • Days since last payment: ${payment.daysCovered} days<br>
+            • Recurring interval: ${payment.recInterval} days<br>
+            ${payment.daysInAdvance > 0 ? `• Days in advance from previous: <strong>${payment.daysInAdvance} days</strong><br>` : ''}
+            ${payment.daysInAdvance < 0 ? `• Days owed from previous: <strong>${Math.abs(payment.daysInAdvance)} days</strong><br>` : ''}
+            <br>
+            <strong>Calculation:</strong><br>
+            • Base recurring amount: $${payment.recAmount.toFixed(2)} (for ${payment.recInterval} days)<br>
+            • Price per day: $${(payment.recAmount / payment.recInterval).toFixed(2)}<br>
+            ${payment.daysInAdvance > 0 ? `
+            • Advance credit: ${payment.daysInAdvance} days × $${(payment.recAmount / payment.recInterval).toFixed(2)} = $${((payment.recAmount / payment.recInterval) * payment.daysInAdvance).toFixed(2)}<br>
+            • Adjusted amount: $${payment.recAmount.toFixed(2)} - $${((payment.recAmount / payment.recInterval) * payment.daysInAdvance).toFixed(2)} = <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
+            • Paying for: ${payment.daysToPay} days (${payment.recInterval} - ${payment.daysInAdvance})<br>
+            ` : payment.daysInAdvance < 0 ? `
+            • Owed amount: ${Math.abs(payment.daysInAdvance)} days × $${(payment.recAmount / payment.recInterval).toFixed(2)} = $${((payment.recAmount / payment.recInterval) * Math.abs(payment.daysInAdvance)).toFixed(2)}<br>
+            • Adjusted amount: $${payment.recAmount.toFixed(2)} + $${((payment.recAmount / payment.recInterval) * Math.abs(payment.daysInAdvance)).toFixed(2)} = <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
+            • Paying for: ${payment.daysToPay} days (${payment.recInterval} + ${Math.abs(payment.daysInAdvance)})<br>
+            ` : `
+            • No adjustment needed (exactly on schedule)<br>
+            • Amount: <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
+            • Paying for: ${payment.daysToPay} days<br>
+            `}
+            • Fee (${payment.feePercent}%): $${payment.feeAmount.toFixed(2)}<br>
+            • <strong>Total: $${payment.totalAmount.toFixed(2)}</strong><br>
+            <br>
+            ${(() => {
+              const nextPayment = new Date(payment.date);
+              nextPayment.setMonth(nextPayment.getMonth() + 1);
+              const daysUntilNext = Math.floor((nextPayment - payment.date) / (1000 * 60 * 60 * 24));
+              const newAdvance = payment.recInterval - daysUntilNext;
+              return `<strong>New advance for next payment:</strong> ${payment.recInterval} - ${daysUntilNext} = <strong>${newAdvance} days</strong><br>
+              <span style="color: #6b7280; font-size: 12px;">→ Next payment on ${nextPayment.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} will be ${newAdvance > 0 ? 'reduced' : newAdvance < 0 ? 'increased' : 'regular'}</span>`;
+            })()}
+          </div>
+        `}
+      </div>
+
+      ${!showHistory && history.length > 1 ? `
+        <button class="um-btn um-btn--ghost" onclick="showPaymentDetails(simulationState.paymentHistory.find(p => p.date.getTime() === ${payment.date.getTime()}), true)"
+                style="width: 100%; margin-top: 16px;">
+           Show Complete Payment History (${history.length} total payments)
+        </button>
+      ` : ''}
+    </div>
+  `;
+
+  if (showHistory && history.length > 0) {
+    html += `
+      <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 24px;">
+        <h4 style="margin: 0 0 16px 0; color: #374151; font-size: 16px; font-weight: 700;"> Complete Payment History</h4>
+        <div style="font-size: 13px; color: #6b7280; margin-bottom: 16px;">
+          From account creation (${simulationState.accountCreationDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
+          to ${payment.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          ${history.map(h => {
+            const paymentJson = JSON.stringify(h).replace(/"/g, '&quot;');
+            return `
+            <div onclick='showCalculationDetails(JSON.parse(this.getAttribute("data-payment")))'
+                 data-payment="${paymentJson}"
+                 style="background: ${h.date.getTime() === payment.date.getTime() ? '#f0f9ff' : '#f9fafb'};
+                        border: ${h.date.getTime() === payment.date.getTime() ? '2px solid #667eea' : '1px solid #e5e7eb'};
+                        border-radius: 8px; padding: 16px; display: flex; justify-content: space-between; align-items: center;
+                        cursor: pointer; transition: all 0.2s;"
+                 onmouseover="this.style.background='#f0f9ff'; this.style.borderColor='#667eea';"
+                 onmouseout="this.style.background='${h.date.getTime() === payment.date.getTime() ? '#f0f9ff' : '#f9fafb'}'; this.style.borderColor='${h.date.getTime() === payment.date.getTime() ? '#667eea' : '#e5e7eb'}';">
+              <div>
+                <div style="font-size: 14px; font-weight: 600; color: #374151;">
+                  ${h.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  ${h.date.getTime() === payment.date.getTime() ? '<span style="color: #667eea; font-size: 12px; margin-left: 8px;">← Current</span>' : ''}
+                </div>
+                <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                  ${h.paymentType === 'first' ? ' First payment' : h.paymentType === 'adjusted' ? ' Adjusted' : h.paymentType === 'overdue' ? ' Overdue' : '✓ Regular'}
+                  • For ${h.paymentForMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                </div>
+              </div>
+              <div style="display: flex; align-items: center; gap: 12px;">
+                <div style="font-size: 18px; font-weight: 700; color: ${h.date.getTime() === payment.date.getTime() ? '#667eea' : '#374151'};">
+                  $${h.totalAmount.toFixed(2)}
+                </div>
+                <div style="font-size: 12px; color: #9ca3af;">
+                   View
+                </div>
+              </div>
+            </div>
+          `;
+          }).join('')}
+        </div>
+        <div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid #e5e7eb; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div style="text-align: center;">
+            <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">Total Payments</div>
+            <div style="font-size: 24px; font-weight: 800; color: #667eea;">
+              ${history.length}
+            </div>
+          </div>
+          <div style="text-align: center;">
+            <div style="font-size: 14px; color: #6b7280; margin-bottom: 4px;">Total Paid</div>
+            <div style="font-size: 24px; font-weight: 800; color: #667eea;">
+              $${history.reduce((sum, h) => sum + h.totalAmount, 0).toFixed(2)}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  document.getElementById('simulationPaymentDetails').innerHTML = html;
+}
+
+
+function resetSimulation() {
+  const startDate = simulationState.accountCreationDate;
+  const endDate = new Date(startDate);
+  endDate.setMonth(endDate.getMonth() + 5);
+  
+  // Create payment days map
+  const paymentDaysMap = {};
+  payments.forEach(p => {
+    const key = `${p.date.getFullYear()}-${p.date.getMonth()}-${p.date.getDate()}`;
+    paymentDaysMap[key] = p;
+  });
+  
+  let calendarHTML = '';
+  let currentMonth = new Date(startDate.getFullYear(), startDate.getMonth(), 1);
+  
+  while (currentMonth <= endDate) {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const monthName = currentMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const daysInMonth = lastDay.getDate();
+    const startDayOfWeek = firstDay.getDay();
+    
+    calendarHTML += `
+      <div class="simulation-calendar-month-nav">
+        <div class="simulation-calendar-month-title">${monthName}</div>
+      </div>
+      <div class="simulation-calendar">
+        ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => 
+          `<div class="simulation-calendar-day-header">${day}</div>`
+        ).join('')}
+        ${Array(startDayOfWeek).fill(0).map(() => 
+          `<div class="simulation-calendar-day empty"></div>`
+        ).join('')}
+        ${Array(daysInMonth).fill(0).map((_, i) => {
+          const day = i + 1;
+          const key = `${year}-${month}-${day}`;
+          const isPaymentDay = paymentDaysMap[key];
+          return `<div class="simulation-calendar-day ${isPaymentDay ? 'payment-day' : ''}">${day}</div>`;
+        }).join('')}
+      </div>
+    `;
+    
+    currentMonth.setMonth(currentMonth.getMonth() + 1);
+  }
+  
+  document.getElementById('simulationCalendar').innerHTML = calendarHTML;
+}
+
+function resetSimulation() {
+  document.querySelector('.simulation-config').style.display = 'block';
+  document.getElementById('simulationResults').style.display = 'none';
+}
+
+function closePaymentSimulation() {
+  document.getElementById('paymentSimulationModal').style.display = 'none';
+}
+
+function showCalculationDetails(paymentData) {
+  const payment = typeof paymentData === 'string' ? JSON.parse(paymentData) : paymentData;
+  
+  // Convert date string back to Date object if needed
+  if (typeof payment.date === 'string') {
+    payment.date = new Date(payment.date);
+  }
+  if (typeof payment.paymentForMonth === 'string') {
+    payment.paymentForMonth = new Date(payment.paymentForMonth);
+  }
+  
+  let statusColor = '#10b981';
+  if (payment.paymentType === 'adjusted') statusColor = '#f59e0b';
+  else if (payment.paymentType === 'overdue') statusColor = '#ef4444';
+  
+  const html = `
+    <div style="background: white; border: 2px solid ${statusColor}; border-radius: 12px; padding: 24px;">
+      <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 16px;">
+        <div>
+          <div style="font-size: 18px; font-weight: 700; color: #1f2937; margin-bottom: 8px;">
+            ${payment.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          </div>
+          <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
+            Payment for ${payment.paymentForMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+          </div>
+        </div>
+        <div style="text-align: right;">
+          <div style="font-size: 32px; font-weight: 800; color: ${statusColor};">
+            $${payment.totalAmount.toFixed(2)}
+          </div>
+          <div style="font-size: 12px; color: #6b7280;">Total Amount</div>
+        </div>
+      </div>
+      
+      <div style="background: #f9fafb; border-radius: 8px; padding: 16px; font-size: 13px; color: #374151; line-height: 1.8;">
+        <div style="font-weight: 700; color: #667eea; margin-bottom: 12px; font-size: 14px;"> Calculation Logic</div>
+        ${payment.paymentType === 'first' ? `
+          <div style="margin-bottom: 8px;"><strong> First Payment (Full Price)</strong></div>
+          <div style="padding-left: 16px; border-left: 3px solid #10b981;">
+            • Account created: ${simulationState.accountCreationDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}<br>
+            • Payment day set to: ${payment.paymentDay}<br>
+            • Days until next payment day: ${payment.daysCovered} days<br>
+            • Recurring interval: ${payment.recInterval} days<br>
+            <br>
+            <strong>Calculation:</strong><br>
+            • Base amount: $${payment.recAmount.toFixed(2)} (for ${payment.recInterval} days)<br>
+            • Fee (${payment.feePercent}%): $${payment.feeAmount.toFixed(2)}<br>
+            • <strong>Total: $${payment.totalAmount.toFixed(2)}</strong><br>
+            <br>
+            <strong>Days in advance:</strong> ${payment.recInterval} - ${payment.daysCovered} = <strong>${payment.daysInAdvance} days</strong><br>
+            <span style="color: #6b7280; font-size: 12px;">→ Next payment will be adjusted by ${payment.daysInAdvance} days</span>
+          </div>
+        ` : `
+          <div style="margin-bottom: 8px;"><strong>${payment.paymentType === 'adjusted' ? ' Adjusted Payment' : payment.paymentType === 'overdue' ? '⚠️ Overdue Payment' : '✓ Regular Payment'}</strong></div>
+          <div style="padding-left: 16px; border-left: 3px solid ${payment.paymentType === 'adjusted' ? '#f59e0b' : payment.paymentType === 'overdue' ? '#ef4444' : '#10b981'};">
+            • Days since last payment: ${payment.daysCovered} days<br>
+            • Recurring interval: ${payment.recInterval} days<br>
+            ${payment.daysInAdvance > 0 ? `• Days in advance from previous: <strong>${payment.daysInAdvance} days</strong><br>` : ''}
+            ${payment.daysInAdvance < 0 ? `• Days owed from previous: <strong>${Math.abs(payment.daysInAdvance)} days</strong><br>` : ''}
+            <br>
+            <strong>Calculation:</strong><br>
+            • Base recurring amount: $${payment.recAmount.toFixed(2)} (for ${payment.recInterval} days)<br>
+            • Price per day: $${(payment.recAmount / payment.recInterval).toFixed(2)}<br>
+            ${payment.daysInAdvance > 0 ? `
+            • Advance credit: ${payment.daysInAdvance} days × $${(payment.recAmount / payment.recInterval).toFixed(2)} = $${((payment.recAmount / payment.recInterval) * payment.daysInAdvance).toFixed(2)}<br>
+            • Adjusted amount: $${payment.recAmount.toFixed(2)} - $${((payment.recAmount / payment.recInterval) * payment.daysInAdvance).toFixed(2)} = <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
+            • Paying for: ${payment.daysToPay} days (${payment.recInterval} - ${payment.daysInAdvance})<br>
+            ` : payment.daysInAdvance < 0 ? `
+            • Owed amount: ${Math.abs(payment.daysInAdvance)} days × $${(payment.recAmount / payment.recInterval).toFixed(2)} = $${((payment.recAmount / payment.recInterval) * Math.abs(payment.daysInAdvance)).toFixed(2)}<br>
+            • Adjusted amount: $${payment.recAmount.toFixed(2)} + $${((payment.recAmount / payment.recInterval) * Math.abs(payment.daysInAdvance)).toFixed(2)} = <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
+            • Paying for: ${payment.daysToPay} days (${payment.recInterval} + ${Math.abs(payment.daysInAdvance)})<br>
+            ` : `
+            • No adjustment needed (exactly on schedule)<br>
+            • Amount: <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
+            • Paying for: ${payment.daysToPay} days<br>
+            `}
+            • Fee (${payment.feePercent}%): $${payment.feeAmount.toFixed(2)}<br>
+            • <strong>Total: $${payment.totalAmount.toFixed(2)}</strong><br>
+            <br>
+            ${(() => {
+              const nextPayment = new Date(payment.date);
+              nextPayment.setMonth(nextPayment.getMonth() + 1);
+              const daysUntilNext = Math.floor((nextPayment - payment.date) / (1000 * 60 * 60 * 24));
+              const newAdvance = payment.recInterval - daysUntilNext;
+              return `<strong>New advance for next payment:</strong> ${payment.recInterval} - ${daysUntilNext} = <strong>${newAdvance} days</strong><br>
+              <span style="color: #6b7280; font-size: 12px;">→ Next payment on ${nextPayment.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} will be ${newAdvance > 0 ? 'reduced' : newAdvance < 0 ? 'increased' : 'regular'}</span>`;
+            })()}
+          </div>
+        `}
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('calculationDetailsBody').innerHTML = html;
+  document.getElementById('calculationDetailsModal').style.display = 'flex';
+}
+
+function closeCalculationDetails() {
+  document.getElementById('calculationDetailsModal').style.display = 'none';
+}
+
+function calculatePaymentHistory(startDate, endDate) {
+  simulationState.paymentHistory = [];
+  
+  client.feeTable.forEach((row, idx) => {
+    const paymentDay = row.paymentDay || 1;
+    const platformName = row.type || 'Unknown Platform';
+    const recInterval = parseInt(row.recInterval) || 30;
+    const recAmountStr = String(row.recAmount || "0").replace(/[$,]/g, "");
+    const recAmount = parseFloat(recAmountStr) || 0;
+    const feeStr = String(row.fee || "0").replace(/%/g, "");
+    const feePercent = parseFloat(feeStr) || 0;
+    
+    // Find first payment date (first occurrence of payment day after account creation)
+    let currentPaymentDate = new Date(startDate);
+    currentPaymentDate.setDate(paymentDay);
+    
+    // If payment day already passed this month, move to next month
+    if (currentPaymentDate < startDate) {
+      currentPaymentDate.setMonth(currentPaymentDate.getMonth() + 1);
+    }
+    
+    let lastPaymentDate = new Date(startDate);
+    let isFirstPayment = true;
+    let daysInAdvance = 0; // Track how many days were paid in advance
+    
+    // Generate all payments from start to end
+    while (currentPaymentDate <= endDate) {
+      const daysSinceLastPayment = Math.floor((currentPaymentDate - lastPaymentDate) / (1000 * 60 * 60 * 24));
+      
+      let actualAmount = recAmount;
+      let proRata = false;
+      let paymentType = 'regular';
+      
+      if (isFirstPayment) {
+        // First payment is ALWAYS full price (payment in advance for recInterval days)
+        actualAmount = recAmount;
+        proRata = false;
+        paymentType = 'first';
+        
+        // We're paying for recInterval days starting from account creation
+        // Calculate how many days until this payment
+        // If we're paying on day 34 but recInterval is 30, we have -4 advance (we're late)
+        // If we're paying on day 20 but recInterval is 30, we have +10 advance (we're early)
+        const daysCoveredByPayment = recInterval;
+        daysInAdvance = daysCoveredByPayment - daysSinceLastPayment;
+        
+        isFirstPayment = false;
+      } else {
+        // Subsequent payments: adjust based on advance payment
+        // We need to pay for daysSinceLastPayment days, but we already paid daysInAdvance
+        const daysOwed = daysSinceLastPayment - daysInAdvance;
+        
+        if (daysOwed <= 0) {
+          // We already paid for these days in advance, skip this payment
+          actualAmount = 0;
+          proRata = true;
+          paymentType = 'prepaid';
+          daysInAdvance = Math.abs(daysOwed);
+        } else if (daysOwed < recInterval) {
+          // Pay for the days we owe, less than full interval
+          actualAmount = (recAmount / recInterval) * daysOwed;
+          proRata = true;
+          paymentType = 'adjusted';
+          // Calculate new advance: we're paying for recInterval but only owe daysOwed
+          daysInAdvance = recInterval - daysOwed;
+        } else if (daysOwed > recInterval) {
+          // We owe more than the interval (overdue)
+          actualAmount = (recAmount / recInterval) * daysOwed;
+          proRata = true;
+          paymentType = 'overdue';
+          daysInAdvance = 0;
+        } else {
+          // Exactly recInterval days owed
+          actualAmount = recAmount;
+          proRata = false;
+          paymentType = 'regular';
+          daysInAdvance = 0;
+        }
+      }
+      
+      const feeAmount = (actualAmount * feePercent) / 100;
+      const totalAmount = actualAmount + feeAmount;
+      
+      simulationState.paymentHistory.push({
+        date: new Date(currentPaymentDate),
+        platform: platformName,
+        platformIdx: idx,
+        paymentDay: paymentDay,
+        recAmount: recAmount,
+        actualAmount: actualAmount,
+        feeAmount: feeAmount,
+        feePercent: feePercent,
+        totalAmount: totalAmount,
+        proRata: proRata,
+        paymentType: paymentType,
+        daysCovered: daysSinceLastPayment,
+        daysInAdvance: daysInAdvance,
+        recInterval: recInterval
+      });
+      
+      lastPaymentDate = new Date(currentPaymentDate);
+      currentPaymentDate.setMonth(currentPaymentDate.getMonth() + 1);
+    }
+  });
+  
+  // Sort by date
+  simulationState.paymentHistory.sort((a, b) => a.date - b.date);
+}
+
+function closePaymentSimulation() {
+  document.getElementById('paymentSimulationModal').style.display = 'none';
+}
+
+function showPaymentNotification(payments) {
+  const modal = document.getElementById('paymentNotificationModal');
+  const body = document.getElementById('paymentNotificationBody');
+
+  // Group payments by platform
+  const paymentsByPlatform = {};
+  payments.forEach(p => {
+    if (!paymentsByPlatform[p.platform]) {
+      paymentsByPlatform[p.platform] = [];
+    }
+    paymentsByPlatform[p.platform].push(p);
+  });
+
+  body.innerHTML = Object.entries(paymentsByPlatform).map(([platform, platformPayments]) => {
+    const currentPayment = platformPayments[0];
+
+    // Get history for this platform (payments before the current simulation date)
+    const platformHistory = simulationState.paymentHistory.filter(p =>
+      p.platform === platform && p.date < currentPayment.date
+    );
+
+    let statusBadge = '';
+    let statusColor = '#10b981';
+
+    if (currentPayment.paymentType === 'first') {
+      statusBadge = '<span style="background: #10b981; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">FIRST PAYMENT</span>';
+    } else if (currentPayment.paymentType === 'adjusted') {
+      statusBadge = '<span style="background: #f59e0b; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">ADJUSTED</span>';
+      statusColor = '#f59e0b';
+    } else if (currentPayment.paymentType === 'overdue') {
+      statusBadge = '<span style="background: #ef4444; color: white; padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;">OVERDUE</span>';
+      statusColor = '#ef4444';
+    }
+
+    return `
+      <div class="payment-notification-platform-section">
+        <div class="payment-notification-platform-header">
+          <span class="payment-notification-platform-icon">💳</span>
+          <span class="payment-notification-platform-name">${platform}</span>
+          ${statusBadge}
+        </div>
+
+        <div class="payment-notification-current" style="border-color: ${statusColor};">
+          <div class="payment-notification-current-label" style="color: ${statusColor};">
+            Today's Payment - Day ${currentPayment.paymentDay}
+          </div>
+          <div class="payment-notification-current-amount" style="color: ${statusColor};">
+            $${currentPayment.totalAmount.toFixed(2)}
+          </div>
+          <div class="payment-notification-current-details">
+            ${currentPayment.paymentType === 'first' ? `
+              🎉 First payment (Full price in advance)<br>
+              Days since account creation: ${currentPayment.daysCovered}<br>
+              Recurring: $${currentPayment.recAmount.toFixed(2)} + Fee: $${currentPayment.feeAmount.toFixed(2)}
+            ` : currentPayment.proRata ? `
+              Days covered: ${currentPayment.daysCovered} of ${currentPayment.recInterval}<br>
+              ${currentPayment.daysInAdvance > 0 ? `Advance remaining: ${currentPayment.daysInAdvance} days<br>` : ''}
+              Base: $${currentPayment.recAmount.toFixed(2)} → Adjusted: $${currentPayment.actualAmount.toFixed(2)}<br>
+              Fee (${currentPayment.feePercent}%): $${currentPayment.feeAmount.toFixed(2)}
+            ` : `
+              Regular payment<br>
+              Recurring: $${currentPayment.recAmount.toFixed(2)} + Fee: $${currentPayment.feeAmount.toFixed(2)}
+            `}
+          </div>
+        </div>
+
+        ${platformHistory.length > 0 ? `
+          <div class="payment-notification-history">
+            <div class="payment-notification-history-title">
+              📜 Payment History (${platformHistory.length} previous)
+            </div>
+            ${platformHistory.slice(-5).reverse().map(h => `
+              <div class="payment-notification-history-item">
+                <div>
+                  <div class="payment-notification-history-date">
+                    ${h.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </div>
+                  <div style="font-size: 11px; color: #9ca3af; margin-top: 2px;">
+                    ${h.paymentType === 'first' ? 'First payment' : h.proRata ? 'Adjusted' : 'Regular'}
+                  </div>
+                </div>
+                <div class="payment-notification-history-amount">
+                  $${h.totalAmount.toFixed(2)}
+                </div>
+              </div>
+            `).join('')}
+            ${platformHistory.length > 5 ? `
+              <div style="text-align: center; font-size: 12px; color: #9ca3af; margin-top: 8px;">
+                + ${platformHistory.length - 5} more payments
+              </div>
+            ` : ''}
+          </div>
+        ` : `
+          <div style="text-align: center; padding: 12px; color: #9ca3af; font-size: 13px;">
+            No previous payments
+          </div>
+        `}
+      </div>
+    `;
+  }).join('');
+
+  modal.style.display = 'block';
+}
+
+function closePaymentNotification() {
+  const modal = document.getElementById('paymentNotificationModal');
+  modal.style.display = 'none';
+}
+
+// Show payment notification for a specific day in simulation
+function showPaymentForDay(day) {
+  const currentDate = new Date(simulationState.currentDate);
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  
+  // Find payments for this specific day
+  const dayPayments = simulationState.paymentHistory.filter(p => {
+    return p.date.getFullYear() === year && 
+           p.date.getMonth() === month && 
+           p.date.getDate() === day;
+  });
+  
+  if (dayPayments.length > 0) {
+    // Temporarily update simulation current date to show correct history
+    const originalDate = new Date(simulationState.currentDate);
+    simulationState.currentDate = new Date(year, month, day);
+    
+    showPaymentNotification(dayPayments);
+    
+    // Restore original date
+    simulationState.currentDate = originalDate;
+  }
+}
+
+// Check if today is a payment day and show notification
+function checkTodayPayments() {
+  if (!client || !client.feeTable || client.feeTable.length === 0) return;
+  
+  const today = new Date();
+  const currentDay = today.getDate();
+  
+  // Get account creation date
+  const createdDate = client.created ? new Date(client.created) : new Date('2026-01-01');
+  
+  // Initialize simulation state
+  simulationState.currentDate = today;
+  simulationState.accountCreationDate = createdDate;
+  simulationState.paymentHistory = [];
+  
+  // Calculate all payments from account creation to today
+  calculatePaymentHistory(createdDate, today);
+  
+  // Find payments that happen today
+  const todayPayments = simulationState.paymentHistory.filter(p => {
+    return p.date.getFullYear() === today.getFullYear() &&
+           p.date.getMonth() === today.getMonth() &&
+           p.date.getDate() === currentDay;
+  });
+  
+  // If there are payments today, show the notification
+  if (todayPayments.length > 0) {
+    setTimeout(() => {
+      showPaymentNotification(todayPayments);
+    }, 500);
+  }
+}
+
+function setSimulationDate() {
+  const dateInput = document.getElementById('simulationStartDate');
+  if (dateInput.value) {
+    const newDate = new Date(dateInput.value);
+    
+    // Recalculate history up to new date
+    calculatePaymentHistory(simulationState.accountCreationDate, newDate);
+    simulationState.currentDate = newDate;
+    
+    renderPaymentSimulation();
+  }
+}
+
+function resetToToday() {
+  const today = new Date();
+  
+  // Recalculate history up to today
+  calculatePaymentHistory(simulationState.accountCreationDate, today);
+  simulationState.currentDate = today;
+  
+  document.getElementById('simulationStartDate').valueAsDate = simulationState.currentDate;
+  renderPaymentSimulation();
+}
+
+function nextMonth() {
+  // Move to next month
+  simulationState.currentDate.setMonth(simulationState.currentDate.getMonth() + 1);
+  
+  // Recalculate history up to new date
+  calculatePaymentHistory(simulationState.accountCreationDate, simulationState.currentDate);
+  
+  document.getElementById('simulationStartDate').valueAsDate = simulationState.currentDate;
+  renderPaymentSimulation();
+}
+
+function previousMonth() {
+  // Move to previous month
+  simulationState.currentDate.setMonth(simulationState.currentDate.getMonth() - 1);
+  
+  // Recalculate history up to new date
+  calculatePaymentHistory(simulationState.accountCreationDate, simulationState.currentDate);
+  
+  document.getElementById('simulationStartDate').valueAsDate = simulationState.currentDate;
+  renderPaymentSimulation();
+}
+
+function renderPaymentSimulation() {
+  const currentDate = new Date(simulationState.currentDate);
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth();
+  const monthName = currentDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  
+  // Update navigation
+  document.getElementById('currentMonthDisplay').textContent = monthName;
+  document.getElementById('prevMonthBtn').disabled = false;
+  document.getElementById('nextMonthBtn').disabled = false;
+  
+  // Get payments for current month
+  const currentMonthPayments = simulationState.paymentHistory.filter(p => {
+    return p.date.getFullYear() === year && p.date.getMonth() === month;
+  });
+  
+  // Get payments before current month (history)
+  const historyPayments = simulationState.paymentHistory.filter(p => {
+    return p.date < new Date(year, month, 1);
+  });
+  
+  // Check if today is a payment day and show notification
+  const currentDay = currentDate.getDate();
+  const todayPayments = currentMonthPayments.filter(p => p.date.getDate() === currentDay);
+  
+  if (todayPayments.length > 0) {
+    // Show payment notification modal
+    setTimeout(() => {
+      showPaymentNotification(todayPayments);
+    }, 300);
+  }
+  
+  // Render payment history
+  const historyContainer = document.getElementById('paymentHistory');
+  if (historyPayments.length > 0) {
+    historyContainer.style.display = 'block';
+    
+    // Group by platform
+    const groupedByPlatform = {};
+    historyPayments.forEach(p => {
+      if (!groupedByPlatform[p.platform]) {
+        groupedByPlatform[p.platform] = [];
+      }
+      groupedByPlatform[p.platform].push(p);
+    });
+    
+    historyContainer.innerHTML = `
+      <div class="payment-history-title">
+        📜 Payment History
+      </div>
+      <div class="payment-history-list">
+        ${Object.entries(groupedByPlatform).map(([platform, payments]) => {
+          const lastPayment = payments[payments.length - 1];
+          const totalPaid = payments.reduce((sum, p) => sum + p.totalAmount, 0);
+          
+          return `
+            <div class="history-item">
+              <div class="history-item-left">
+                <div class="history-item-month">
+                  ${platform} - Day ${lastPayment.paymentDay}
+                </div>
+                <div class="history-item-platforms">
+                  ${payments.length} payment(s) made • Last: ${lastPayment.date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })} - $${lastPayment.totalAmount.toFixed(2)}
+                  ${lastPayment.paymentType === 'first' ? ' (First payment - Full price)' : ''}
+                  ${lastPayment.paymentType === 'adjusted' ? ' (Adjusted)' : ''}
+                </div>
+              </div>
+              <div class="history-item-amount">
+                <div style="font-size: 12px; color: #6b7280; font-weight: 400;">Total Paid</div>
+                $${totalPaid.toFixed(2)}
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } else {
+    historyContainer.style.display = 'none';
+  }
+  
+  // Generate month data for calendar
+  const monthData = generateMonthCalendarData(currentDate, currentMonthPayments);
+  
+  // Render single month
+  const monthsContainer = document.getElementById('simulationMonths');
+  monthsContainer.innerHTML = `
+    <div class="month-card current-month" style="max-width: 600px; margin: 0 auto;">
+      <div class="month-header">
+        ${monthData.monthName}
+        <span style="color: #667eea;">● Current Month</span>
+      </div>
+      ${renderCalendar(monthData)}
+      <div class="month-payments">
+        ${currentMonthPayments.length > 0 ? 
+          currentMonthPayments.map(p => {
+            let statusText = '';
+            let statusColor = '';
+            
+            if (p.paymentType === 'first') {
+              statusText = ' First Payment - Full Price (In Advance)';
+              statusColor = '#10b981';
+            } else if (p.paymentType === 'adjusted') {
+              statusText = ` Adjusted Payment (${p.daysInAdvance} days advance remaining)`;
+              statusColor = '#f59e0b';
+            } else if (p.paymentType === 'overdue') {
+              statusText = ' Overdue Payment (Extra days charged)';
+              statusColor = '#ef4444';
+            } else {
+              statusText = '✓ Regular Payment';
+              statusColor = '#10b981';
+            }
+            
+            return `
+            <div class="payment-item ${p.proRata ? 'prorata' : ''}">
+              <div class="payment-platform"> ${p.platform} - Payment Processed!</div>
+              <div class="payment-amount">Total: $${p.totalAmount.toFixed(2)}</div>
+              <div class="payment-details">
+                <strong style="color: ${statusColor};">${statusText}</strong><br>
+                ${p.paymentType === 'first' ? 
+                  `Days since account creation: ${p.daysCovered}<br>
+                   Paying full amount in advance<br>
+                   Recurring: $${p.recAmount.toFixed(2)} + Fee (${p.feePercent}%): $${p.feeAmount.toFixed(2)}` :
+                  p.proRata ? 
+                    `Days covered: ${p.daysCovered} (${p.recInterval} day interval)<br>
+                     Base amount: $${p.recAmount.toFixed(2)} → Adjusted: $${p.actualAmount.toFixed(2)}<br>
+                     Fee (${p.feePercent}%): $${p.feeAmount.toFixed(2)}` : 
+                    `Recurring: $${p.recAmount.toFixed(2)} + Fee (${p.feePercent}%): $${p.feeAmount.toFixed(2)}`
+                }
+              </div>
+            </div>
+          `}).join('') : 
+          '<div style="color: #9ca3af; font-size: 14px; text-align: center; padding: 20px; background: #f9fafb; border-radius: 8px;">✓ No payments scheduled for this month</div>'
+        }
+      </div>
+    </div>
+  `;
+  
+  // Render summary for current month
+  const totalAmount = currentMonthPayments.reduce((sum, p) => sum + p.totalAmount, 0);
+  const totalPayments = currentMonthPayments.length;
+  const proRataPayments = currentMonthPayments.filter(p => p.proRata).length;
+  const totalHistoryAmount = historyPayments.reduce((sum, p) => sum + p.totalAmount, 0);
+  
+  document.getElementById('paymentSummary').innerHTML = `
+    <div class="summary-title">Summary - ${monthName}</div>
+    <div class="summary-grid">
+      <div class="summary-item">
+        <div class="summary-label">This Month</div>
+        <div class="summary-value">${totalPayments}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">This Month Amount</div>
+        <div class="summary-value">$${totalAmount.toFixed(2)}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">Total History</div>
+        <div class="summary-value">$${totalHistoryAmount.toFixed(2)}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">All Time Total</div>
+        <div class="summary-value">$${(totalAmount + totalHistoryAmount).toFixed(2)}</div>
+      </div>
+    </div>
+  `;
+}
+
+function generateMonthCalendarData(monthDate, payments) {
+  const year = monthDate.getFullYear();
+  const month = monthDate.getMonth();
+  const monthName = monthDate.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+  
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  const daysInMonth = lastDay.getDate();
+  const startDayOfWeek = firstDay.getDay();
+  
+  const paymentDays = new Set(payments.map(p => p.date.getDate()));
+  
+  return {
+    monthName,
+    year,
+    month,
+    daysInMonth,
+    startDayOfWeek,
+    payments,
+    paymentDays
+  };
+}
+
+function renderCalendar(monthData) {
+  const simulationDate = new Date(simulationState.currentDate);
+  const isCurrentMonth = monthData.year === simulationDate.getFullYear() && monthData.month === simulationDate.getMonth();
+  const todayDate = simulationDate.getDate();
+  
+  let html = '<div class="month-calendar">';
+  
+  // Day headers
+  const dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  dayHeaders.forEach(day => {
+    html += `<div class="calendar-day-header">${day}</div>`;
+  });
+  
+  // Empty cells before first day
+  for (let i = 0; i < monthData.startDayOfWeek; i++) {
+    html += '<div class="calendar-day empty"></div>';
+  }
+  
+  // Days
+  for (let day = 1; day <= monthData.daysInMonth; day++) {
+    const isToday = isCurrentMonth && day === todayDate;
+    const isPaymentDay = monthData.paymentDays.has(day);
+    
+    let classes = 'calendar-day';
+    if (isToday) classes += ' today';
+    if (isPaymentDay) classes += ' payment-day';
+    
+    const clickHandler = isPaymentDay ? `onclick="showPaymentForDay(${day})"` : '';
+    const cursorStyle = isPaymentDay ? 'cursor: pointer;' : '';
+    
+    html += `<div class="${classes}" ${clickHandler} style="${cursorStyle}">${day}</div>`;
+  }
+  
+  html += '</div>';
+  return html;
+}
+
 // ===== Event Listeners =====
 els.feeBody.addEventListener("click", (e) => {
   const openBtn = e.target.closest("[data-discount-open]");
@@ -950,6 +2116,9 @@ if (client){
 }
 renderAll();
 
+// Check if today is a payment day and show notification automatically
+checkTodayPayments();
+
 // Profile events
 els.editBtn.addEventListener("click", enterEdit);
 els.cancelBtn.addEventListener("click", () => exitEdit(true));
@@ -964,6 +2133,7 @@ els.netSaveBtn.addEventListener("click", saveNetFees);
 els.feeEditBtn.addEventListener("click", enterFeeEdit);
 els.feeCancelBtn.addEventListener("click", () => exitFeeEdit(true));
 els.feeSaveBtn.addEventListener("click", saveFeeTable);
+els.simulatePaymentBtn.addEventListener("click", simulatePaymentDay);
 
 // Notification thresholds events
 els.thresholdEditBtn.addEventListener("click", enterThresholdEdit);
