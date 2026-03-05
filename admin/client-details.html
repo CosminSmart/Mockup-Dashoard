@@ -858,79 +858,70 @@
     <div class="simulation-overlay" onclick="closePaymentSimulation()"></div>
     <div class="simulation-content">
       <div class="simulation-header">
-        <h2>💰 Payment Day Simulation</h2>
+        <h2>Payment Day Simulation</h2>
         <button class="simulation-close" onclick="closePaymentSimulation()">✕</button>
       </div>
       
       <div class="simulation-body">
         <!-- Configuration Form -->
         <div class="simulation-config">
-          <h3 style="margin: 0 0 16px 0; color: #374151; font-size: 16px;">Simulation Parameters</h3>
+          <h3 style="margin: 0 0 16px 0; color: #111827; font-size: 16px;">Simulation Parameters</h3>
           <div class="simulation-config-grid">
             <div class="simulation-input-group">
               <label>Account Creation Date</label>
               <input type="date" id="simAccountCreated" />
             </div>
             <div class="simulation-input-group">
-              <label>Payment Day (1-31)</label>
+              <label>Billing Day (1-31)</label>
               <input type="number" id="simPaymentDay" min="1" max="31" value="4" />
             </div>
             <div class="simulation-input-group">
-              <label>Recurring Interval (days)</label>
-              <input type="number" id="simRecInterval" min="1" value="30" />
+              <label>Initial Amount ($)</label>
+              <input type="number" id="simInitialAmount" min="0" step="0.01" value="50" />
+            </div>
+            <div class="simulation-input-group">
+              <label>Initial Interval (days)</label>
+              <input type="number" id="simInitialInterval" min="1" value="30" />
             </div>
             <div class="simulation-input-group">
               <label>Recurring Amount ($)</label>
               <input type="number" id="simRecAmount" min="0" step="0.01" value="50" />
             </div>
             <div class="simulation-input-group">
-              <label>Fee (%)</label>
-              <input type="number" id="simFeePercent" min="0" max="100" step="0.1" value="5" />
+              <label>Recurring Interval (days)</label>
+              <input type="number" id="simRecInterval" min="1" value="30" />
             </div>
             <div class="simulation-input-group">
               <label>Platform Name</label>
               <input type="text" id="simPlatformName" value="Google Ads" />
             </div>
           </div>
-          <button class="um-btn um-btn--primary" onclick="runSimulation()" style="width: 100%; margin-top: 16px;">
-             Run Simulation (Next 5 Months)
+          <button class="um-btn um-btn--primary" onclick="runSimulation()" style="width: 100%; margin-top: 16px; background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); border: none; color: white; padding: 12px; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);" onmouseover="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(59, 130, 246, 0.3)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(59, 130, 246, 0.2)'">
+            Run Simulation
           </button>
         </div>
 
         <!-- Results Container -->
         <div id="simulationResults" style="display: none;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-            <h3 style="margin: 0; color: #374151; font-size: 16px;">Simulation Results</h3>
-            <button class="um-btn um-btn--ghost" onclick="resetSimulation()" style="padding: 6px 12px; font-size: 13px;">
-              ← Back to Config
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #e5e7eb;">
+            <h3 style="margin: 0; color: #111827; font-size: 18px; font-weight: 600;">Payment Simulation</h3>
+            <button class="um-btn um-btn--ghost" onclick="resetSimulation()" style="padding: 8px 16px; font-size: 14px; background: white; border: 1px solid #e2e8f0; color: #475569; border-radius: 8px; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#cbd5e1'" onmouseout="this.style.background='white'; this.style.borderColor='#e2e8f0'">
+              New Simulation
             </button>
           </div>
           
           <!-- Summary Stats -->
-          <div class="simulation-summary-stats" id="summaryStats"></div>
+          <div id="summaryStats"></div>
           
-          <!-- Split Layout: Calendar + Payment List -->
-          <div class="simulation-split-layout">
-            <!-- Left: Calendar -->
-            <div class="simulation-calendar-section">
-              <h4 style="margin: 0 0 12px 0; color: #374151; font-size: 14px; font-weight: 600;">📅 Select Date</h4>
-              
-              <!-- Date Picker -->
-              <div style="margin-bottom: 16px;">
-                <input type="date" id="simulationCurrentDate" style="width: 100%; padding: 10px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;" />
-              </div>
-              
-              <!-- Calendar for current month -->
-              <div id="simulationCalendar"></div>
-            </div>
+          <!-- Modern Layout: Payment List + Details Side by Side -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 24px;">
+            <!-- Left: Payment Schedule -->
+            <div id="simulationCalendar"></div>
             
             <!-- Right: Payment Details -->
-            <div class="simulation-payments-section">
-              <h4 style="margin: 0 0 12px 0; color: #374151; font-size: 14px; font-weight: 600;">💰 Payment Details</h4>
-              <div id="simulationPaymentDetails">
-                <div style="text-align: center; padding: 40px; color: #9ca3af;">
-                  Select a date to see payment details
-                </div>
+            <div id="simulationPaymentDetails">
+              <div style="background: #f9fafb; border-radius: 8px; padding: 40px; text-align: center; color: #6b7280; border: 1px solid #e5e7eb;">
+                <div style="font-size: 14px; font-weight: 500;">Select a payment to view details</div>
               </div>
             </div>
           </div>
@@ -944,7 +935,7 @@
     <div class="calculation-overlay" onclick="closeCalculationDetails()"></div>
     <div class="calculation-modal-content">
       <div class="calculation-modal-header">
-        <h3 style="margin: 0; color: #374151; font-size: 18px; font-weight: 700;"> Payment Calculation Details</h3>
+        <h3 style="margin: 0; color: #111827; font-size: 18px; font-weight: 700;">Payment Calculation Details</h3>
         <button class="calculation-close" onclick="closeCalculationDetails()">✕</button>
       </div>
       <div id="calculationDetailsBody" class="calculation-modal-body">
@@ -1138,46 +1129,47 @@
     .simulation-overlay {
       position: absolute;
       inset: 0;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(4px);
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(2px);
     }
 
     .simulation-content {
       position: relative;
-      background: #fff;
-      border-radius: 16px;
+      background: #ffffff;
+      border-radius: 12px;
       width: 95%;
       max-width: 1200px;
       max-height: 90vh;
       overflow: hidden;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       display: flex;
       flex-direction: column;
     }
 
     .simulation-header {
-      padding: 20px 24px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 24px 32px;
+      border-bottom: 1px solid #e5e7eb;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: linear-gradient(to right, #f8fafc, #f1f5f9);
+      color: #475569;
     }
 
     .simulation-header h2 {
       margin: 0;
       font-size: 20px;
-      font-weight: 700;
+      font-weight: 600;
+      color: #334155;
     }
 
     .simulation-close {
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
-      color: white;
-      font-size: 24px;
-      width: 36px;
-      height: 36px;
+      background: white;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
+      font-size: 20px;
+      width: 32px;
+      height: 32px;
       border-radius: 8px;
       cursor: pointer;
       display: flex;
@@ -1187,21 +1179,24 @@
     }
 
     .simulation-close:hover {
-      background: rgba(255, 255, 255, 0.3);
-      transform: scale(1.1);
+      background: #f8fafc;
+      color: #475569;
+      border-color: #cbd5e1;
     }
 
     .simulation-body {
-      padding: 24px;
+      padding: 32px;
       overflow-y: auto;
       flex: 1;
+      background: #f8fafc;
     }
 
     .simulation-config {
-      background: #f8f9fa;
+      background: #ffffff;
       border-radius: 12px;
-      padding: 20px;
-      border: 2px solid #e5e7eb;
+      padding: 24px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     }
 
     .simulation-config-grid {
@@ -1218,22 +1213,25 @@
 
     .simulation-input-group label {
       font-size: 13px;
-      font-weight: 600;
-      color: #374151;
+      font-weight: 500;
+      color: #475569;
     }
 
     .simulation-input-group input {
       padding: 10px 12px;
-      border: 1px solid #d1d5db;
+      border: 1px solid #e2e8f0;
       border-radius: 8px;
       font-size: 14px;
       transition: all 0.2s;
+      background: #ffffff;
+      color: #334155;
     }
 
     .simulation-input-group input:focus {
       outline: none;
-      border-color: #667eea;
-      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      border-color: #94a3b8;
+      box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.1);
+      background: #f8fafc;
     }
 
     .simulation-summary-stats {
@@ -1244,22 +1242,24 @@
     }
 
     .simulation-stat-card {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      color: #334155;
       padding: 16px;
-      border-radius: 10px;
+      border-radius: 12px;
       text-align: center;
+      border: 1px solid #e2e8f0;
     }
 
     .simulation-stat-label {
       font-size: 12px;
-      opacity: 0.9;
+      color: #64748b;
       margin-bottom: 4px;
     }
 
     .simulation-stat-value {
       font-size: 24px;
-      font-weight: 800;
+      font-weight: 600;
+      color: #3b82f6;
     }
 
     .simulation-months-list {
@@ -1327,17 +1327,17 @@
     }
 
     .simulation-calendar-day.payment-day {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
       color: white;
-      font-weight: 700;
+      font-weight: 600;
       border: none;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
     }
 
     .simulation-calendar-day.payment-day:hover {
-      transform: scale(1.1);
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(59, 130, 246, 0.4);
     }
 
     .simulation-calendar-month-nav {
@@ -1363,15 +1363,16 @@
 
     .simulation-month-card {
       background: white;
-      border: 2px solid #e5e7eb;
+      border: 1px solid #e2e8f0;
       border-radius: 12px;
       padding: 20px;
       transition: all 0.2s;
     }
 
     .simulation-month-card:hover {
-      border-color: #667eea;
-      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+      transform: translateY(-2px);
     }
 
     .simulation-month-header {
@@ -1391,8 +1392,8 @@
 
     .simulation-month-total {
       font-size: 20px;
-      font-weight: 800;
-      color: #667eea;
+      font-weight: 600;
+      color: #3b82f6;
     }
 
     .simulation-payment-item {
@@ -1762,6 +1763,7 @@
   </style>
 
   <script src="../js/admin-client-details.js"></script>
+  <script src="../js/payment-logic-fixed.js"></script>
   <script src="../js/sidebar.js"></script>
 </body>
 </html>

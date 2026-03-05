@@ -926,14 +926,15 @@ function simulatePaymentDay() {
 function runSimulation() {
   // Get input values
   const accountCreated = new Date(document.getElementById('simAccountCreated').value);
-  const paymentDay = parseInt(document.getElementById('simPaymentDay').value);
-  const recInterval = parseInt(document.getElementById('simRecInterval').value);
+  const billingDay = parseInt(document.getElementById('simPaymentDay').value);
+  const initialAmount = parseFloat(document.getElementById('simInitialAmount').value);
+  const initialInterval = parseInt(document.getElementById('simInitialInterval').value);
   const recAmount = parseFloat(document.getElementById('simRecAmount').value);
-  const feePercent = parseFloat(document.getElementById('simFeePercent').value);
+  const recInterval = parseInt(document.getElementById('simRecInterval').value);
   const platformName = document.getElementById('simPlatformName').value || 'Platform';
   
   // Validate inputs
-  if (!accountCreated || isNaN(paymentDay) || isNaN(recInterval) || isNaN(recAmount) || isNaN(feePercent)) {
+  if (!accountCreated || isNaN(billingDay) || isNaN(initialAmount) || isNaN(initialInterval) || isNaN(recAmount) || isNaN(recInterval)) {
     alert('Please fill in all fields with valid values');
     return;
   }
@@ -947,7 +948,7 @@ function runSimulation() {
   simulationState.paymentHistory = [];
   
   // Calculate payments
-  calculateSimulationPayments(accountCreated, endDate, paymentDay, recInterval, recAmount, feePercent, platformName);
+  calculateSimulationPayments(accountCreated, endDate, billingDay, initialAmount, initialInterval, recAmount, recInterval, platformName);
   
   // Show results
   document.querySelector('.simulation-config').style.display = 'none';
@@ -956,155 +957,204 @@ function runSimulation() {
   renderSimulationResults();
 }
 
-function calculateSimulationPayments(startDate, endDate, paymentDay, recInterval, recAmount, feePercent, platformName) {
+function calculateSimulationPayments(startDate, endDate, billingDay, initialAmount, initialInterval, recAmount, recInterval, platformName) {
   simulationState.paymentHistory = [];
   
-  // First payment is taken IMMEDIATELY on account creation (in advance)
-  let currentPaymentDate = new Date(startDate); // First payment = account creation date
-  let lastPaymentDate = new Date(startDate);
-  let isFirstPayment = true;
-  let daysInAdvance = 0;
+  // Helper functions
+  const daysBetween = (date1, date2) => Math.floor((date2 - date1) / (1000 * 60 * 60 * 24));
+  const addDays = (date, days) => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  };
   
-  // Calculate when the next payment day would be
-  let nextPaymentDay = new Date(startDate);
-  nextPaymentDay.setDate(paymentDay);
-  if (nextPaymentDay <= startDate) {
-    nextPaymentDay.setMonth(nextPaymentDay.getMonth() + 1);
+  const creationDate = new Date(startDate);
+  
+  // 1️⃣ Calculate when initial interval ends
+  const initialEndDate = addDays(creationDate, initialInterval);
+  
+  // 2️⃣ Find first billing date (first occurrence of billingDay after creation)
+  let firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth(), billingDay);
+  if (firstBillingDate <= creationDate) {
+    firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth() + 1, billingDay);
   }
   
-  while (currentPaymentDate <= endDate) {
-    const daysSinceLastPayment = Math.floor((currentPaymentDate - lastPaymentDate) / (1000 * 60 * 60 * 24));
+  // 3️⃣ Calculate prorata for first billing
+  const billingMonthEnd = new Date(firstBillingDate.getFullYear(), firstBillingDate.getMonth() + 1, 0);
+  
+  let prorataDays = 0;
+  let prorataAmount = 0;
+  
+  // If initial interval ends before the end of billing month, we need prorata
+  if (initialEndDate < billingMonthEnd) {
+    prorataDays = daysBetween(initialEndDate, billingMonthEnd);
+    const dailyRate = recAmount / recInterval;
+    prorataAmount = prorataDays * dailyRate;
+  }
+  
+  const firstInvoiceAmount = initialAmount + prorataAmount;
+  
+  // 4️⃣ Add first invoice
+  simulationState.paymentHistory.push({
+    date: new Date(firstBillingDate),
+    platform: platformName,
+    billingDay: billingDay,
+    recAmount: recAmount,
+    recInterval: recInterval,
+    paymentType: 'first',
+    initialAmount: initialAmount,
+    initialInterval: initialInterval,
+    initialEndDate: new Date(initialEndDate),
+    prorataAmount: prorataAmount,
+    prorataDays: prorataDays,
+    actualAmount: firstInvoiceAmount,
+    totalAmount: firstInvoiceAmount,
+    daysCovered: initialInterval + prorataDays,
+    explanation: `Initial: $${initialAmount} + Prorata: $${prorataAmount.toFixed(2)}`
+  });
+  
+  // 5️⃣ Calculate subsequent recurring payments
+  let currentBillingDate = new Date(firstBillingDate);
+  currentBillingDate.setMonth(currentBillingDate.getMonth() + 1);
+  
+  while (currentBillingDate <= endDate) {
+    const currentMonthStart = new Date(currentBillingDate.getFullYear(), currentBillingDate.getMonth(), 1);
+    const currentMonthEnd = new Date(currentBillingDate.getFullYear(), currentBillingDate.getMonth() + 1, 0);
+    const daysInMonth = currentMonthEnd.getDate();
     
-    let actualAmount = recAmount;
-    let paymentType = 'regular';
-    let daysToPay = recInterval;
-    let paymentForMonth = new Date(currentPaymentDate);
-    paymentForMonth.setMonth(paymentForMonth.getMonth() + 1); // Payment is for NEXT month
+    let amount = 0;
+    let daysCovered = 0;
+    let paymentType = 'recurring';
+    let explanation = '';
     
-    if (isFirstPayment) {
-      // First payment on account creation date (full price for recInterval days)
-      actualAmount = recAmount;
-      paymentType = 'first';
-      daysToPay = recInterval;
-      
-      // Calculate days in advance
-      // We pay for recInterval (30) days, but only daysUntilNextPayment will pass
-      const daysUntilNextPayment = Math.floor((nextPaymentDay - startDate) / (1000 * 60 * 60 * 24));
-      daysInAdvance = recInterval - daysUntilNextPayment;
-      
-      isFirstPayment = false;
+    // Check if this month is partially covered by initial interval
+    if (initialEndDate >= currentMonthStart && initialEndDate < currentMonthEnd) {
+      // Part of this month is covered by initial interval
+      // We only charge for days after initialEndDate
+      const uncoveredDays = daysBetween(initialEndDate, currentMonthEnd);
+      daysCovered = uncoveredDays;
+      const dailyRate = recAmount / recInterval;
+      amount = uncoveredDays * dailyRate;
+      paymentType = 'prorata';
+      explanation = `Prorata: days ${initialEndDate.getDate() + 1}-${currentMonthEnd.getDate()} (${uncoveredDays} days)`;
+    } else if (initialEndDate >= currentMonthEnd) {
+      // This entire month is covered by initial interval - skip
+      currentBillingDate.setMonth(currentBillingDate.getMonth() + 1);
+      continue;
     } else {
-      // Subsequent payments
-      // If we have days in advance from previous payment, deduct them
-      
-      if (daysInAdvance > 0) {
-        // We have credit from previous payment
-        // Pay full amount minus the advance days
-        const advanceAmount = (recAmount / recInterval) * daysInAdvance;
-        actualAmount = recAmount - advanceAmount;
-        paymentType = 'adjusted';
-        daysToPay = recInterval - daysInAdvance;
-      } else if (daysInAdvance < 0) {
-        // We owe days from previous payment
-        // Pay full amount plus the owed days
-        const owedAmount = (recAmount / recInterval) * Math.abs(daysInAdvance);
-        actualAmount = recAmount + owedAmount;
-        paymentType = 'overdue';
-        daysToPay = recInterval + Math.abs(daysInAdvance);
-      } else {
-        // Exactly on schedule
-        actualAmount = recAmount;
-        paymentType = 'regular';
-        daysToPay = recInterval;
-      }
-      
-      // Calculate new advance for next payment
-      // Calculate days until next payment
-      const nextPayment = new Date(currentPaymentDate);
-      nextPayment.setMonth(nextPayment.getMonth() + 1);
-      const daysUntilNextPayment = Math.floor((nextPayment - currentPaymentDate) / (1000 * 60 * 60 * 24));
-      daysInAdvance = recInterval - daysUntilNextPayment;
+      // Normal recurring payment (proportional to days in month)
+      daysCovered = daysInMonth;
+      amount = recAmount * (daysInMonth / recInterval);
+      paymentType = 'recurring';
+      explanation = `Recurring: ${daysInMonth} days`;
     }
-    
-    const feeAmount = (recAmount * feePercent) / 100;
-    const totalAmount = actualAmount + feeAmount;
     
     simulationState.paymentHistory.push({
-      date: new Date(currentPaymentDate),
-      paymentForMonth: paymentForMonth,
+      date: new Date(currentBillingDate),
       platform: platformName,
-      paymentDay: paymentDay,
+      billingDay: billingDay,
       recAmount: recAmount,
-      actualAmount: actualAmount,
-      feeAmount: feeAmount,
-      feePercent: feePercent,
-      totalAmount: totalAmount,
+      recInterval: recInterval,
       paymentType: paymentType,
-      daysCovered: daysSinceLastPayment,
-      daysToPay: daysToPay,
-      daysInAdvance: daysInAdvance,
-      recInterval: recInterval
+      actualAmount: amount,
+      totalAmount: amount,
+      daysCovered: daysCovered,
+      explanation: explanation
     });
     
-    // Move to next payment date
-    if (paymentType === 'first') {
-      // After first payment, jump to the payment day
-      lastPaymentDate = new Date(currentPaymentDate);
-      currentPaymentDate = new Date(nextPaymentDay);
-    } else {
-      // Regular monthly increment
-      lastPaymentDate = new Date(currentPaymentDate);
-      currentPaymentDate.setMonth(currentPaymentDate.getMonth() + 1);
-    }
+    // Move to next billing date
+    currentBillingDate.setMonth(currentBillingDate.getMonth() + 1);
   }
 }
 
 function renderSimulationResults() {
   const payments = simulationState.paymentHistory;
-
-  // Calculate summary stats
-  const totalPayments = payments.length;
   const totalAmount = payments.reduce((sum, p) => sum + p.totalAmount, 0);
-  const avgPayment = totalPayments > 0 ? totalAmount / totalPayments : 0;
-  const adjustedPayments = payments.filter(p => p.paymentType === 'adjusted').length;
 
-  // Render summary stats
+  // Get simulation parameters
+  const accountCreated = simulationState.accountCreationDate;
+  const initialAmount = payments[0]?.initialAmount || 0;
+  const initialInterval = payments[0]?.initialInterval || 0;
+  const recAmount = payments[0]?.recAmount || 0;
+  const recInterval = payments[0]?.recInterval || 0;
+  const billingDay = payments[0]?.billingDay || 1;
+  const platform = payments[0]?.platform || 'Platform';
+
+  // Show parameters and results
   document.getElementById('summaryStats').innerHTML = `
-    <div class="simulation-stat-card">
-      <div class="simulation-stat-label">Total Payments</div>
-      <div class="simulation-stat-value">${totalPayments}</div>
-    </div>
-    <div class="simulation-stat-card">
-      <div class="simulation-stat-label">Total Amount</div>
-      <div class="simulation-stat-value">$${totalAmount.toFixed(2)}</div>
-    </div>
-    <div class="simulation-stat-card">
-      <div class="simulation-stat-label">Average Payment</div>
-      <div class="simulation-stat-value">$${avgPayment.toFixed(2)}</div>
-    </div>
-    <div class="simulation-stat-card">
-      <div class="simulation-stat-label">Adjusted Payments</div>
-      <div class="simulation-stat-value">${adjustedPayments}</div>
+    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+      <h3 style="margin: 0 0 16px 0; color: #334155; font-size: 18px; font-weight: 600;">Simulation Parameters</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; font-size: 14px;">
+        <div>
+          <div style="color: #64748b; margin-bottom: 4px;">Account Created</div>
+          <div style="font-weight: 600; color: #334155;">${accountCreated.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+        </div>
+        <div>
+          <div style="color: #64748b; margin-bottom: 4px;">Billing Day</div>
+          <div style="font-weight: 600; color: #334155;">${billingDay}</div>
+        </div>
+        <div>
+          <div style="color: #64748b; margin-bottom: 4px;">Initial Payment</div>
+          <div style="font-weight: 600; color: #334155;">${initialAmount.toFixed(2)} / ${initialInterval} days</div>
+        </div>
+        <div>
+          <div style="color: #64748b; margin-bottom: 4px;">Recurring</div>
+          <div style="font-weight: 600; color: #334155;">${recAmount.toFixed(2)} / ${recInterval} days</div>
+        </div>
+        <div>
+          <div style="color: #64748b; margin-bottom: 4px;">Platform</div>
+          <div style="font-weight: 600; color: #334155;">${platform}</div>
+        </div>
+        <div>
+          <div style="color: #64748b; margin-bottom: 4px;">Total (5 months)</div>
+          <div style="font-weight: 700; color: #3b82f6; font-size: 18px;">${totalAmount.toFixed(2)}</div>
+        </div>
+      </div>
     </div>
   `;
 
-  // Set current date to today
-  const today = new Date();
-  document.getElementById('simulationCurrentDate').valueAsDate = today;
+  // Render payment list
+  document.getElementById('simulationCalendar').innerHTML = `
+    <div style="background: white; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+      <h3 style="margin: 0 0 16px 0; color: #334155; font-size: 18px; font-weight: 600;">Payment Schedule</h3>
+      <div style="display: flex; flex-direction: column; gap: 12px;">
+        ${payments.map(p => `
+          <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+                      border: 1px solid #e2e8f0;
+                      border-radius: 10px; padding: 16px; cursor: pointer; transition: all 0.2s;"
+               onclick='showPaymentDetailsSimple(${JSON.stringify(p).replace(/'/g, "&#39;")})'
+               onmouseover="this.style.borderColor='#cbd5e1'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 6px rgba(0, 0, 0, 0.05)'"
+               onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 16px; font-weight: 600; color: #334155; margin-bottom: 4px;">
+                  ${p.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                </div>
+                <div style="font-size: 13px; color: #64748b;">
+                  ${p.paymentType === 'first' ? 'First Payment' : p.paymentType === 'prorata' ? 'Prorata' : 'Recurring'}
+                  ${p.explanation ? ` • ${p.explanation}` : ''}
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 24px; font-weight: 700; color: #3b82f6;">
+                  ${p.totalAmount.toFixed(2)}
+                </div>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
 
-  // Render calendar for current month
-  renderSimulationCalendar(today);
-
-  // Check if today has payment
-  checkDateForPayment(today);
-
-  // Add event listener for date change
-  document.getElementById('simulationCurrentDate').addEventListener('change', function() {
-    const selectedDate = new Date(this.value);
-    renderSimulationCalendar(selectedDate);
-    checkDateForPayment(selectedDate);
-  });
+  // Show placeholder in details panel
+  document.getElementById('simulationPaymentDetails').innerHTML = `
+    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 12px; padding: 48px; text-align: center; border: 1px solid #e2e8f0;">
+      <div style="color: #64748b; font-size: 16px;">Select a payment to view details</div>
+    </div>
+  `;
 }
+
 
 
 function renderSimulationCalendar(currentDate) {
@@ -1189,14 +1239,9 @@ function showPaymentDetails(payment, showHistory = false) {
 
   if (payment.paymentType === 'first') {
     statusBadge = '<span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">FIRST PAYMENT</span>';
-  } else if (payment.paymentType === 'adjusted') {
-    statusBadge = '<span style="background: #f59e0b; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">ADJUSTED</span>';
-    statusColor = '#f59e0b';
-  } else if (payment.paymentType === 'overdue') {
-    statusBadge = '<span style="background: #ef4444; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">OVERDUE</span>';
-    statusColor = '#ef4444';
-  } else {
-    statusBadge = '<span style="background: #10b981; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">REGULAR</span>';
+  } else if (payment.paymentType === 'recurring') {
+    statusBadge = '<span style="background: #667eea; color: white; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600;">RECURRING</span>';
+    statusColor = '#667eea';
   }
 
   // Get payment history (all payments from account creation to current date)
@@ -1210,7 +1255,7 @@ function showPaymentDetails(payment, showHistory = false) {
             ${payment.date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </div>
           <div style="font-size: 13px; color: #6b7280; margin-bottom: 8px;">
-            Payment for ${payment.paymentForMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            ${payment.paymentForMonth ? `Payment for ${payment.paymentForMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}` : 'Payment'}
           </div>
           ${statusBadge}
         </div>
@@ -1223,58 +1268,32 @@ function showPaymentDetails(payment, showHistory = false) {
       </div>
 
       <div style="background: #f9fafb; border-radius: 8px; padding: 16px; font-size: 13px; color: #374151; line-height: 1.8;">
-        <div style="font-weight: 700; color: #667eea; margin-bottom: 12px; font-size: 14px;"> Calculation Logic</div>
+        <div style="font-weight: 700; color: #667eea; margin-bottom: 12px; font-size: 14px;">📊 Calculation Logic</div>
         ${payment.paymentType === 'first' ? `
-          <div style="margin-bottom: 8px;"><strong> First Payment (Full Price)</strong></div>
+          <div style="margin-bottom: 8px;"><strong>🎉 First Payment (Initial + Prorata)</strong></div>
           <div style="padding-left: 16px; border-left: 3px solid #10b981;">
             • Account created: ${simulationState.accountCreationDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}<br>
-            • Payment day set to: ${payment.paymentDay}<br>
-            • Days until next payment day: ${payment.daysCovered} days<br>
-            • Recurring interval: ${payment.recInterval} days<br>
+            • First billing date: ${payment.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}<br>
             <br>
             <strong>Calculation:</strong><br>
-            • Base amount: $${payment.recAmount.toFixed(2)} (for ${payment.recInterval} days)<br>
-            • Fee (${payment.feePercent}%): $${payment.feeAmount.toFixed(2)}<br>
+            • Initial amount: $${payment.initialAmount.toFixed(2)}<br>
+            ${payment.prorataDays > 0 ? `
+            • Prorata days: ${payment.prorataDays} days<br>
+            • Prorata amount: $${payment.prorataAmount.toFixed(2)}<br>
+            ` : '• No prorata needed<br>'}
             • <strong>Total: $${payment.totalAmount.toFixed(2)}</strong><br>
             <br>
-            <strong>Days in advance:</strong> ${payment.recInterval} - ${payment.daysCovered} = <strong>${payment.daysInAdvance} days</strong><br>
-            <span style="color: #6b7280; font-size: 12px;">→ Next payment will be adjusted by ${payment.daysInAdvance} days</span>
+            <span style="color: #6b7280; font-size: 12px;">→ Covers ${payment.daysCovered} days total</span>
           </div>
         ` : `
-          <div style="margin-bottom: 8px;"><strong>${payment.paymentType === 'adjusted' ? ' Adjusted Payment' : payment.paymentType === 'overdue' ? '⚠️ Overdue Payment' : '✓ Regular Payment'}</strong></div>
-          <div style="padding-left: 16px; border-left: 3px solid ${payment.paymentType === 'adjusted' ? '#f59e0b' : payment.paymentType === 'overdue' ? '#ef4444' : '#10b981'};">
-            • Days since last payment: ${payment.daysCovered} days<br>
-            • Recurring interval: ${payment.recInterval} days<br>
-            ${payment.daysInAdvance > 0 ? `• Days in advance from previous: <strong>${payment.daysInAdvance} days</strong><br>` : ''}
-            ${payment.daysInAdvance < 0 ? `• Days owed from previous: <strong>${Math.abs(payment.daysInAdvance)} days</strong><br>` : ''}
+          <div style="margin-bottom: 8px;"><strong>🔄 Recurring Payment</strong></div>
+          <div style="padding-left: 16px; border-left: 3px solid #667eea;">
+            • Days since last billing: ${payment.daysCovered} days<br>
             <br>
             <strong>Calculation:</strong><br>
-            • Base recurring amount: $${payment.recAmount.toFixed(2)} (for ${payment.recInterval} days)<br>
-            • Price per day: $${(payment.recAmount / payment.recInterval).toFixed(2)}<br>
-            ${payment.daysInAdvance > 0 ? `
-            • Advance credit: ${payment.daysInAdvance} days × $${(payment.recAmount / payment.recInterval).toFixed(2)} = $${((payment.recAmount / payment.recInterval) * payment.daysInAdvance).toFixed(2)}<br>
-            • Adjusted amount: $${payment.recAmount.toFixed(2)} - $${((payment.recAmount / payment.recInterval) * payment.daysInAdvance).toFixed(2)} = <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
-            • Paying for: ${payment.daysToPay} days (${payment.recInterval} - ${payment.daysInAdvance})<br>
-            ` : payment.daysInAdvance < 0 ? `
-            • Owed amount: ${Math.abs(payment.daysInAdvance)} days × $${(payment.recAmount / payment.recInterval).toFixed(2)} = $${((payment.recAmount / payment.recInterval) * Math.abs(payment.daysInAdvance)).toFixed(2)}<br>
-            • Adjusted amount: $${payment.recAmount.toFixed(2)} + $${((payment.recAmount / payment.recInterval) * Math.abs(payment.daysInAdvance)).toFixed(2)} = <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
-            • Paying for: ${payment.daysToPay} days (${payment.recInterval} + ${Math.abs(payment.daysInAdvance)})<br>
-            ` : `
-            • No adjustment needed (exactly on schedule)<br>
-            • Amount: <strong>$${payment.actualAmount.toFixed(2)}</strong><br>
-            • Paying for: ${payment.daysToPay} days<br>
-            `}
-            • Fee (${payment.feePercent}%): $${payment.feeAmount.toFixed(2)}<br>
-            • <strong>Total: $${payment.totalAmount.toFixed(2)}</strong><br>
+            • Amount: $${payment.totalAmount.toFixed(2)}<br>
             <br>
-            ${(() => {
-              const nextPayment = new Date(payment.date);
-              nextPayment.setMonth(nextPayment.getMonth() + 1);
-              const daysUntilNext = Math.floor((nextPayment - payment.date) / (1000 * 60 * 60 * 24));
-              const newAdvance = payment.recInterval - daysUntilNext;
-              return `<strong>New advance for next payment:</strong> ${payment.recInterval} - ${daysUntilNext} = <strong>${newAdvance} days</strong><br>
-              <span style="color: #6b7280; font-size: 12px;">→ Next payment on ${nextPayment.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} will be ${newAdvance > 0 ? 'reduced' : newAdvance < 0 ? 'increased' : 'regular'}</span>`;
-            })()}
+            <span style="color: #6b7280; font-size: 12px;">→ Proportional to days between billing dates</span>
           </div>
         `}
       </div>
@@ -1282,7 +1301,7 @@ function showPaymentDetails(payment, showHistory = false) {
       ${!showHistory && history.length > 1 ? `
         <button class="um-btn um-btn--ghost" onclick="showPaymentDetails(simulationState.paymentHistory.find(p => p.date.getTime() === ${payment.date.getTime()}), true)"
                 style="width: 100%; margin-top: 16px;">
-           Show Complete Payment History (${history.length} total payments)
+          📜 Show Complete Payment History (${history.length} total payments)
         </button>
       ` : ''}
     </div>
@@ -1291,7 +1310,7 @@ function showPaymentDetails(payment, showHistory = false) {
   if (showHistory && history.length > 0) {
     html += `
       <div style="background: white; border: 2px solid #e5e7eb; border-radius: 12px; padding: 24px;">
-        <h4 style="margin: 0 0 16px 0; color: #374151; font-size: 16px; font-weight: 700;"> Complete Payment History</h4>
+        <h4 style="margin: 0 0 16px 0; color: #374151; font-size: 16px; font-weight: 700;">📜 Complete Payment History</h4>
         <div style="font-size: 13px; color: #6b7280; margin-bottom: 16px;">
           From account creation (${simulationState.accountCreationDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })})
           to ${payment.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
@@ -1314,8 +1333,8 @@ function showPaymentDetails(payment, showHistory = false) {
                   ${h.date.getTime() === payment.date.getTime() ? '<span style="color: #667eea; font-size: 12px; margin-left: 8px;">← Current</span>' : ''}
                 </div>
                 <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
-                  ${h.paymentType === 'first' ? ' First payment' : h.paymentType === 'adjusted' ? ' Adjusted' : h.paymentType === 'overdue' ? ' Overdue' : '✓ Regular'}
-                  • For ${h.paymentForMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                  ${h.paymentType === 'first' ? '🎉 First payment' : '🔄 Recurring'}
+                  ${h.paymentForMonth ? `• For ${h.paymentForMonth.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}` : ''}
                 </div>
               </div>
               <div style="display: flex; align-items: center; gap: 12px;">
@@ -1323,7 +1342,7 @@ function showPaymentDetails(payment, showHistory = false) {
                   $${h.totalAmount.toFixed(2)}
                 </div>
                 <div style="font-size: 12px; color: #9ca3af;">
-                   View
+                  👁️ View
                 </div>
               </div>
             </div>
@@ -1350,6 +1369,7 @@ function showPaymentDetails(payment, showHistory = false) {
 
   document.getElementById('simulationPaymentDetails').innerHTML = html;
 }
+
 
 
 function resetSimulation() {
