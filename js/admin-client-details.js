@@ -960,41 +960,46 @@ function runSimulation() {
 function calculateSimulationPayments(startDate, endDate, billingDay, initialAmount, initialInterval, recAmount, recInterval, platformName) {
   simulationState.paymentHistory = [];
   
-  // Helper functions
-  const daysBetween = (date1, date2) => Math.floor((date2 - date1) / (1000 * 60 * 60 * 24));
+  // Helper functions - normalize dates to midnight to avoid timezone issues
+  const normalizeDate = (date) => {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+  };
+  
+  const daysBetween = (date1, date2) => {
+    const d1 = normalizeDate(date1);
+    const d2 = normalizeDate(date2);
+    return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+  };
+  
   const addDays = (date, days) => {
-    const result = new Date(date);
+    const result = normalizeDate(date);
     result.setDate(result.getDate() + days);
     return result;
   };
   
-  const creationDate = new Date(startDate);
-  
-  // 1️⃣ Calculate when initial interval ends
+  const creationDate = normalizeDate(new Date(startDate));
+
   const initialEndDate = addDays(creationDate, initialInterval);
-  
-  // 2️⃣ Find first billing date (first occurrence of billingDay after creation)
-  let firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth(), billingDay);
+ 
+  let firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth(), billingDay, 0, 0, 0, 0);
   if (firstBillingDate <= creationDate) {
-    firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth() + 1, billingDay);
+    firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth() + 1, billingDay, 0, 0, 0, 0);
   }
-  
-  // 3️⃣ Calculate prorata for first billing
-  const billingMonthEnd = new Date(firstBillingDate.getFullYear(), firstBillingDate.getMonth() + 1, 0);
+ 
+  const billingMonthEnd = new Date(firstBillingDate.getFullYear(), firstBillingDate.getMonth() + 1, 0, 0, 0, 0, 0);
   
   let prorataDays = 0;
   let prorataAmount = 0;
   
-  // If initial interval ends before the end of billing month, we need prorata
   if (initialEndDate < billingMonthEnd) {
+    // Count days from day after initialEndDate to end of month (inclusive)
     prorataDays = daysBetween(initialEndDate, billingMonthEnd);
     const dailyRate = recAmount / recInterval;
     prorataAmount = prorataDays * dailyRate;
   }
   
   const firstInvoiceAmount = initialAmount + prorataAmount;
-  
-  // 4️⃣ Add first invoice
+
   simulationState.paymentHistory.push({
     date: new Date(firstBillingDate),
     platform: platformName,
@@ -1012,8 +1017,7 @@ function calculateSimulationPayments(startDate, endDate, billingDay, initialAmou
     daysCovered: initialInterval + prorataDays,
     explanation: `Initial: $${initialAmount} + Prorata: $${prorataAmount.toFixed(2)}`
   });
-  
-  // 5️⃣ Calculate subsequent recurring payments
+
   let currentBillingDate = new Date(firstBillingDate);
   currentBillingDate.setMonth(currentBillingDate.getMonth() + 1);
   
@@ -1027,10 +1031,7 @@ function calculateSimulationPayments(startDate, endDate, billingDay, initialAmou
     let paymentType = 'recurring';
     let explanation = '';
     
-    // Check if this month is partially covered by initial interval
     if (initialEndDate >= currentMonthStart && initialEndDate < currentMonthEnd) {
-      // Part of this month is covered by initial interval
-      // We only charge for days after initialEndDate
       const uncoveredDays = daysBetween(initialEndDate, currentMonthEnd);
       daysCovered = uncoveredDays;
       const dailyRate = recAmount / recInterval;
@@ -1038,11 +1039,9 @@ function calculateSimulationPayments(startDate, endDate, billingDay, initialAmou
       paymentType = 'prorata';
       explanation = `Prorata: days ${initialEndDate.getDate() + 1}-${currentMonthEnd.getDate()} (${uncoveredDays} days)`;
     } else if (initialEndDate >= currentMonthEnd) {
-      // This entire month is covered by initial interval - skip
       currentBillingDate.setMonth(currentBillingDate.getMonth() + 1);
       continue;
     } else {
-      // Normal recurring payment (proportional to days in month)
       daysCovered = daysInMonth;
       amount = recAmount * (daysInMonth / recInterval);
       paymentType = 'recurring';
@@ -1062,7 +1061,6 @@ function calculateSimulationPayments(startDate, endDate, billingDay, initialAmou
       explanation: explanation
     });
     
-    // Move to next billing date
     currentBillingDate.setMonth(currentBillingDate.getMonth() + 1);
   }
 }
@@ -1071,7 +1069,6 @@ function renderSimulationResults() {
   const payments = simulationState.paymentHistory;
   const totalAmount = payments.reduce((sum, p) => sum + p.totalAmount, 0);
 
-  // Get simulation parameters
   const accountCreated = simulationState.accountCreationDate;
   const initialAmount = payments[0]?.initialAmount || 0;
   const initialInterval = payments[0]?.initialInterval || 0;
@@ -1080,7 +1077,6 @@ function renderSimulationResults() {
   const billingDay = payments[0]?.billingDay || 1;
   const platform = payments[0]?.platform || 'Platform';
 
-  // Show parameters and results
   document.getElementById('summaryStats').innerHTML = `
     <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 12px; padding: 24px; margin-bottom: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
       <h3 style="margin: 0 0 16px 0; color: #334155; font-size: 18px; font-weight: 600;">Simulation Parameters</h3>
@@ -1113,7 +1109,6 @@ function renderSimulationResults() {
     </div>
   `;
 
-  // Render payment list
   document.getElementById('simulationCalendar').innerHTML = `
     <div style="background: white; border-radius: 12px; padding: 24px; border: 1px solid #e2e8f0; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
       <h3 style="margin: 0 0 16px 0; color: #334155; font-size: 18px; font-weight: 600;">Payment Schedule</h3>
@@ -1147,7 +1142,6 @@ function renderSimulationResults() {
     </div>
   `;
 
-  // Show placeholder in details panel
   document.getElementById('simulationPaymentDetails').innerHTML = `
     <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 12px; padding: 48px; text-align: center; border: 1px solid #e2e8f0;">
       <div style="color: #64748b; font-size: 16px;">Select a payment to view details</div>

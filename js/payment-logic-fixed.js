@@ -4,33 +4,43 @@
 function calculateSimulationPayments(startDate, endDate, billingDay, initialAmount, initialInterval, recAmount, recInterval, platformName) {
   simulationState.paymentHistory = [];
   
-  // Helper functions
-  const daysBetween = (date1, date2) => Math.floor((date2 - date1) / (1000 * 60 * 60 * 24));
+  // Helper functions - normalize dates to midnight to avoid timezone issues
+  const normalizeDate = (date) => {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0, 0);
+  };
+  
+  const daysBetween = (date1, date2) => {
+    const d1 = normalizeDate(date1);
+    const d2 = normalizeDate(date2);
+    return Math.round((d2 - d1) / (1000 * 60 * 60 * 24));
+  };
+  
   const addDays = (date, days) => {
-    const result = new Date(date);
+    const result = normalizeDate(date);
     result.setDate(result.getDate() + days);
     return result;
   };
   
-  const creationDate = new Date(startDate);
+  const creationDate = normalizeDate(new Date(startDate));
   
   // 1️⃣ Calculate when initial interval ends
   const initialEndDate = addDays(creationDate, initialInterval);
   
   // 2️⃣ Find first billing date (first occurrence of billingDay after creation)
-  let firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth(), billingDay);
+  let firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth(), billingDay, 0, 0, 0, 0);
   if (firstBillingDate <= creationDate) {
-    firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth() + 1, billingDay);
+    firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth() + 1, billingDay, 0, 0, 0, 0);
   }
   
   // 3️⃣ Calculate prorata for first billing
-  const billingMonthEnd = new Date(firstBillingDate.getFullYear(), firstBillingDate.getMonth() + 1, 0);
+  const billingMonthEnd = new Date(firstBillingDate.getFullYear(), firstBillingDate.getMonth() + 1, 0, 0, 0, 0, 0);
   
   let prorataDays = 0;
   let prorataAmount = 0;
   
   // If initial interval ends before the end of billing month, we need prorata
   if (initialEndDate < billingMonthEnd) {
+    // Count days from day after initialEndDate to end of month (inclusive)
     prorataDays = daysBetween(initialEndDate, billingMonthEnd);
     const dailyRate = recAmount / recInterval;
     prorataAmount = prorataDays * dailyRate;
