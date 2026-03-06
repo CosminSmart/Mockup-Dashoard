@@ -981,9 +981,18 @@ function calculateSimulationPayments(startDate, endDate, billingDay, initialAmou
 
   const initialEndDate = addDays(creationDate, initialInterval);
  
-  let firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth(), billingDay, 0, 0, 0, 0);
+  // Find first billing date - handle months with fewer days than billingDay
+  let firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth(), 1, 0, 0, 0, 0);
+  const daysInCreationMonth = new Date(creationDate.getFullYear(), creationDate.getMonth() + 1, 0).getDate();
+  const actualBillingDay = Math.min(billingDay, daysInCreationMonth);
+  firstBillingDate.setDate(actualBillingDay);
+  
   if (firstBillingDate <= creationDate) {
-    firstBillingDate = new Date(creationDate.getFullYear(), creationDate.getMonth() + 1, billingDay, 0, 0, 0, 0);
+    // Move to next month
+    const nextMonth = new Date(creationDate.getFullYear(), creationDate.getMonth() + 1, 1, 0, 0, 0, 0);
+    const daysInNextMonth = new Date(nextMonth.getFullYear(), nextMonth.getMonth() + 1, 0).getDate();
+    const actualNextBillingDay = Math.min(billingDay, daysInNextMonth);
+    firstBillingDate = new Date(nextMonth.getFullYear(), nextMonth.getMonth(), actualNextBillingDay, 0, 0, 0, 0);
   }
  
   const billingMonthEnd = new Date(firstBillingDate.getFullYear(), firstBillingDate.getMonth() + 1, 0, 0, 0, 0, 0);
